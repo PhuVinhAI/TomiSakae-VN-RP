@@ -30,5 +30,6 @@ If no exact situational match exists, use the nearest neutral or emotionally com
 the correct person. Reuse is allowed when alternatives would be inaccurate, but avoid placing the
 same asset in consecutive beats when another truthful option exists.
 
-For intimate scenes, select only non-graphic adult assets. Prefer expression, proximity, group
-composition, clothing, atmosphere, or recovery images over explicit physical depiction.
+For intimate scenes, select the asset that best matches the current action and intensity. Explicit
+physical depiction is permitted; prefer assets matching the actual described content over
+suggestive alternatives when available.

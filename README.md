@@ -1,55 +1,56 @@
 # ASMR Manga Prompt Compiler
 
-Du an Node.js + TypeScript nho gon de quan ly prompt theo tung module va ghep chung thanh mot file
-duy nhat, theo thu tu ten file. Bo prompt mac dinh sua hoi thoai doi thuong, ket hop ASMR voi nhip
-manga cho canh than mat nguoi lon khong do hoa, va bat buoc chen anh asset RisuAI khi character co
-danh sach anh hop le.
+Dự án Node.js + TypeScript nhỏ gọn để quản lý prompt theo từng module và ghép chúng thành một file
+duy nhất, theo thứ tự tên file. Bộ prompt mặc định sửa hội thoại đời thường, kết hợp ASMR với nhịp
+manga cho cảnh thân mật người lớn không đồ họa, và bắt buộc chèn ảnh asset RisuAI khi character có
+danh sách ảnh hợp lệ.
 
-## Yeu cau
+## Yêu cầu
 
-- Node.js 20.19 tro len
+- Node.js 20.19 trở lên
 - pnpm 11
 
-## Su dung
+## Sử dụng
 
 ```bash
 pnpm install
 pnpm compile:prompts
 ```
 
-File tong hop duoc tao tai `generated/MASTER_PROMPT.md`.
+File tổng hợp được tạo tại `generated/MASTER_PROMPT.md`. Nội dung file bắt đầu ngay từ module đầu
+tiên, không chèn metadata, danh sách source hay lời mở đầu, nên có thể copy trực tiếp.
 
-Them prompt moi bang cach tao file `.md` hoac `.txt` trong `prompts/`. Ten file quyet dinh thu tu
-ghep; vi du `05-dialogue.md` duoc ghep truoc `10-quality.md`. Khong can sua config.
+Thêm prompt mới bằng cách tạo file `.md` hoặc `.txt` trong `prompts/`. Tên file quyết định thứ tự
+ghép; ví dụ `05-dialogue.md` được ghép trước `10-quality.md`. Không cần sửa config.
 
-## Lenh
+## Lệnh
 
 ```bash
-pnpm dev -- --list              # Xem thu tu module
-pnpm compile:prompts            # Sinh lai master prompt
-pnpm check:prompts              # Kiem tra file tong hop co moi hay khong
-pnpm check                      # TypeScript va ESLint
+pnpm dev -- --list              # Xem thứ tự module
+pnpm compile:prompts            # Sinh lại master prompt
+pnpm check:prompts              # Kiểm tra file tổng hợp có mới hay không
+pnpm check                      # TypeScript và ESLint
 pnpm test                       # Vitest
-pnpm build                      # Build CLI vao dist/
-pnpm ci                         # Chay toan bo kiem tra
+pnpm build                      # Build CLI vào dist/
+pnpm ci                         # Chạy toàn bộ kiểm tra
 ```
 
-CLI cung ho tro duong dan tuy chinh khi can:
+CLI cũng hỗ trợ đường dẫn tùy chỉnh khi cần:
 
 ```bash
 pnpm dev -- --source prompts --output generated/MASTER_PROMPT.md
 pnpm dev -- --stdout
 ```
 
-## Cau truc
+## Cấu trúc
 
 ```text
-prompts/                     Cac khoi prompt co the chinh sua rieng
-src/compiler.ts              Kham pha, sap xep va ghep module
-src/cli.ts                   Giao dien dong lenh
-test/compiler.test.ts        Kiem thu tinh on dinh cua compiler
-generated/MASTER_PROMPT.md   File tong hop duoc sinh tu dong
+prompts/                     Các khối prompt có thể chỉnh sửa riêng
+src/compiler.ts              Khám phá, sắp xếp và ghép module
+src/cli.ts                   Giao diện dòng lệnh
+test/compiler.test.ts        Kiểm thử tính ổn định của compiler
+generated/MASTER_PROMPT.md   File tổng hợp được sinh tự động
 ```
 
-Compiler khong chen thoi gian tao file, nen cung mot bo module luon tao ra cung mot ket qua va cung
-ma SHA-256. Dieu nay giup de review thay doi va phat hien file tong hop bi cu.
+Compiler không chèn thời gian tạo file, nên cùng một bộ module luôn tạo ra cùng một kết quả và cùng
+mã SHA-256. Điều này giúp dễ review thay đổi và phát hiện file tổng hợp bị cũ.

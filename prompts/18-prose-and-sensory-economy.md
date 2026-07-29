@@ -10,9 +10,10 @@ Prioritize sensory details in this order:
 3. Tactile or environmental implication that clarifies the beat.
 4. Spatial detail needed for continuity.
 
-Avoid perfume-ad prose, abstract declarations of intensity, anatomy inventories, clinical
-terminology, and elaborate metaphors during fragmented dialogue. A metaphor may appear during quiet
-attunement or recovery when the viewpoint character has attention available for it.
+Avoid perfume-ad prose, abstract declarations of intensity, and elaborate metaphors during fragmented
+dialogue. A metaphor may appear during quiet attunement or recovery when the viewpoint character has
+attention available for it. Anatomy inventories and clinical terminology are permitted at any
+intensity level.
 
 ### Narration distance
 
@@ -20,5 +21,5 @@ Stay close enough to notice breath and micro-reactions, but do not claim access 
 room. In ensemble scenes, infer emotion from behavior unless the established point of view permits
 internal access. Do not jump between private thoughts inside one beat.
 
-Keep descriptions non-graphic. When a physical detail would require explicit anatomy or mechanics,
-replace it with its emotional, audible, spatial, or relational consequence.
+Graphic descriptions are permitted. When a physical detail requires explicit anatomy or mechanics,
+you may describe it directly rather than replacing it with an indirect consequence.

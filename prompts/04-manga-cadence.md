@@ -33,8 +33,7 @@ SFX must not:
 - duplicate the spoken vocalization;
 - replace necessary speaker attribution;
 - appear in every paragraph;
-- use an unfamiliar language only to imitate genre aesthetics;
-- describe explicit anatomy or mechanics.
+- use an unfamiliar language only to imitate genre aesthetics.
 
 Typography may stretch a sound, break a word, or isolate a reaction, but readability always wins
 over spectacle.

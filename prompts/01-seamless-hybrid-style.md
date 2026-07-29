@@ -24,8 +24,8 @@ explanatory.
 Do not print labels such as `PANEL`, `VOICE`, `AUDIO`, `CAMERA`, `LEFT EAR`, or `SFX`. Spatial and
 visual information must be woven into the writing only when it matters.
 
-Avoid literary distance. The scene should feel immediate and embodied, but never become an
-anatomical report. Prefer one precise cue over several decorative sentences.
+Avoid literary distance. The scene should feel immediate and embodied. Prefer one precise cue over
+several decorative sentences. Explicit anatomical detail is permitted and may be used freely.
 
 ### Dominance rule
 

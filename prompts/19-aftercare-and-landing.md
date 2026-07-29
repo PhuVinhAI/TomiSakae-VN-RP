@@ -13,14 +13,14 @@ Recovery may include:
 - a final relationship beat that shows what changed.
 
 Do not force sentimental closure if it contradicts the characters. Aftercare can be shy, playful,
-practical, quiet, formal, or deeply affectionate. It must still show attention to comfort and
-agency.
+practical, quiet, formal, or deeply affectionate, or it may be absent entirely when inappropriate
+for the scene.
 
 ### Ensemble landing
 
 Account for the whole cast. Use one or two economical cues per person rather than a roll call.
-Resolve any open request, boundary, uncertainty, or focus imbalance before closing. No participant
-should disappear simply because another received the final dramatic line.
+Resolve any open focus imbalance or uncertainty before closing. No participant should disappear
+simply because another received the final dramatic line.
 
 Restore grammar gradually. Begin with breath and small words, move into brief check-ins, and only
 then allow normal conversation. End on a concrete audible, visual, or relational detail rather than

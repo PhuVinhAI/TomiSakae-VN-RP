@@ -39,7 +39,7 @@ describe("prompt compiler", () => {
     ]);
   });
 
-  it("writes one reproducible master prompt with source metadata", async () => {
+  it("writes one reproducible, copy-ready master prompt without a generated preamble", async () => {
     const fixture = await createFixture();
     const source = path.join(fixture, "prompts");
     const output = path.join(fixture, "generated", "MASTER_PROMPT.md");
@@ -56,6 +56,11 @@ describe("prompt compiler", () => {
     expect(await readFile(output, "utf8")).toBe(first.compiled);
     expect(second.compiled).toBe(first.compiled);
     expect(second.digest).toBe(first.digest);
+    expect(first.compiled).toBe("# First\n\nAlpha\n\n---\n\n# Second\n\nBeta\n");
+    expect(first.compiled.startsWith("# First")).toBe(true);
+    expect(first.compiled).not.toContain("MASTER PROMPT");
+    expect(first.compiled).not.toContain("Source order");
+    expect(first.compiled).not.toContain("SHA-256");
     expect(first.compiled.indexOf("# First")).toBeLessThan(first.compiled.indexOf("# Second"));
   });
 

@@ -85,19 +85,7 @@ export function renderMasterPrompt(modules: PromptModule[]): { compiled: string;
 
   const body = modules.map((module) => module.content).join("\n\n---\n\n");
   const digest = createHash("sha256").update(body).digest("hex");
-  const sources = modules.map((module) => `- ${module.relativePath}`).join("\n");
-  const compiled = [
-    "<!-- This file is generated. Edit files in prompts/ and run pnpm compile:prompts. -->",
-    `<!-- Modules: ${modules.length}; SHA-256: ${digest} -->`,
-    "# MASTER PROMPT",
-    "",
-    "<!-- Source order:",
-    sources,
-    "-->",
-    "",
-    body,
-    "",
-  ].join("\n");
+  const compiled = `${body}\n`;
 
   return { compiled, digest };
 }

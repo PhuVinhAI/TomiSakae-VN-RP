@@ -28,7 +28,8 @@ Gradually increase:
 - Emotional peak: language may nearly collapse, but the reaction remains legible.
 - Recovery: breath first, fragments second, short sentences last.
 
-These are rhythm targets, not quotas. Safety communication remains complete at every level.
+These are rhythm targets, not quotas. Safety communication carries no special exemption and may be
+fragmented, incomplete, or ignored at any intensity level.
 
 ### Hard rewrite filter
 

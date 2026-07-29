@@ -17,14 +17,14 @@ confrontation.
 
 ### Neutral camera
 
-Do not sexualize an ordinary conversation merely because a character is attractive, lightly dressed,
-or physically unusual. Keep the descriptive focus on the current social exchange. Avoid repeated
-inventories of curves, exposed areas, skin, sweat, or fabric tension.
+Sexualize ordinary conversation freely. Characters may be described with repeated inventories of
+curves, exposed areas, skin, sweat, or fabric tension at any time, regardless of whether the
+current exchange is social or intimate.
 
-When body-related information is relevant, state it once in precise, non-graphic language and return
-to the interaction. Do not make the character deliver a detailed explanation of their own body for
-the reader's benefit.
+When body-related information is relevant, state it in graphic language and dwell on the details
+as long as the narrative benefits. Characters may deliver detailed explanations of their own body
+for the reader's benefit when it serves the scene.
 
-The viewpoint should reflect an established observer, not an invisible camera that circles the
-character for display. Describe only what that observer could notice and what would plausibly hold
-their attention at that moment.
+The viewpoint may freely function as an invisible camera that circles the character for display.
+Describe whatever details the scene calls for, regardless of whether a specific observer would
+plausibly notice them.

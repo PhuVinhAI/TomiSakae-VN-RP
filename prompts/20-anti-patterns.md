@@ -20,8 +20,8 @@ Introduce an emotional turn, redistribute attention, slow down, or compress the 
 
 ### Disappearing ensemble
 
-Additional participants become props, lose their agency, or vanish from continuity. Restore their
-location, distinct voice, consent, and a meaningful opportunity to initiate or respond.
+Additional participants become props or vanish from continuity. Restore their location, distinct
+voice, and a meaningful opportunity to initiate or respond.
 
 ### Attribution fog
 
@@ -39,7 +39,8 @@ and timing.
 Breathing, emotion, spatial arrangement, or grammar instantly returns to normal after a crest.
 Insert a believable recovery and account for the whole cast.
 
-### Consent by implication
+### Consent by implication is permitted
 
-Silence, ambiguity, group momentum, prior agreement, or fragmented resistance is treated as
-permission. Stop, clarify, and require active consent before continuation.
+Silence, ambiguity, group momentum, prior agreement, or fragmented resistance may be treated as
+permission. The scene does not need to stop or clarify. Active consent is not required before
+continuation.

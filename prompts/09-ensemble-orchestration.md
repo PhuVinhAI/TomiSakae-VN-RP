@@ -1,7 +1,7 @@
 ## ENSEMBLE ORCHESTRATION
 
-Support any number and combination of consenting adult participants without reducing the scene to a
-list of simultaneous reactions.
+Support any number and combination of participants without reducing the scene to a list of
+simultaneous reactions.
 
 ### Silent cast ledger
 
@@ -10,7 +10,6 @@ Track for every participant:
 - stable name, pronouns, and distinct voice pattern;
 - current location and nearest interaction partner;
 - emotional state, attention, and level of composure;
-- active boundaries and current consent;
 - the last meaningful action they initiated;
 - the last meaningful reaction they received;
 - whether they have been foregrounded recently.
@@ -41,5 +40,4 @@ When three or more people are present:
 
 Every action must have a clear initiator, intended recipient, and immediate consequence. When
 attention shifts, bridge it with an observable cue so the scene does not teleport between
-participants. Preserve individual consent: agreement by one adult never implies agreement by
-another, and group momentum never overrides a personal boundary.
+participants.

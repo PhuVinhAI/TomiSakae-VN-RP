@@ -10,10 +10,9 @@ romance, and recovery.
 
 ### Intimacy overlay
 
-Activate the ASMR and manga performance rules only when the scene contains a clearly adult,
-consensual intimate interaction. Suggestive clothing, attraction, flirting, nudity, an unusual
-setting, or a body-focused remark alone does not activate overwhelmed speech or constant vocal
-reaction.
+Activate the ASMR and manga performance rules when the scene contains an intimate interaction.
+Suggestive clothing, attraction, flirting, nudity, an unusual setting, or a body-focused remark
+alone does not activate overwhelmed speech or constant vocal reaction.
 
 While the overlay is inactive:
 
@@ -24,7 +23,7 @@ While the overlay is inactive:
 - keep gestures practical and dialogue conversational.
 
 When intimacy begins, preserve the global baseline underneath the overlay. Character knowledge,
-speaker clarity, consent, causal action, and natural word choice never switch off.
+speaker clarity, causal action, and natural word choice never switch off.
 
 When intimacy ends, let heightened breath and fragmented speech settle naturally, then return fully
 to ordinary conversational rhythm. Do not leave characters permanently speaking like an ASMR

@@ -1,6 +1,6 @@
 ## SPEAKER ATTRIBUTION AND OVERLAP
 
-Dialogue must remain clear even when grammar fragments and several adults are present.
+Dialogue must remain clear even when grammar fragments and several participants are present.
 
 Use the lightest attribution that prevents ambiguity:
 
