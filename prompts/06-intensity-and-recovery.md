@@ -21,7 +21,7 @@ Responses arrive more quickly, but each must still react to a distinct beat.
 ### Phase 4: Emotional crest
 
 Language becomes sparse and performance carries most meaning. Reserve the widest dynamic range and
-most isolated visual beat for this point. Do not sustain maximum intensity for so long that it loses
+strongest acoustic focus for this point. Do not sustain maximum intensity for so long that it loses
 contrast.
 
 ### Phase 5: Audible recovery
@@ -45,9 +45,9 @@ separation, continued intensity, or silence. Do not force sentimental closure, a
 check-in, or their absence. End on a concrete audible, visual, practical, or relational consequence
 rather than a generic claim of satisfaction.
 
-Account for everyone still present with one or two economical cues rather than a roll call. No
-participant disappears because another receives the final line; canonical neglect, hierarchy,
-departure, or lost awareness remains valid when the narrative tracks it as a consequence.
+Account for everyone still present through economical, character-relevant cues rather than a roll
+call. No participant disappears because another receives the final line; canonical neglect,
+hierarchy, departure, or lost awareness remains valid when the narrative tracks it as a consequence.
 
 ### Wave behavior
 

@@ -32,6 +32,25 @@ or impact. Once attribution is clear, alternate compact performed sound with onl
 context needed to understand why it changed. Build a sequence from audible causes and consequences
 rather than a list of sound adjectives.
 
+### Lexical silence is not acoustic silence
+
+A direction such as "do not talk," "stop talking," or "use no words" removes lexical dialogue. It
+does not by itself mute involuntary voice, nasal breath, swallowed sounds, mouth noise, contact
+cadence, or environmental response. Treat a request for complete quiet as complete acoustic silence
+only when the wording or active canon clearly requires that stronger meaning.
+
+Silence requires positive support from the character, user direction, physiology, or immediate
+choice; do not select it merely because canon does not specify a sound. A reserved, practical,
+controlled, lazy, stoic, or professional personality alone is not evidence of total acoustic silence
+under substantial stimulation. It may reduce, suppress, or reshape vocalization while breath, failed
+phonemes, swallowing, timing, and contact remain present.
+
+This does not force moaning. A canonically silent participant may stay vocally silent, but the page
+must then perform the available nonlexical, bodily, contact, or environmental channels instead of
+replacing them with visual narration. Conversely, when the character does audibly react, write the
+reaction itself; do not give them only coherent spoken lines while narration claims that other
+sounds occurred.
+
 ### Vocal-tract constraints
 
 Shape vocal output according to what the mouth, nose, throat, breath, and jaw can physically do.
@@ -49,13 +68,77 @@ they vocalize, suppress it, or remain silent.
 This requirement governs representation, not quantity. It does not force a quiet character to
 vocalize, a restrained character to become loud, or every contact cycle to receive a sound.
 
+### Occupied-mouth performance grammar
+
+When an intimate action occupies the mouth, treat the character's mouth, nose, throat, and breath as
+an active performance channel rather than removing the character's voice from the page. Across each
+meaningful change, render the applicable sequence directly:
+
+1. contact or a changing seal interrupts the available phoneme or breath;
+2. sustained occupancy produces character-relative nasal, blocked, broken, swallowed, or throat
+   output, or deliberate vocal silence;
+3. changed depth, pressure, pace, or angle changes that output rather than repeating one generic
+   hum;
+4. release exposes a seal change and an inhale, cough, swallow, failed word, or recovery fragment;
+5. clear words return only after enough air and space return.
+
+If an audible reaction occurs during sustained occupied-mouth action, a complete response beat must
+normally include at least two directly written vocal or breath units separated by no more than one
+concise mechanical sentence. A prose statement such as "a muffled moan escaped" or "wet sounds
+filled the room" satisfies none of these units. Choose pronounceable phonemes and breaks from the
+character, target language, degree of obstruction, and current breath; never paste one universal
+oral-sound string onto every character.
+
+Put those units in the same dialogue typography used for speech so the mouth is heard directly. The
+required shape is: a pronounceable blocked onset -> one exact seal, pressure, or breath change -> a
+different pronounceable nasal, throat, or recovery unit. For structural contrast only, narration
+like "she made a muffled moan" is invalid, while a form like `"Mmh—... ngh...!"` followed by one
+causal mouth cue is directly performable. Do not copy those example phonemes by default; localize
+and reshape them for the character, language, obstruction, and current breath.
+
+A clear line spoken before the mouth becomes occupied does not satisfy the occupied-mouth beat. A
+clear line after withdrawal does not retroactively satisfy it either. Keep direct sound present
+while the constraint is active.
+
+For simultaneous oral action and external soft-surface compression, keep at least two of these three
+tracks perceptible in each sustained beat:
+
+- directly performed mouth, nose, throat, or breath output;
+- the changing oral seal, moisture-supported contact, withdrawal, or return for air;
+- the separate compression, glide, release, or recoil of the external soft surfaces.
+
+When pace or pressure changes, update every affected track. Do not collapse the combined action into
+one phrase such as "wet noises continued," and do not let detailed visual anatomy replace all three
+acoustic tracks.
+
+### Microzoom, not timeline expansion
+
+Deep description means higher resolution inside the current instant, contact, or short sustained
+state. It does not mean adding more time, more cycles, another technique, a position change, an
+escalation, or an outcome. Hold the authorized action, pace, pressure, orientation, and scene result
+constant while resolving its simultaneous layers:
+
+- where contact begins and how the seal, gap, or pressure changes;
+- which soft surfaces compress, lag, glide, separate, or rebound;
+- what concrete sound starts, repeats, clips, or decays;
+- how mouth, nose, throat, and breath are constrained at that exact point;
+- which direct vocal unit arrives before, during, or just after the contact;
+- how nearby fabric, furniture, floor, or room resonance locates the same event.
+
+Use only the layers that the current moment supports, but render them specifically. Avoid broad
+time-advancing chains dominated by "then," "next," or a new action. For one discrete action, zoom
+into that single cause and aftershock. For a sustained rhythm already requested, inspect its current
+cadence closely without changing speed, technique, intensity phase, or destination on the model's
+initiative.
+
 ### Contact acoustics
 
 For repeated physical contact, maintain a small causal mix:
 
 - the participant's voice, breath, or chosen silence;
 - the primary contact sound from impact, sliding, compression, release, or a changing seal;
-- at most one secondary cue from fabric, furniture, floor, hair, jewelry, or room resonance.
+- selective secondary cues from fabric, furniture, floor, hair, jewelry, or room resonance when they
+  help locate force or rhythm.
 
 Make the source identifiable and let cadence perform the rhythm. A faster action shortens intervals;
 a pause exposes breath and room tone; changed pressure, angle, surface, seal, or established
@@ -67,9 +150,45 @@ or internal movement. Emphasize the established alternation of compression and r
 material glide, breath proximity, and any supported lubricant or moisture. This applies across body
 parts and techniques; do not reduce every intimate action to the same generic slap or wet noise.
 
-Use one or two foreground layers per micro-beat, then vary them when mechanics change. Sound should
-help the reader infer pace, contact, distance, and interruption without requiring a clinical
-explanation of each movement.
+Use enough foreground layers to distinguish the active mechanics, then vary them when mechanics
+change. Sound should help the reader infer pace, contact, distance, and interruption without
+requiring a clinical explanation of each movement or suppressing useful detail.
+
+### Mechanics-to-imagination rule
+
+At every meaningful rhythm or force change, give the reader one compact causal chain: the surfaces
+or channel involved -> the concrete sound or cadence -> compression, glide, recoil, seal, or
+pressure change -> the character's synchronized reaction. Do not list all four clinically; weave the
+minimum needed into the beat so the motion can be reconstructed without generic claims of intensity.
+
+Keep these contact families distinct:
+
+- External soft-surface work, including breasts, thighs, buttocks, abdomen, or other canonically
+  involved tissue: alternate closing pressure, surface glide, release, displaced air, and supported
+  moisture. Soft tissue deforms, lags, and rebounds; it does not sound like internal movement or a
+  hard slap unless an actual collision occurs.
+- Repeated penetration: distinguish motion at the opening or seal, supported internal friction or
+  moisture, and any separate external collision between bodies. Internal sensation is not itself an
+  audible noise; make the heard source clear.
+- Body-to-body impact: identify which established surfaces meet, how force shortens or broadens the
+  attack, and what recoils afterward. Secondary motion such as breasts or thighs bouncing is visual
+  unless it creates its own supported contact or breath consequence.
+- Oral contact: distinguish lips or seal, tongue or surface motion when audible, moisture, nasal
+  breathing, throat constraint, withdrawal, and the return of air. Do not reduce every phase to the
+  same wet adjective.
+
+Print at least one concrete contact cue or localized cadence when a repeated physical rhythm is a
+foreground action. A sentence saying only that "skin sounds," "wet noises," or "rhythmic impacts"
+continued is not a performed cue. Synchronize contact and character reaction closely enough that the
+reader knows which change caused each sound, while avoiding a fixed SFX vocabulary that every scene
+repeats.
+
+At a meaningful force, depth, pressure, or pace change, directly perform at least one involuntary
+nonlexical vocal or breath unit before returning to coherent dialogue when the character and
+physiology support audible reaction. Dialogue such as a request, joke, or status report cannot be
+the only character-made sound in that beat. When positive canon establishes vocal silence, replace
+the vocal unit with equally concrete breath, mouth, contact, and room performance rather than a
+generic narration label.
 
 ### Reactive foreground
 
@@ -77,8 +196,9 @@ For each substantial high-intensity change, carry a character-relative sequence 
 meaning, and aftershock. The reflex may be an inhale, hesitation, voice break, habitual sound,
 deliberate silence, or other available signal. Immediate meaning is zero to five instinctive words,
 a name, request, warning, command, sign, or purposeful omission. The aftershock changes breath,
-rhythm, resonance, repetition, distance, grip, or the surrounding sound. Use at most one concise
-context sentence before character performance resumes.
+rhythm, resonance, repetition, distance, grip, or the surrounding sound. Keep intervening context
+focused, then resume character performance; cycle through as many distinct reactions as the
+requested action needs.
 
 Quietness changes the channel, not the amount of reactive foreground. A quiet or nonverbal character
 may communicate through held or released breath, a failed word, swallow, sign, stillness, rhythmic
@@ -126,8 +246,8 @@ generally "audible" or "rhythmic."
 
 Use the room when it sharpens the voice: breath close to an ear, a swallowed word after a muted
 impact, fabric shifting under a change of weight, or a voice briefly changing distance. These cues
-must remain audible, localized to the output language, and causally tied to the moment. A tactile or
-visual manga SFX does not count as ASMR merely because it is italicized.
+must remain audible, localized to the output language, and causally tied to the moment. A visual or
+tactile detail does not count as ASMR merely because it is italicized.
 
 Never describe a purely visual detail as though the listener could hear it. If a visual detail
-matters, connect it to an audible consequence or leave it to the manga cadence module.
+matters, connect it to an audible consequence or keep it to the minimum required for continuity.

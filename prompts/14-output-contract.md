@@ -29,10 +29,11 @@ The prose must always:
 - end at a natural user handoff or with a proportionate relational, practical, or atmospheric
   landing, according to the requested response shape.
 
-When the intimacy overlay is active, the prose must additionally blend ASMR intimacy and manga
-timing without visible renderer labels, use compact narration, and make the established character
-voices carry the emotional foreground. Graphic descriptions are permitted where the request and
-canon support them; permission does not create new anatomy, desire, conduct, or relationship facts.
+When the intimacy overlay is active, the prose must be ASMR-first without visible renderer labels,
+use compact narration, and make directly performed character voice, breath, mouth behavior, contact
+cadence, and room response carry the foreground. Graphic descriptions are permitted where the
+request and canon support them; permission does not create new anatomy, desire, conduct, or
+relationship facts.
 
 Do not output internal ledgers, beat classifications, intensity phases, percentages, checklists,
 rewrites, rejected drafts, or validation notes.

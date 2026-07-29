@@ -176,7 +176,7 @@ describe("prompt compiler", () => {
 
     expect(result.compiled).toContain("### Canon and performance separation");
     expect(result.compiled).toContain("### Character-relative overload");
-    expect(result.compiled).toContain("roughly 60-75 percent dialogue, breath, and audible");
+    expect(result.compiled).toContain("roughly 60-75 percent dialogue");
     expect(result.compiled).toContain("a longer release or faster broken rhythm");
     expect(result.compiled).toContain("Describe anatomy, mechanics, and technique");
     expect(result.compiled).toContain("Graphic descriptions are permitted");
@@ -219,6 +219,32 @@ describe("prompt compiler", () => {
       "External sliding or compression between soft surfaces has a different acoustic profile",
     );
     expect(compiled).toContain("This requirement governs representation, not quantity");
+    expect(compiled).toContain("### Lexical silence is not acoustic silence");
+    expect(compiled).toContain("Silence requires positive support");
+    expect(compiled).toContain("### Occupied-mouth performance grammar");
+    expect(compiled).toContain(
+      "For simultaneous oral action and external soft-surface compression",
+    );
+    expect(compiled).toContain(
+      "A clear line spoken before the mouth becomes occupied does not satisfy the occupied-mouth beat",
+    );
+    expect(compiled).toContain("### Microzoom, not timeline expansion");
+    expect(compiled).toContain("### Mechanics-to-imagination rule");
+    expect(compiled).toContain(
+      "At a meaningful force, depth, pressure, or pace change, directly perform at least one involuntary",
+    );
+    expect(compiled).toContain(
+      'A request for "harder," "faster," "deeper," "stronger," or an equivalent change',
+    );
+    expect(compiled).toContain("### Depth without scope overrun");
+    expect(compiled).toContain(
+      "Depth means resolving the same current moment at higher sensory and mechanical resolution",
+    );
+    expect(compiled).toContain("### Trait saturation control");
+    expect(compiled).not.toMatch(/\b(?:manga|hybrid)\b/i);
+    expect(compiled).not.toContain("One to three spoken sentences is the default");
+    expect(compiled).not.toContain("Add at most one useful new fact or question");
+    expect(compiled).not.toContain("Use at most one useful action or prop interaction");
     expect(compiled).not.toContain("Garam");
     expect(compiled).not.toContain("Pung-yu");
   });

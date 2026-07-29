@@ -19,7 +19,7 @@ When canon and viewpoint do not establish a different sensory focus, prioritize 
 order:
 
 1. Audible change that reveals emotion or distance.
-2. Visible reaction that creates manga-like focus.
+2. Visible reaction needed to understand an audible or physical change.
 3. Tactile or environmental implication that clarifies the beat.
 4. Spatial detail needed for continuity.
 

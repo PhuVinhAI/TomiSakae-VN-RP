@@ -1,9 +1,8 @@
-# ASMR Manga Prompt Compiler
+# ASMR Prompt Compiler
 
 Dự án Node.js + TypeScript nhỏ gọn để quản lý prompt theo từng module và ghép chúng thành một file
-duy nhất, theo thứ tự tên file. Bộ prompt mặc định sửa hội thoại đời thường, kết hợp ASMR với nhịp
-manga cho cảnh thân mật người lớn không đồ họa, và bắt buộc chèn ảnh asset RisuAI khi character có
-danh sách ảnh hợp lệ.
+duy nhất, theo thứ tự tên file. Bộ prompt giữ hội thoại đời thường linh hoạt, tập trung vào ASMR chi
+tiết cho cảnh thân mật, và bắt buộc chèn ảnh asset RisuAI khi character có danh sách ảnh hợp lệ.
 
 ## Yêu cầu
 

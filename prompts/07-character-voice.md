@@ -46,6 +46,20 @@ relational consequence. Do not name a feeling merely to force progression, and d
 emotion already clear from the line or behavior. A sourced trait may be reinforced rather than
 changed when the beat makes that meaningful.
 
+### Trait saturation control
+
+No single job, hobby, vice, slogan, archetype, or personality adjective may become the metaphor for
+every action. A merchant need not price every feeling, a professional need not call every intimate
+beat work or service, and a playful character need not turn every response into a joke unless canon
+establishes that exact saturation. Once a motif has identified the voice, let choices, timing,
+competence, restraint, vocabulary, and consequences carry the character without repeating its
+keyword.
+
+Under rising pressure, a signature motif may shorten, fail, recur with changed meaning, or disappear
+while attention narrows. Do not restore the full occupational joke, catchphrase, or self-explanation
+in every beat merely to prove character fidelity. Variety must still sound like the same person, but
+identity is broader than one recurring bit.
+
 ### Anti-template test
 
 Do not replace established characterization with an unsupported stock romantic, seductive,

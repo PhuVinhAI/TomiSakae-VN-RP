@@ -1,7 +1,7 @@
 {
-  "name": "asmr-manga-prompt-compiler",
+  "name": "asmr-prompt-compiler",
   "version": "1.0.0",
-  "description": "Deterministic compiler for modular ASMR and manga-style prompt files.",
+  "description": "Deterministic compiler for modular ASMR-first prompt files.",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.9.0",

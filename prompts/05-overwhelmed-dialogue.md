@@ -57,6 +57,12 @@ between audible interruptions. Count a repeated name, a broken command, or one i
 word as a purposeful unit. Do not join several short fragments into a sentence that still performs a
 complete explanation.
 
+These limits apply to each breath-bound spoken unit, not to the number of reactions, micro-beats,
+paragraphs, or total response length. Several vocal, breath, contact, and mechanical units may
+resolve different layers of the same instant without advancing to more actions or later phases.
+Cognitive compression must remove polished analysis, not erase sensory detail or rush toward a
+handoff.
+
 ### Forbidden lucid rebound
 
 While the high-intensity cause is still active, reject unsupported dialogue that:

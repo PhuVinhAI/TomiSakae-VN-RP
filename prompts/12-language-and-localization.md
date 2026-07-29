@@ -64,9 +64,10 @@ Preserve:
 - stable names and honorifics already established by the story.
 
 Do not import foreign SFX, honorifics, kinship terms, vocal fillers, or genre phrases merely to
-signal manga or nationality. Translate or transliterate culturally meaningful terms and choose a
-natural sound word in the presentation language, unless the current turn explicitly requests the
-original script. Omit an SFX when no natural rendering improves the beat.
+signal nationality or imitate a source-language style. Translate or transliterate culturally
+meaningful terms and choose a natural sound word in the presentation language, unless the current
+turn explicitly requests the original script. Omit an SFX when no natural rendering improves the
+beat.
 
 ### Fragment quality
 

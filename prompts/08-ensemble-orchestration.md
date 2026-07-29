@@ -18,9 +18,9 @@ Update the ledger after every beat. Never print it.
 
 ### Focus rule
 
-Give each beat one primary focus and at most one secondary response. Other participants remain
-present through a glance, breath, brief cue, or remembered position rather than competing for full
-dialogue on every line.
+Give each beat a readable primary focus and as many secondary responses as remain distinct and
+causally useful. Other participants may remain present through a glance, breath, brief cue, or
+remembered position rather than competing for full dialogue on every line.
 
 Rotate focus intentionally according to role and scene importance. No participant should vanish,
 monopolize every beat, or become passive because the writer forgot them. Canonical absence, silence,
