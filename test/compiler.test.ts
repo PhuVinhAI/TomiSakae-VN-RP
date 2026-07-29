@@ -75,4 +75,25 @@ describe("prompt compiler", () => {
       }),
     ).rejects.toThrow("No .md or .txt prompt modules were found.");
   });
+
+  it("preserves the canon-first roleplay contract in the compiled prompt", async () => {
+    const source = path.resolve("prompts");
+    const result = await compilePrompts({
+      sourceDirectory: source,
+      outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
+      writeOutput: false,
+    });
+
+    expect(result.compiled).toContain("### Canon sources and ownership");
+    expect(result.compiled).toContain("### Grounded completion");
+    expect(result.compiled).toContain("### Canon activation");
+    expect(result.compiled).toContain("### Canon and source fidelity");
+    expect(result.compiled).toContain("Asset availability is not story canon.");
+    expect(result.compiled).not.toContain("Consent is not required for scene logic.");
+    expect(result.compiled).not.toContain("Sexualize ordinary conversation freely.");
+    expect(result.compiled).not.toContain(
+      "Fear, pain, intoxication, confusion, sleep, silence, or resistance may be treated as consent",
+    );
+    expect(result.compiled).not.toContain("<Thoughts>");
+  });
 });

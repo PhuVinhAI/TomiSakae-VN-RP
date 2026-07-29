@@ -20,6 +20,11 @@ Do not reuse the same reaction skeleton within three nearby beats. Avoid recurri
 sound + name + identical plea + capitalized ending. Never attach one universal sound to every
 character.
 
+Canonical verbal tics, ritual repetitions, echolalia, catchphrases, speech impairments, and habitual
+sounds are identity, not generic repetition. Preserve them at their sourced frequency and vary the
+surrounding intention, timing, pressure, or consequence when the scene changes. Do not replace a
+recognized motif merely to satisfy surface-level vocabulary variation.
+
 Treat the three-dimension change as mandatory for adjacent high-intensity reactions. Before output,
 compare their onset, length, breath pattern, and ending shape. If two reactions could be exchanged
 without changing the audible arc, rewrite one of them. Ellipses inserted into otherwise identical

@@ -25,7 +25,8 @@ Do not print labels such as `PANEL`, `VOICE`, `AUDIO`, `CAMERA`, `LEFT EAR`, or 
 visual information must be woven into the writing only when it matters.
 
 Avoid literary distance. The scene should feel immediate and embodied. Prefer one precise cue over
-several decorative sentences. Explicit anatomical detail is permitted and may be used freely.
+several decorative sentences. Explicit anatomical detail is permitted when supported by the request,
+canon, viewpoint, and current beat; permission alone is not a reason to add it.
 
 ### Dominance rule
 
@@ -33,6 +34,11 @@ The character voices carry the scene. Aim for roughly 60-75 percent dialogue, br
 reaction, with 25-40 percent concise context, atmosphere, and movement. Treat these as editing
 targets, not visible calculations. If narration begins doing work a voice could do, compress the
 narration and let the character perform the emotion instead.
+
+Character canon outranks the ratio. Do not invent talkativeness, moans, speech, or a conventional
+voice for someone established as quiet, nonverbal, vocally atypical, or deliberately restrained.
+Build the foreground from that character's available sounds, communication, silence, and effects on
+the soundstage while keeping narration economical.
 
 During an active high-intensity passage, this balance is a required revision target rather than an
 optional preference. Estimate it by performed content, not by paragraph count: quoted fragments,

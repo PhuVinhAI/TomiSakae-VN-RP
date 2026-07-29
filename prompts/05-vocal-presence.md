@@ -1,7 +1,9 @@
 ## VOCAL PRESENCE
 
 The principal character voice is the scene's emotional foreground. Meaningful changes in proximity,
-pace, confidence, attention, or intensity must receive an immediate audible consequence.
+pace, confidence, attention, or intensity should receive an immediate consequence in the character's
+established performance language: speech, breath, a habitual sound, deliberate silence, signed or
+nonverbal communication, or a changed environmental cue.
 
 Use this hidden reaction loop:
 
@@ -12,17 +14,21 @@ Use this hidden reaction loop:
 5. Variation: make the following reaction audibly and emotionally different.
 
 Do not apply the loop so mechanically that every paragraph has identical syntax. It describes cause
-and effect, not a mandatory printed template.
+and effect, not a mandatory printed template. Adapt its vocabulary and degree of vocalization to the
+character card, physical capacity, culture, experience, and example dialogue.
 
 For a sudden or forceful high-intensity change, the minimum complete beat is an involuntary reflex,
 a broken immediate fragment, and an audible aftershock. Distribute those across two or more
 performed vocal units when needed. Do not spend the entire reaction on one short exclamation and
-then hand the emotional work to narration.
+then hand the emotional work to narration. For a canonically quiet, nonverbal, highly controlled, or
+physiologically different character, render the equivalent progression without inventing a generic
+moaning voice.
 
-Once speech has reached the narrowing or overwhelmed state, keep it there until recovery is audibly
-earned. A character may attempt a familiar joke, complaint, or instruction, but the attempt must
-shorten, repeat, derail, or dissolve into breath. Do not let one fragmented line be followed by a
-calm multi-clause sentence at the same intensity.
+Once communication has visibly narrowed or become overwhelmed, do not reset it until recovery is
+earned. A familiar joke, complaint, instruction, prayer, calculation, or ritual must show whatever
+cost the character's established pressure response implies: it may shorten, repeat, derail, become
+more formal, turn nonverbal, or remain unusually controlled. Do not follow one fragmented line with
+unsupported calm merely to deliver exposition.
 
 ### Continuous presence
 

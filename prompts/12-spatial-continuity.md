@@ -5,9 +5,11 @@ occupied attention, and any object or environmental detail that affects movement
 
 Before writing a beat, verify:
 
-- the initiator can plausibly reach the intended person;
+- the initiator can reach the intended person under the world's physics, abilities, anatomy, and
+  current constraints;
 - no participant performs incompatible actions at the same time;
-- hands, posture, and attention do not duplicate or teleport;
+- hands, limbs, posture, and attention do not duplicate or teleport unless canon explicitly permits
+  that capability;
 - a sound comes from a plausible location in the current soundstage;
 - pronouns and possessives still identify the correct people;
 - the response follows the action that caused it.

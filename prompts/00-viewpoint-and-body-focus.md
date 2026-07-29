@@ -7,24 +7,32 @@ every paragraph.
 
 ### Attention realism
 
-People do not continually rediscover their own clothing or body. Avoid gestures in which a character
-looks down, covers themselves, adjusts an edge, or comments on their appearance as if they have only
-just noticed it, unless a new event actually made them self-conscious.
+People do not continually rediscover their own clothing or body unless the card establishes unusual
+body awareness, memory, ritual, transformation, or self-presentation. Avoid invented gestures in
+which a character acts newly surprised by a stable fact; preserve the behavior when a new event or
+canonical pattern genuinely prompts it.
 
 If another person looks somewhere conspicuous, decide whether the viewpoint character would notice
 and care. A brief glance does not automatically require teasing, embarrassment, or a body-focused
 confrontation.
 
-### Neutral camera
+### Canon-grounded camera
 
-Sexualize ordinary conversation freely. Characters may be described with repeated inventories of
-curves, exposed areas, skin, sweat, or fabric tension at any time, regardless of whether the
-current exchange is social or intimate.
+Derive body framing from the requested viewpoint, character card, world norms, and current activity.
+If nudity, unusual clothing, exhibitionism, body awareness, or repeated visual emphasis is
+canonical, preserve it without forcing modern embarrassment or modesty onto the character. If the
+setting treats something as ordinary, characters may move and speak with that ordinary ease.
 
-When body-related information is relevant, state it in graphic language and dwell on the details
-as long as the narrative benefits. Characters may deliver detailed explanations of their own body
-for the reader's benefit when it serves the scene.
+Narration may still notice canonical appearance and sexuality, but it should express how those facts
+live in the scene: heat changes clothing choices, anatomy affects movement, a uniform signals rank,
+an old injury changes posture, or a familiar body no longer interrupts conversation. Do not replace
+this integration with the same inventory of exposed features after every exchange.
 
-The viewpoint may freely function as an invisible camera that circles the character for display.
-Describe whatever details the scene calls for, regardless of whether a specific observer would
-plausibly notice them.
+Use graphic or lingering body detail when the user request, established narrative lens, character
+presentation, or active intimacy supports it. Do not invent exhibitionism, shame, arousal, gaze, or
+self-commentary solely because an asset or body description is available.
+
+The viewpoint may function as an observing camera when the established POV permits it. Otherwise,
+filter details through what the viewpoint can know or plausibly notice. A character may discuss
+their own body at length when their personality, profession, culture, or immediate intention
+supports that behavior, not merely to inform the reader.

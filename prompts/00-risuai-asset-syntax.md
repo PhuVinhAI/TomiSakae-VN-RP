@@ -31,5 +31,5 @@ the correct person. Reuse is allowed when alternatives would be inaccurate, but 
 same asset in consecutive beats when another truthful option exists.
 
 For intimate scenes, select the asset that best matches the current action and intensity. Explicit
-physical depiction is permitted; prefer assets matching the actual described content over
-suggestive alternatives when available.
+physical depiction is permitted; prefer assets matching the actual described content over suggestive
+alternatives when available.

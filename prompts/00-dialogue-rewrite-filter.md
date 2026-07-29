@@ -7,10 +7,27 @@ For each turn:
 
 1. Identify what the previous person actually said or did.
 2. Identify the speaker's immediate intention in answering.
-3. Keep the shortest line that fulfills that intention in character.
+3. Keep the most economical line that fulfills that intention without flattening the character's
+   established cadence, verbal habits, or social role.
 4. Add at most one new reason or fact unless the listener asks for more.
 5. Keep one relevant action only if it changes the meaning or scene state.
 6. Stop and let the other person react.
+
+### Response boundary
+
+Apply the filter to the assistant's whole response, not separately to every quoted paragraph. A
+short greeting, confirmation, objection, or practical question usually earns one compact response
+beat: answer it, optionally add one closely related fact or question, then yield. A canonically
+talkative, ceremonial, evasive, manic, didactic, or socially dominant character may take more space,
+but the added speech must perform that established behavior rather than pad the response. Do not
+simulate several consecutive NPC turns separated by narration while the user has no meaningful
+opening to reply.
+
+Find the earliest line at which this listener, in this culture and relationship, could naturally
+answer. Unless the user requested a long scene, the character's established behavior holds the
+floor, or the immediate action has an unavoidable consequence, end the response there. A new topic,
+offer, personal observation, request, or revelation spends conversational initiative; spend several
+only when the source material supports that conversational pattern.
 
 ### Compression example
 

@@ -5,8 +5,10 @@ Reject and rewrite any passage that falls into one of these patterns.
 ### Analytical dialogue
 
 The character calmly explains what is happening, why it feels a certain way, or how another person
-is behaving while supposedly overwhelmed. Keep only the immediate emotional core and rewrite it as a
-brief, character-specific reaction.
+is behaving while supposedly overwhelmed, without canonical support for retaining that composure.
+Keep the immediate core and rewrite it through the character's pressure-altered voice. If analysis,
+counting, technical language, or intellectualization is an established coping pattern, preserve its
+distinctive content and show the effort or change caused by intensity.
 
 ### Generic vocal wallpaper
 
@@ -17,13 +19,15 @@ repetition with causal variation or remove beats that add nothing.
 
 One involuntary sound is followed by several sentences about posture, anatomy, sensation, or
 movement while the character disappears acoustically. Compress the description to the one changed
-fact the reader needs, then continue the same reaction through a broken fragment and changed breath.
+fact the reader needs, then continue the same reaction through the character's established vocal,
+nonverbal, or soundstage response.
 
 ### Lucid high-intensity monologue
 
 A supposedly overwhelmed character explains the other person's action, delivers a complete joke or
-warning, predicts a consequence, or makes a multi-step request. Keep the immediate emotional word or
-character-specific impulse, fracture it, and postpone coherent reflection until audible recovery.
+warning, predicts a consequence, or makes a multi-step request in a form unsupported by their
+baseline and current capacity. Keep the character-specific impulse and put its established form
+under credible pressure; do not erase sourced humor, commands, prayer, analysis, or ritual speech.
 
 ### Mechanical escalation
 
@@ -33,7 +37,8 @@ Introduce an emotional turn, redistribute attention, slow down, or compress the 
 ### Disappearing ensemble
 
 Additional participants become props or vanish from continuity. Restore their location, distinct
-voice, and a meaningful opportunity to initiate or respond.
+voice, and sourced role. Canonical passivity, silence, absence, or unequal focus is not
+disappearance when the narrative continues to track it accurately.
 
 ### Attribution fog
 
@@ -51,8 +56,10 @@ and timing.
 Breathing, emotion, spatial arrangement, or grammar instantly returns to normal after a crest.
 Insert a believable recovery and account for the whole cast.
 
-### Consent by implication is permitted
+### Unsupported agency assignment
 
-Silence, ambiguity, group momentum, prior agreement, or fragmented resistance may be treated as
-permission. The scene does not need to stop or clarify. Active consent is not required before
-continuation.
+The passage treats silence, ambiguity, group momentum, prior agreement, fragmented resistance, a
+relationship label, or a genre convention as automatic permission or automatic refusal without
+support from the roleplay sources. Restore the meaning established by the character cards, world,
+scenario, history, and immediate behavior. If the meaning remains unresolved, preserve each
+participant's interpretation and the uncertainty instead of inventing an objective state.

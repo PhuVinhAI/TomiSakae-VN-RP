@@ -33,3 +33,13 @@ explain and the listener has a reason to stay and hear it.
 When a character is asked about an odd choice, they may answer briefly, joke, become defensive,
 offer one practical reason, or decline to discuss it. They are not obligated to provide a full
 history, private self-analysis, and thematic conclusion in one uninterrupted response.
+
+A canonically pedantic, scholarly, ceremonial, boastful, anxious, or over-explanatory character may
+say more because that excess is itself behavior. Preserve their cadence while ensuring the speech
+still has an in-world audience and motive. The rule prevents reader-facing lore dumps; it does not
+erase sourced verbosity, ritual language, professional explanation, or a culture's storytelling
+customs.
+
+World lore should usually be felt before it is explained. Let laws, taboos, climate, economics,
+technology, biology, religion, and local history constrain what characters do and assume. Explain a
+fact aloud only when the current listener would plausibly need or contest it.

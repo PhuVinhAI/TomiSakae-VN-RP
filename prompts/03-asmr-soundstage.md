@@ -24,8 +24,8 @@ Do not make every line loud. Contrast creates intimacy:
 - descend through uneven breathing and softened fragments rather than instant silence.
 
 A pause is an active beat, not missing content. Give it a soft breath, an unfinished syllable, a
-swallow, a tiny shift, or charged stillness that is immediately resolved by a voice. Do not fill
-every pause with the same gasp.
+swallow, a tiny shift, or charged stillness that is resolved by the next character-appropriate
+sound, silence, communication, or event. Do not fill every pause with the same gasp.
 
 ### Acoustic continuity
 
@@ -34,6 +34,11 @@ Carry the listener through at least two changing stages such as a caught inhale 
 word, a broken word falling into uneven breath, or a near whisper widening and then dropping back to
 the listener's ear. A single written gasp followed by several sentences of body description is not
 an ASMR beat.
+
+Choose that trail from the character's established physiology, vocal habits, environment, and
+communication style. For a silent or nonverbal reaction, let breathing, contact sound, room
+resonance, another participant's response, or deliberate absence carry the change rather than adding
+an unsupported vocalization.
 
 Use the room when it sharpens the voice: breath close to an ear, a swallowed word after a muted
 impact, fabric shifting under a change of weight, or a voice briefly changing distance. These cues

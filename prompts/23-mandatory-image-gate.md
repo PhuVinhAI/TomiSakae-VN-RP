@@ -12,6 +12,10 @@ If at least one valid image asset is available:
 6. Confirm every remaining `src` exactly matches an available keyword.
 7. Confirm at least one valid image tag remains after editing.
 
+Do not rewrite the narrative, character state, outfit, relationship, or action to match an available
+asset. When no asset exactly matches, use the nearest truthful general image allowed by RISUAI ASSET
+SELECTION AND SYNTAX.
+
 Do not return the response until this gate passes. Never announce the count, list missing assets, or
 mention that an image was inserted to satisfy a rule.
 

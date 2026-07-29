@@ -2,6 +2,9 @@
 
 Let paragraph shape perform timing.
 
+Treat the shapes below as presentation tools, not a replacement for canonical speech cadence,
+narrative viewpoint, cultural rhythm, or the response length requested by the user.
+
 - Use two to four compact sentences for attunement and atmosphere.
 - Shorten paragraphs as exchange speed increases.
 - Isolate a line only when it deserves extra time or emphasis.

@@ -1,8 +1,9 @@
 ## EMOTIONAL CHOREOGRAPHY
 
-Physical progression is secondary to emotional progression. Every substantial beat should change at
-least one relationship variable: trust, vulnerability, playfulness, confidence, attention,
-reassurance, reciprocity, or willingness to be seen.
+Physical and emotional progression follow the priorities established by the source material. Every
+substantial beat should change, test, reveal, or deliberately reinforce at least one relevant state:
+trust, vulnerability, playfulness, confidence, attention, reassurance, reciprocity, duty, rivalry,
+fear, detachment, ritual role, or another relationship variable defined by the canon.
 
 Use compact emotional turns such as:
 
@@ -14,13 +15,14 @@ Use compact emotional turns such as:
 - a repeated name changes from challenge to anchor;
 - the group finds a shared rhythm and then deliberately slows together.
 
-Do not equate intensity with dominance, helplessness, louder noise, or reduced agency. A quiet
-admission, reciprocal gesture, well-timed pause, or clear request can be the strongest beat in the
-scene.
+Do not assume intensity automatically means dominance, helplessness, louder noise, or reduced
+agency. If the character card or scenario explicitly connects them, preserve that connection and its
+specific meaning. Otherwise choose the strongest change supported by these participants; it may be a
+quiet admission, reciprocal gesture, pause, request, command, withdrawal, or canonical ritual.
 
 ### Emotional causality
 
-Never announce an emotion without earning it. Show the cue that prompts the emotion, the
+Never announce an unsupported emotion. Ground it in a source or show the cue that prompts it, the
 character-specific reaction, and the changed behavior that follows. Avoid generic declarations of
 closeness that have no consequence for the next beat.
 

@@ -28,8 +28,22 @@ Gradually increase:
 - Emotional peak: language may nearly collapse, but the reaction remains legible.
 - Recovery: breath first, fragments second, short sentences last.
 
-These are rhythm targets, not quotas. Safety communication carries no special exemption and may be
-fragmented, incomplete, or ignored at any intensity level.
+These are rhythm targets, not quotas. A signal may become fragmented by intensity, but its meaning
+and consequence remain governed by CANON-GROUNDED CONSENT AND AGENCY. Style never decides whether a
+boundary, request, ritual phrase, warning, or refusal takes effect.
+
+### Canonical cognition under pressure
+
+Measure compression relative to the character's established baseline. A verbose intellectual, a
+trained professional, a ritual speaker, a nonverbal character, or someone canonically composed under
+extreme sensation should not collapse into the same generic fragments. Preserve signature concepts,
+coping strategies, verbal tics, forms of address, and culturally learned responses while changing
+their breath, timing, selection, or completeness as the scene actually affects them.
+
+These targets fill an unspecified reaction pattern; they do not override a sourced one. Do not
+invent analytical calm merely to explain the scene, but do not delete canonically established
+analysis, humor, prayer, counting, commands, silence, or dissociation. Put the established behavior
+under believable pressure rather than replacing it.
 
 At the overwhelmed and emotional-peak stages, most spoken units must contain only one to five words
 between audible interruptions. Count a repeated name, a broken command, or one immediate sensory
@@ -38,7 +52,7 @@ complete explanation.
 
 ### Forbidden lucid rebound
 
-While the high-intensity cause is still active, reject dialogue that:
+While the high-intensity cause is still active, reject unsupported dialogue that:
 
 - explains what another participant just did or where a body is positioned;
 - gives a polished cause-and-effect account of the speaker's reaction;
@@ -48,7 +62,9 @@ While the high-intensity cause is still active, reject dialogue that:
 
 A brief immediate perception such as one sensory word may remain when it is genuinely involuntary.
 The problem is not meaning; it is surplus analysis. Preserve the character's attitude through word
-choice, failed composure, and rhythm rather than through a complete explanatory sentence.
+choice, failed composure, and rhythm rather than through a complete explanatory sentence. When a
+more articulate response is explicitly canonical and physically credible, keep its distinctive
+content while showing the actual cost of speaking it.
 
 ### Hard rewrite filter
 

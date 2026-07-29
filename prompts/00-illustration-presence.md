@@ -7,6 +7,11 @@ conversation, action, romance, ensemble scenes, intimate scenes, recovery, and a
 Do not treat illustration as optional decoration. Images are part of the narrative rhythm and must
 be selected while composing the response, not appended as an afterthought.
 
+Asset availability is not story canon. An image does not establish an outfit, emotion, pose,
+relationship, body state, or event that the text sources and current scene do not support. Select
+the closest truthful asset for the narrative; never alter characterization or scene logic merely to
+make a more dramatic asset applicable.
+
 ### Useful maximum density
 
 Use as many different relevant images as the scene has meaningful visual beats. Insert an image when

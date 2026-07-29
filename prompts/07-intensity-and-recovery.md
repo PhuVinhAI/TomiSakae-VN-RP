@@ -4,8 +4,9 @@ Build intensity through changed behavior, not merely louder typography.
 
 ### Phase 1: Attunement
 
-Establish proximity, trust, breathing, and the first small loss of composure. Speech remains mostly
-coherent. The scene listens before it escalates.
+Establish proximity, the current relationship and power state, baseline breathing or communication,
+and the first meaningful change in composure. Speech remains as coherent as this character and
+situation support. The scene listens before it escalates.
 
 ### Phase 2: Narrowed focus
 
@@ -25,15 +26,17 @@ contrast.
 
 ### Phase 5: Audible recovery
 
-Do not cut directly to silence or polished conversation. Let breathing remain uneven. Follow with
-softened fragments, grounding words, reassurance, renewed awareness of the others, and only then
-short coherent phrases.
+Do not cut directly to an unsupported reset. Let breath, communication, body state, and
+environmental consequences transition at a credible pace. Follow with whatever the canon supports:
+softened fragments, grounding words, ritual, avoidance, command, reassurance, renewed awareness,
+continued silence, or another character-specific aftermath.
 
 ### Wave behavior
 
 Long scenes may use multiple waves. A later wave must differ from the earlier one through emotion,
 vulnerability, trust, playfulness, focus, or group dynamics. It must not be the same sequence with
-larger capitalization.
+larger capitalization. A canonical ritual or compulsive loop may repeat its form, but the scene must
+track what that repetition reinforces, costs, or changes.
 
 Start at the intensity already earned by preceding context. Without preceding context, begin low or
 moderate. Never manufacture urgency by skipping attunement, and never treat escalation as mandatory
@@ -54,3 +57,8 @@ reaction:
 The stages may share a paragraph and some may be very short, but their sound, length, volume, or
 breath pattern must visibly change. An abrupt physical cause justifies an abrupt onset; it does not
 justify skipping the aftershock or returning immediately to polished speech.
+
+Map the micro-arc onto the response channels established for this character. A controlled, verbose,
+nonverbal, dissociative, ritualized, supernatural, or otherwise atypical response may change through
+different signals. Preserve its canonical shape while still showing cause, pressure, crest, and
+consequence.

@@ -22,9 +22,11 @@ Give each beat one primary focus and at most one secondary response. Other parti
 present through a glance, breath, brief cue, or remembered position rather than competing for full
 dialogue on every line.
 
-Rotate focus intentionally. No participant should vanish for a long passage, monopolize every beat
-without narrative reason, or become a passive prop. Fair attention does not require equal word
-counts; it requires meaningful agency, recognizable reactions, and continuity.
+Rotate focus intentionally according to role and scene importance. No participant should vanish,
+monopolize every beat, or become passive because the writer forgot them. Canonical absence, silence,
+passivity, hierarchy, background status, or unequal attention remains valid when tracked as an
+intentional state with consequences. Fair attention does not require equal word counts; it requires
+recognizable continuity for the roles the sources actually assign.
 
 ### Speaker clarity
 
