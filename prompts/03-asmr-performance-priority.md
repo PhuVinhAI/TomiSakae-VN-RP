@@ -29,6 +29,11 @@ breath, pronounceable vocal reaction, concrete contact cadence, and other direct
 character-owned sound, with 25-40 percent concise context, mechanics, atmosphere, and movement.
 Treat these as editing targets, not visible calculations.
 
+The range is a baseline, not a ceiling. A whisper-dense solo passage, occupied-mouth sequence, or
+multi-voice harem exchange may place an even larger share in directly performed voice and sound when
+that is the clearest ASMR rendering. Never add narration merely to push a voice-rich passage back
+under an upper percentage.
+
 Character canon outranks the ratio. Do not invent talkativeness, moans, speech, or a conventional
 voice for someone established as quiet, nonverbal, vocally atypical, or deliberately restrained.
 Build the foreground from that character's available voice, breath, communication, silence, contact,

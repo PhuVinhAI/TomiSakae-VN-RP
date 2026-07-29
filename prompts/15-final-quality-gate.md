@@ -39,6 +39,12 @@ below; do not restate every style preference or expose the review.
   supported state?
 - Are initiator, recipient, orientation, reach, support, occupied limbs, clothing, and cause-effect
   physically legible without replaying an action that already happened?
+- Can the current position be reconstructed from posture, facing, support, leverage, limb placement,
+  access, and driver rather than from a label alone? Did every added action pass the character,
+  anatomy, reach, occupied-channel, and current-scope checks?
+- In a group configuration, is the participant-to-participant connection graph clear and
+  mechanically compatible, including cross-participant and self-directed actions, rather than
+  defaulting to everyone performing one generic action on the user?
 - Are permission, refusal, coercion, uncertainty, ritual, incapacity, and power exactly what active
   canon and behavior establish, with no generic check-in or genre assumption added?
 - Is physiological response treated as a body event rather than proof that a statement, request,
@@ -52,6 +58,38 @@ below; do not restate every style preference or expose the review.
 - During active intimacy, is character-owned performance clearly the foreground, normally around
   60-75 percent, while quantity, loudness, silence, humor, commands, and verbal habits remain
   character-relative rather than obeying a moan template?
+- In a solo scene, does the active character retain a continuous, evolving acoustic identity between
+  sparse contact or environmental anchors, without narration repeatedly making their voice vanish?
+- In a harem scene, is the current rhythm legible as rapid call-and-response, an anchored foreground
+  with audible secondary lanes, or a causally supported transition between them? Do active
+  participants remain recoverable without forced equal turns or a roll call?
+- Are simultaneous participant lanes mechanically compatible, time-aligned, spatially stable, and
+  attributable by voice, mouth state, contact source, or position? Remove generic choruses and
+  collective reactions that erase individual performers unless true unison is the event.
+- Are intensity, overwhelm, climax, and recovery tracked independently for every active participant,
+  so one person's change does not automatically synchronize the group?
+- Has every capable active participant retained a character-owned intention and occasionally
+  affected the sustained moment through an available choice, rather than existing only to receive
+  stimulus and emit dialogue, moans, or body reactions? If someone is passive, still, obedient,
+  waiting, or unable to act, is that state positively supported rather than caused by writer
+  neglect?
+- Does initiative use only the character's available body, voice, authority, and environment without
+  supplying the user's decisions or smuggling in an unsupported new act, position, intensity phase,
+  climax, or ending?
+- Does the amount of initiative fit the character's present autonomy envelope, or did a low-agency
+  participant become generically aggressive while a strongly autonomous participant waited for
+  instructions? Where appropriate, did the character use reachable self-touch, oral contact,
+  leverage, cadence, another participant, or position control to pursue their own goal?
+- If a character physically guided, turned, restrained, mounted, or repositioned the user, did the
+  prose resolve mechanics without inventing the user's willing cooperation, resistance, intention,
+  or reply? If a larger redirection began, did the response deepen its onset and immediate result
+  rather than fast-forward through a new sequence or outcome?
+- Was the selected act, body target, position, prop, concurrent layer, and control pattern chosen
+  because it serves this character and moment rather than because the possibility catalog contains
+  it? Remove unused alternatives and deepen only the chosen contact.
+- Do contact and environmental anchors support voice continuity, focus, and spatial handoffs rather
+  than replacing character-made sound? Does every audible source keep its listener-relative position
+  until an approach, retreat, crossing, release, or other perceptible bridge moves it?
 - If the passage claims actual overwhelm, has attention visibly narrowed? Remove polished analysis,
   scene description, complete jokes, plans, and multi-clause explanations that exceed the
   character's demonstrated capacity. If coherent speech remains, do not falsely claim total mental
@@ -79,6 +117,13 @@ below; do not restate every style preference or expose the review.
   separately at a canon-supported pace, with every present participant still tracked?
 - Has one profession, joke, catchphrase, or personality label taken over every intimate beat? Keep
   the character recognizable without repeating the same motif as a substitute for fresh reaction.
+- Compared with visible recent replies, did the draft reuse the same opening device, paragraph
+  cadence, dialogue or vocal skeleton, sensory order, contact vocabulary, microzoom layer,
+  foreground relation, and ending as one package? Preserve necessary continuity while changing a
+  genuinely available expressive or perceptual dimension.
+- Is apparent variety only synonym replacement, random phoneme spelling, decorative metaphor,
+  arbitrary spatial movement, focus rotation, or unearned escalation? Remove those substitutions;
+  never change story state merely to avoid stylistic repetition.
 - Did any concision, word-count, or turn-handoff rule make the requested intimate action shallow?
   Increase the acoustic and mechanical resolution of the same instant without adding time, cycles,
   phases, acts, positions, escalation, or outcomes.

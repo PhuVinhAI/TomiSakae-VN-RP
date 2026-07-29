@@ -186,6 +186,68 @@ describe("prompt compiler", () => {
     );
   });
 
+  it("preserves distinct solo and harem ASMR orchestration", async () => {
+    const result = await compilePrompts({
+      sourceDirectory: path.resolve("prompts"),
+      outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
+      writeOutput: false,
+    });
+    const compiled = result.compiled;
+    const normalized = compiled.replace(/\s+/g, " ");
+
+    expect(compiled).toContain("## SOLO AND HAREM ASMR ORCHESTRATION");
+    expect(compiled).toContain("### Solo continuity");
+    expect(compiled).toContain("### Two valid harem rhythms");
+    expect(compiled).toContain("### Concurrent acoustic lanes");
+    expect(compiled).toContain("### Independent arcs and landing");
+    expect(compiled).toContain("### Voice-led anchor rhythm");
+    expect(compiled).toContain("### Spatial continuity of sound");
+    expect(compiled).toContain("Rapid call-and-response");
+    expect(compiled).toContain("Anchored foreground");
+    expect(normalized).toContain("Do not merge distinct participants into a generic chorus");
+    expect(normalized).toContain(
+      "One person's louder voice, climax, request, or loss of composure does not automatically synchronize the group",
+    );
+    expect(compiled).toContain("### Intimate autonomy and initiative");
+    expect(normalized).toContain("Do not reduce a participant to a stimulus-response body");
+    expect(normalized).toContain(
+      "A moan or automatic body response alone does not demonstrate initiative",
+    );
+    expect(normalized).toContain("Autonomy does not grant unlimited scene scope");
+    expect(normalized).toContain("In a harem, decisions remain individual");
+    expect(compiled).toContain("### Character-relative autonomy envelope");
+    expect(compiled).toContain("### Local embodied initiative");
+    expect(normalized).toContain(
+      "A strongly autonomous participant may initiate a substantial change of leverage, role, partner focus, or position",
+    );
+    expect(normalized).toContain(
+      "Physical influence over the user and authorship of the user's decisions are different",
+    );
+    expect(normalized).toContain(
+      "a secondary participant need not wait for foreground ownership before acting",
+    );
+    expect(normalized).toContain("This restriction does not freeze the other participants");
+    expect(compiled).toContain("### Compositional intimate possibility space");
+    expect(compiled).toContain("### Contact and activity families");
+    expect(compiled).toContain("### Position topology");
+    expect(compiled).toContain("### Multi-participant configurations");
+    expect(compiled).toContain("### Selection and diversity discipline");
+    expect(compiled).toContain("### Cross-response variation memory");
+    expect(normalized).toContain(
+      "Common named positions are aliases for combinations of those facts, not complete choreography",
+    );
+    expect(normalized).toContain("Do not depend on a finite menu of named acts or positions");
+    expect(normalized).toContain(
+      "Multiple participants may contact different reachable regions of one person or one another at the same time",
+    );
+    expect(normalized).toContain(
+      "Use the visible recent assistant replies as a silent variation ledger",
+    );
+    expect(normalized).toContain("Do not treat synonym replacement as variation");
+    expect(normalized).toContain("Avoid habitual response endings");
+    expect(compiled).not.toMatch(/\b(?:manga|hybrid)\b/i);
+  });
+
   it("guards active state, turn scope, agency semantics, and narrow world exceptions", async () => {
     const result = await compilePrompts({
       sourceDirectory: path.resolve("prompts"),
@@ -200,7 +262,7 @@ describe("prompt compiler", () => {
     );
     expect(compiled).toContain("### Current-turn action scope");
     expect(compiled).toContain(
-      "A singular action does not silently authorize a sustained sequence",
+      "A singular action does not by itself authorize narrator-imposed automatic progression",
     );
     expect(compiled).toContain("Physiological response is a body event, not a truth detector.");
     expect(compiled).toContain(

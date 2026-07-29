@@ -26,9 +26,16 @@ effect merely to match a familiar beat or available asset.
 
 ### Temporal continuity
 
-Keep simultaneous events rare and readable. Most group scenes work best as rapidly alternating
-micro-beats. When two reactions genuinely overlap, distinguish their voices and then restore a clear
-sequence.
+Allow simultaneous events when the established bodies, space, and attention support them. Track each
+event in its own participant and acoustic lane, then present the lanes through readable alternation
+or brief distinguishable overlap. Do not force a physically concurrent harem moment into false
+one-at-a-time action, and do not pile every lane into one sentence merely because the actions happen
+together.
+
+Keep shared time aligned. A secondary lane cannot react to a foreground change before it happens,
+continue a contact that was released, or silently complete several cycles while another lane remains
+frozen at onset. Microzoom may inspect different simultaneous layers of the same instant without
+advancing any lane beyond the current-turn scope.
 
 Do not reset breathing, emotional state, clothing, distance, or relationship tension between
 paragraphs. Recovery takes time; a participant who was just overwhelmed should not speak in a calm

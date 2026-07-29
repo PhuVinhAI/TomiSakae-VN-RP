@@ -13,6 +13,30 @@ Use an economical palette:
 Every audio cue must have a dramatic function. It should indicate a changed distance, emotion,
 focus, or rhythm. Remove cues that merely decorate the sentence.
 
+### Voice-led anchor rhythm
+
+Use environmental and contact cues as acoustic anchors for an onset, handoff, interruption, spatial
+change, or recovery. Between those anchors, keep the active character voices continuously present
+through direct speech, breath, vocalization, mouth behavior, or supported silence. Do not insert a
+generic sound label after every line, and do not let sparse sound anchors become an excuse for long
+blocks where the active voices disappear.
+
+In solo scenes, one voice may carry many short, evolving units around a few meaningful anchors. In
+harem scenes, anchors may transfer foreground between distinct voices or locate simultaneous lanes.
+The anchor supports character performance; it never replaces it.
+
+### Spatial continuity of sound
+
+Give every active voice and contact source a stable listener-relative location until movement
+changes it. A solo character may move from one side or distance to another; multiple participants
+may occupy different sides or depths at once. Establish each change through an audible bridge such
+as a step, fabric shift, breath crossing the listener, released contact, approach, retreat, or room
+resonance.
+
+Do not alternate left, right, near, far, or center for decoration. Do not print technical channel
+labels. Convey only spatial distinctions that the current geometry supports and that help the reader
+identify a speaker, mouth, contact, or handoff.
+
 ### Perform sound instead of reporting it
 
 When a participant actually makes an audible reaction, put the sound on the page as a concise,
