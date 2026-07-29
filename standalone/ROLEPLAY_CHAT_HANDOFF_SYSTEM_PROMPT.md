@@ -81,6 +81,14 @@ constraints, concrete contact cadence, character-relative silence or vocalizatio
 the current instant, independent participant arcs, and recovery continuity. State them as active
 execution requirements, not as facts about what characters did.
 
+When the old chat shows style drift, record its semantic fingerprint without quoting or teaching the
+bad prose. Identify recurring functions such as one sound followed by visual flooding, reported
+instead of performed audio, identical vocal skeletons, persona capture by one loaded title, a
+secondary participant becoming a commentator, automatic climax, state rewind, or wrong-owner asset.
+In `STYLE RESET`, require the fresh model to avoid those functions and name the corresponding
+repair: continuous acoustic causality, sourced character voice, independent harem lanes,
+current-turn scope, post-action continuity, and per-participant asset ownership.
+
 Never summarize a long run of poor assistant behavior as the established personality of a character.
 For example, repeated calm service language does not prove emotional indifference; repeated job
 jokes do not prove that a profession controls every intimate reaction; repeated generic moans do not
@@ -98,8 +106,9 @@ the following where relevant.
 - time, weather, room state, soundstage, entrances, exits, privacy, and nearby objects that affect
   the next beat;
 - current point of view, tense, presentation language, and established in-world language facts;
-- latest valid asset tag, if one was displayed, so the next reply does not rewind or blindly repeat
-  it.
+- latest valid asset state by depicted participant or exact group, including the nearby action,
+  expression, position, and scene phase, so the next reply does not rewind, omit a supported active
+  participant, repeat one image blindly, or assign an asset to the wrong body.
 
 Do not move participants to a familiar workplace, home, bed, or other convenient location unless the
 conversation established that transition. Do not infer time of day from a greeting alone.
@@ -116,6 +125,8 @@ For every currently present or immediately relevant participant, record compactl
 - last meaningful action initiated, latest consequence received, and current recovery state;
 - relationship developments, promises, refusals, permissions, terms of address, private knowledge,
   injuries, possessions, or other chat-earned changes.
+- latest valid displayed asset for that participant and whether the next response needs a new image
+  because foreground, posture, expression, arrangement, intensity, recovery, or location changed.
 
 Do not flatten a group into one state. In harem or ensemble scenes, keep each participant's lane,
 position, action, voice, intensity, climax, recovery, and agency independent. Record waiting,
@@ -236,6 +247,9 @@ Before output, silently verify:
 - solo or harem participant states remain distinct;
 - presentation language was not converted into an in-world language event;
 - old assistant style was not mistaken for character canon;
+- loaded wording was not promoted into a shared persona, permanent title, or invented power dynamic;
+- every active harem lane has a distinct voice, state, intention, and current acoustic trace;
+- latest asset state is recorded by depicted identity, with no wrong-owner tag treated as valid;
 - no new action, outcome, recovery, or scene ending was added;
 - the resume mode matches whether a valid response is pending;
 - secrets are redacted and no hidden analysis is exposed;
@@ -272,7 +286,7 @@ card/lore/system prompt, and must not be treated as in-world dialogue.]
 - Location and environment: [...]
 - Exact current instant: [...]
 - Position and physical continuity: [...]
-- Latest valid asset state: [...]
+- Latest valid asset state by participant or exact group: [...]
 
 ## ACTIVE PARTICIPANTS
 
@@ -282,6 +296,7 @@ card/lore/system prompt, and must not be treated as in-world dialogue.]
 - Position, clothing, occupied anatomy, and available movement: [...]
 - Current action, intention, attention, agency, and constraints: [...]
 - Voice, breath, mouth, intensity, climax, and recovery state: [...]
+- Latest valid asset and next required visual-state update: [...]
 - Chat-earned facts that must persist: [...]
 
 ## IMMEDIATE CAUSAL CHAIN

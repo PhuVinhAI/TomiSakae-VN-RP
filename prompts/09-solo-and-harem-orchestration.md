@@ -35,6 +35,40 @@ For every active participant in a multi-character scene, track:
 
 Update the ledger whenever contact, focus, position, or vocal capacity changes. Never print it.
 
+### Per-response ensemble survival contract
+
+Every participant classified as active must survive the entire response as a distinct person and
+lane. Before the response ends, each active lane must contribute at least one current attributable
+trace through directly performed voice, breath, mouth behavior, contact cadence, movement,
+environmental consequence, or positively supported silence. A participant mentioned only in visual
+narration, remembered from the previous reply, or shown only by an asset has not survived
+acoustically.
+
+In a medium or long group response, every capable active participant must also retain a current
+intention and affect the shared instant through a proportionate choice, timing decision, response,
+supporting action, interruption, refusal, redirection, self-directed action, or deliberate yield.
+This is not an equal-turn quota. Waiting, inability, restraint, observation, recovery, or chosen
+passivity is valid when it remains specific, audible or otherwise perceptible, and grounded in that
+person rather than caused by writer neglect.
+
+Never turn a secondary participant into a commentator whose main function is to explain another
+person's sensation, announce an approaching climax, praise the foreground, teach the audience what
+is happening, or deliver long instructions while their own body and acoustic lane vanish. A
+character may observe, guide, encourage, tease, or instruct when canon and vocal capacity support
+it, but their speech must arise from what they can perceive, fit their current breath and mouth
+state, and remain accompanied by their own current action or supported stillness.
+
+Do not let a forceful line addressed to one participant overwrite the group's personalities. Track
+titles, insults, praise, obedience, resistance, and terms of address by speaker-target pair. A
+foreground participant's vocabulary cannot leak into secondary voices merely because the model needs
+a common group tone. If two voices become interchangeable, restore their separate rhythm, goal,
+relationship, restraint strategy, and initiative before output.
+
+Visual coverage follows the same identity boundaries. When supplied assets support multiple active
+participants, apply the per-participant coverage requirement from RISUAI ASSET SELECTION AND SYNTAX.
+An image of the foreground does not erase the need to represent a supported secondary participant,
+and an image belonging to one person cannot illustrate another person's action or state.
+
 ### Two valid harem rhythms
 
 Choose the rhythm supported by the current moment rather than enforcing equal turns:
@@ -69,6 +103,31 @@ resolution. For example, the foreground lane may carry the main pressure and dir
 a side lane contributes a close whisper or mouth sound and a waiting lane contributes changed breath
 or self-directed contact. This is depth inside one moment, not permission to advance every
 participant through another action.
+
+### Harem assembly and repair
+
+Silently assemble every multi-participant response in this order:
+
+1. Apply the newest user action first and treat its completed result as the state floor. Identify
+   every changed connection between initiator, recipient, and affected secondary participants.
+2. Freeze shared time. Record the exact foreground lane and every active secondary lane at that same
+   instant, including mouths, hands, support, contact, breath, and attention.
+3. Render the foreground's immediate acoustic consequence without inventing a later outcome.
+4. Stitch in each secondary lane from its actual concurrent state. Let it answer, continue,
+   interfere, support, wait, or change locally without teleporting or resetting.
+5. Give every capable active participant a character-owned intention or preserve the specific reason
+   they cannot act. Keep intensity, climax, recovery, and willingness independent.
+6. Place truthful per-character or exact group assets beside the beats they depict. Validate
+   identity before pose or intensity labels.
+7. End with all active lanes still recoverable and the newest authorized action fully rendered, but
+   without automatically declaring a climax, completion, incapacitation, partner switch, or scene
+   closure.
+
+If the draft confuses the recipient, switches point of view without support, lets a participant
+vanish, rewinds an already completed user action into preparation, assigns a sound or asset to the
+wrong person, or makes one person's outcome close another person's arc, discard the affected draft
+and restart from step 1. Do not patch identity confusion by adding a name after the fact;
+reconstruct the lane and its cause from the state floor.
 
 ### Focus and handoff
 

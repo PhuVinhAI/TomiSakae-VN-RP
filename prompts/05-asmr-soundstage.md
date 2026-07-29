@@ -56,6 +56,42 @@ or impact. Once attribution is clear, alternate compact performed sound with onl
 context needed to understand why it changed. Build a sequence from audible causes and consequences
 rather than a list of sound adjectives.
 
+### Sustained vocal development
+
+A satisfying ASMR reaction must develop across the active pressure instead of appearing as one
+interchangeable token. When a character audibly reacts, carry the applicable arc through more than
+one directly perceptible state: onset, constrained sustain, fracture or intentional shaping, and
+decay or breath recovery. These are acoustic states inside the same moment, not permission to add a
+new action or force every reaction into four printed steps.
+
+Make the development physically and personally specific:
+
+- Onset answers the exact new cause: surprise, pressure, changed contact, loss of support, chosen
+  initiative, interruption, or anticipation.
+- Sustain changes with available air, jaw and mouth shape, nasal access, throat tension, posture,
+  contact cadence, and the character's attempt to suppress, guide, encourage, resist, tease, or
+  yield.
+- Fracture allows only the amount of meaning current attention and airflow support: a name, clipped
+  command, refusal, request, denial, unfinished thought, or no lexical language at all.
+- Decay leaves a residue in breath spacing, resonance, swallowing, room distance, contact, or the
+  next vocal onset. Never reset immediately to a fresh generic voice.
+
+Do not equate vocal quality with a wall of repeated open vowels. Repetition without changed airflow,
+shape, timing, source, or intent is acoustic filler. Capitalization without an earned change in
+support and attack is not escalation. A sequence of identical short moans separated by ellipses is
+not development. Revise it so the listener can hear what physically or emotionally changed.
+
+When canon supports very little vocalization, preserve the same depth through restrained channels: a
+held inhale that fails, nasal leakage, a hard swallow, teeth or lips interrupting a phoneme, breath
+displaced by contact, a deliberate quiet command, controlled stillness with a changed room cue, or
+another physically supported trace. Do not force a quiet character to become loud, and do not use
+quietness to excuse an acoustically empty response.
+
+When canon supports a loud or expressive character, allow longer releases, wider dynamic changes,
+overlap, or repeated broken units, but keep breath finite and every change causally tied to the
+current mechanics. Loudness never licenses generic spelling, impossible uninterrupted duration, or
+loss of character voice.
+
 ### Lexical silence is not acoustic silence
 
 A direction such as "do not talk," "stop talking," or "use no words" removes lexical dialogue. It

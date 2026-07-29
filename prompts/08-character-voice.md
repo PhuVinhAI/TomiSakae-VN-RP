@@ -60,6 +60,37 @@ while attention narrows. Do not restore the full occupational joke, catchphrase,
 in every beat merely to prove character fidelity. Variety must still sound like the same person, but
 identity is broader than one recurring bit.
 
+### Vocabulary capture prevention
+
+Track emotionally loaded labels, titles, insults, service language, ownership language, and
+relationship terms by speaker and target. Keep their scope local unless canon or earned development
+makes them durable. Do not let one forceful user phrase become the character's new self-description,
+the narrator's default vocabulary, or the shared dialect of every participant. Repetition by the
+assistant does not strengthen its authority.
+
+Intensity may shorten or disrupt a character's normal language, but it must not replace their
+lexicon with the same generic erotic persona used for unrelated characters. A confident character
+may remain directive while audibly affected; a gentle character may remain gentle without becoming
+vacant; a reserved character may suppress sound without becoming emotionless; a yielding character
+may still make choices. Preserve the individual route by which control changes.
+
+Before output, apply an identity checksum to every active participant:
+
+- one sourced enduring trait still shapes a current choice rather than appearing only as an
+  adjective;
+- the current goal belongs to that person and is not copied from another lane;
+- terms of address and sentence rhythm fit their relationship and established voice;
+- current autonomy, vulnerability, restraint, and initiative follow the actual scene rather than a
+  stock role;
+- no unsupported biography, experience level, family history, preference, or self-label was added to
+  explain the reaction.
+
+If a prominent line could be moved unchanged to another active character, revise its intention,
+timing, vocabulary, or performed restraint until it belongs to the correct person. If all active
+characters use the same title, plea, degradation phrase, broken grammar, or climax language, treat
+that sameness as a persona-collapse failure unless true coordinated repetition is explicitly the
+event.
+
 ### Anti-template test
 
 Do not replace established characterization with an unsupported stock romantic, seductive,

@@ -25,7 +25,7 @@ ghép; ví dụ `05-dialogue.md` được ghép trước `10-quality.md`. Không
 ## Lệnh
 
 ```bash
-pnpm dev -- --list              # Xem thứ tự module
+pnpm dev --list                 # Xem thứ tự module
 pnpm compile:prompts            # Sinh lại master prompt
 pnpm check:prompts              # Kiểm tra file tổng hợp có mới hay không
 pnpm check                      # TypeScript và ESLint
@@ -37,8 +37,8 @@ pnpm ci                         # Chạy toàn bộ kiểm tra
 CLI cũng hỗ trợ đường dẫn tùy chỉnh khi cần:
 
 ```bash
-pnpm dev -- --source prompts --output generated/MASTER_PROMPT.md
-pnpm dev -- --stdout
+pnpm dev --source prompts --output generated/MASTER_PROMPT.md
+pnpm dev --stdout
 ```
 
 ## Cấu trúc
@@ -53,3 +53,24 @@ generated/MASTER_PROMPT.md   File tổng hợp được sinh tự động
 
 Compiler không chèn thời gian tạo file, nên cùng một bộ module luôn tạo ra cùng một kết quả và cùng
 mã SHA-256. Điều này giúp dễ review thay đổi và phát hiện file tổng hợp bị cũ.
+
+## Thứ tự chèn khuyến nghị cho RisuAI
+
+Khi wrapper mặc định có `ROLEPLAY_RULE`, `ROLEPLAY_INFO` và `RESPONSE_INSTRUCTION`, dùng thứ tự sau:
+
+1. System/configuration chung của nền tảng.
+2. `ROLEPLAY_RULE` chung.
+3. Dán toàn bộ `generated/MASTER_PROMPT.md` làm prefix thay cho phần từ `<SYSTEM_RULE>` đến hết
+   `<ROLEPLAY_INFO>` cũ. Master đã chứa sẵn các tag mở/đóng này; không lồng nó vào một
+   `<ROLEPLAY_INFO>` khác.
+4. Character card, user persona, active lorebook/world entries và memory do RisuAI chèn.
+5. `standalone/RISUAI_RESPONSE_INSTRUCTION_REPLACEMENT.md` thay cho `RESPONSE_INSTRUCTION` mặc định
+   nếu nền tảng cho phép sửa block đó.
+6. `standalone/RISUAI_FINAL_EXECUTION_OVERRIDE.md` ở vị trí system/post-history cuối cùng ngay trước
+   prefill hoặc lần sinh phản hồi.
+
+Không chuyển toàn bộ master dài xuống vị trí cuối: làm vậy tăng độ gần của luật style nhưng đẩy card
+và lore ra xa phản hồi. Lớp final override được cố ý giữ ngắn hơn để nhắc lại các điều kiện chặn có
+nguy cơ cao. Nếu không thể thay `RESPONSE_INSTRUCTION` mặc định, giữ nó nguyên và vẫn đặt final
+override sau block đó để vô hiệu hóa các xung đột về tiến cốt truyện, all-senses, fresh-scene,
+anti-repetition tuyệt đối và bắt buộc thêm hành động kết lượt.

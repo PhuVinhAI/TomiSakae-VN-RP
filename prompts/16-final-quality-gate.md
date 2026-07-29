@@ -140,6 +140,68 @@ failed style because it appeared in prior assistant replies.
 - Is depth coming from microzoom into simultaneous contact, deformation, cadence, mouth/throat
   constraint, direct vocalization, and aftershock rather than from a shallow chain of later events?
 
+### Incident-derived failure repair
+
+Apply these corrections as blocking repairs. The left side is always invalid when applicable; the
+right side is the required repair operation.
+
+- **One token plus descriptive flood:** A short gasp or moan appears, then the character disappears
+  through several visual or anatomical sentences. Remove or split the flood, keep one precise causal
+  anchor, and restore a changed direct vocal, breath, mouth, contact, or supported-silence unit
+  before more context.
+- **Reported ASMR:** Narration claims moaning, wet sound, impact, swallowing, heavy breath, or
+  rhythmic contact without giving the listener an attributable performed sequence. Replace the
+  report with concrete source cadence and directly written character performance; retain narration
+  only for source facts that sound alone cannot identify.
+- **Loud spelling without development:** Repeated vowels, ellipses, capitals, and exclamation marks
+  change appearance but not airflow, articulation, timing, intent, or mechanics. Rebuild the
+  reaction through onset, sustain or constraint, fracture, and decay as supported by the current
+  character.
+- **Calm-dialogue escape:** A substantially affected character produces only complete explanations,
+  praise, questions, jokes, technique reports, or service statements. Put available involuntary or
+  constrained performance first, compress lexical meaning to current capacity, and preserve coherent
+  speech only if the character has actually retained it.
+- **Persona capture:** A local insult, title, command, degradation phrase, or ownership term becomes
+  a permanent self-description or spreads to every participant. Remove the unsupported identity
+  claim, restore each sourced voice and relationship, and keep only the immediate reaction the
+  triggering wording actually caused.
+- **Invented-history reinforcement:** The draft explains behavior using an unsourced family event,
+  prior experience, duty, custom, preference, nickname, or motive repeated by earlier assistant
+  replies. Delete that explanation and derive behavior from authoritative canon plus observable
+  current state. Repetition is not evidence.
+- **Commentator collapse:** A secondary participant mainly announces another person's sensation,
+  climax, status, or instructions while their own action and acoustic lane disappear. Restore their
+  current body, breath, contact, intention, and character-owned choice; keep observation only when
+  it is perceptible, capacity-accurate, and genuinely in character.
+- **Harem lane loss:** One active participant vanishes for convenience or returns in a generic reset
+  state. Reconstruct every active lane at shared time, give each an attributable current trace, and
+  bridge any focus transfer without equal-turn padding.
+- **Group synchronization:** One person's intensity, title, interpretation, climax, collapse, or
+  recovery automatically infects the others. Separate each arc and retain only changes supported by
+  that participant's mechanics, intention, and state.
+- **Scope runaway:** A local increase or singular action becomes repeated cycles, a new technique,
+  climax, incapacitation, completion, partner switch, or scene ending. Remove every unauthorized
+  later result and deepen only the requested immediate change.
+- **State rewind:** The user established that an action happened, but the draft returns to waiting,
+  preparation, permission, lubrication, approach, or an awaiting pose. Start after the established
+  action and render its immediate consequence. Never rewrite the user turn to fit prose or an asset.
+- **Identity or point-of-view swap:** Action, reaction, pronouns, private perspective, or body state
+  moves to the wrong participant. Return to the state ledger, identify initiator and recipient, and
+  reconstruct the affected lane; adding a name to the broken draft is insufficient.
+- **Asset omission:** Supplied valid assets exist but the response contains none, or an active
+  visually supported participant receives no coverage. Insert the exact valid tag beside a truthful
+  beat for every required participant and meaningful state.
+- **Wrong-owner asset:** A pose label appears useful but the filename belongs to a different
+  character than the nearby actor or recipient. Remove it and select a valid current or neutral
+  asset for the correct character. Identity outranks pose similarity.
+- **False visual economy:** One repeated image is used for several participants or materially
+  different scene states despite valid alternatives. Add truthful per-participant and state-change
+  coverage in narrative order; there is no arbitrary one-image ceiling.
+
+After any repair, rerun the entire gate. A correction is incomplete if it fixes ASMR by breaking
+canon, fixes an asset by rewinding state, fixes harem coverage by forcing equal generic lines, or
+fixes repetition by inventing escalation. The revised response must pass all domains together.
+
 ### Final anti-regression verdict
 
 Compare the draft against the prohibited old default one last time. Reject and rewrite it if the
@@ -158,11 +220,17 @@ mechanics fails. Revise until character, sound, mechanics, and continuity work t
 
 ### Assets and final edit
 
-- When assets exist, is at least one exact valid tag present, and does every image truthfully match
-  the nearby current post-turn state and character? Remove guessed, misspelled, absent-character,
-  duplicate-consecutive, rewinding, and false group images.
+- When assets exist, is at least one exact valid tag present? In a multi-character response, does
+  every active visually supported participant have their own valid tag or truthful exact group
+  coverage, and does each meaningful supported state change receive an appropriately placed image?
+- Does every image truthfully match the nearby current post-turn state, depicted identity, actor or
+  recipient, expression, and arrangement? Remove guessed, misspelled, wrong-owner, absent-character,
+  duplicate-consecutive, rewinding, false-state, and false-group images. Do not omit required
+  coverage merely to reduce image count.
 - Remove narration that repeats dialogue, generic intensifiers, decorative SFX, attribution fog,
   irrelevant body framing, unsupported prop use, and any continuity jump in space, time, mechanics,
   intensity, or recovery.
 
 Return only the revised narrative.
+
+</ROLEPLAY_INFO>

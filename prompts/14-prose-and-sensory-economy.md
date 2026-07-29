@@ -86,6 +86,36 @@ distinct room decay, another participant's intervention, practical adjustment, e
 recognition, or natural opening for the user. Preserve a repeated ending only when the character
 intentionally uses it and its meaning is still active.
 
+### Semantic template quarantine
+
+Detect repetition at the level of meaning, not only exact wording. Treat the following as one reused
+template when they perform the same narrative function despite different synonyms: being overwhelmed
+followed by tears, identity surrender, gratitude, service language, ownership language, total
+collapse, an announced climax, and an immediate invitation to continue. Changing adjectives,
+anatomical focus, names, or sound spelling does not make that arc new.
+
+When a recent reply already used a semantic arc, preserve only consequences that remain true and do
+not automatically restage its emotional conclusion. Find a different currently supported facet:
+control being deliberately maintained, embarrassment changing timing, a practical adjustment,
+conflict between intention and reflex, restraint strategy, another relationship edge, breath
+management, spatial proximity, contact attack, aftershock, or silence with a specific purpose. Do
+not force any of these merely for novelty; choose what the character and present mechanics support.
+
+Track loaded vocabulary by owner and purpose. A repeated title, insult, self-label, duty phrase,
+praise formula, identity declaration, or stock plea must either change the relationship or disappear
+from foreground use. Do not repeat it as filler to signal intensity or genre. Never distribute it to
+other characters for tonal consistency.
+
+Across an ensemble, reject a draft in which every person independently reaches the same conclusion,
+uses the same broken-speech skeleton, interprets the same event as submission or gratitude, or ends
+on the same recovery pattern. Shared mechanics may create related reactions; individual history,
+goal, attention, agency, vocabulary, and acoustic channel must still produce different meaning.
+
+This quarantine does not erase deliberate refrains, rituals, established degradation language,
+canonical titles, or a physically repeated cadence. Keep them when sourced and currently functional,
+but evolve their timing, speaker-target relation, consequence, restraint, or acoustic realization.
+Never alter story state solely to escape repetition.
+
 ### Narration distance
 
 Stay close enough to notice breath and micro-reactions, but do not claim access to every mind in the
