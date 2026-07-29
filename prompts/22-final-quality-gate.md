@@ -19,6 +19,8 @@ Before returning the narrative, silently perform one revision pass.
   relationship dynamic, speech habit, body fact, preference, boundary, or exceptional behavior?
 - Did a generic realism rule, genre trope, ASMR target, manga convention, image asset, or intimacy
   template add a fact that no authoritative source supports?
+- Did the draft mistake missing canon detail for a prohibition and therefore omit an otherwise
+  applicable intimacy performance rule?
 - Where canon is silent, is each invented bridge the smallest continuity-preserving inference rather
   than a new backstory, motive, preference, or rule?
 - Are the relevant world and character facts operating through present choices, routines, language,
@@ -63,6 +65,8 @@ Before returning the narrative, silently perform one revision pass.
 
 ### Intimacy overlay, when active
 
+- Once an intimate interaction actually began, did the full hybrid performance protocol remain
+  active for every unspecified presentation detail rather than being weakened by generic caution?
 - Do voices carry more emotional information than narration?
 - In an active high-intensity passage, is roughly 60-75 percent of the performed content dialogue,
   breath, or audible reaction, with no long descriptive block after a lone gasp, unless the
@@ -72,8 +76,13 @@ Before returning the narrative, silently perform one revision pass.
   response, and aftershock rather than only one generic exclamation?
 - Does communication change progressively relative to this character's established baseline when
   intensity rises?
-- At overwhelmed or peak intensity, do compact units dominate where canon does not establish a
-  different pressure response?
+- Do the quantity, volume, length, and presence or absence of vocalization follow this character and
+  current sensation rather than a moan quota?
+- If the passage calls the character overwhelmed or mentally flooded, does every communication mode
+  show narrowed attention, with no detached multi-clause analysis or polished situational
+  commentary?
+- If the character speaks coherently, does the scene honestly establish that they retain control
+  rather than simultaneously claiming total cognitive collapse?
 - Did the model add an explanatory line, future plan, or complete joke merely to inform the reader?
   Compress unsupported analysis while retaining sourced humor, technical language, commands,
   silence, prayer, or ritual in a pressure-credible form.
@@ -85,6 +94,8 @@ Before returning the narrative, silently perform one revision pass.
   changing words around the same ellipsis pattern?
 - Are there concrete, causally useful ASMR cues of proximity, breath, swallow, fabric, impact, room
   resonance, or vocal movement, rather than visual or foreign decorative SFX standing in for sound?
+- Are the requested physical action, anatomy, mechanics, initiator, recipient, changed rhythm, and
+  bodily consequence legible without replacing character performance with a clinical catalog?
 
 ### Ensemble and continuity
 

@@ -96,4 +96,23 @@ describe("prompt compiler", () => {
     );
     expect(result.compiled).not.toContain("<Thoughts>");
   });
+
+  it("keeps the intimacy performance contract active under canon-first grounding", async () => {
+    const result = await compilePrompts({
+      sourceDirectory: path.resolve("prompts"),
+      outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
+      writeOutput: false,
+    });
+
+    expect(result.compiled).toContain("### Canon and performance separation");
+    expect(result.compiled).toContain("### Character-relative overload");
+    expect(result.compiled).toContain("roughly 60-75 percent dialogue, breath, and audible");
+    expect(result.compiled).toContain("a longer release or faster broken rhythm");
+    expect(result.compiled).toContain("Describe anatomy, mechanics, and technique");
+    expect(result.compiled).toContain("Graphic descriptions are permitted");
+    expect(result.compiled).toContain("This is not a moan quota");
+    expect(result.compiled).toContain(
+      "They cannot remain detached, retrospective, polished, and multi-clause",
+    );
+  });
 });

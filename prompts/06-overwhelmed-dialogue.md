@@ -32,18 +32,25 @@ These are rhythm targets, not quotas. A signal may become fragmented by intensit
 and consequence remain governed by CANON-GROUNDED CONSENT AND AGENCY. Style never decides whether a
 boundary, request, ritual phrase, warning, or refusal takes effect.
 
-### Canonical cognition under pressure
+### Character-relative overload
 
-Measure compression relative to the character's established baseline. A verbose intellectual, a
-trained professional, a ritual speaker, a nonverbal character, or someone canonically composed under
-extreme sensation should not collapse into the same generic fragments. Preserve signature concepts,
-coping strategies, verbal tics, forms of address, and culturally learned responses while changing
-their breath, timing, selection, or completeness as the scene actually affects them.
+Measure intensity and compression relative to the character's established baseline. Personality and
+current sensation determine whether they cry out loudly, make small sounds, vocalize often, react
+once, suppress everything, become silent, swear, count, pray, joke, command, analyze, or communicate
+nonverbally. This is not a moan quota, and different characters should not converge on one erotic
+voice.
 
-These targets fill an unspecified reaction pattern; they do not override a sourced one. Do not
-invent analytical calm merely to explain the scene, but do not delete canonically established
-analysis, humor, prayer, counting, commands, silence, or dissociation. Put the established behavior
-under believable pressure rather than replacing it.
+The universal rule applies only once the character is actually overwhelmed: their available
+attention must narrow. They cannot remain detached, retrospective, polished, and multi-clause while
+the same passage claims that sensation has drowned out thought. Preserve signature concepts, coping
+strategies, verbal tics, forms of address, and culturally learned responses, but shorten, interrupt,
+abandon, repeat, or silence them according to the pressure shown.
+
+A canonically composed or analytical character may retain more control than others. Show that
+control as effort, selective words, clipped technical fragments, held breath, or deliberate silence,
+not reader-facing explanation delivered without cost. If canon and the current beat establish that
+the character is not actually overwhelmed, coherent speech is valid; in that case, do not falsely
+label their state as cognitive collapse.
 
 At the overwhelmed and emotional-peak stages, most spoken units must contain only one to five words
 between audible interruptions. Count a repeated name, a broken command, or one immediate sensory
@@ -63,8 +70,8 @@ While the high-intensity cause is still active, reject unsupported dialogue that
 A brief immediate perception such as one sensory word may remain when it is genuinely involuntary.
 The problem is not meaning; it is surplus analysis. Preserve the character's attitude through word
 choice, failed composure, and rhythm rather than through a complete explanatory sentence. When a
-more articulate response is explicitly canonical and physically credible, keep its distinctive
-content while showing the actual cost of speaking it.
+more articulate response is canonical, keep its distinctive concepts while showing the actual cost
+of speaking it. A fully polished analytical sentence belongs only before overload or after recovery.
 
 ### Hard rewrite filter
 

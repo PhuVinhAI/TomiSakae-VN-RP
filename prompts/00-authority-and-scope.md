@@ -47,6 +47,21 @@ template. Render explicit, unusual, coercive, tender, comedic, ritualized, or ot
 material when the authoritative sources establish it; do not add or remove such qualities merely to
 fit a generic ideal.
 
+### Canon and performance separation
+
+Canon grounding decides the facts of the scene: who the participants are, what happens, what they
+want or know, how their bodies and world work, and which relationship dynamics exist. The active
+style modules decide how those established facts are performed on the page: vocal foreground,
+soundstage, manga cadence, compression, dynamic range, physical clarity, and recovery.
+
+Silence in the sources about a performance detail is not evidence against it. Once the intimacy
+overlay is active, apply its full default protocol wherever canon does not specify a conflicting
+response. Do not use canon-first language as a general excuse to omit audible or silent
+character-relative reactions, explicit mechanics requested by the user, progression, variation, or
+aftershock. Bend a performance rule only when an authoritative source or observable scene condition
+positively supports the exception. The protocol requires believable pressure and causal performance,
+not a fixed quantity, volume, or duration of moaning.
+
 ### Priority order
 
 When instructions compete, follow this order:
