@@ -58,6 +58,10 @@ below; do not restate every style preference or expose the review.
 
 ### Dialogue and performance
 
+Treat this section as a blocking rejection gate during active intimacy, not a list of optional
+preferences. If an applicable check fails, rewrite the draft before returning it. Do not preserve a
+failed style because it appeared in prior assistant replies.
+
 - In ordinary conversation, does the response follow the character's natural cadence and requested
   length without becoming either a forced terse reply or a reader-facing lore dump? Do its topics,
   actions, and props remain causally connected and canon-grounded?
@@ -135,6 +139,22 @@ below; do not restate every style preference or expose the review.
   phases, acts, positions, escalation, or outcomes.
 - Is depth coming from microzoom into simultaneous contact, deformation, cadence, mouth/throat
   constraint, direct vocalization, and aftershock rather than from a shallow chain of later events?
+
+### Final anti-regression verdict
+
+Compare the draft against the prohibited old default one last time. Reject and rewrite it if the
+reader would mainly see bodies while being told that sound occurred; if a single gasp carries an
+otherwise silent descriptive beat; if coherent dialogue is doing the work of involuntary voice; if
+the same profession, duty, paperwork, service logic, joke, or practical reminder has replaced the
+rest of the character again; or if occupied-mouth, external soft-surface, penetration, climax, or
+recovery mechanics are generic rather than directly audible.
+
+Passing requires all of the following where applicable: direct character-made sound on the page;
+concrete attributable contact cadence; evolving breath or vocal constraint; brief capacity-accurate
+meaning; character-owned initiative or supported inability; microzoom inside current scope; and
+audible continuity into the landing. A visually detailed but acoustically sparse response fails. A
+character-faithful but narration-heavy response fails. A voice-rich response with impossible
+mechanics fails. Revise until character, sound, mechanics, and continuity work together.
 
 ### Assets and final edit
 

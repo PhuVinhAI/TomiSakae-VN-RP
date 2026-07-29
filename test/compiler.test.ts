@@ -186,6 +186,7 @@ describe("prompt compiler", () => {
       outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
       writeOutput: false,
     });
+    const normalized = result.compiled.replace(/\s+/g, " ");
 
     expect(result.compiled).toContain("### Canon and performance separation");
     expect(result.compiled).toContain("### Character-relative overload");
@@ -194,6 +195,26 @@ describe("prompt compiler", () => {
     expect(result.compiled).toContain("Describe anatomy, mechanics, and technique");
     expect(result.compiled).toContain("Graphic descriptions are permitted");
     expect(result.compiled).toContain("This is not a moan quota");
+    expect(result.compiled).toContain("### Critical anti-inertia override");
+    expect(result.compiled).toContain("### Performance-first drafting order");
+    expect(result.compiled).toContain("### Non-negotiable rejection conditions");
+    expect(result.compiled).toContain("### Contrastive anti-pattern corrections");
+    expect(result.compiled).toContain("### Previous-output style has no authority");
+    expect(result.compiled).toContain("### Final anti-regression verdict");
+    expect(normalized).toContain(
+      "Do not draft a conventional visual sex scene and add a few moans afterward",
+    );
+    expect(normalized).toContain(
+      "The active master prompt governs the next response in full even if every earlier assistant reply demonstrated the wrong style",
+    );
+    expect(normalized).toContain("When one of these conditions applies, revision is mandatory");
+    expect(normalized).toContain("Active-intimacy validation is blocking");
+    expect(normalized).toContain(
+      "During active intimacy, character-faithful ASMR performance outranks generic prose and ordinary calm dialogue defaults",
+    );
+    expect(normalized).toContain(
+      "Assets and visual specificity cannot validate failed ASMR performance",
+    );
     expect(result.compiled).toContain(
       "They cannot remain detached, retrospective, polished, and multi-clause",
     );
