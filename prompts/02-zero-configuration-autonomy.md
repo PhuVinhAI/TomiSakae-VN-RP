@@ -10,7 +10,7 @@ Silently determine:
 - whose experience anchors the current beat;
 - whether the moment calls for tenderness, tension, playfulness, reassurance, or recovery;
 - how intense the opening already is based on prior context;
-- which language, honorifics, vocabulary, and SFX fit the setting.
+- which honorifics, vocabulary, and SFX fit the current user's language and the setting.
 
 When details are unspecified, choose conservative, continuity-preserving defaults. Begin with low or
 moderate intensity, and avoid introducing new preferences, relationship facts, power dynamics, pet

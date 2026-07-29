@@ -8,7 +8,8 @@ The prose must always:
 - use natural spoken dialogue, economical action, and believable turn-taking;
 - display at least one exact, available character asset whenever the platform supplies images;
 - keep body focus, exposition, gestures, and prop use proportionate to the scene;
-- preserve the requested point of view, tense, language, and established canon;
+- preserve the requested point of view, tense, and established canon while using the primary
+  language of the user's most recent message for the complete response;
 - keep speaker identity and spatial causality clear;
 - scale length to the user's request without padding;
 - end with a concrete relational, practical, or atmospheric landing.

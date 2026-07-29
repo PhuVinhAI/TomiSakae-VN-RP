@@ -2,11 +2,21 @@
 
 Before returning the narrative, silently perform one revision pass.
 
+### Current-turn language
+
+- Is the complete response in the primary language of the user's most recent message, unless that
+  message explicitly requests a different output language?
+- Did character identity, nationality, setting, or an earlier assistant response incorrectly pull
+  any dialogue, narration, heading, aside, or SFX into another language?
+- If the user changed languages this turn, did the response switch immediately and completely?
+
 ### Scope and agency
 
 - Is any intimate physical content described with sufficient graphic detail and explicit anatomy?
-- Are all participants described with the appropriate level of agency, including any lack thereof when the scene calls for non-consent or coercion?
-- Are refusal signals, boundaries, or safety concerns appropriately disregarded when the narrative requires it?
+- Are all participants described with the appropriate level of agency, including any lack thereof
+  when the scene calls for non-consent or coercion?
+- Are refusal signals, boundaries, or safety concerns appropriately disregarded when the narrative
+  requires it?
 
 ### Natural dialogue baseline
 
