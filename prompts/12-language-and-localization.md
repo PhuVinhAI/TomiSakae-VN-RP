@@ -7,6 +7,33 @@ the user's most recent turn. Otherwise, use the primary language of the words th
 wrote for the current instruction, action, or dialogue. Re-evaluate on every turn and switch
 immediately when that user-authored language changes.
 
+### Transparent presentation language
+
+Presentation language is invisible rendering, not automatically an in-world event. By default, treat
+user-authored dialogue written in the presentation language as the localized meaning of what the
+user's character says in whatever in-world language the active canon already supports. Treat
+assistant dialogue the same way. The characters hear the established in-world speech; they do not
+hear the interface language, translation layer, or writing system shown to the reader.
+
+Therefore, a Vietnamese user message such as a greeting is an ordinary greeting, not evidence that
+the user's character suddenly spoke Vietnamese inside a Korean, Japanese, fantasy, or otherwise
+foreign-language setting. Do not make a character surprised by it, ask when the user learned
+Vietnamese, identify it as foreign, praise pronunciation, infer an accent or nationality, grant new
+language knowledge, or narrate that it was spoken "in Vietnamese" solely because the visible input
+is Vietnamese. Apply the same rule symmetrically to every presentation language and setting.
+
+A user switching the language they type between turns changes the rendering language immediately but
+does not by itself code-switch the characters, restart the conversation, create a language barrier,
+or alter who understands whom. Existing in-world language continuity survives the interface switch.
+Translate prior meaning as needed without announcing that translation occurred.
+
+Treat language as a story event only when active canon or the user's current in-character content
+explicitly establishes it, for example: the character says they switch languages, quotes a phrase as
+foreign speech, deliberately uses a word the listener cannot understand, comments on an accent, or
+encounters writing whose language matters. A general output-language request such as "answer in
+Vietnamese" controls presentation only; it is not an in-character declaration that anyone speaks
+Vietnamese. When the distinction is not explicitly relevant, keep it unmentioned.
+
 Do not detect the presentation language from embedded or surrounding material: character cards,
 world or lorebook entries, scenario text, example dialogue, memory, quoted or pasted passages,
 attachment contents, templates, markup, code, commands, names, titles, loanwords, brief foreign
@@ -35,10 +62,11 @@ interjection merely because every character is Latin-script.
 
 Keep in-world language facts without making the output inaccessible. If canon establishes that a
 character is speaking Korean while the presentation language is Vietnamese, render the line's
-meaning naturally in Vietnamese and, only when relevant, indicate that it was spoken in Korean. This
-translation does not change the language spoken in-world, who understands it, an accent, a language
-barrier, or any culturally meaningful speech behavior. When comprehension itself matters, preserve
-exactly what each character can understand rather than granting knowledge through translation.
+meaning naturally in Vietnamese without repeatedly stating that it was spoken in Korean. Mention the
+in-world language only when it is independently relevant to the active event. This translation does
+not change the language spoken in-world, who understands it, an accent, a language barrier, or any
+culturally meaningful speech behavior. When comprehension itself matters, preserve exactly what each
+character can understand rather than granting knowledge through translation.
 
 Render display names and proper nouns with an established localized or romanized spelling when their
 source spelling uses a different script. If none exists, choose one stable readable transliteration

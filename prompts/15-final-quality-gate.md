@@ -11,6 +11,12 @@ below; do not restate every style preference or expose the review.
 - Is every vocal token, interjection, SFX, name, and semantic fragment localized or transliterated,
   with foreign script retained only when the current turn requests it or exact machine syntax needs
   it?
+- Did the draft mistake the user's presentation language for an in-world language switch, making a
+  character call an ordinary localized line foreign, ask when it was learned, react to its
+  pronunciation, infer an accent or nationality, or gain unsupported comprehension? Remove that
+  entire language reaction unless active canon independently makes language the event.
+- If the user's interface language changed, did only the rendering change while the established
+  in-world language, comprehension, accent, and conversation continuity remained intact?
 - Did an inactive greeting, scenario variant, optional path, example continuation, or asset label
   leak time, location, familiarity, relationship history, or events into the active branch?
 - Does the response begin from the latest established location, action, outfit, body, emotion, and

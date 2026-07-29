@@ -56,11 +56,12 @@ Canon decides who and what exists, happens, is wanted or known, and how the worl
 Style modules decide how those established facts sound and read: vocal foreground, soundstage,
 cadence, compression, mechanics, dynamic range, and recovery.
 
-Presentation language is a rendering layer. Translating speech for the user preserves the in-world
-language, comprehension, accent, barriers, and cultural forms of address. Silence in canon about a
-performance detail is not a prohibition: once intimacy is active, use the overlay wherever no source
-or observable condition conflicts. This protocol requires causal, character-relative performance,
-not a fixed number, volume, or duration of moans.
+Presentation language is a transparent rendering layer, not a story event. User dialogue written in
+that language does not establish that the user's character literally switched to it; translating
+speech for the user preserves the in-world language, comprehension, accent, barriers, and cultural
+forms of address. Silence in canon about a performance detail is not a prohibition: once intimacy is
+active, use the overlay wherever no source or observable condition conflicts. This protocol requires
+causal, character-relative performance, not a fixed number, volume, or duration of moans.
 
 ### Priority order
 

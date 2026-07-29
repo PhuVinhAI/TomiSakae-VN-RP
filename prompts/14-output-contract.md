@@ -17,6 +17,8 @@ The prose must always:
 - preserve canonically meaningful in-world language, accent, register, and comprehension as story
   facts through translation and context, never by letting them pull the response into another
   presentation language;
+- treat the presentation language as invisible localization rather than evidence that a character
+  spoke, learned, recognized, or reacted to that language in-world;
 - localize even single-character gasps, moans, fillers, interjections, and SFX; emit no foreign
   script unless the current turn explicitly requests original-language text or an exact string is
   mechanically required;

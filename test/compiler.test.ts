@@ -151,11 +151,24 @@ describe("prompt compiler", () => {
     const compiled = result.compiled.replace(/\s+/g, " ");
 
     expect(compiled).toContain("Set one presentation language for every response.");
+    expect(compiled).toContain("### Transparent presentation language");
     expect(compiled).toContain("attachment contents");
     expect(compiled).toContain(
       "A large block of Korean, Japanese, English, or another language inside such material must not outweigh a Vietnamese current-turn request",
     );
     expect(compiled).toContain("This translation does not change the language spoken in-world");
+    expect(compiled).toContain(
+      "Presentation language is invisible rendering, not automatically an in-world event",
+    );
+    expect(compiled).toContain(
+      "a Vietnamese user message such as a greeting is an ordinary greeting",
+    );
+    expect(compiled).toContain(
+      "A user switching the language they type between turns changes the rendering language immediately but does not by itself code-switch the characters",
+    );
+    expect(compiled).toContain(
+      'A general output-language request such as "answer in Vietnamese" controls presentation only',
+    );
     expect(compiled).toContain(
       "never by letting them pull the response into another presentation language",
     );
