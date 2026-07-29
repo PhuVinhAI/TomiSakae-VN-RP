@@ -14,8 +14,11 @@ Before returning the narrative, silently perform one revision pass.
 - If an in-world language, accent, code-switch, untranslated phrase, honorific, inscription, or
   language barrier matters, did the response preserve it as a story fact while translating
   accessible meaning and maintaining each character's actual comprehension?
-- Is every retained foreign expression brief, canonically or contextually necessary, and immediately
-  understandable, rather than an opening for an accidental full-language switch?
+- Does any unintended foreign-script character remain in a gasp, moan, filler, interjection, SFX,
+  display name, dialogue, or narration? Localize or transliterate it even if it is only one
+  character.
+- Is every retained foreign-script string explicitly requested in the current turn or mechanically
+  required, rather than merely canonical, brief, familiar, decorative, or genre-appropriate?
 
 ### Canon and source fidelity
 

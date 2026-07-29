@@ -114,6 +114,12 @@ describe("prompt compiler", () => {
     expect(compiled).toContain(
       "never by letting them pull the response into another presentation language",
     );
+    expect(compiled).toContain("The lock applies even to one-character utterances.");
+    expect(compiled).toContain("Never copy a Hangul, kana, or other foreign-script vocal token");
+    expect(compiled).toContain(
+      "emit no foreign script unless the current turn explicitly requests original-language text",
+    );
+    expect(compiled).toContain("Localize or transliterate it even if it is only one character.");
   });
 
   it("keeps the intimacy performance contract active under canon-first grounding", async () => {

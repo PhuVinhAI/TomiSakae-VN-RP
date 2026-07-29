@@ -17,6 +17,9 @@ The prose must always:
 - preserve canonically meaningful in-world language, accent, register, and comprehension as story
   facts through translation and context, never by letting them pull the response into another
   presentation language;
+- localize even single-character gasps, moans, fillers, interjections, and SFX; emit no foreign
+  script unless the current turn explicitly requests original-language text or an exact string is
+  mechanically required;
 - integrate relevant canon through choices, routines, vocabulary, objects, bodies, institutions,
   relationships, and consequences rather than reciting or silently replacing it;
 - add no unsupported preference, motive, history, world rule, relationship fact, power dynamic,

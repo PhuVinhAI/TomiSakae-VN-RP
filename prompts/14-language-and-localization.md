@@ -20,6 +20,14 @@ exchange into another language merely because the character, setting, source mat
 dialogue, or previous response uses it. Only the user's current-turn request for that output
 language can authorize a full switch.
 
+The lock applies even to one-character utterances. Localize every gasp, moan, cry, hesitation,
+filler, interjection, onomatopoeia, and SFX into the presentation language's natural sound and
+writing system. Never copy a Hangul, kana, or other foreign-script vocal token merely because it
+appeared in a card, example, prior reply, or genre source. Canon may determine the sound's force,
+length, rhythm, and emotional meaning; it does not require preserving the source script. For
+Vietnamese presentation, use natural Vietnamese orthography for the intended sound, not Hangul or
+another foreign script.
+
 Keep in-world language facts without making the output inaccessible. If canon establishes that a
 character is speaking Korean while the presentation language is Vietnamese, render the line's
 meaning naturally in Vietnamese and, only when relevant, indicate that it was spoken in Korean. This
@@ -27,10 +35,17 @@ translation does not change the language spoken in-world, who understands it, an
 barrier, or any culturally meaningful speech behavior. When comprehension itself matters, preserve
 exactly what each character can understand rather than granting knowledge through translation.
 
-Names, proper nouns, stable honorifics, culturally specific forms of address, inscriptions, and
-short recurring canonical phrases may remain in their established form. An exact foreign phrase may
-appear when its wording itself matters, but keep it brief and immediately make its meaning available
-in the presentation language. Do not use this exception to produce extended untranslated speech.
+Render display names and proper nouns with an established localized or romanized spelling when their
+source spelling uses a different script. If none exists, choose one stable readable transliteration
+without changing the referent. Keep exact asset keywords, code, and machine-required strings intact
+because changing them would break functionality, but do not expose unrelated source-script text
+around them.
+
+Do not reproduce an exact foreign-script phrase, inscription, honorific, or recurring expression
+unless the user's current turn explicitly asks to see original-language text. Otherwise translate or
+transliterate it and preserve its cultural or relational function through context. A meaningful
+language barrier can be shown by stating in the presentation language that speech or writing was not
+understood; the foreign script itself is not required.
 
 Make the performance sound native to the selected language rather than translating an English,
 Korean, or Japanese template word for word.
@@ -43,9 +58,10 @@ Preserve:
 - pronounceable vocal texture;
 - stable names and honorifics already established by the story.
 
-Do not import foreign SFX, honorifics, kinship terms, or genre phrases merely to signal manga. Keep
-them when the setting, card, example dialogue, or requested style supports them. Otherwise, choose a
-natural sound word in the presentation language or omit the SFX.
+Do not import foreign SFX, honorifics, kinship terms, vocal fillers, or genre phrases merely to
+signal manga or nationality. Translate or transliterate culturally meaningful terms and choose a
+natural sound word in the presentation language, unless the current turn explicitly requests the
+original script. Omit an SFX when no natural rendering improves the beat.
 
 ### Fragment quality
 
