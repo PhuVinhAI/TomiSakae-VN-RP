@@ -20,6 +20,11 @@ Do not reuse the same reaction skeleton within three nearby beats. Avoid recurri
 sound + name + identical plea + capitalized ending. Never attach one universal sound to every
 character.
 
+Treat the three-dimension change as mandatory for adjacent high-intensity reactions. Before output,
+compare their onset, length, breath pattern, and ending shape. If two reactions could be exchanged
+without changing the audible arc, rewrite one of them. Ellipses inserted into otherwise identical
+complete sentences do not create vocal variation.
+
 ### Motifs with progression
 
 Repetition is valuable when it evolves. A name may begin as a confident address, return as a

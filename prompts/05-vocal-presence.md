@@ -14,6 +14,16 @@ Use this hidden reaction loop:
 Do not apply the loop so mechanically that every paragraph has identical syntax. It describes cause
 and effect, not a mandatory printed template.
 
+For a sudden or forceful high-intensity change, the minimum complete beat is an involuntary reflex,
+a broken immediate fragment, and an audible aftershock. Distribute those across two or more
+performed vocal units when needed. Do not spend the entire reaction on one short exclamation and
+then hand the emotional work to narration.
+
+Once speech has reached the narrowing or overwhelmed state, keep it there until recovery is audibly
+earned. A character may attempt a familiar joke, complaint, or instruction, but the attempt must
+shorten, repeat, derail, or dissolve into breath. Do not let one fragmented line be followed by a
+calm multi-clause sentence at the same intensity.
+
 ### Continuous presence
 
 Continuous vocal presence does not mean uninterrupted noise. A character may become quiet, listen,

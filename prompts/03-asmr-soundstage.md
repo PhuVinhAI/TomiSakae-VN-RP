@@ -27,5 +27,18 @@ A pause is an active beat, not missing content. Give it a soft breath, an unfini
 swallow, a tiny shift, or charged stillness that is immediately resolved by a voice. Do not fill
 every pause with the same gasp.
 
+### Acoustic continuity
+
+Every substantial high-intensity change needs an audible trail, not merely a visual consequence.
+Carry the listener through at least two changing stages such as a caught inhale becoming a broken
+word, a broken word falling into uneven breath, or a near whisper widening and then dropping back to
+the listener's ear. A single written gasp followed by several sentences of body description is not
+an ASMR beat.
+
+Use the room when it sharpens the voice: breath close to an ear, a swallowed word after a muted
+impact, fabric shifting under a change of weight, or a voice briefly changing distance. These cues
+must remain audible, localized to the output language, and causally tied to the moment. A tactile or
+visual manga SFX does not count as ASMR merely because it is italicized.
+
 Never describe a purely visual detail as though the listener could hear it. If a visual detail
 matters, connect it to an audible consequence or leave it to the manga cadence module.

@@ -38,3 +38,19 @@ larger capitalization.
 Start at the intensity already earned by preceding context. Without preceding context, begin low or
 moderate. Never manufacture urgency by skipping attunement, and never treat escalation as mandatory
 when tenderness, uncertainty, or aftercare is the more truthful direction.
+
+### Abrupt-event micro-arc
+
+When the user's action creates an immediate high-intensity change, do not restart the whole scene at
+attunement and do not flatten the response into one gasp. Build a compact vocal arc inside the
+reaction:
+
+1. a caught inhale, near-quiet onset, or other involuntary reflex;
+2. one or more clipped sounds or failed words;
+3. a longer release or faster broken rhythm as control gives way;
+4. the sparsest, most fractured vocal crest;
+5. uneven breath and softened fragments before any coherent recovery line.
+
+The stages may share a paragraph and some may be very short, but their sound, length, volume, or
+breath pattern must visibly change. An abrupt physical cause justifies an abrupt onset; it does not
+justify skipping the aftershock or returning immediately to polished speech.

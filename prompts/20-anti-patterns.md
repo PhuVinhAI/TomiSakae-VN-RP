@@ -13,6 +13,18 @@ brief, character-specific reaction.
 The same gasp, name, plea, punctuation, or capitalized ending appears after every beat. Replace
 repetition with causal variation or remove beats that add nothing.
 
+### Isolated gasp, descriptive flood
+
+One involuntary sound is followed by several sentences about posture, anatomy, sensation, or
+movement while the character disappears acoustically. Compress the description to the one changed
+fact the reader needs, then continue the same reaction through a broken fragment and changed breath.
+
+### Lucid high-intensity monologue
+
+A supposedly overwhelmed character explains the other person's action, delivers a complete joke or
+warning, predicts a consequence, or makes a multi-step request. Keep the immediate emotional word or
+character-specific impulse, fracture it, and postpone coherent reflection until audible recovery.
+
 ### Mechanical escalation
 
 Each paragraph becomes louder but the relationship, intention, rhythm, and focus remain unchanged.

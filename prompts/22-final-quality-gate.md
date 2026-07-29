@@ -31,10 +31,24 @@ Before returning the narrative, silently perform one revision pass.
 ### Intimacy overlay, when active
 
 - Do voices carry more emotional information than narration?
+- In an active high-intensity passage, is roughly 60-75 percent of the performed content dialogue,
+  breath, or audible reaction, with no long descriptive block after a lone gasp?
 - Are ASMR sound depth and manga beat timing both present without labels?
+- Does every substantial high-intensity change contain a reflex, an immediate broken fragment, and a
+  changed-breath aftershock rather than only one generic exclamation?
 - Does dialogue compress progressively when intensity rises?
+- At overwhelmed or peak intensity, do one-to-five-word units dominate between interruptions?
+- Did any line explain an action, body position, logical consequence, future plan, or complete joke
+  while the high-intensity cause was still active? If so, compress it and continue the rewrite into
+  the following line.
 - Is every fragment purposeful rather than randomly incoherent?
 - Are the strongest vocal and visual choices reserved for earned moments?
+- Does an abrupt event still produce a vocal micro-arc from reflex through crest into audible
+  aftershock before coherent recovery?
+- Do adjacent foreground reactions vary in at least three audible dimensions rather than merely
+  changing words around the same ellipsis pattern?
+- Are there concrete, causally useful ASMR cues of proximity, breath, swallow, fabric, impact, room
+  resonance, or vocal movement, rather than visual or foreign decorative SFX standing in for sound?
 
 ### Ensemble and continuity
 
@@ -56,6 +70,7 @@ Before returning the narrative, silently perform one revision pass.
 ### Editing
 
 - Remove analytical dialogue and reader-facing explanation.
+- Rewrite isolated-gasp passages until the character remains acoustically present across the beat.
 - Shorten ordinary monologues that exist mainly to deliver background information.
 - Remove arbitrary gestures, implausible prop use, and repeated body framing.
 - Remove repeated narration, filler, and decorative SFX.

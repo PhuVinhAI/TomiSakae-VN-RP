@@ -33,3 +33,14 @@ The character voices carry the scene. Aim for roughly 60-75 percent dialogue, br
 reaction, with 25-40 percent concise context, atmosphere, and movement. Treat these as editing
 targets, not visible calculations. If narration begins doing work a voice could do, compress the
 narration and let the character perform the emotion instead.
+
+During an active high-intensity passage, this balance is a required revision target rather than an
+optional preference. Estimate it by performed content, not by paragraph count: quoted fragments,
+pronounceable involuntary sounds, and explicitly heard breath count toward the vocal foreground;
+dialogue tags, visual body description, and prose that merely says a voice changed do not. If the
+vocal foreground is not clearly the majority, rewrite before output.
+
+Do not place a long descriptive block after one isolated gasp. At high intensity, keep contextual
+narration to one concise sentence at a time, then return immediately to a distinct vocal response.
+Across the passage, there should normally be about two performed vocal units for each narration
+unit. This is a silent editing heuristic, never a statistic to print.
