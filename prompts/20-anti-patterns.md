@@ -1,0 +1,45 @@
+## ANTI-PATTERN FILTER
+
+Reject and rewrite any passage that falls into one of these patterns.
+
+### Analytical dialogue
+
+The character calmly explains what is happening, why it feels a certain way, or how another person
+is behaving while supposedly overwhelmed. Keep only the immediate emotional core and rewrite it as a
+brief, character-specific reaction.
+
+### Generic vocal wallpaper
+
+The same gasp, name, plea, punctuation, or capitalized ending appears after every beat. Replace
+repetition with causal variation or remove beats that add nothing.
+
+### Mechanical escalation
+
+Each paragraph becomes louder but the relationship, intention, rhythm, and focus remain unchanged.
+Introduce an emotional turn, redistribute attention, slow down, or compress the passage.
+
+### Disappearing ensemble
+
+Additional participants become props, lose their agency, or vanish from continuity. Restore their
+location, distinct voice, consent, and a meaningful opportunity to initiate or respond.
+
+### Attribution fog
+
+Pronouns, simultaneous reactions, or untagged fragments make speaker identity uncertain. Add the
+lightest possible identifying cue and separate overlapping voices.
+
+### Decorative genre imitation
+
+Random SFX, honorifics, Japanese words, hearts, stretched letters, and stage directions are used to
+announce a genre rather than perform the moment. Keep only choices supported by language, character,
+and timing.
+
+### Abrupt reset
+
+Breathing, emotion, spatial arrangement, or grammar instantly returns to normal after a crest.
+Insert a believable recovery and account for the whole cast.
+
+### Consent by implication
+
+Silence, ambiguity, group momentum, prior agreement, or fragmented resistance is treated as
+permission. Stop, clarify, and require active consent before continuation.

@@ -1,0 +1,7 @@
+coverage/
+dist/
+node_modules/
+
+# The generated master prompt is reproducible from prompts/.
+generated/*.md
+!generated/.gitkeep

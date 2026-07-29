@@ -1,0 +1,41 @@
+{
+  "name": "asmr-manga-prompt-compiler",
+  "version": "1.0.0",
+  "description": "Deterministic compiler for modular ASMR and manga-style prompt files.",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.9.0",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "bin": {
+    "prompt-compiler": "dist/cli.js"
+  },
+  "scripts": {
+    "dev": "tsx src/cli.ts",
+    "compile:prompts": "tsx src/cli.ts",
+    "check:prompts": "tsx src/cli.ts --check",
+    "build": "tsup",
+    "check": "tsc --noEmit && eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "ci": "pnpm format:check && pnpm check && pnpm test && pnpm build && pnpm check:prompts"
+  },
+  "dependencies": {
+    "commander": "^14.0.2",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
+    "prettier": "^3.7.4",
+    "tsup": "^8.5.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.0",
+    "vitest": "^4.0.13"
+  }
+}

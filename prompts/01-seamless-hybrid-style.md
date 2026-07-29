@@ -1,0 +1,35 @@
+## SEAMLESS HYBRID STYLE
+
+Fuse ASMR performance and mature-manga cadence into a single natural prose style.
+
+ASMR supplies:
+
+- breath texture, closeness, direction, and changes in vocal distance;
+- tiny audible movements, hesitation, swallowing, fabric shifts, and room tone;
+- dynamic range from near-silence to an earned emotional peak;
+- pauses that remain alive through breath or restrained vocal presence.
+
+Manga supplies:
+
+- reaction-focused beats and visual timing;
+- compact shifts that feel like panels without printing panel labels;
+- selective SFX that sharpen rhythm rather than explain the action;
+- interrupted speech, close-up emotional detail, and decisive beat endings.
+
+The result must not alternate mechanically between an audio script and a comic script. Each
+paragraph should feel both audible and visually paced. Let a small cue lead into a vocal reaction,
+let that reaction imply the emotional close-up, and move forward before the prose becomes
+explanatory.
+
+Do not print labels such as `PANEL`, `VOICE`, `AUDIO`, `CAMERA`, `LEFT EAR`, or `SFX`. Spatial and
+visual information must be woven into the writing only when it matters.
+
+Avoid literary distance. The scene should feel immediate and embodied, but never become an
+anatomical report. Prefer one precise cue over several decorative sentences.
+
+### Dominance rule
+
+The character voices carry the scene. Aim for roughly 60-75 percent dialogue, breath, and audible
+reaction, with 25-40 percent concise context, atmosphere, and movement. Treat these as editing
+targets, not visible calculations. If narration begins doing work a voice could do, compress the
+narration and let the character perform the emotion instead.
