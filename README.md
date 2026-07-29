@@ -65,12 +65,9 @@ Khi wrapper mặc định có `ROLEPLAY_RULE`, `ROLEPLAY_INFO` và `RESPONSE_INS
    `<ROLEPLAY_INFO>` khác.
 4. Character card, user persona, active lorebook/world entries và memory do RisuAI chèn.
 5. `standalone/RISUAI_RESPONSE_INSTRUCTION_REPLACEMENT.md` thay cho `RESPONSE_INSTRUCTION` mặc định
-   nếu nền tảng cho phép sửa block đó.
-6. `standalone/RISUAI_FINAL_EXECUTION_OVERRIDE.md` ở vị trí system/post-history cuối cùng ngay trước
-   prefill hoặc lần sinh phản hồi.
+   nếu nền tảng cho phép sửa block đó. File này đã chứa `<FINAL_EXECUTION_OVERRIDE>` ngay trước
+   `</RESPONSE_INSTRUCTION>`, vì vậy không chèn thêm một final override hoặc assistant prefill riêng.
 
 Không chuyển toàn bộ master dài xuống vị trí cuối: làm vậy tăng độ gần của luật style nhưng đẩy card
-và lore ra xa phản hồi. Lớp final override được cố ý giữ ngắn hơn để nhắc lại các điều kiện chặn có
-nguy cơ cao. Nếu không thể thay `RESPONSE_INSTRUCTION` mặc định, giữ nó nguyên và vẫn đặt final
-override sau block đó để vô hiệu hóa các xung đột về tiến cốt truyện, all-senses, fresh-scene,
-anti-repetition tuyệt đối và bắt buộc thêm hành động kết lượt.
+và lore ra xa phản hồi. Final override đã được ghép vào cuối response instruction để nhắc lại các
+điều kiện chặn có nguy cơ cao trong cùng system prompt và tránh bị gửi sai thành role `assistant`.
