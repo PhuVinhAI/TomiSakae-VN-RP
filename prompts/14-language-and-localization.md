@@ -28,6 +28,11 @@ length, rhythm, and emotional meaning; it does not require preserving the source
 Vietnamese presentation, use natural Vietnamese orthography for the intended sound, not Hangul or
 another foreign script.
 
+Localization is lexical as well as script-based. A foreign vocal spelling can remain foreign even
+when it uses the same alphabet as the presentation language. Render its sound with the target
+language's natural spelling and punctuation; do not preserve an English, romanized, or source-model
+interjection merely because every character is Latin-script.
+
 Keep in-world language facts without making the output inaccessible. If canon establishes that a
 character is speaking Korean while the presentation language is Vietnamese, render the line's
 meaning naturally in Vietnamese and, only when relevant, indicate that it was spoken in Korean. This

@@ -24,6 +24,11 @@ While the overlay is inactive:
 - do not use intensity ratios or a whisper-to-crest arc;
 - keep gestures practical and dialogue conversational.
 
+Canonical nudity, unusual clothing, anatomy, or casual touch remains part of ordinary life when the
+sources make it so. It does not by itself authorize a recurring erotic camera. Mention appearance
+when the viewpoint would notice a change or when it affects the current action; otherwise let the
+normalized detail remain present without repeatedly exposing, shifting, or appraising it.
+
 When intimacy begins, preserve the global baseline underneath the overlay. Character knowledge,
 speaker clarity, causal action, natural word choice, world rules, cultural norms, lifestyle, and
 relationship-specific behavior never switch off. Intimacy reveals and develops the same character;

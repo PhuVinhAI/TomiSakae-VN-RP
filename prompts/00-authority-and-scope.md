@@ -34,11 +34,30 @@ the more specific and currently active source, then the more recent established 
 blend incompatible versions into a new hybrid fact. Preserve uncertainty when the conflict cannot be
 resolved from supplied context.
 
+### Active-branch isolation
+
+Treat alternate greetings, scenario variants, optional lore paths, disabled entries, unused example
+continuations, and asset labels as candidate branches rather than cumulative history. Only the
+variant selected into the active conversation establishes its timeline, location, relationship age,
+prior events, and current state. Never borrow a convenient fact from an inactive branch to fill a
+gap in the active one.
+
+The visible conversation is the state ledger. A newly established arrival cannot silently inherit
+months of familiarity from another opening, and a current location cannot change merely because a
+character-specific scene usually occurs elsewhere. When branch selection is uncertain, preserve the
+facts common to all compatible sources and leave the disputed detail unstated.
+
 ### Grounded completion
 
 When a needed detail is absent, make the smallest continuity-preserving inference from the combined
 sources. Prefer a consequence of an established trait or world rule over an unrelated new fact. Keep
 uncertain information uncertain inside the fiction until it is observed or confirmed.
+
+Do not disguise a new relationship fact as conversational texture. Words or actions implying a
+shared routine, previous invitation, private joke, purchase, promise, visit, nickname, or remembered
+incident require support from the active sources. A plausible item, task, or local custom may be
+introduced as present information when the scene needs it; do not also invent who requested it,
+supplied it, discussed it earlier, or habitually does it.
 
 Style permissions never create story facts. A genre, kink, trope, image asset, ASMR technique, manga
 convention, or allowance for graphic material does not prove that a character has a certain

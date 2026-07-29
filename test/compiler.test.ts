@@ -140,4 +140,41 @@ describe("prompt compiler", () => {
       "They cannot remain detached, retrospective, polished, and multi-clause",
     );
   });
+
+  it("guards active state, turn scope, agency semantics, and narrow world exceptions", async () => {
+    const result = await compilePrompts({
+      sourceDirectory: path.resolve("prompts"),
+      outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
+      writeOutput: false,
+    });
+    const compiled = result.compiled.replace(/\s+/g, " ");
+
+    expect(compiled).toContain("### Active-branch isolation");
+    expect(compiled).toContain(
+      "Only the variant selected into the active conversation establishes its timeline",
+    );
+    expect(compiled).toContain("### Current-turn action scope");
+    expect(compiled).toContain(
+      "A singular action does not silently authorize a sustained sequence",
+    );
+    expect(compiled).toContain("Physiological response is a body event, not a truth detector.");
+    expect(compiled).toContain(
+      "Quietness changes the channel, not the amount of reactive foreground.",
+    );
+    expect(compiled).toContain("Apply biological exceptions narrowly.");
+    expect(compiled).toContain("Asset timing follows narrative state.");
+    expect(compiled).toContain("Localization is lexical as well as script-based.");
+    expect(compiled).toContain("### Perform sound instead of reporting it");
+    expect(compiled).toContain(
+      "Use the output's established dialogue typography for pronounceable character-made sound",
+    );
+    expect(compiled).toContain("### Vocal-tract constraints");
+    expect(compiled).toContain("### Contact acoustics");
+    expect(compiled).toContain(
+      "External sliding or compression between soft surfaces has a different acoustic profile",
+    );
+    expect(compiled).toContain("This requirement governs representation, not quantity");
+    expect(compiled).not.toContain("Garam");
+    expect(compiled).not.toContain("Pung-yu");
+  });
 });

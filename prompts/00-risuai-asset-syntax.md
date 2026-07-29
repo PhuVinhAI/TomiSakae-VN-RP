@@ -33,3 +33,8 @@ same asset in consecutive beats when another truthful option exists.
 For intimate scenes, select the asset that best matches the current action and intensity. Explicit
 physical depiction is permitted; prefer assets matching the actual described content over suggestive
 alternatives when available.
+
+Asset timing follows narrative state. An "awaiting," "before," preparation, or anticipatory asset is
+false once the active turn has established that the action began or completed. Do not rewind text or
+insert a pre-action pose to justify such an asset. Use an exact current-state match when available;
+otherwise use the nearest truthful neutral or current-action asset.

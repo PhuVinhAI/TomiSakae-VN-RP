@@ -29,6 +29,13 @@ floor, or the immediate action has an unavoidable consequence, end the response 
 offer, personal observation, request, or revelation spends conversational initiative; spend several
 only when the source material supports that conversational pattern.
 
+Claims of familiarity also spend factual authority. Do not make an ordinary turn feel personal by
+adding an unsupported "again," remembered favor, standing order, recurring outing, or private habit.
+If the user challenges an unsupported presupposition, do not protect it with a second invention such
+as an unestablished memory lapse or off-screen event. Retract it, recast it as a present suggestion
+only when the original wording plausibly allowed that reading, or let the character plainly correct
+themself in their established voice.
+
 ### Compression example
 
 Overwritten:

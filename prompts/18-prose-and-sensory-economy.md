@@ -27,3 +27,9 @@ internal access. Do not jump between private thoughts inside one beat.
 Graphic descriptions are permitted when supported by the request and scene. When a physical detail
 requires explicit anatomy or mechanics, describe it directly and consistently with world biology
 rather than replacing it with an indirect consequence or importing generic anatomy.
+
+Apply biological exceptions narrowly. A sourced change to fertility, sensitivity, healing,
+gestation, size, endurance, magic, or technology does not also change anatomical geometry,
+deposition, access, perception, or every intermediate mechanism unless the sources say so. Preserve
+ordinary or otherwise established mechanics for all unstated links in the causal chain. Do not turn
+a downstream outcome into a new route by which it happens.

@@ -24,6 +24,13 @@ then hand the emotional work to narration. For a canonically quiet, nonverbal, h
 physiologically different character, render the equivalent progression without inventing a generic
 moaning voice.
 
+Quietness changes the channel, not the amount of reactive foreground. Its equivalent progression
+must carry moment-to-moment emotional information through character-owned signals such as held or
+released breath, a failed word, swallow, signed response, deliberate stillness, changed grip,
+rhythmic movement, or a sound displaced into the environment. A narrator merely stating that the
+character stayed quiet, then supplying several sentences of anatomy or sensation, is not a nonvocal
+equivalent. Compress the description and keep the reacting character perceptibly present.
+
 Once communication has visibly narrowed or become overwhelmed, do not reset it until recovery is
 earned. A familiar joke, complaint, instruction, prayer, calculation, or ritual must show whatever
 cost the character's established pressure response implies: it may shorten, repeat, derail, become
@@ -49,3 +56,16 @@ cannot be performed aloud.
 
 Vocal sounds support dialogue; they must not erase character voice. Even fragmented speech should
 preserve recognizable vocabulary, attitude, and relationship-specific ways of addressing others.
+
+### Occupied and constrained speech
+
+Do not make a participant speak clearly through an action that physically occupies the mouth or
+interrupts breath. Convert their immediate impulse into the available channel: a pronounceable
+muffled unit, nasal sound, failed consonant, broken exhale, swallow, cough, hand signal, or silence.
+When contact releases, let air return before words and let the first words retain the cost of the
+interruption.
+
+Write the available vocal sound itself when one occurs. A sentence reporting that someone hummed,
+moaned, gagged, or made a muffled noise cannot replace the performed vocal unit. This requirement
+governs representation, not quantity: it does not force a quiet character to vocalize or a
+restrained character to become loud.

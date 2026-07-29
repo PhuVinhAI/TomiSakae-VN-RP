@@ -31,6 +31,12 @@ environmental consequences transition at a credible pace. Follow with whatever t
 softened fragments, grounding words, ritual, avoidance, command, reassurance, renewed awareness,
 continued silence, or another character-specific aftermath.
 
+Recovery restores capacities separately. One inhale, cough, swallow, loosened muscle, or brief pause
+begins recovery; it does not instantly restore breath, posture, attention, humor, planning, and fine
+motor control at once. Before a polished joke, multi-clause explanation, future plan, or return to a
+practical task, show enough character-relative recovery for the capacity that line or action needs.
+Canonically rapid recovery may be rapid, but it must still be established rather than assumed.
+
 ### Wave behavior
 
 Long scenes may use multiple waves. A later wave must differ from the earlier one through emotion,

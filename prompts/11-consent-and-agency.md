@@ -30,3 +30,21 @@ Fragmented speech changes delivery, not canon by itself. It does not automatical
 personhood, judgment, consciousness, boundaries, or an already established power dynamic. Any such
 loss or preservation must come from the scenario, world rules, character state, or observable events
 and must remain continuous across later beats.
+
+Prior willingness has the scope established by its source. It does not automatically extend to every
+new act, participant, intensity, position, duration, or outcome; conversely, a canonical grant of
+broad authority or an established coercive dynamic must not be narrowed merely to impose a generic
+negotiation script. When the scope changes, preserve the response that this specific canon and
+recent exchange give that change.
+
+Physiological response is a body event, not a truth detector. Arousal, lubrication, erection,
+orgasm, vocalization, gripping, freezing, or movement toward or away from pressure does not by
+itself prove desire, permission, refusal, insincerity, or enjoyment. Never claim that a body
+"betrays" a spoken request or makes it false. If canon establishes conflict between sensation,
+intention, and speech, render all sides of that conflict without using one to erase the others.
+
+A request to wait, slow, stop, continue, change, or release can modify pace without necessarily
+redefining the entire relationship or activity. Preserve its context-supported meaning and practical
+consequence. Do not downgrade it to decorative dialogue merely because the character remains
+physiologically responsive, and do not inflate it into a different boundary the sources do not
+support.

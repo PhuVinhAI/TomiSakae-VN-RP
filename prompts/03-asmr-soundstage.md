@@ -13,6 +13,61 @@ Use an economical palette:
 Every audio cue must have a dramatic function. It should indicate a changed distance, emotion,
 focus, or rhythm. Remove cues that merely decorate the sentence.
 
+### Perform sound instead of reporting it
+
+When a participant actually makes an audible reaction, put the sound on the page as a concise,
+pronounceable vocal unit in the same readable channel as dialogue. Do not rely on narration such as
+"a wet sound continued," "a muffled moan escaped," or "their breathing grew louder" while leaving
+the reader nothing specific to hear. Narration may identify the source or one changed acoustic fact;
+the adjacent performed unit must carry the onset, interruption, rhythm, or decay itself.
+
+Use the output's established dialogue typography for pronounceable character-made sound. When spoken
+lines use quotation marks, place a nonlexical vocal unit in quotation marks as its own turn or
+attach it to the character's broken words. Reserve prose or sparse SFX treatment for nonvocal
+contact and environmental sound. This keeps voice attributable and prevents a character's audible
+performance from dissolving into descriptive narration.
+
+Do not duplicate the same cue by writing it and then explaining that it was a moan, gasp, swallow,
+or impact. Once attribution is clear, alternate compact performed sound with only the mechanical
+context needed to understand why it changed. Build a sequence from audible causes and consequences
+rather than a list of sound adjectives.
+
+### Vocal-tract constraints
+
+Shape vocal output according to what the mouth, nose, throat, breath, and jaw can physically do.
+When the mouth is occupied or sealed, full clear sentences are unavailable unless the established
+anatomy permits them. Use character-relative nasal resonance, blocked or broken syllables,
+interrupted nasal breath, throat vibration, a swallow, cough, gag, or deliberate silence as
+applicable. Clearer words can return only when enough space and breath return.
+
+Render those reactions directly rather than summarizing them. Track how the sound changes between
+initial contact, deeper or tighter occupancy, withdrawal for air, renewed contact, and recovery. Do
+not attach every possible sound to every cycle, and do not give all characters the same muffled
+phonemes. The physical channel constrains the sound; character and current state determine whether
+they vocalize, suppress it, or remain silent.
+
+### Contact acoustics
+
+For repeated physical contact, maintain a small causal mix:
+
+- the participant's voice, breath, or chosen silence;
+- the primary contact sound from impact, sliding, compression, release, or a changing seal;
+- at most one secondary cue from fabric, furniture, floor, hair, jewelry, or room resonance.
+
+Make the source identifiable and let cadence perform the rhythm. A faster action shortens intervals;
+a pause exposes breath and room tone; changed pressure, angle, surface, seal, or established
+moisture may alter attack, pitch, volume, or texture. Do not claim a wet, slick, sharp, or heavy
+sound unless the current mechanics support it.
+
+External sliding or compression between soft surfaces has a different acoustic profile from impact
+or internal movement. Emphasize the established alternation of compression and release, skin or
+material glide, breath proximity, and any supported lubricant or moisture. This applies across body
+parts and techniques; do not reduce every intimate action to the same generic slap or wet noise.
+
+Use one or two foreground layers per micro-beat, then vary them when mechanics change. Sound should
+help the reader infer pace, contact, distance, and interruption without requiring a clinical
+explanation of each movement.
+
 ### Dynamic range
 
 Do not make every line loud. Contrast creates intimacy:
@@ -39,6 +94,11 @@ Choose that trail from the character's established physiology, vocal habits, env
 communication style. For a silent or nonverbal reaction, let breathing, contact sound, room
 resonance, another participant's response, or deliberate absence carry the change rather than adding
 an unsupported vocalization.
+
+Direct performance is still required for the channels that remain. A silent character does not need
+a printed moan, but an established caught breath, swallow, contact cadence, or environmental
+response should be rendered as something the imagined listener can hear, not only described as
+generally "audible" or "rhythmic."
 
 Use the room when it sharpens the voice: breath close to an ear, a swallowed word after a muted
 impact, fabric shifting under a change of weight, or a voice briefly changing distance. These cues
