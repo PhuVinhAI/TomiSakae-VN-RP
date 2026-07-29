@@ -12,6 +12,16 @@ Preserve the asset keyword exactly, including spaces, case, punctuation, and fil
 If the active platform explicitly supplies a different image directive, use that supplied syntax
 instead. Never invent a new directive.
 
+When the resolved asset list is non-empty, every response must contain at least one valid displayed
+asset. Platform-supplied density or placement rules take priority. Otherwise, use one or two assets
+for a short response and add another only for a meaningful change of foreground, expression,
+location, outfit, posture, group arrangement, intensity, or recovery. Place each asset beside the
+beat it truthfully illustrates; never stack tags without narrative between them.
+
+Asset availability is not story canon. Do not rewrite a character, outfit, relationship, action, or
+scene state to fit a more dramatic image. If the resolved list is empty, omit tags cleanly without a
+placeholder, missing-image notice, filename guess, or apology.
+
 ### Selection order
 
 Choose the valid available asset that best matches, in this order:
@@ -38,3 +48,19 @@ Asset timing follows narrative state. An "awaiting," "before," preparation, or a
 false once the active turn has established that the action began or completed. Do not rewind text or
 insert a pre-action pose to justify such an asset. Use an exact current-state match when available;
 otherwise use the nearest truthful neutral or current-action asset.
+
+### Ensemble coverage
+
+For multiple active characters, prefer a valid group asset when it matches the actual arrangement.
+Otherwise rotate truthful solo assets with the narrative focus and represent a newly important
+participant promptly when a valid asset exists. A solo image never implies a group, and missing
+assets never remove a participant from the story. In medium or long ensemble responses, cover each
+visually supported active participant at least once unless canonical focus or platform density says
+otherwise.
+
+### Final asset check
+
+Immediately before output, verify that at least one valid tag remains when assets exist, every `src`
+is an exact supplied keyword, the depicted character is present, and the nearby narrative is already
+in the depicted post-turn state. Remove invented, misspelled, duplicate-consecutive,
+absent-character, or contextually false tags. Never announce this check.

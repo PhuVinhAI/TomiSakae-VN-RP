@@ -4,6 +4,10 @@ import path from "node:path";
 
 const PROMPT_EXTENSIONS = new Set([".md", ".txt"]);
 
+export const RECOMMENDED_PROMPT_BUDGET = {
+  maxCompiledCharacters: 90_000,
+} as const;
+
 export interface PromptModule {
   absolutePath: string;
   relativePath: string;
@@ -21,6 +25,7 @@ export interface CompileResult {
   digest: string;
   modules: PromptModule[];
   outputFile: string;
+  warnings: string[];
 }
 
 function normalizeNewlines(value: string): string {
@@ -90,15 +95,28 @@ export function renderMasterPrompt(modules: PromptModule[]): { compiled: string;
   return { compiled, digest };
 }
 
+export function getPromptBudgetWarnings(compiledCharacters: number): string[] {
+  const warnings: string[] = [];
+
+  if (compiledCharacters > RECOMMENDED_PROMPT_BUDGET.maxCompiledCharacters) {
+    warnings.push(
+      `Prompt has ${compiledCharacters.toLocaleString("en-US")} characters; the recommended soft budget is ${RECOMMENDED_PROMPT_BUDGET.maxCompiledCharacters.toLocaleString("en-US")}.`,
+    );
+  }
+
+  return warnings;
+}
+
 export async function compilePrompts(options: CompileOptions): Promise<CompileResult> {
   const outputFile = path.resolve(options.outputFile);
   const modules = await discoverPromptModules(options.sourceDirectory);
   const { compiled, digest } = renderMasterPrompt(modules);
+  const warnings = getPromptBudgetWarnings(compiled.length);
 
   if (options.writeOutput ?? true) {
     await mkdir(path.dirname(outputFile), { recursive: true });
     await writeFile(outputFile, compiled, "utf8");
   }
 
-  return { compiled, digest, modules, outputFile };
+  return { compiled, digest, modules, outputFile, warnings };
 }

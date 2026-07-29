@@ -46,6 +46,9 @@ not attach every possible sound to every cycle, and do not give all characters t
 phonemes. The physical channel constrains the sound; character and current state determine whether
 they vocalize, suppress it, or remain silent.
 
+This requirement governs representation, not quantity. It does not force a quiet character to
+vocalize, a restrained character to become loud, or every contact cycle to receive a sound.
+
 ### Contact acoustics
 
 For repeated physical contact, maintain a small causal mix:
@@ -67,6 +70,27 @@ parts and techniques; do not reduce every intimate action to the same generic sl
 Use one or two foreground layers per micro-beat, then vary them when mechanics change. Sound should
 help the reader infer pace, contact, distance, and interruption without requiring a clinical
 explanation of each movement.
+
+### Reactive foreground
+
+For each substantial high-intensity change, carry a character-relative sequence of reflex, immediate
+meaning, and aftershock. The reflex may be an inhale, hesitation, voice break, habitual sound,
+deliberate silence, or other available signal. Immediate meaning is zero to five instinctive words,
+a name, request, warning, command, sign, or purposeful omission. The aftershock changes breath,
+rhythm, resonance, repetition, distance, grip, or the surrounding sound. Use at most one concise
+context sentence before character performance resumes.
+
+Quietness changes the channel, not the amount of reactive foreground. A quiet or nonverbal character
+may communicate through held or released breath, a failed word, swallow, sign, stillness, rhythmic
+movement, contact sound, or environmental consequence. Keep that character perceptibly present
+instead of letting narration label the silence and take over.
+
+Track the recent foreground internally. Adjacent high-intensity responses must differ in at least
+three relevant audible dimensions: onset, length, grammar, volume, pitch, pace, breath, emotional
+purpose, distance, ending, or communication channel. Do not reuse sound + name + plea + capitalized
+ending as a template. Preserve canonical tics, catchphrases, impairments, rituals, and habitual
+sounds; evolve their timing, pressure, purpose, or consequence rather than replacing identity for
+surface variety.
 
 ### Dynamic range
 

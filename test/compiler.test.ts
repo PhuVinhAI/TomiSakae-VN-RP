@@ -2,7 +2,11 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { compilePrompts, discoverPromptModules } from "../src/compiler.js";
+import {
+  compilePrompts,
+  discoverPromptModules,
+  RECOMMENDED_PROMPT_BUDGET,
+} from "../src/compiler.js";
 
 const temporaryDirectories: string[] = [];
 
@@ -74,6 +78,47 @@ describe("prompt compiler", () => {
         writeOutput: false,
       }),
     ).rejects.toThrow("No .md or .txt prompt modules were found.");
+  });
+
+  it("warns above the soft prompt budget without blocking compilation", async () => {
+    const fixture = await createFixture();
+    const source = path.join(fixture, "prompts");
+    const moduleCount = 3;
+    const moduleSize = Math.ceil(RECOMMENDED_PROMPT_BUDGET.maxCompiledCharacters / moduleCount);
+
+    await Promise.all(
+      Array.from({ length: moduleCount }, (_, index) =>
+        writeFile(
+          path.join(source, `${String(index).padStart(2, "0")}-module.md`),
+          `# Module ${index}\n\n${"x".repeat(moduleSize)}`,
+          "utf8",
+        ),
+      ),
+    );
+
+    const result = await compilePrompts({
+      sourceDirectory: source,
+      outputFile: path.join(fixture, "out.md"),
+      writeOutput: false,
+    });
+
+    expect(result.modules).toHaveLength(moduleCount);
+    expect(result.compiled).toContain("# Module 2");
+    expect(result.warnings).toEqual([
+      expect.stringContaining(
+        `recommended soft budget is ${RECOMMENDED_PROMPT_BUDGET.maxCompiledCharacters.toLocaleString("en-US")}`,
+      ),
+    ]);
+  });
+
+  it("keeps project prompt module ordinals contiguous", async () => {
+    const modules = await discoverPromptModules(path.resolve("prompts"));
+
+    for (const [index, module] of modules.entries()) {
+      expect(module.relativePath).toMatch(
+        new RegExp(`^${String(index).padStart(2, "0")}-[a-z0-9-]+\\.(?:md|txt)$`),
+      );
+    }
   });
 
   it("preserves the canon-first roleplay contract in the compiled prompt", async () => {

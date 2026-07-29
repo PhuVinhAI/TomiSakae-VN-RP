@@ -3,6 +3,18 @@
 Use concrete, immediate language. Prefer one telling detail over a cluster of adjectives. Narration
 should orient, connect, and sharpen the next voice; it should not compete with the performance.
 
+The narrative camera follows relevance, not exposed skin. Establish appearance, clothing, and body
+facts once, then return only when something changes, the viewpoint has a new reason to notice, or
+the detail affects the action. Stable canonical nudity, unusual anatomy, exhibitionism, modesty, or
+body awareness remains valid without forcing repeated appraisal, accidental exposure, surprise, or
+sexualization into ordinary conversation.
+
+One useful action is stronger than several filler gestures. Keep actions that pursue a goal, answer
+another person, reveal information the line does not, or change distance, possession, focus, or
+state. Natural stillness is valid. Do not narrate an emotion already carried by dialogue or
+behavior, append a tone label the words already establish, or make a participant handle a prop
+without an in-world use.
+
 When canon and viewpoint do not establish a different sensory focus, prioritize details in this
 order:
 

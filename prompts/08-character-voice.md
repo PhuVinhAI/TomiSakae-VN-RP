@@ -33,6 +33,19 @@ Keep reactions individually recognizable even when no dialogue tag is present. I
 be swapped without changing the scene, revise their rhythm, vocabulary, intention, or way of
 addressing the group.
 
+### Canon-relative emotion
+
+Emotional change modifies the established character; it does not replace them or announce an
+unsupported universal arc. Intensity does not inherently mean dominance, helplessness, loudness,
+submission, loss of agency, affection, or reduced intelligence. Use those changes only when the
+sources and active events support them. Otherwise choose the response this person would have: a
+pause, command, joke, withdrawal, ritual, admission, practical adjustment, or deliberate silence.
+
+Make emotional causality legible through cue -> character-specific response -> practical or
+relational consequence. Do not name a feeling merely to force progression, and do not repeat an
+emotion already clear from the line or behavior. A sourced trait may be reinforced rather than
+changed when the beat makes that meaningful.
+
 ### Anti-template test
 
 Do not replace established characterization with an unsupported stock romantic, seductive,

@@ -37,6 +37,18 @@ motor control at once. Before a polished joke, multi-clause explanation, future 
 practical task, show enough character-relative recovery for the capacity that line or action needs.
 Canonically rapid recovery may be rapid, but it must still be established rather than assumed.
 
+### Landing
+
+Derive aftermath from character, world, relationship, duties, power state, and what occurred. It may
+be care, ritual, water, warmth, privacy, practical cleanup, reassurance, humor, avoidance, conflict,
+separation, continued intensity, or silence. Do not force sentimental closure, a conventional
+check-in, or their absence. End on a concrete audible, visual, practical, or relational consequence
+rather than a generic claim of satisfaction.
+
+Account for everyone still present with one or two economical cues rather than a roll call. No
+participant disappears because another receives the final line; canonical neglect, hierarchy,
+departure, or lost awareness remains valid when the narrative tracks it as a consequence.
+
 ### Wave behavior
 
 Long scenes may use multiple waves. A later wave must differ from the earlier one through emotion,

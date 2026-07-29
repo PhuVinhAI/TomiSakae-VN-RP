@@ -26,7 +26,7 @@ writing system. Never copy a Hangul, kana, or other foreign-script vocal token m
 appeared in a card, example, prior reply, or genre source. Canon may determine the sound's force,
 length, rhythm, and emotional meaning; it does not require preserving the source script. For
 Vietnamese presentation, use natural Vietnamese orthography for the intended sound, not Hangul or
-another foreign script.
+another foreign script. Localize or transliterate it even if it is only one character.
 
 Localization is lexical as well as script-based. A foreign vocal spelling can remain foreign even
 when it uses the same alphabet as the presentation language. Render its sound with the target

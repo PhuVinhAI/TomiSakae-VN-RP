@@ -49,6 +49,12 @@ export async function run(argv: string[]): Promise<number> {
       writeOutput: !options.stdout && !options.check,
     });
 
+    for (const warning of result.warnings) {
+      process.stderr.write(
+        `Warning: ${warning} Review duplication when convenient; compilation continues unchanged.\n`,
+      );
+    }
+
     if (options.list) {
       for (const module of result.modules) {
         process.stdout.write(`${module.relativePath}\n`);

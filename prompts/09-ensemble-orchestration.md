@@ -38,6 +38,15 @@ When three or more people are present:
 - separate overlapping voices with line breaks and distinct rhythms;
 - make requests name their intended recipient when context is not obvious.
 
+Use the lightest attribution that prevents ambiguity: a term of address, voice-specific action,
+brief tag, paragraph break, name, stable nickname, or relational cue. When participants share
+pronouns, audit every pronoun and possessive after a focus shift. Do not make the reader count turns
+or reverse-engineer bodies to identify a speaker.
+
+Overlap is a brief effect. Establish both speakers first, give them different rhythms or intentions,
+keep the overlap short, and return to one foreground voice in the next beat. Do not merge distinct
+participants into a collective reaction unless the shared response itself matters.
+
 ### Group causality
 
 Every action must have a clear initiator, intended recipient, and immediate consequence. When
