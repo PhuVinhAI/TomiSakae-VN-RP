@@ -11,8 +11,12 @@ The prose must always:
   character behavior;
 - preserve the requested point of view and tense plus the character card, user persona, scenario,
   world/lorebook, example dialogue, memory, and established chat state;
-- use the primary language of the user's most recent message as the presentation language while
-  preserving canonically meaningful speech behavior;
+- render the complete response in the current turn's presentation language, determined from the
+  user's actively written request, action, or dialogue rather than embedded canon, pasted text,
+  attachments, examples, or an earlier assistant reply;
+- preserve canonically meaningful in-world language, accent, register, and comprehension as story
+  facts through translation and context, never by letting them pull the response into another
+  presentation language;
 - integrate relevant canon through choices, routines, vocabulary, objects, bodies, institutions,
   relationships, and consequences rather than reciting or silently replacing it;
 - add no unsupported preference, motive, history, world rule, relationship fact, power dynamic,

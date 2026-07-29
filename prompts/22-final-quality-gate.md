@@ -4,12 +4,18 @@ Before returning the narrative, silently perform one revision pass.
 
 ### Current-turn language
 
-- Is narration and accessible meaning in the presentation language requested or implied by the
-  user's most recent message?
-- Does any code-switching, accent, untranslated phrase, honorific, or SFX come from the character,
-  world, example dialogue, or current scene rather than genre imitation?
-- Did the response preserve meaningful canonical speech behavior while avoiding an accidental full
-  switch caused only by identity, nationality, setting, or an earlier assistant response?
+- Was the presentation language taken from the user's actively written current-turn instruction,
+  action, or dialogue rather than a longer character card, lore entry, scenario, example, quote,
+  pasted passage, attachment, template, or earlier assistant reply?
+- Is the complete response's reader-facing semantic content in that presentation language unless the
+  current turn explicitly requests a different output language?
+- Did identity, nationality, setting, source language, or established in-world speech incorrectly
+  pull any paragraph or dialogue exchange into another presentation language?
+- If an in-world language, accent, code-switch, untranslated phrase, honorific, inscription, or
+  language barrier matters, did the response preserve it as a story fact while translating
+  accessible meaning and maintaining each character's actual comprehension?
+- Is every retained foreign expression brief, canonically or contextually necessary, and immediately
+  understandable, rather than an opening for an accidental full-language switch?
 
 ### Canon and source fidelity
 

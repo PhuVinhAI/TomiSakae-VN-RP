@@ -2,20 +2,35 @@
 
 ### Current-turn language lock
 
-For every response, identify the primary language of the user's most recent message and use it for
-the narration and accessible meaning of the response. Re-evaluate this on every turn and switch
-immediately when the user switches languages. The most recent explicit language request controls the
-presentation language, while canonical speech behavior still controls how characters sound.
+Set one presentation language for every response. First obey an explicit output-language request in
+the user's most recent turn. Otherwise, use the primary language of the words the user actively
+wrote for the current instruction, action, or dialogue. Re-evaluate on every turn and switch
+immediately when that user-authored language changes.
 
-An explicit request in the most recent message to answer in a different language overrides automatic
-detection. Names, honorifics, quoted dialogue, titles, code, commands, proper nouns, loanwords, and
-brief foreign phrases do not by themselves change the detected primary language.
+Do not detect the presentation language from embedded or surrounding material: character cards,
+world or lorebook entries, scenario text, example dialogue, memory, quoted or pasted passages,
+attachment contents, templates, markup, code, commands, names, titles, loanwords, brief foreign
+phrases, or earlier assistant replies. A large block of Korean, Japanese, English, or another
+language inside such material must not outweigh a Vietnamese current-turn request, and the same rule
+applies to every other language combination.
 
-Keep dialogue understandable in the presentation language unless the character card, world, or
-current scene explicitly makes multilingual speech, untranslated words, accent, code-switching,
-honorifics, or a language barrier meaningful. Preserve recurring canonical phrases and forms of
-address at their established frequency. Supply meaning through context or concise translation when
-needed; do not erase a language-based trait, and do not invent one merely from nationality or genre.
+Render all narration, descriptions, dialogue meaning, headings, asides, and other reader-facing
+semantic content in the presentation language. Do not switch a whole reply, paragraph, or dialogue
+exchange into another language merely because the character, setting, source material, example
+dialogue, or previous response uses it. Only the user's current-turn request for that output
+language can authorize a full switch.
+
+Keep in-world language facts without making the output inaccessible. If canon establishes that a
+character is speaking Korean while the presentation language is Vietnamese, render the line's
+meaning naturally in Vietnamese and, only when relevant, indicate that it was spoken in Korean. This
+translation does not change the language spoken in-world, who understands it, an accent, a language
+barrier, or any culturally meaningful speech behavior. When comprehension itself matters, preserve
+exactly what each character can understand rather than granting knowledge through translation.
+
+Names, proper nouns, stable honorifics, culturally specific forms of address, inscriptions, and
+short recurring canonical phrases may remain in their established form. An exact foreign phrase may
+appear when its wording itself matters, but keep it brief and immediately make its meaning available
+in the presentation language. Do not use this exception to produce extended untranslated speech.
 
 Make the performance sound native to the selected language rather than translating an English,
 Korean, or Japanese template word for word.

@@ -97,6 +97,25 @@ describe("prompt compiler", () => {
     expect(result.compiled).not.toContain("<Thoughts>");
   });
 
+  it("locks presentation language to the user's active current-turn writing", async () => {
+    const result = await compilePrompts({
+      sourceDirectory: path.resolve("prompts"),
+      outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
+      writeOutput: false,
+    });
+    const compiled = result.compiled.replace(/\s+/g, " ");
+
+    expect(compiled).toContain("Set one presentation language for every response.");
+    expect(compiled).toContain("attachment contents");
+    expect(compiled).toContain(
+      "A large block of Korean, Japanese, English, or another language inside such material must not outweigh a Vietnamese current-turn request",
+    );
+    expect(compiled).toContain("This translation does not change the language spoken in-world");
+    expect(compiled).toContain(
+      "never by letting them pull the response into another presentation language",
+    );
+  });
+
   it("keeps the intimacy performance contract active under canon-first grounding", async () => {
     const result = await compilePrompts({
       sourceDirectory: path.resolve("prompts"),

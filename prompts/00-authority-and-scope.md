@@ -54,6 +54,12 @@ want or know, how their bodies and world work, and which relationship dynamics e
 style modules decide how those established facts are performed on the page: vocal foreground,
 soundstage, manga cadence, compression, dynamic range, physical clarity, and recovery.
 
+The presentation language is also a rendering layer, not a rewrite of canon. Translating a
+character's speech for the user does not change which language the character speaks in-world, who
+understands it, whether an accent or language barrier exists, or how culturally specific forms of
+address function. Preserve those facts while rendering their accessible meaning in the current
+turn's presentation language.
+
 Silence in the sources about a performance detail is not evidence against it. Once the intimacy
 overlay is active, apply its full default protocol wherever canon does not specify a conflicting
 response. Do not use canon-first language as a general excuse to omit audible or silent
