@@ -70,6 +70,10 @@ phạm vi lượt.
    hoặc nuốt; người không rên dùng hơi, tiếp xúc, cử động và im chủ động. Không ép ai trái tính.
 6. **Đúng cơ quan phát âm:** miệng bị chiếm không nói tròn chữ. Âm thay đổi theo hơi, miệng/họng, độ
    cản, nhịp, lực, khoảng cách, bề mặt và ý định; không chỉ đổi nguyên âm, chữ hoa hay dấu câu.
+   Khi cao trào hoặc cường độ cực đại, nguyên âm được kéo dài liên tục không giới hạn độ dài, không
+   có `...` ngắt giữa chuỗi — mỗi dòng là một lần đẩy hơi riêng biệt, cung leo–đỉnh–tàn cần ít nhất
+   3 dòng âm trực tiếp. Người giọng trầm khàn oho dùng Ô/HÔ kéo dài từ cổ họng/ngực; người giọng
+   cao dùng A/Ư kéo dài từ ngực trên. Không dùng nhãn "cao trào", "lên đỉnh", "xuất tinh" thay âm.
 7. **Lời và tự chủ:** dưới quá tải, giữ lõi ý định nhưng bỏ phân tích dài không còn đủ hơi. Tự chủ
    hiện qua lựa chọn và hành động đúng tính cách, không qua độc thoại tỉnh táo.
 8. **Cảnh nhóm:** mỗi người giữ tuyến riêng về vị trí, hành động, miệng/hơi, âm hoặc im, ý định, tự

@@ -15,6 +15,8 @@ Trước khi xuất, sửa âm thầm theo quan hệ giữa nguồn–lượt–
 - Có chỉ một tiếng rồi mô tả dài, báo “rên/ướt/va”, phóng chữ hoặc bịa âm không nguồn thay cho chuỗi âm–cơ học trực tiếp không?
 - Người nhiều, ít hoặc không rên có kênh đúng tính cách, quan hệ, khoảng cách và ý định, không bị ép cùng mức hay biến mất không?
 - Miệng bận có phát âm đúng cơ quan; lời quá tải có giữ lõi ý nhưng mất phân tích; mọi quy tắc có biến mất khỏi văn thay vì giọng người chấm bài không?
+- Nếu có cao trào, cung leo–đỉnh–tàn có đủ ít nhất 3 dòng âm trực tiếp liên tiếp, nguyên âm kéo dài liên tục không có `...` ngắt giữa, độ dài chuỗi biến thiên theo lượng hơi và chất giọng của đúng nhân vật đó không?
+- Giọng nhân vật có đúng chất: người giọng trầm khàn (oho) dùng Ô/HÔ kéo dài từ cổ họng; người giọng cao dùng A/Ư kéo dài từ ngực trên — không lẫn giọng, không đồng bộ nhóm?
 
 ### Nhân vật và nhóm
 
