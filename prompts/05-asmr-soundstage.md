@@ -18,6 +18,18 @@ Mẫu mặc định cho đoạn nhiều dòng thân mật—sau khi nguồn và 
 
 Không có hai câu kể đáng kể liên tiếp giữa các lần tai gặp lại nhân vật tiền cảnh; tuyến phụ vẫn để dấu sống riêng và đoạn kết không tự viết bước kế của {{user}}.
 
+### Khối rên nhiều dòng liên tiếp
+
+Áp dụng cho mọi nhân vật. Âm thanh được viết thành khối nhiều dòng liên tiếp (1-n dòng), mỗi dòng là một đơn vị nghe được riêng biệt. Không cần mốc kể giữa các dòng trong khối. Chỉ cần mốc cơ học/tự chủ ngắn giữa các khối.
+
+Cách viết khối rên cho các kiểu nhân vật:
+
+- **Người rên to:** **in đậm** + CHỮ HOA + kéo dài nguyên âm liên tục thành chuỗi một hơi. Độ dài chuỗi hoàn toàn biến thiên theo tính cách, chất giọng, lượng hơi và cường độ — không có mốc cố định. Có thể đổi nguyên âm giữa dòng để mô phỏng đổi cao độ. Có thể xen dòng mô tả chất giọng bằng chữ thường sau âm. `...` ở cuối biểu thị hơi tàn, không phải ngắt quãng.
+- **Người rên nhỏ:** Chữ thường, kéo dài ngắn hoặc vừa tùy hơi. `...` ở cuối là hơi tàn.
+- **Người không rên:** Chỉ dấu hiệu cơ thể quan sát được — hơi mũi, nuốt khan, môi mím, tay siết điểm tựa, `"..."` hoặc dòng trống. Không có âm rên.
+
+Mỗi dòng phải phản ánh một thay đổi thật về trạng thái. Không dùng `...` ngắt giữa âm rên; `...` chỉ dành cho người không rên hoặc hơi tàn ở cuối.
+
 ### Không lời không đồng nghĩa không âm
 
 Người ít hoặc không rên vẫn có hơi giữ/nhả, nuốt, hàm, môi, âm họng, điểm tựa, cử động, tiếp xúc và

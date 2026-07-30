@@ -22,11 +22,14 @@ Giữa hai neo chỉ có tối đa một câu kể/cơ học gọn chứa nguồ
 là bản nháp lỗi vì nhân vật đã mất khỏi tiền cảnh nghe được. Đây là ngưỡng cục bộ, không phải giới hạn tổng độ dài, số đoạn hay quota
 tiếng rên; độ dài phải theo lượt và không theo kích thước route.
 
-- Người nhiều/lớn tiếng: nhiều đơn vị giọng phát triển theo lực, hơi và vốn từ; không lặp cùng chữ hoa hay lây mức âm sang nhóm.
-- Người ít/nhỏ tiếng: âm kín, hơi, nuốt, từ ngắn và khoảng im có lực vẫn gắn với đúng hành động, khoảng cách và ý định.
-- Người không rên: ba lần trạng thái nghe được trở lại qua hơi, miệng/họng, điểm tựa, tiếp xúc hoặc
-  im chủ động; không ép họ rên, đổi tính hay dùng lời người kể để bù.
-- Miệng bận: dùng âm bị cản, hơi mũi/họng, nuốt và nhả đúng cơ quan; lời rõ chỉ khi có chỗ và hơi, không vì cần truyền đạt mà phá cơ học.
+Âm thanh được viết thành khối nhiều dòng liên tiếp (1-n dòng, áp dụng cho mọi nhân vật). Mỗi dòng là một đơn vị nghe được riêng biệt. Giữa các dòng trong khối không cần mốc kể. Mỗi dòng phải phản ánh một thay đổi thật về trạng thái (hơi, lực, cao độ, độ mở miệng). Giữa các khối mới cần một mốc cơ học/tự chủ ngắn.
+
+Biểu đạt cường độ bằng cách kéo dài liên tục trên cùng một từ, không có mốc độ dài cố định — chuỗi có thể ngắn một vài ký tự hoặc cực dài tùy theo tính cách, chất giọng, lượng hơi và cường độ của từng nhân vật. Người giọng cao, nhiều hơi có thể kéo rất dài; người yếu, ít hơi kéo ngắn hơn. Không dùng dấu ba chấm `...` bên trong âm rên (dấu `...` chỉ dành cho người không rên như tín hiệu cơ thể, hoặc hơi tàn ở cuối). Các kiểu nhân vật:
+
+- **Người rên to/mạnh:** Dùng **in đậm** + CHỮ HOA + kéo dài nguyên âm liên tục thành chuỗi một hơi, độ dài biến thiên theo tính cách và chất giọng. Mỗi dòng là một chuỗi kéo dài riêng. Có thể đổi nguyên âm giữa dòng để mô phỏng đổi cao độ. Khối rên dài 3-n dòng. Có thể xen dòng mô tả chất giọng bằng chữ thường, nhưng cường độ phải nằm trên chữ.
+- **Người rên nhỏ/ít:** Khối 1-3 dòng, chữ thường, kéo dài ngắn hoặc vừa tùy hơi. Không dùng `...` ngắt giữa âm.
+- **Người không rên:** Mỗi dòng là một dấu hiệu cơ thể quan sát được: `"..."` , hơi mũi gấp, nuốt khan, môi mím, tay siết điểm tựa, hoặc dòng trống. Không được im hoàn toàn; giữ ba lần trạng thái trở lại.
+- **Miệng bận:** Mỗi dòng là một âm bị cản kéo dài, độ dài tùy hơi và độ kín miệng — xuống dòng liên tiếp không cần mốc kể, mỗi dòng phản ánh một thay đổi thật về hơi hoặc độ kín miệng.
 
 Chỉ bỏ ngưỡng ba neo khi lượt thật sự chỉ cần một phản ứng đơn rất ngắn hoặc nguồn xác lập im
 tuyệt đối; khi ấy vẫn giữ dấu hiện diện, tự chủ, tuyến nhóm và điểm bàn giao mà không kéo dài cho đủ khuôn.

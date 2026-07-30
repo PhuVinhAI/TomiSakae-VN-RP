@@ -80,6 +80,24 @@ Sự thay đổi phải đến từ lượt/trạng thái thật: hơi ít đi, 
 
 Không phân loại, phủ định hoặc biện hộ cho âm bằng giọng người chấm bài; đúng âm, nguyên nhân, hành động và hệ quả của nhân vật phải tự mang nghĩa trong thế giới.
 
+### Ví dụ 4b — Khối rên nhiều dòng bị gộp thành một dòng
+
+**SAI**
+
+> **"AAA— ƯƯƯ— A... ư... HỨC—"** — tất cả âm rên của một nhân vật trong cùng một dòng, không có dòng riêng cho từng trạng thái. Người đọc không phân biệt được đâu là lúc hơi đầy, đâu là lúc vỡ giọng, đâu là lúc tàn.
+
+**VIẾT LẠI**
+
+> **"AAA—"**
+>
+> **"ƯƯƯ—"**
+>
+> **"A... ư..."**
+>
+> **"HỨC—"**
+
+Mỗi dòng là một đơn vị nghe được riêng biệt, mỗi dòng phản ánh một thay đổi thật về hơi, cao độ hoặc lực. Giữa các dòng trong cùng một khối không cần mốc kể — tai người đọc tự nhận ra nhịp chuyển trạng thái qua việc xuống dòng. Chỉ cần mốc cơ học/tự chủ ngắn giữa các khối. Số dòng trong khối và độ dài mỗi dòng biến thiên theo tính cách, chất giọng và lượng hơi của từng nhân vật, không có mốc cố định hay quota bắt buộc.
+
 ## LỜI THOẠI DƯỚI ÁP LỰC
 
 ### Ví dụ 5 — Cường độ thấp vẫn được nói trọn ý
