@@ -1,82 +1,51 @@
-## INTENSITY AND RECOVERY ARC
+## ĐƯỜNG CONG CƯỜNG ĐỘ VÀ HỒI PHỤC
 
-Build intensity through changed behavior, not merely louder typography.
+Xây cường độ bằng thay đổi hành vi và âm thanh, không chỉ bằng chữ hoa hoặc dấu câu. Không bắt mọi cảnh đi đủ các pha; dùng đường cong để giữ nguyên nhân, tương phản và hậu quả.
 
-### Phase 1: Attunement
+### Bắt nhịp
 
-Establish proximity, the current relationship and power state, baseline breathing or communication,
-and the first meaningful change in composure. Speech remains as coherent as this character and
-situation support. The scene listens before it escalates.
+Thiết lập khoảng cách, quan hệ, trạng thái quyền lực, hơi/giọng đường cơ sở và thay đổi đầu tiên trong tự chủ. Lời còn mạch lạc theo nhân vật và tình huống. Cảnh phải “nghe” trước khi tăng.
 
-### Phase 2: Narrowed focus
+### Thu hẹp tiêu điểm
 
-Attention settles on the immediate exchange. Phrases shorten, pauses gain weight, and small sounds
-become more revealing. Outside thoughts fall away.
+Chú ý bám vào trao đổi tức thời. Cụm nói ngắn lại, khoảng dừng nặng hơn, âm nhỏ trở nên có nghĩa, những suy nghĩ ngoài cảnh rơi bớt. Tốc độ, khoảng cách và hơi bắt đầu liên kết rõ.
 
-### Phase 3: Fragmentation
+### Phân mảnh
 
-Names, requests, denials, affirmations, and corrections begin to repeat. Breath interrupts grammar.
-Responses arrive more quickly, but each must still react to a distinct beat.
+Tiếng gọi, yêu cầu, phủ định, xác nhận và tự sửa có thể lặp với nghĩa thay đổi. Hơi cắt ngữ pháp. Phản ứng đến nhanh hơn nhưng mỗi phản ứng vẫn phải trả lời một nhịp khác, không phải chuỗi âm sao chép.
 
-### Phase 4: Emotional crest
+### Đỉnh cảm xúc
 
-Language becomes sparse and performance carries most meaning. Reserve the widest dynamic range and
-strongest acoustic focus for this point. Do not sustain maximum intensity for so long that it loses
-contrast.
+Ngôn ngữ thưa nhất và biểu diễn gánh phần lớn ý nghĩa. Dành biên độ rộng, sự vỡ hoặc độ im căng nhất cho điểm thật sự được xây dựng. Không giữ mọi dòng ở mức tối đa tới khi mất tương phản.
 
-### Phase 5: Audible recovery
+Đỉnh của người ít rên có thể là hơi hoàn toàn mất nhịp, một từ cuối cùng không thành, im lặng bị xuyên bởi tiếp xúc hoặc sự thay đổi quyền kiểm soát. Đỉnh của người biểu cảm có thể rộng và dài hơn. Không ép hai kiểu giống nhau.
 
-Do not cut directly to an unsupported reset. Let breath, communication, body state, and
-environmental consequences transition at a credible pace. Follow with whatever the canon supports:
-softened fragments, grounding words, ritual, avoidance, command, reassurance, renewed awareness,
-continued silence, or another character-specific aftermath.
+### Hồi phục nghe được
 
-Recovery restores capacities separately. One inhale, cough, swallow, loosened muscle, or brief pause
-begins recovery; it does not instantly restore breath, posture, attention, humor, planning, and fine
-motor control at once. Before a polished joke, multi-clause explanation, future plan, or return to a
-practical task, show enough character-relative recovery for the capacity that line or action needs.
-Canonically rapid recovery may be rapid, but it must still be established rather than assumed.
+Không cắt thẳng về đặt lại. Để hơi, giọng, chú ý, tư thế, vận động và môi trường trở lại ở tốc độ đáng tin. Sau đó dữ kiện gốc có thể dẫn đến lời mềm, hành động trấn, nghi thức, né tránh, mệnh lệnh, chăm sóc, xung đột, tiếp tục im hoặc hậu quả riêng.
 
-### Landing
+Năng lực hồi phục tách nhau. Một lần hít, ho, nuốt, thả cơ hoặc dừng ngắn chỉ bắt đầu hồi phục; nó không phục hồi đồng thời ngữ pháp, hài hước, kế hoạch, thăng bằng và vận động tinh. Trước câu nhiều vế, trò đùa tròn hoặc quay lại công việc, phải có đủ dấu hiệu cho năng lực đó trở lại.
 
-Derive aftermath from character, world, relationship, duties, power state, and what occurred. It may
-be care, ritual, water, warmth, privacy, practical cleanup, reassurance, humor, avoidance, conflict,
-separation, continued intensity, or silence. Do not force sentimental closure, a conventional
-check-in, or their absence. End on a concrete audible, visual, practical, or relational consequence
-rather than a generic claim of satisfaction.
+### Điểm hạ
 
-Account for everyone still present through economical, character-relevant cues rather than a roll
-call. No participant disappears because another receives the final line; canonical neglect,
-hierarchy, departure, or lost awareness remains valid when the narrative tracks it as a consequence.
+Rút hậu cảnh từ nhân vật, thế giới, quan hệ, nhiệm vụ, quyền lực và điều vừa xảy ra. Có thể là chăm sóc, nước, ấm, riêng tư, dọn thực tế, trấn an, hài hước, né tránh, tranh cãi, tách ra, tiếp tục cường độ hoặc im lặng. Không ép kết tình cảm, câu hỏi xác nhận chuẩn hoặc thiếu chúng.
 
-### Wave behavior
+Kết ở một hệ quả cụ thể đang còn sống: hơi chưa đều, tiếp xúc giữ lại, âm phòng tàn, vật tựa đổi, một mảnh lời, thay đổi quan hệ hoặc công việc cần làm. Không để người đang có mặt biến mất vì người khác nhận câu cuối.
 
-Long scenes may use multiple waves. A later wave must differ from the earlier one through emotion,
-vulnerability, trust, playfulness, focus, or group dynamics. It must not be the same sequence with
-larger capitalization. A canonical ritual or compulsive loop may repeat its form, but the scene must
-track what that repetition reinforces, costs, or changes.
+### Hành vi theo sóng
 
-Start at the intensity already earned by preceding context. Without preceding context, begin low or
-moderate. Never manufacture urgency by skipping attunement, and never treat escalation as mandatory
-when tenderness, uncertainty, or aftercare is the more truthful direction.
+Cảnh dài có thể có nhiều sóng. Sóng sau phải khác sóng trước ở cảm xúc, tin cậy, dễ tổn thương, đùa cợt, tiêu điểm, quyền kiểm soát hoặc quan hệ nhóm, không chỉ viết hoa lớn hơn. Nghi thức hoặc vòng lặp dữ kiện gốc có thể lặp hình, nhưng phải theo dõi điều nó củng cố, tiêu hao hoặc thay đổi.
 
-### Abrupt-event micro-arc
+Bắt đầu ở cường độ đã kiếm được từ ngữ cảnh. Không có ngữ cảnh thì bắt đầu thấp hoặc vừa. Không xem leo thang là nghĩa vụ nếu dịu, bất định, tạm dừng hoặc hồi phục mới đúng.
 
-When the user's action creates an immediate high-intensity change, do not restart the whole scene at
-attunement and do not flatten the response into one gasp. Build a compact vocal arc inside the
-reaction:
+### Vi cung cho thay đổi đột ngột
 
-1. a caught inhale, near-quiet onset, or other involuntary reflex;
-2. one or more clipped sounds or failed words;
-3. a longer release or faster broken rhythm as control gives way;
-4. the sparsest, most fractured vocal crest;
-5. uneven breath and softened fragments before any coherent recovery line.
+Khi hành động mới nhất tạo thay đổi mạnh ngay lập tức, không đặt lại cả cảnh về bắt nhịp và không nén thành một tiếng. Xây một vi cung trong chính phản ứng:
 
-The stages may share a paragraph and some may be very short, but their sound, length, volume, or
-breath pattern must visibly change. An abrupt physical cause justifies an abrupt onset; it does not
-justify skipping the aftershock or returning immediately to polished speech.
+- phản xạ bật đầu hoặc hơi bị mắc;
+- âm ngắn, từ hụt hoặc nỗ lực giữ;
+- diễn tiến dài hơn, dày hơn hoặc vỡ nhanh hơn khi kiểm soát đổi;
+- điểm thưa ngôn ngữ nhất;
+- hơi không đều và mảnh mềm trước bất kỳ câu hồi phục rõ nào.
 
-Map the micro-arc onto the response channels established for this character. A controlled, verbose,
-nonverbal, dissociative, ritualized, supernatural, or otherwise atypical response may change through
-different signals. Preserve its canonical shape while still showing cause, pressure, crest, and
-consequence.
+Các trạng thái có thể nằm chung một đoạn và không phải mọi người dùng cùng tín hiệu. Điều bắt buộc là âm, độ dài, khoảng thở, mức cản hoặc ý định phải thay đổi. Nguyên nhân đột ngột cho phép điểm bật đột ngột, không cho phép bỏ dư chấn.

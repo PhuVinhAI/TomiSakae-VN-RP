@@ -1,8 +1,14 @@
-# ASMR Prompt Compiler
+# Trình biên dịch bộ lệnh ASMR tiếng Việt
 
-Dự án Node.js + TypeScript nhỏ gọn để quản lý prompt theo từng module và ghép chúng thành một file
-duy nhất, theo thứ tự tên file. Bộ prompt giữ hội thoại đời thường linh hoạt, tập trung vào ASMR chi
-tiết cho cảnh thân mật, và bắt buộc chèn ảnh asset RisuAI khi character có danh sách ảnh hợp lệ.
+Dự án Node.js + TypeScript nhỏ gọn để quản lý bộ lệnh theo từng mô-đun và ghép chúng thành một tệp
+duy nhất, theo thứ tự tên tệp. Bộ lệnh chỉ tạo phản hồi nhập vai bằng tiếng Việt, giữ hội thoại
+đời thường linh hoạt, tập trung sâu vào ASMR cho cảnh thân mật và bắt buộc chèn ảnh RisuAI khi nhân
+vật có danh sách tài nguyên ảnh hợp lệ.
+
+Hệ thống tiếng Việt chuyên biệt xử lý đại từ/vai vế, khẩu ngữ thân mật, mức trực diện của từ chỉ cơ
+thể, lời vỡ dưới áp lực, âm phi từ vựng có thể đọc, giới hạn phát âm khi miệng bị chiếm dụng, nhịp
+tiếp xúc và chống lẫn chữ hoặc cách rên Hàn/Nhật/Anh. Thẻ nhân vật, tri thức nền và tên riêng có thể đến từ
+nguồn ngoại ngữ nhưng toàn bộ nội dung hướng người đọc vẫn được trình bày tự nhiên bằng tiếng Việt.
 
 ## Yêu cầu
 
@@ -16,21 +22,21 @@ pnpm install
 pnpm compile:prompts
 ```
 
-File tổng hợp được tạo tại `generated/MASTER_PROMPT.md`. Nội dung file bắt đầu ngay từ module đầu
-tiên, không chèn metadata, danh sách source hay lời mở đầu, nên có thể copy trực tiếp.
+Tệp tổng hợp được tạo tại `generated/MASTER_PROMPT.md`. Nội dung tệp bắt đầu ngay từ mô-đun đầu
+tiên, không chèn metadata, danh sách nguồn hay lời mở đầu, nên có thể sao chép trực tiếp.
 
-Thêm prompt mới bằng cách tạo file `.md` hoặc `.txt` trong `prompts/`. Tên file quyết định thứ tự
-ghép; ví dụ `05-dialogue.md` được ghép trước `10-quality.md`. Không cần sửa config.
+Thêm bộ lệnh mới bằng cách tạo tệp `.md` hoặc `.txt` trong `prompts/`. Tên tệp quyết định thứ tự
+ghép; ví dụ `05-dialogue.md` được ghép trước `10-quality.md`. Không cần sửa cấu hình.
 
 ## Lệnh
 
 ```bash
-pnpm dev --list                 # Xem thứ tự module
-pnpm compile:prompts            # Sinh lại master prompt
-pnpm check:prompts              # Kiểm tra file tổng hợp có mới hay không
+pnpm dev --list                 # Xem thứ tự mô-đun
+pnpm compile:prompts            # Sinh lại bộ lệnh chính
+pnpm check:prompts              # Kiểm tra tệp tổng hợp có mới hay không
 pnpm check                      # TypeScript và ESLint
 pnpm test                       # Vitest
-pnpm build                      # Build CLI vào dist/
+pnpm build                      # Biên dịch CLI vào dist/
 pnpm ci                         # Chạy toàn bộ kiểm tra
 ```
 
@@ -44,30 +50,40 @@ pnpm dev --stdout
 ## Cấu trúc
 
 ```text
-prompts/                     Các khối prompt có thể chỉnh sửa riêng
-src/compiler.ts              Khám phá, sắp xếp và ghép module
+prompts/                     Các khối bộ lệnh có thể chỉnh sửa riêng
+src/compiler.ts              Khám phá, sắp xếp và ghép mô-đun
 src/cli.ts                   Giao diện dòng lệnh
 test/compiler.test.ts        Kiểm thử tính ổn định của compiler
-generated/MASTER_PROMPT.md   File tổng hợp được sinh tự động
+generated/MASTER_PROMPT.md   Tệp tổng hợp được sinh tự động
 ```
 
-Compiler không chèn thời gian tạo file, nên cùng một bộ module luôn tạo ra cùng một kết quả và cùng
-mã SHA-256. Điều này giúp dễ review thay đổi và phát hiện file tổng hợp bị cũ.
+Trình biên dịch không chèn thời gian tạo tệp, nên cùng một bộ mô-đun luôn tạo ra cùng một kết quả và cùng
+mã SHA-256. Điều này giúp dễ rà soát thay đổi và phát hiện tệp tổng hợp bị cũ.
+
+## Phạm vi tiếng Việt
+
+- `generated/MASTER_PROMPT.md`, các mô-đun trong `prompts/`, chỉ dẫn phản hồi và bộ lệnh bàn giao
+  đều bắt buộc nội dung hướng người đọc bằng tiếng Việt.
+- Chỉ giữ nguyên biến, thẻ XML, khóa tài nguyên ảnh, mã, đường dẫn và tên riêng cần thiết về kỹ thuật.
+- bộ lệnh phiên âm Gemini cũng được hướng dẫn hoàn toàn bằng tiếng Việt. Riêng lời nghe thấy trong
+  audio vẫn phải chép nguyên ngôn ngữ nguồn để bảo toàn tính nguyên văn; đây là ngoại lệ kỹ thuật của
+  tác vụ phiên âm, không phải hỗ trợ đa ngôn ngữ cho nhập vai.
 
 ## Thứ tự chèn khuyến nghị cho RisuAI
 
-Khi wrapper mặc định có `ROLEPLAY_RULE`, `ROLEPLAY_INFO` và `RESPONSE_INSTRUCTION`, dùng thứ tự sau:
+Khi khung lệnh bao ngoài mặc định có `ROLEPLAY_RULE`, `ROLEPLAY_INFO` và `RESPONSE_INSTRUCTION`, dùng thứ tự sau:
 
 1. System/configuration chung của nền tảng.
 2. `ROLEPLAY_RULE` chung.
 3. Dán toàn bộ `generated/MASTER_PROMPT.md` làm prefix thay cho phần từ `<SYSTEM_RULE>` đến hết
    `<ROLEPLAY_INFO>` cũ. Master đã chứa sẵn các tag mở/đóng này; không lồng nó vào một
    `<ROLEPLAY_INFO>` khác.
-4. Character card, user persona, active lorebook/world entries và memory do RisuAI chèn.
+4. Thẻ nhân vật, hồ sơ nhân vật người dùng, các mục tri thức thế giới đang hoạt động và bộ nhớ do RisuAI chèn.
 5. `standalone/RISUAI_RESPONSE_INSTRUCTION_REPLACEMENT.md` thay cho `RESPONSE_INSTRUCTION` mặc định
-   nếu nền tảng cho phép sửa block đó. File này đã chứa `<FINAL_EXECUTION_OVERRIDE>` ngay trước
-   `</RESPONSE_INSTRUCTION>`, vì vậy không chèn thêm một final override hoặc assistant prefill riêng.
+   nếu nền tảng cho phép sửa khối đó. Tệp này đã chứa `<FINAL_EXECUTION_OVERRIDE>` ngay trước
+   `</RESPONSE_INSTRUCTION>`, vì vậy không chèn thêm phần chốt cuối hoặc phần điền trước riêng cho AI.
 
-Không chuyển toàn bộ master dài xuống vị trí cuối: làm vậy tăng độ gần của luật style nhưng đẩy card
-và lore ra xa phản hồi. Final override đã được ghép vào cuối response instruction để nhắc lại các
-điều kiện chặn có nguy cơ cao trong cùng system prompt và tránh bị gửi sai thành role `assistant`.
+Không chuyển toàn bộ master dài xuống vị trí cuối: làm vậy tăng độ gần của luật phong cách nhưng đẩy
+thẻ nhân vật và tri thức nền ra xa phản hồi. Phần chốt cuối đã được ghép vào cuối chỉ dẫn phản hồi để nhắc lại
+các điều kiện chặn có nguy cơ cao trong cùng thông điệp hệ thống và tránh bị gửi sai thành vai
+`assistant`.

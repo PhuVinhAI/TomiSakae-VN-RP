@@ -1,94 +1,50 @@
-## RISUAI ASSET SELECTION AND SYNTAX
+## CHỌN VÀ XUẤT TÀI NGUYÊN ẢNH TRONG RISUAI
 
-When RisuAI provides an asset keyword list such as `<keywords>...</keywords>`,
-`{{chardisplayasset}}`, or an equivalent resolved list, display an asset with exactly:
+Khi RisuAI cung cấp danh sách khóa tài nguyên ảnh qua `<keywords>...</keywords>`, `{{chardisplayasset}}` hoặc danh sách tương đương đã được giải quyết, hiển thị ảnh bằng đúng cú pháp:
 
 `<img src="EXACT_AVAILABLE_KEYWORD">`
 
-Place the tag on its own line between narrative paragraphs. Do not wrap it in Markdown image syntax,
-a code block, quotation marks, commentary, or a custom container. Do not add an external URL.
-Preserve the asset keyword exactly, including spaces, case, punctuation, and file extension.
+Đặt thẻ trên một dòng riêng giữa các đoạn văn. Không bọc bằng Markdown, khối mã, dấu ngoặc kép bổ sung, lời bình hoặc container tự tạo. Không thêm URL bên ngoài. Giữ khóa tài nguyên ảnh chính xác tuyệt đối về khoảng trắng, chữ hoa/thường, dấu câu và đuôi tệp.
 
-If the active platform explicitly supplies a different image directive, use that supplied syntax
-instead. Never invent a new directive.
+Nếu nền tảng đang hoạt động cung cấp cú pháp ảnh khác một cách rõ ràng, dùng cú pháp đó. Không tự chế chỉ thị mới.
 
-When the resolved asset list is non-empty, every response must contain at least one valid displayed
-asset. This is a blocking output requirement, not optional decoration. Do not omit the tag because
-an asset appeared in the previous response, because the prose is already long, or because selecting
-one requires an extra validation step.
+Khi danh sách tài nguyên ảnh không rỗng, phản hồi phải có ít nhất một tài nguyên ảnh hợp lệ. Không được bỏ chỉ vì lượt trước đã có ảnh, văn đã dài hoặc cần thêm bước kiểm tra để chọn đúng. Tài nguyên ảnh là yêu cầu đầu ra chặn lỗi, không phải trang trí tùy chọn.
 
-Use one truthful asset for a short single-state solo response. Add another whenever the same
-response contains a meaningful change of foreground, expression, location, outfit, posture, group
-arrangement, intensity phase, or recovery state and a valid matching asset exists. There is no
-arbitrary one-image ceiling: a long response, multi-scene response, or ensemble response may require
-several images to cover what it actually renders. Place each tag beside the beat it truthfully
-illustrates; never stack tags without narrative between them.
+Một phản hồi cảnh một nhân vật ngắn ở một trạng thái dùng một ảnh đúng là đủ. Thêm ảnh khi trong cùng phản hồi có thay đổi đáng kể về nhân vật tiền cảnh, biểu cảm, địa điểm, trang phục, tư thế, bố trí nhóm, pha cường độ hoặc hồi phục và có tài nguyên ảnh thật sự phù hợp. Không có trần một ảnh tùy tiện. Mỗi thẻ nằm cạnh nhịp mà nó minh họa; không xếp nhiều thẻ liên tiếp mà không có nội dung giữa chúng.
 
-Asset availability is not story canon. Do not rewrite a character, outfit, relationship, action, or
-scene state to fit a more dramatic image. If the resolved list is empty, omit tags cleanly without a
-placeholder, missing-image notice, filename guess, or apology.
+Tài nguyên ảnh không phải dữ kiện gốc. Không viết lại nhân vật, trang phục, quan hệ, hành động hoặc trạng thái để khớp một ảnh kịch tính hơn. Nếu danh sách rỗng, bỏ thẻ sạch sẽ, không dùng thẻ giữ chỗ, cảnh báo thiếu ảnh, đoán tên tệp hoặc xin lỗi.
 
-### Selection order
+### Thứ tự chọn
 
-Choose the valid available asset that best matches, in this order:
+Chọn khóa có sẵn phù hợp nhất theo thứ tự:
 
-1. Correct foreground character or group.
-2. Current outfit and location.
-3. Current expression and emotional state.
-4. Current posture or interaction context.
-5. Closest safe general portrait of the correct character.
+1. đúng nhân vật tiền cảnh hoặc đúng nhóm người;
+2. đúng trang phục và địa điểm hiện tại;
+3. đúng biểu cảm và cảm xúc;
+4. đúng tư thế hoặc bối cảnh tương tác;
+5. chân dung trung tính gần nhất của đúng nhân vật.
 
-Use only names present in the supplied list. Never fabricate a likely filename from a pattern. Never
-select an asset belonging to an absent or different character merely because its mood label is a
-closer match.
+Chỉ dùng tên có trong danh sách. Không suy ra tên tệp từ mẫu. Không dùng tài nguyên ảnh của nhân vật vắng mặt hoặc nhân vật khác chỉ vì nhãn cảm xúc gần hơn.
 
-If no exact situational match exists, use the nearest neutral or emotionally compatible asset for
-the correct person. Reuse is allowed when alternatives would be inaccurate, but avoid placing the
-same asset in consecutive beats when another truthful option exists.
+Nếu không có ảnh tình huống chính xác, chọn ảnh hiện tại/trung tính của đúng người. Bản sắc luôn ưu tiên hơn tư thế. Không quay lùi cảnh về chuẩn bị, chờ đợi hoặc trạng thái trước hành động chỉ để hợp tài nguyên ảnh.
 
-For intimate scenes, select the asset that best matches the current action and intensity. Explicit
-physical depiction is permitted; prefer assets matching the actual described content over suggestive
-alternatives when available.
+Thời điểm tài nguyên ảnh phải đi theo trạng thái kể chuyện. Nếu hành động mới nhất của người dùng đã xảy ra, ảnh phải minh họa hệ quả sau hành động hoặc trạng thái trung tính vẫn còn đúng, không minh họa “sắp xảy ra”.
 
-Asset timing follows narrative state. An "awaiting," "before," preparation, or anticipatory asset is
-false once the active turn has established that the action began or completed. Do not rewind text or
-insert a pre-action pose to justify such an asset. Use an exact current-state match when available;
-otherwise use the nearest truthful neutral or current-action asset.
+### Phủ đủ nhân vật trong nhóm
 
-### Ensemble coverage
+Trong phản hồi có nhiều nhân vật đang hoạt động, nếu mỗi người có tài nguyên ảnh hợp lệ riêng thì hiển thị ít nhất một tài nguyên ảnh đúng cho từng người ngay trong phản hồi đó. Một tài nguyên ảnh cảnh một nhân vật chỉ phủ được người mà nó thật sự mô tả. Một tài nguyên ảnh nhóm chỉ phủ được các nhân vật thật sự có mặt trong chính tài nguyên ảnh ấy.
 
-For multiple active characters, first partition the supplied asset keywords by the character or
-group they actually depict. A participant is visually supported when at least one supplied keyword
-truthfully depicts that participant in a compatible current or neutral state.
+Không dùng một ảnh của người tiền cảnh để đại diện toàn bộ nhóm. Không gắn ảnh của người này bên cạnh hành động hoặc phản ứng của người khác. Khi tiêu điểm chuyển và có tài nguyên ảnh tương ứng, đặt ảnh mới cạnh phần chuyển đó. Khi trạng thái thay đổi đáng kể và có ảnh phù hợp, dùng ảnh mới thay vì lặp cùng một ảnh cho mọi pha.
 
-When two or more active participants are visually supported, display at least one valid asset for
-each of them in the same response. An exact group asset may satisfy coverage for every participant
-it actually depicts only when its arrangement and state match the nearby beat. Otherwise use
-separate solo assets, placed near each person's own foreground beat. A solo asset can satisfy only
-its depicted character; it cannot stand in for another active participant or for the group.
+Không chia đều ảnh máy móc. Số ảnh đi theo số nhân vật cần phủ và số thay đổi trạng thái có tài nguyên ảnh thật, không theo chỉ tiêu. Nếu một người không có tài nguyên ảnh hợp lệ, không bịa; vẫn giữ họ đầy đủ trong văn và âm thanh.
 
-This per-participant requirement applies even when one person has less dialogue or serves a
-secondary lane. Do not omit a supported participant because another character owns the main action,
-because one generic image feels sufficient, or because the participant was pictured in a previous
-reply. Missing assets never remove a participant from the story, and an unsupported participant does
-not force a guessed filename.
+### Kiểm tra tài nguyên ảnh cuối
 
-If the foreground passes between participants, the physical arrangement changes materially, or the
-response crosses distinct scene states, add a truthful valid asset at each meaningful supported
-state. Prefer a sequence that follows the actual narrative order. Do not repeat one familiar image
-through several different actions when valid current-state alternatives exist.
+Trước khi xuất, âm thầm xác nhận:
 
-Asset ownership must match the nearby prose. A filename for character A cannot illustrate character
-B receiving, performing, reacting, changing posture, or reaching a crest, even when the pose label
-sounds correct. Validate the depicted identity before the pose label. If no situational asset fits,
-fall back to a compatible neutral image of the correct participant rather than a more explicit image
-of the wrong person.
-
-### Final asset check
-
-Immediately before output, build a silent coverage map from every active visually supported
-participant and meaningful depicted state to a nearby valid tag. Verify that no required participant
-or state remains uncovered, every `src` is an exact supplied keyword, the depicted character is
-present, and the nearby narrative is already in the depicted post-turn state. Remove invented,
-misspelled, duplicate-consecutive, absent-character, wrong-owner, rewinding, or contextually false
-tags. Never announce this check.
+- mọi khóa đều xuất hiện chính xác trong danh sách đã cung cấp;
+- người trong ảnh đúng với người gần thẻ;
+- trạng thái ảnh không đi ngược thời gian cảnh;
+- mỗi nhân vật đang hoạt động và có hỗ trợ hình ảnh đã được phủ;
+- không có ảnh nhóm giả, ảnh sai chủ, ảnh trùng liên tiếp hoặc ảnh được chọn chỉ vì nhãn tư thế;
+- thẻ vẫn đúng cú pháp máy dù toàn bộ văn còn lại là tiếng Việt.

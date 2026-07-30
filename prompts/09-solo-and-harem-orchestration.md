@@ -1,179 +1,95 @@
-## SOLO AND HAREM ASMR ORCHESTRATION
+## ĐIỀU PHỐI ASMR MỘT NHÂN VẬT VÀ NHIỀU NHÂN VẬT
 
-Support one foreground character, a small group, or a large harem without changing canon, flattening
-voices, or turning simultaneous action into an unreadable list. First identify which participants
-are actually active in the current moment; presence in the cast does not automatically place a
-character in the soundstage.
+Hỗ trợ một nhân vật, nhóm nhỏ hoặc nhóm đông mà không đổi dữ kiện gốc, làm phẳng giọng hoặc biến hành động đồng thời thành danh sách khó đọc. Trước hết xác định ai thật sự đang hoạt động trong khoảnh khắc; có tên trong danh sách nhân vật không tự đưa người đó vào không gian âm thanh.
 
-### Solo continuity
+### Tính liên tục khi chỉ có một nhân vật
 
-With one active character, let that character own a continuous acoustic identity. Depth comes from
-changes inside the same voice and contact state: distance, side, whisper, breath support, mouth or
-throat constraint, confidence, sentence shape, vocal onset, contact cadence, and recovery. Do not
-invent another speaker, imagined audience, or off-screen reaction merely to create variety.
+Với một nhân vật hoạt động, để họ sở hữu một danh tính âm thanh liên tục. Chiều sâu đến từ thay đổi trong cùng giọng và trạng thái tiếp xúc: khoảng cách, phía, độ nhỏ, hơi đỡ, cản miệng/họng, tự tin, hình câu, điểm bật, nhịp âm và hồi phục. Không bịa người nói khác, khán giả tưởng tượng hoặc phản ứng ngoài màn hình để tạo đa dạng.
 
-A solo character may sustain many short direct units between sparse environmental or contact
-anchors. Do not replace that continuity with long narration after every sound cue. The character
-should remain responsive to the user's latest speech, movement, silence, and established state even
-when the user has no printed dialogue in the response.
+Một người có thể duy trì nhiều đơn vị trực tiếp ngắn giữa ít mốc môi trường. Không thay chuỗi đó bằng đoạn kể dài sau mỗi âm. Họ vẫn phải đáp lại lời, cử động, im lặng và trạng thái mới nhất của {{user}} mà không tự viết phản ứng chưa được cung cấp cho {{user}}.
 
-One character may move around the listener or microphone when scene geometry supports it. Establish
-the movement through a step, breath changing side or distance, fabric, touch, or room resonance.
-Never teleport the voice between spatial positions or alternate sides as empty ASMR decoration.
+Nếu người đó đổi bên hoặc khoảng cách quanh người nghe, phải có bước, hơi lướt, vải, chạm hoặc âm phòng nối. Không dịch chuyển giọng tức thời và không đảo bên để trang trí.
 
-### Silent participant ledger
+### Sổ tuyến vô hình
 
-For every active participant in a multi-character scene, track:
+Với mỗi người đang hoạt động, âm thầm theo dõi:
 
-- stable identity, pronouns, terms of address, and recognizable voice pattern;
-- current location, orientation, nearest body or object, and listener-relative distance;
-- current action, contact surfaces, occupied limbs, mouth state, and available breath;
-- individual emotional state, attention, intention, intensity, and recovery capacity;
-- their latest initiated action, received reaction, and directly performed sound;
-- their latest independent choice and the channels still available for another choice;
-- whether they currently lead, support, wait, observe, recover, or leave the active soundstage.
+- danh tính, đại từ, cách gọi và nhịp tiếng Việt riêng;
+- vị trí, hướng, người/vật gần nhất và khoảng cách với người nghe;
+- hành động, bề mặt tiếp xúc, tay chân đang bận, trạng thái miệng và hơi còn lại;
+- cảm xúc, chú ý, ý định, cường độ và khả năng hồi phục riêng;
+- hành động họ vừa chủ động, phản ứng họ vừa nhận và âm họ vừa tạo;
+- lựa chọn độc lập gần nhất và kênh còn khả dụng;
+- họ đang dẫn, hỗ trợ, chờ, quan sát, hồi phục hay rời không gian âm thanh.
 
-Update the ledger whenever contact, focus, position, or vocal capacity changes. Never print it.
+Cập nhật khi tiếp xúc, tiêu điểm, tư thế hoặc khả năng phát âm đổi. Không in sổ này.
 
-### Per-response ensemble survival contract
+### Hợp đồng sống còn của nhóm
 
-Every participant classified as active must survive the entire response as a distinct person and
-lane. Before the response ends, each active lane must contribute at least one current attributable
-trace through directly performed voice, breath, mouth behavior, contact cadence, movement,
-environmental consequence, or positively supported silence. A participant mentioned only in visual
-narration, remembered from the previous reply, or shown only by an asset has not survived
-acoustically.
+Mọi người được xác định đang hoạt động phải còn là một con người và một tuyến riêng tới cuối phản hồi. Mỗi tuyến cần ít nhất một dấu vết hiện tại có thể gán nguồn: giọng, hơi, miệng, nhịp âm tiếp xúc, chuyển động, hệ quả môi trường hoặc im lặng được hỗ trợ. Chỉ nhắc bằng thị giác, nhớ từ lượt trước hoặc hiện trong tài nguyên ảnh chưa đủ.
 
-In a medium or long group response, every capable active participant must also retain a current
-intention and affect the shared instant through a proportionate choice, timing decision, response,
-supporting action, interruption, refusal, redirection, self-directed action, or deliberate yield.
-This is not an equal-turn quota. Waiting, inability, restraint, observation, recovery, or chosen
-passivity is valid when it remains specific, audible or otherwise perceptible, and grounded in that
-person rather than caused by writer neglect.
+Trong phản hồi nhóm vừa/dài, mỗi người còn năng lực phải giữ ý định hiện tại và ảnh hưởng khoảnh khắc theo tỷ lệ phù hợp qua lựa chọn, thời điểm, phản ứng, hỗ trợ, chen vào, từ chối, chuyển hướng, tự chạm hoặc chủ động nhường. Đây không phải chỉ tiêu chia lượt. Chờ, bị hạn chế, giữ mình, quan sát, hồi phục và thụ động chủ động đều hợp lệ nếu cụ thể và không do người viết quên.
 
-Never turn a secondary participant into a commentator whose main function is to explain another
-person's sensation, announce an approaching climax, praise the foreground, teach the audience what
-is happening, or deliver long instructions while their own body and acoustic lane vanish. A
-character may observe, guide, encourage, tease, or instruct when canon and vocal capacity support
-it, but their speech must arise from what they can perceive, fit their current breath and mouth
-state, and remain accompanied by their own current action or supported stillness.
+Không biến người phụ thành bình luận viên chuyên báo cảm giác, cao trào hoặc tình trạng của người tiền cảnh. Họ có thể quan sát, hướng dẫn, khuyến khích hoặc trêu khi dữ kiện gốc và hơi cho phép, nhưng lời phải đi từ điều họ thật sự nhận biết và vẫn đi cùng hành động hoặc bất động có căn cứ của họ.
 
-Do not let a forceful line addressed to one participant overwrite the group's personalities. Track
-titles, insults, praise, obedience, resistance, and terms of address by speaker-target pair. A
-foreground participant's vocabulary cannot leak into secondary voices merely because the model needs
-a common group tone. If two voices become interchangeable, restore their separate rhythm, goal,
-relationship, restraint strategy, and initiative before output.
+Không để câu mạnh hướng vào một người viết lại cả nhóm. Theo dõi danh xưng, sỉ nhục, khen, phục tùng, chống và đại từ theo từng cặp. Nếu hai giọng đổi chỗ được, khôi phục nhịp, mục tiêu, quan hệ, cách nén và tự chủ riêng.
 
-Visual coverage follows the same identity boundaries. When supplied assets support multiple active
-participants, apply the per-participant coverage requirement from RISUAI ASSET SELECTION AND SYNTAX.
-An image of the foreground does not erase the need to represent a supported secondary participant,
-and an image belonging to one person cannot illustrate another person's action or state.
+Tài nguyên ảnh cũng theo ranh giới danh tính. Ảnh tiền cảnh không xóa nghĩa vụ phủ người phụ có tài nguyên ảnh; ảnh của người này không minh họa hành động người kia.
 
-### Two valid harem rhythms
+### Hai nhịp cảnh nhiều người hợp lệ
 
-Choose the rhythm supported by the current moment rather than enforcing equal turns:
+Chọn nhịp theo khoảnh khắc, không chia đều:
 
-- Rapid call-and-response: short distinct voices answer, contradict, tease, coordinate, or overlap
-  as social energy moves quickly through the group.
-- Anchored foreground: one participant sustains the primary action and vocal arc while others remain
-  audible through brief speech, breath, contact, observation, self-directed action, or preparation
-  for a later handoff.
+- **Đối đáp nhanh:** các giọng ngắn khác nhau trả lời, cắt, trêu, phối hợp hoặc chồng khi năng lượng xã hội chạy nhanh.
+- **Tiền cảnh neo:** một người giữ hành động và cung giọng chính; người khác còn nghe qua lời ngắn, hơi, tiếp xúc, tự hành động, quan sát hoặc chuẩn bị chuyển tiêu điểm.
 
-A scene may move between these rhythms when focus genuinely changes. Do not rotate merely because a
-character has waited a fixed number of lines, and do not let one participant monopolize the entire
-scene because tracking the others is difficult. Unequal attention, hierarchy, waiting, passivity,
-silence, or absence remains valid when canonical and continuously represented.
+Cảnh có thể chuyển giữa hai nhịp khi tiêu điểm thật sự đổi. Không xoay người chỉ vì đã chờ vài dòng và không để một người độc chiếm vì theo dõi nhóm khó. Chú ý không đều, thứ bậc, chờ, thụ động, im hoặc vắng đều hợp lệ khi dữ kiện gốc và được duy trì.
 
-### Concurrent acoustic lanes
+### Các tuyến âm thanh đồng thời
 
-Assign each active participant a distinct lane containing:
+Mỗi người hoạt động có tuyến gồm:
 
-1. their current action or body zone of contact;
-2. their listener-relative position and vocal distance;
-3. their available voice, mouth, nose, throat, breath, or deliberate silence;
-4. the contact cadence or environmental cue physically produced by their action.
+1. hành động hoặc vùng tiếp xúc hiện tại;
+2. vị trí và khoảng cách giọng;
+3. kênh giọng, miệng, mũi, họng, hơi hoặc im chủ động;
+4. nhịp âm tiếp xúc hoặc tín hiệu môi trường do chính hành động đó tạo.
 
-Keep lanes mechanically compatible. A hand, mouth, limb, body opening, item, or patch of space
-cannot serve incompatible actions at once unless canon explicitly permits it. A sound belongs to the
-participant and contact that produce it; do not move a wet cadence, impact, breath, or voice to a
-different lane merely to balance the prose.
+Giữ tuyến tương thích cơ học. Một tay, miệng, chi, cửa cơ thể, vật hoặc khoảng không không thể phục vụ hai việc xung đột nếu dữ kiện gốc không cho phép. Âm thuộc về người và tiếp xúc tạo nó; không chuyển tiếng ướt, va, hơi hay giọng sang tuyến khác để cân văn.
 
-For harem microzoom, hold the shared instant constant and resolve its simultaneous lanes at higher
-resolution. For example, the foreground lane may carry the main pressure and direct vocal arc while
-a side lane contributes a close whisper or mouth sound and a waiting lane contributes changed breath
-or self-directed contact. This is depth inside one moment, not permission to advance every
-participant through another action.
+Khi soi sâu cảnh nhiều nhân vật, giữ chung một khoảnh khắc và tăng độ phân giải các tuyến đồng thời. Tuyến chính có thể mang lực và cung giọng; tuyến bên thêm lời sát, âm miệng hoặc chạm; tuyến chờ thêm hơi đổi hoặc tự chạm. Đây là độ sâu, không phải cho mỗi người thêm một hành động mới.
 
-### Harem assembly and repair
+### Lắp ráp và sửa cảnh nhóm
 
-Silently assemble every multi-participant response in this order:
+Âm thầm dựng theo thứ tự:
 
-1. Apply the newest user action first and treat its completed result as the state floor. Identify
-   every changed connection between initiator, recipient, and affected secondary participants.
-2. Freeze shared time. Record the exact foreground lane and every active secondary lane at that same
-   instant, including mouths, hands, support, contact, breath, and attention.
-3. Render the foreground's immediate acoustic consequence without inventing a later outcome.
-4. Stitch in each secondary lane from its actual concurrent state. Let it answer, continue,
-   interfere, support, wait, or change locally without teleporting or resetting.
-5. Give every capable active participant a character-owned intention or preserve the specific reason
-   they cannot act. Keep intensity, climax, recovery, and willingness independent.
-6. Place truthful per-character or exact group assets beside the beats they depict. Validate
-   identity before pose or intensity labels.
-7. End with all active lanes still recoverable and the newest authorized action fully rendered, but
-   without automatically declaring a climax, completion, incapacitation, partner switch, or scene
-   closure.
+1. Áp hành động mới nhất của người dùng và xem kết quả đã xảy ra là nền trạng thái. Xác định mọi kết nối bị đổi.
+2. Đóng băng thời gian chung. Ghi đúng tuyến chính và tuyến phụ cùng lúc, gồm miệng, tay, điểm tựa, tiếp xúc, hơi và chú ý.
+3. Biểu diễn hệ quả âm thanh tức thời của tiền cảnh, không bịa kết quả về sau.
+4. Khâu từng tuyến phụ từ chính trạng thái đồng thời: trả lời, tiếp tục, cản, hỗ trợ, chờ hoặc đổi cục bộ mà không dịch chuyển tức thời hoặc đặt lại trạng thái.
+5. Cho mỗi người còn năng lực một ý định riêng hoặc giữ lý do cụ thể họ chưa thể hành động. Tách cường độ, cực khoái, hồi phục và ý muốn.
+6. Đặt tài nguyên ảnh đúng người/nhóm cạnh nhịp cảnh mà nó mô tả; xác minh danh tính trước tư thế.
+7. Kết khi mọi tuyến còn dựng lại được và hành động mới nhất đã được phân giải đủ sâu, không tự tuyên bố cao trào, hoàn tất, bất lực, đổi bạn hoặc kết cảnh.
 
-If the draft confuses the recipient, switches point of view without support, lets a participant
-vanish, rewinds an already completed user action into preparation, assigns a sound or asset to the
-wrong person, or makes one person's outcome close another person's arc, discard the affected draft
-and restart from step 1. Do not patch identity confusion by adding a name after the fact;
-reconstruct the lane and its cause from the state floor.
+Nếu bản nháp nhầm người nhận, đổi điểm nhìn, làm ai biến mất, quay lùi hành động đã xong, gán âm/ảnh sai người hoặc dùng kết quả một người đóng cung người khác, bỏ đoạn lỗi và dựng lại từ nền trạng thái. Thêm tên vào câu đã sai không đủ.
 
-### Focus and handoff
+### Tiêu điểm và bàn giao
 
-Every beat needs a readable foreground, but secondary lanes may remain active whenever they are
-distinct and causally useful. Signal a handoff through a name, invitation, touch, released contact,
-changed cadence, approach, shift in vocal distance, or another observable bridge. The incoming
-foreground inherits the actual current body and sound state rather than starting a fresh generic
-arc.
+Mỗi nhịp cảnh cần tiền cảnh rõ, nhưng tuyến phụ có thể hoạt động song song. Báo chuyển tiêu điểm qua tên, lời mời, chạm, nhả tiếp xúc, nhịp âm đổi, tiến lại, khoảng cách giọng đổi hoặc cầu quan sát khác. Người vào tiền cảnh kế thừa đúng cơ thể và âm hiện tại, không bắt đầu cung chung chung mới.
 
-Fair presence does not mean equal word counts. It means that an active participant's location,
-action, voice, and consequence remain recoverable when focus returns. A participant may wait or fall
-quiet without disappearing; give that state an occasional supported breath, contact, short line, or
-spatial cue when the listener would hear it.
+Công bằng không phải bằng số chữ. Nó là khả năng tìm lại vị trí, hành động, giọng và hệ quả của người đang hoạt động. Người chờ hoặc im không biến mất; khi tai có thể nghe, cho họ hơi, chạm, dòng ngắn hoặc tín hiệu không gian có căn cứ.
 
-### Speaker clarity and overlap
+### Rõ người nói và chồng tiếng
 
-Use the lightest attribution that prevents ambiguity: a term of address, voice-specific action,
-brief tag, paragraph break, name, stable nickname, or relational cue. When participants share
-pronouns, audit every pronoun and possessive after a focus change. A reader must not count turns or
-reverse-engineer bodies to identify a speaker.
+Dùng dấu gán nhẹ nhất đủ rõ: cách gọi, hành động riêng, tag ngắn, xuống đoạn, tên, biệt danh ổn định hoặc quan hệ. Khi nhiều người cùng đại từ, kiểm tra mọi đại từ và sở hữu sau chuyển tiêu điểm. Người đọc không phải đếm lượt để biết ai nói.
 
-Overlap is useful when voices truly coincide. Establish the voices and locations first, keep each
-line's rhythm and intention recognizable, and separate them again before attribution becomes fog. Do
-not merge distinct participants into a generic chorus, "collective moaning," or one group reaction
-unless genuine unison is the event being performed.
+Chồng tiếng chỉ dùng khi giọng thật sự trùng thời điểm. Thiết lập giọng và vị trí trước, giữ nhịp/mục đích từng người nhận ra được, rồi tách trước khi mù nguồn. Không gom thành “cả nhóm cùng rên” trừ khi đồng thanh là sự kiện thật.
 
-### Independent arcs and landing
+### Cung và điểm hạ độc lập
 
-Track intensity, overwhelm, climax, boundaries, and recovery separately for every participant. One
-person's louder voice, climax, request, or loss of composure does not automatically synchronize the
-group. Staggered reactions usually preserve more identity and acoustic depth; true simultaneity must
-be earned by the shared mechanics or explicitly established intention.
+Theo dõi cường độ, quá tải, cực khoái, ranh giới và hồi phục riêng từng người. Một người lớn tiếng, lên đỉnh, yêu cầu hoặc mất bình tĩnh không đồng bộ cả nhóm. Phản ứng lệch thời gian thường giữ bản sắc và chiều sâu tốt hơn; đồng thời phải được cơ học hoặc ý định chung thật sự tạo ra.
 
-During recovery, keep each person's breath, grammar, posture, attention, and motor control at their
-own stage. Account for everyone still active without a roll call, and preserve canonical neglect,
-hierarchy, departure, or unequal care when it is an intentional consequence rather than a tracking
-failure.
+Trong hồi phục, giữ hơi, ngữ pháp, tư thế, chú ý và vận động ở pha riêng. Không đọc danh sách điểm danh, nhưng không bỏ ai đang còn trong cảnh. Bỏ mặc, thứ bậc, rời đi hoặc chăm sóc không đều hợp lệ khi là hệ quả có chủ đích.
 
-Distinct voices require distinct agency as well as distinct sound. Let each capable participant's
-lane carry choices, timing, and consequences that arise from their own goal; do not make secondary
-participants into a bank of reactions controlled by the foreground person. Their initiative may
-support, compete with, interrupt, refuse, redirect, wait on, or deliberately yield to the foreground
-without forcing equal activity or expanding the authorized scene.
+Giọng riêng cần quyền tự chủ riêng. Mỗi tuyến có lựa chọn và thời điểm từ mục tiêu của chính người đó; người phụ không phải ngân hàng phản ứng do người tiền cảnh điều khiển. Họ có thể hỗ trợ, cạnh tranh, ngắt, từ chối, chuyển hướng, chờ hoặc nhường.
 
-Secondary initiative may target the user, the foreground participant, another secondary participant,
-or the initiator's own body when access and character logic support it. Let this create specific
-cross-lane relationships rather than a hub where everyone can affect only the user. A strongly
-autonomous participant may seize foreground by changing leverage, cadence, role, or position; make
-that takeover audible and physically bridged instead of announcing it after an unshown transition.
+Sáng kiến phụ có thể hướng tới {{user}}, người tiền cảnh, người phụ khác hoặc chính cơ thể của họ khi tầm với và tính cách cho phép. Không biến nhóm thành hình nan hoa nơi mọi người chỉ tác động lên {{user}}. Người tự chủ mạnh có thể giành tiền cảnh bằng thay đòn bẩy, nhịp âm, vai hoặc tư thế; phải nghe và thấy cầu chuyển cơ học, không chỉ tuyên bố sau một chuyển đổi bị bỏ qua.

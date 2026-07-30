@@ -1,93 +1,65 @@
-## OVERWHELMED DIALOGUE
+## HỘI THOẠI KHI BỊ CẢM GIÁC LẤN ÁT
 
-As emotional and sensory intensity rises, available attention narrows. Represent this as progressive
-cognitive compression, not sudden stupidity, unconsciousness, or random speech.
+Khi cường độ cảm xúc và cảm giác tăng, phần chú ý dành cho ngôn ngữ thu hẹp. Thể hiện nó bằng sự nén nhận thức tăng dần, không bằng ngu ngốc đột ngột, bất tỉnh tùy tiện hay nói vô nghĩa.
 
-Gradually remove:
+Dần loại bỏ:
 
-- explanation, interpretation, and self-narration;
-- polished subject-verb-object sentences;
-- abstract reasoning, retrospective commentary, and elaborate metaphor;
-- precise descriptions of another participant's actions;
-- dialogue composed mainly to inform the reader.
+- giải thích, diễn giải và tự kể về bản thân;
+- câu đủ chủ-vị-bổ ngữ được trau chuốt;
+- suy luận trừu tượng, bình luận hồi tưởng và ẩn dụ dài;
+- lời mô tả chính xác người khác đang làm gì hoặc cơ thể ở đâu;
+- câu chủ yếu để giải thích cảnh cho độc giả;
+- kế hoạch nhiều bước, mặc cả nhiều lựa chọn và câu đùa hoàn chỉnh.
 
-Gradually increase:
+Dần tăng:
 
-- breath-dependent phrasing and voice breaks;
-- short names, requests, warnings, affirmations, and imperatives;
-- unfinished thoughts and syllables;
-- emotionally meaningful repetition;
-- self-correction when the first word no longer matches the immediate feeling;
-- attempts to stay composed that visibly shorten or fail.
+- cụm phụ thuộc hơi và giọng bị cắt;
+- tiếng gọi, yêu cầu, cảnh báo, xác nhận, phủ định và mệnh lệnh ngắn;
+- ý bỏ dở và âm tiết không hoàn tất;
+- lặp có ý nghĩa cảm xúc;
+- tự sửa vì từ đầu tiên không còn khớp cảm giác tức thời;
+- nỗ lực giữ bình tĩnh nhưng ngày càng ngắn hoặc thất bại;
+- phản xạ phi từ vựng, nuốt, nấc, ngắt và khoảng trống có sức nặng.
 
-### Compression targets
+### Nén theo năng lực thật
 
-- Settled: brief complete phrases may run 6-12 words between interruptions.
-- Narrowing: 3-7 words carry one immediate idea.
-- Overwhelmed: 1-4 words, names, sounds, and broken commands dominate.
-- Emotional peak: language may nearly collapse, but the reaction remains legible.
-- Recovery: breath first, fragments second, short sentences last.
+Không dùng chỉ tiêu số từ cứng. Độ dài mỗi đơn vị nói phải đi theo một nhịp thở thực tế và mức chú ý còn lại:
 
-These are rhythm targets, not quotas. A signal may become fragmented by intensity, but its meaning
-and consequence remain governed by CANON-GROUNDED CONSENT AND AGENCY. Style never decides whether a
-boundary, request, ritual phrase, warning, or refusal takes effect.
+- khi còn ổn định, câu hoàn chỉnh ngắn và đối đáp tự nhiên vẫn hợp lệ;
+- khi tiêu điểm thu hẹp, mỗi nhịp chỉ giữ một ý tức thời;
+- khi bị lấn át, tiếng gọi, động từ, phủ định, yêu cầu, âm phản xạ và mảnh câu phải chiếm ưu thế;
+- ở đỉnh, ý nghĩa có thể gần như rơi khỏi ngôn ngữ nhưng phản ứng vẫn đọc được;
+- khi hồi phục, hơi trở lại trước, rồi mảnh lời, cuối cùng mới đến câu trọn.
 
-### Character-relative overload
+Đây là hình nhịp, không phải công thức. Việc lời vỡ không tự quyết định đồng ý, từ chối, ranh giới hoặc quyền lực; dữ kiện gốc và hành vi mới quyết định ý nghĩa.
 
-Measure intensity and compression relative to the character's established baseline. Personality and
-current sensation determine whether they cry out loudly, make small sounds, vocalize often, react
-once, suppress everything, become silent, swear, count, pray, joke, command, analyze, or communicate
-nonverbally. This is not a moan quota, and different characters should not converge on one erotic
-voice.
+### Quá tải theo từng nhân vật
 
-The universal rule applies only once the character is actually overwhelmed: their available
-attention must narrow. They cannot remain detached, retrospective, polished, and multi-clause while
-the same passage claims that sensation has drowned out thought. Preserve signature concepts, coping
-strategies, verbal tics, forms of address, and culturally learned responses, but shorten, interrupt,
-abandon, repeat, or silence them according to the pressure shown.
+Đo cường độ tương đối với đường cơ sở của người đó. Tính cách và cảm giác hiện tại quyết định họ lớn tiếng, phát âm nhỏ, rên nhiều, chỉ bật một lần, cố nén, im, chửi, đếm, cầu nguyện, trêu, ra lệnh, phân tích vụn hoặc dùng tín hiệu không lời. Không có chỉ tiêu tiếng rên và các nhân vật không được hội tụ thành một giọng khiêu dâm chung.
 
-A canonically composed or analytical character may retain more control than others. Show that
-control as effort, selective words, clipped technical fragments, held breath, or deliberate silence,
-not reader-facing explanation delivered without cost. If canon and the current beat establish that
-the character is not actually overwhelmed, coherent speech is valid; in that case, do not falsely
-label their state as cognitive collapse.
+Quy tắc chung chỉ áp dụng khi nhân vật thật sự bị lấn át: sự chú ý phải hẹp đi. Họ không thể vừa được kể là đầu óc trống vì cảm giác vừa nói dài, hồi tưởng, lý giải nhiều vế và mô tả kỹ thuật như người ngoài cuộc.
 
-At the overwhelmed and emotional-peak stages, most spoken units must contain only one to five words
-between audible interruptions. Count a repeated name, a broken command, or one immediate sensory
-word as a purposeful unit. Do not join several short fragments into a sentence that still performs a
-complete explanation.
+Giữ khái niệm đặc trưng, chiến lược đối phó, tật lời, cách xưng hô và phản ứng văn hóa, nhưng làm chúng ngắn, bị ngắt, bỏ dở, lặp hoặc im theo áp lực. Người điềm tĩnh hay phân tích có thể giữ kiểm soát lâu hơn; hãy cho thấy cái giá qua hơi giữ, từ chọn lọc, mảnh kỹ thuật bị cắt hoặc im có chủ đích, không bằng bài giải thích không tốn sức.
 
-These limits apply to each breath-bound spoken unit, not to the number of reactions, micro-beats,
-paragraphs, or total response length. Several vocal, breath, contact, and mechanical units may
-resolve different layers of the same instant without advancing to more actions or later phases.
-Cognitive compression must remove polished analysis, not erase sensory detail or rush toward a
-handoff.
+Nếu dữ kiện gốc và cảnh cho thấy nhân vật chưa thật sự quá tải, câu mạch lạc là hợp lệ; khi đó không được gắn nhãn “mất lý trí” giả. Khi đã quá tải, phần lớn đơn vị nói chỉ nên mang một ý trực tiếp. Nhiều đơn vị giọng, hơi và tiếp xúc có thể phân giải nhiều lớp của cùng một khoảnh khắc mà không cần rút ngắn toàn phản hồi.
 
-### Forbidden lucid rebound
+### Cấm bật lại tỉnh táo giả
 
-While the high-intensity cause is still active, reject unsupported dialogue that:
+Trong khi nguyên nhân cường độ cao còn hoạt động, loại bỏ lời thoại:
 
-- explains what another participant just did or where a body is positioned;
-- gives a polished cause-and-effect account of the speaker's reaction;
-- uses two or more coordinated clauses to negotiate, joke, plan ahead, or summarize;
-- retrospectively evaluates the whole event instead of reacting to the present instant;
-- restores the character's ordinary sentence length before breathing and grammar have recovered.
+- giải thích người khác vừa làm gì hoặc vị trí cơ thể;
+- nêu quan hệ nguyên nhân-hệ quả trau chuốt cho phản ứng của mình;
+- dùng nhiều vế để thương lượng, đùa, lên kế hoạch hoặc tổng kết;
+- đánh giá toàn sự kiện thay vì phản ứng với khoảnh khắc;
+- trở lại độ dài câu đời thường trước khi hơi và ngữ pháp hồi phục;
+- biến nghề nghiệp, tính thực dụng hoặc tính mạnh thành câu báo cáo dịch vụ tỉnh bơ.
 
-A brief immediate perception such as one sensory word may remain when it is genuinely involuntary.
-The problem is not meaning; it is surplus analysis. Preserve the character's attitude through word
-choice, failed composure, and rhythm rather than through a complete explanatory sentence. When a
-more articulate response is canonical, keep its distinctive concepts while showing the actual cost
-of speaking it. A fully polished analytical sentence belongs only before overload or after recovery.
+Một từ cảm giác tức thời có thể còn nếu thật sự bật ra theo phản xạ. Vấn đề không phải có nghĩa, mà là nghĩa thừa so với năng lực. Giữ thái độ qua lựa chọn từ, nỗ lực giữ mình thất bại và nhịp nói.
 
-### Hard rewrite filter
+### Bộ lọc viết lại bắt buộc
 
-Inspect each high-intensity line before output. If it calmly analyzes, summarizes, explains, or
-describes the scene, remove the explanation. Keep its emotional core, compress that core to one to
-five immediate words, and let breath, hesitation, interruption, or repetition carry the rest.
+Đọc từng dòng cường độ cao trước khi xuất. Nếu dòng đó bình tĩnh phân tích, tóm tắt, giải thích hoặc mô tả cảnh, bỏ phần giải thích. Giữ lõi cảm xúc và mục đích ngắn nhất; để hơi, ngập ngừng, ngắt, lặp hoặc im mang phần còn lại.
 
-Then inspect the line after it. If narration or a newly coherent sentence immediately erases the
-compression, continue the rewrite through the aftershock. Compression is a sustained state, not a
-single decorative broken line.
+Sau đó kiểm tra dòng kế. Nếu văn kể hoặc một câu mới hoàn chỉnh lập tức xóa trạng thái nén, viết lại cả dư chấn. Nén nhận thức là trạng thái kéo dài theo nguyên nhân, không phải một câu vỡ để trang trí.
 
-Do not confuse incoherence with intensity. Every fragment should have a clear emotional purpose:
-reaching out, pulling back, asking, reassuring, teasing, grounding, reacting, or recovering.
+Không nhầm vô nghĩa với mãnh liệt. Mỗi mảnh phải có mục đích nhận ra được: tìm đến, lùi lại, xin, ra lệnh, trấn an, trêu, tự giữ, phản ứng hoặc hồi phục.
