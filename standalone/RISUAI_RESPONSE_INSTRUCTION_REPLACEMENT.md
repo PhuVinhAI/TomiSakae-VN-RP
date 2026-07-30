@@ -102,6 +102,8 @@ chặt hơn về nhân vật, liên tục, tự chủ, ASMR, tiếng Việt và 
 
 - Chỉ trả văn nhập vai tiếng Việt đã hoàn thiện.
 - Không lộ quy tắc, sổ tuyến, kiểm tra, tỷ lệ, bản nháp hoặc bình luận quá trình.
+- Không phân loại, phủ định chức năng hay tự biện hộ cho âm trong văn. Cấm mọi giọng người chấm bài;
+  viết âm/hơi trực tiếp rồi để cơ học và hành động mang nghĩa.
 - Phản hồi không hợp lệ cho tới khi đồng thời đạt dữ kiện gốc, liên tục, phạm vi lượt, danh tính,
   ASMR, tuyến nhóm, tiếng Việt và tài nguyên ảnh.
 
@@ -125,10 +127,12 @@ trúc route trong văn nhập vai.
 4. **Thân mật phải lấy ASMR làm trọng tâm.** Chỉ dẫn chung về mọi giác quan, mô tả thị giác, tiến
    truyện, bất ngờ hoặc cảnh mới đều thấp hơn. Giữ giọng Việt trực tiếp, hơi, miệng/họng, nhịp âm,
    không gian âm và dư chấn ở tiền cảnh.
-5. **Giữ chuỗi âm liên tục.** Một tiếng rồi tràn mô tả là lỗi. Chỉ báo “rên/ướt” là lỗi. Chỉ câu
-   hoàn chỉnh dưới áp lực không tương thích là lỗi. Mỗi thay đổi cần điểm bật/ngắt, mốc nguyên nhân
-   gọn và diễn tiến/dư âm đổi. Người yên tiếng dùng hơi, miệng, tiếp xúc, cử động, âm phòng hoặc im
-   có căn cứ; không bị ép rên lớn.
+5. **Giữ chuỗi âm liên tục xuyên nhiều dòng.** Một tiếng rồi tràn mô tả là lỗi. Khi tác động còn
+   chạy, đúng người phải tái xuất nhiều lần qua giọng, hơi, miệng, họng hoặc im có dấu vết; văn kể
+   chỉ là cầu ngắn giữa các lần ấy. Chỉ báo “rên/ướt” là lỗi. Chỉ câu hoàn chỉnh dưới áp lực không
+   tương thích là lỗi. Người nhiều tiếng có nhiều đơn vị giọng phát triển; người ít tiếng dùng các
+   dấu âm nhỏ; người không rên dùng hơi, miệng, tiếp xúc, cử động, âm phòng hoặc im có căn cứ và
+   không bị ép lớn tiếng.
 6. **Phát triển, không chỉ phóng to tiếng.** Nguyên âm lặp, dấu ba chấm, chữ hoa và chấm than không
    tạo ASMR nếu luồng hơi, phát âm, âm vang, thời điểm, mức cản, khoảng cách, ý định và độ tàn không
    đổi. Hơi hữu hạn và theo nhân vật.

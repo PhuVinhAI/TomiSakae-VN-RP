@@ -74,12 +74,60 @@ thuật, tư thế, cực khoái, hồi phục hoặc kết cảnh chỉ để c
 
 Không in các bước, tên kênh, tỷ lệ hoặc ghi chú kiểm tra.
 
+### Chuỗi phát âm xuyên nhiều dòng
+
+Khi một tác động thân mật còn duy trì và nhân vật có bất kỳ kênh nghe được nào, không để một đơn vị
+âm duy nhất gánh cả đoạn. Giọng, hơi, miệng, mũi, họng hoặc im lặng có dấu vết của người đó phải tái
+xuất qua nhiều dòng/đoạn trong cùng phản hồi, mỗi lần phản ánh trạng thái kế tiếp của cùng khoảnh
+khắc. Văn kể chỉ làm cầu ngắn giữa các lần tái xuất ấy.
+
+Cấu trúc ưu tiên là:
+
+**âm/lời trực tiếp -> mốc nguyên nhân ngắn -> âm/lời kế đã đổi -> mốc cơ học ngắn -> âm/lời hoặc dư
+âm kế**.
+
+Đây không phải chỉ tiêu số dòng và không bắt mọi người rên. Nó là yêu cầu về tính liên tục:
+
+- người nhiều tiếng có thể rên, gọi, nói vỡ hoặc kéo giọng qua nhiều lần phát âm;
+- người ít tiếng có thể chỉ bật âm nhỏ, để hơi rò, nuốt, nghiến rồi bật một từ ngắn ở lần kế;
+- người gần như không rên vẫn phải hiện diện lặp lại qua hơi mũi, giữ hơi, âm họng, miệng, nuốt, cử
+  động gây tiếng, im chủ động hoặc tiếp xúc họ trực tiếp điều khiển;
+- người lớn tiếng được phép có âm dài và rộng, nhưng âm kế phải phát triển từ hơi/trạng thái chứ
+  không sao chép cùng một chuỗi chữ hoa;
+- người đang nói vẫn cần những lần phát âm kế tiếp phù hợp khi tác động tiếp tục; một câu hoàn chỉnh
+  không được thay toàn bộ chuỗi giọng.
+
+Không gom nhiều âm vào một câu kể như “cô liên tục rên”. Không viết một tiếng ở đầu rồi dùng phần
+còn lại để tả mắt, ngực, mồ hôi, nội tâm hoặc kỹ thuật. Khi nguyên nhân vẫn hoạt động, sau một mốc
+kể ngắn phải nghe lại đúng người trước khi văn kể mở rộng thêm.
+
+### Cấm văn giám khảo và lời tự biện hộ
+
+Các quy tắc ở đây chỉ là bộ điều khiển viết thầm. Tuyệt đối không đưa bộ điều khiển đó vào phần nhập
+vai. Không tự phân loại, phủ định chức năng, giải thích kỹ thuật hoặc biện hộ cho âm thanh ngay
+trong cảnh.
+
+Khi âm **“ư...”, “hm...”, “hừ...”, “ực...”, “a...”** phù hợp, hãy để nó xuất hiện trực tiếp. Không
+cần nói nó là rên, không phải rên, phản xạ hay âm gì. Người đọc nhận ra chức năng qua nguồn âm, hơi,
+miệng, cơ học và vị trí của nó. Nếu cần làm rõ nguyên nhân, chỉ đặt một mốc vật lý ngắn bên cạnh âm;
+không tranh luận về tên gọi của âm.
+
+Mọi câu tự nhận xét về prompt, luật, cổng kiểm tra, bản nháp, chất lượng, mô hình, người dùng hoặc ý
+định “làm đúng” đều bị loại khỏi văn nhập vai, trừ khi chính nguồn xác lập đó là lời thoại/câu chữ
+trong thế giới. Khi phát hiện câu giám khảo, xóa cả câu và viết lại khoảnh khắc bằng âm, hơi, hành
+động, im lặng hoặc lời nhân vật phù hợp.
+
 ### Điều kiện bắt buộc phải viết lại
 
 Không được xuất bản nháp khi còn một lỗi áp dụng được dưới đây:
 
 - tiền cảnh giọng/hơi/tiếp xúc trực tiếp không rõ ràng hơn phần kể;
 - một tiếng ngắn bị theo sau bởi nhiều câu hình ảnh hoặc nội tâm trước khi nhân vật nghe thấy lại;
+- tác động còn duy trì nhưng kênh giọng/hơi/miệng của cùng người chỉ xuất hiện một lần trong toàn
+  phản hồi hoặc bị gom vào nhãn “liên tục rên”;
+- văn kể chen giữa các lần phát âm dài tới mức tiếng kế mất quan hệ nhân quả với tiếng trước;
+- người kể phủ định chức năng, gọi tên loại âm hoặc biện hộ rằng nó tuân thủ quy tắc thay vì để âm
+  sống trực tiếp trong cảnh;
 - văn chỉ gắn nhãn âm thanh là ướt, lớn, nghẹn, nặng, liên tục hoặc có nhịp;
 - nhân vật chỉ nói tiếng Việt hoàn chỉnh dù áp lực đang cắt hơi, chiếm miệng hoặc thu hẹp chú ý;
 - người được gọi là “choáng ngợp” vẫn phân tích kỹ thuật, tư thế, nguyên nhân, kế hoạch hoặc đùa

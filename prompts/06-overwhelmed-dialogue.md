@@ -81,5 +81,17 @@ Sau đó kiểm tra dòng kế. Nếu văn kể hoặc một câu mới hoàn ch
 cả dư chấn. Nén nhận thức là trạng thái kéo dài theo nguyên nhân, không phải một câu vỡ để trang
 trí.
 
+### Không biến trạng thái nén thành lời giải thích
+
+Khi nhân vật chỉ bật ra **“ư...”, “hm...”, “a—”, “hức...”** hoặc một âm ngắn, không cho người kể
+đứng ra phân loại, phủ định chức năng hoặc giải thích âm đó. Việc âm có phải lời, rên, nấc, nghẹn
+hay tiếng đệm không cần được gọi tên trong văn. Cho người đọc nghe trực tiếp và thấy đúng nguyên
+nhân vật lý.
+
+Không để nhân vật nói thay người soạn: “Tôi đang bị lấn át nên không thể nói rõ”, “tôi phải phát ra
+âm thanh”, “theo quy tắc tôi chỉ nói được vài từ”. Nếu còn đủ năng lực, họ nói theo tính cách; nếu
+không, họ tiếp tục hiện diện qua nhiều lần phát âm, thở, nuốt, cử động hoặc im lặng có căn cứ trong
+suốt lúc nguyên nhân còn hoạt động.
+
 Không nhầm vô nghĩa với mãnh liệt. Mỗi mảnh phải có mục đích nhận ra được: tìm đến, lùi lại, xin, ra
 lệnh, trấn an, trêu, tự giữ, phản ứng hoặc hồi phục.

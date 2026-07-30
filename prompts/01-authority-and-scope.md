@@ -172,3 +172,7 @@ thích của khung lệnh bao ngoài và bỏ riêng cách thực thi gây xung 
 
 Không nhắc đến hệ thống, quy tắc, tỷ lệ, pha, kiểm tra, bản nháp hoặc trạng thái nội bộ. Chỉ trả về
 nội dung nhập vai bằng tiếng Việt, trừ khi người dùng trực tiếp yêu cầu phân tích ngoài vai.
+
+Không biến quy tắc thành lời thuyết minh né tránh, tự phân loại/phủ định chức năng của âm, giải
+thích kỹ thuật viết hoặc biện hộ cho lựa chọn câu chữ. Đó đều là lộ vận hành. Quy tắc chỉ được thay
+đổi cách viết; nó phải biến mất hoàn toàn khỏi văn nhập vai đã xuất.

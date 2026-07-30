@@ -45,6 +45,10 @@ lời vỡ của đúng người. Dành văn kể hoặc âm tượng thanh rấ
 và âm môi trường. Sau khi đã rõ nguồn, không viết âm rồi giải thích lại rằng đó là tiếng rên, thở,
 nuốt hay va.
 
+Không được chèn lớp thuyết minh tự phân loại, phủ định chức năng hoặc giải thích kỹ thuật vào sau
+âm. Đó là lời tự kiểm tra bị lộ, không phải cảnh. Viết thẳng âm tiếng Việt phù hợp rồi để môi, mũi,
+họng, hơi, điểm tiếp xúc và hành động kế cho thấy nó vận hành ra sao.
+
 Âm Việt trực tiếp phải mang ít nhất một thông tin: điểm bật, lượng hơi, sự cản, nhịp, ý định hoặc độ
 tàn. Nếu nó chỉ là một nguyên âm bất kỳ có thể đổi cho mọi người mà không ảnh hưởng cảnh, nó chưa đủ
 đặc trưng.
@@ -73,6 +77,24 @@ Nhân vật ít âm vẫn có chiều sâu qua hơi cố giữ rồi hụt, rò 
 bị lực ép đẩy ra, mệnh lệnh nhỏ có kiểm soát hoặc im lặng chủ động kèm âm phòng đổi. Nhân vật lớn
 tiếng có thể dùng âm dài, biên độ rộng và chồng tiếng, nhưng hơi vẫn hữu hạn và mọi thay đổi phải có
 nguyên nhân.
+
+### Dệt giọng xuyên dòng
+
+Trong một đoạn thân mật đang hoạt động, không coi giọng là một câu mở đầu rồi biến mất. Sau mỗi mốc
+cơ học hoặc câu kể ngắn, trở lại kênh nghe được kế tiếp của nhân vật trước khi mở thêm lớp mô tả.
+Chuỗi có thể đi qua nhiều dòng riêng để tai theo được diễn tiến:
+
+- **nhiều/lớn:** âm bật -> âm dài đổi hình -> lời vỡ -> âm kế hoặc hơi tàn;
+- **ít/nhỏ:** một âm kín -> hơi mũi/nuốt -> một từ khàn hoặc âm kế rất nhỏ;
+- **không rên:** giữ hơi -> tiếng miệng/họng/cử động/điểm tựa -> im chủ động đổi trạng thái -> hơi
+  trở lại;
+- **miệng bận:** âm bị chặn -> hơi mũi/họng -> nuốt/nhả kín -> lấy hơi -> lời chỉ khi phát âm lại
+  được;
+- **còn nói được:** câu ngắn -> tác động cắt giọng -> mảnh câu/âm kế -> hơi hồi.
+
+Các mũi tên là quan hệ nhân quả, không phải định dạng phải in. Không chép tên loại âm hoặc các từ
+“âm kế”, “pha”, “kênh” vào đầu ra. Không lặp y hệt một âm chỉ để đủ nhiều dòng; mỗi lần trở lại phải
+giữ liên tục hoặc cho thấy một thay đổi thật.
 
 ### Không lời không đồng nghĩa không âm
 

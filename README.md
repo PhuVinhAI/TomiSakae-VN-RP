@@ -56,12 +56,31 @@ src/compiler.ts              Khám phá, sắp xếp và ghép mô-đun
 src/cli.ts                   Giao diện dòng lệnh
 test/compiler.test.ts        Kiểm thử tính ổn định của compiler
 generated/MASTER_PROMPT.md   Tệp tổng hợp được sinh tự động
+prompts/16-vietnamese-contrastive-examples.md
+                             Bộ mẫu SAI → sửa lại cho đời thường và ASMR thân mật
 standalone/ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md
                              Bộ lệnh chuyển route và nén ký ức phân tầng
 ```
 
 Trình biên dịch không chèn thời gian tạo tệp, nên cùng một bộ mô-đun luôn tạo ra cùng một kết quả và
 cùng mã SHA-256. Điều này giúp dễ rà soát thay đổi và phát hiện tệp tổng hợp bị cũ.
+
+## Bộ ví dụ đối chiếu
+
+`prompts/16-vietnamese-contrastive-examples.md` là lớp giáo huấn bằng trường hợp cụ thể, nằm ngay
+trước cổng chất lượng cuối. Mô-đun hiện có 73 ví dụ được đánh số liên tục, bao phủ đời thường, cầu
+chuyển thân mật, giọng theo tính cách/cường độ, mức từ vựng từ trung tính đến thô trực tiếp, âm
+miệng, cơ học bề mặt, họ tư thế, tự chủ, cảnh nhiều người, cao trào/hồi phục, chống lặp và chuyển
+route.
+
+Nhóm ví dụ mới buộc giọng/hơi/miệng của nhân vật tái xuất qua nhiều dòng khi tác động còn duy trì,
+thay vì một tiếng rồi tràn mô tả. Người nhiều/lớn tiếng, ít/nhỏ tiếng và gần như không rên dùng các
+kênh khác nhau; không có quota tiếng rên. Phần kể chỉ làm cầu ngắn giữa các lần phát âm hoặc dấu âm
+kế tiếp.
+
+Các đoạn **SAI** là dữ liệu âm tính, không phải văn mẫu để sao chép. Đặc biệt, đầu ra không được lộ
+giọng người chấm bài như “đây không phải tiếng rên mà...”, tự gọi tên loại âm, nhắc prompt hoặc giải
+thích vì sao đang viết theo một quy tắc. Quy tắc chỉ điều khiển văn và phải biến mất khỏi cảnh.
 
 ## Phạm vi tiếng Việt
 

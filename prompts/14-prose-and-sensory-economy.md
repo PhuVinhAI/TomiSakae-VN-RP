@@ -13,6 +13,21 @@ người khác, lộ thông tin lời chưa có hoặc đổi khoảng cách, s�
 tự nhiên hợp lệ. Không kể lại cảm xúc lời đã mang, không nối tag giọng thừa và không bắt nhân vật
 cầm đạo cụ vô cớ.
 
+### Không có giọng người chấm bài trong văn kể
+
+Người kể không được đứng ngoài cảnh để gọi tên, phân loại, phủ định chức năng hoặc bảo vệ âm vừa
+viết. Đừng sửa lớp bình luận đó bằng cách đổi từ; xóa toàn bộ rồi để âm, hơi, hành động và hệ quả tự
+mang nghĩa.
+
+Cấu trúc “không phải... mà...” vẫn hợp lệ trong lời nói hoặc văn kể khi nhân vật thật sự đang đối
+chiếu hai sự kiện trong thế giới. Nó chỉ bị cấm khi dùng để bình luận kỹ thuật viết, phân loại âm,
+nhắc prompt hoặc trấn an người đọc rằng AI đang tuân thủ luật.
+
+Trong thân mật kéo dài, văn kể không được chiếm nhiều dòng liên tiếp giữa một âm và âm kế của cùng
+người. Dùng mốc kể ngắn để định vị lực, bề mặt, hơi hoặc ý định, rồi trả tiền cảnh cho
+giọng/miệng/hơi tiếp theo. Độ sâu đến từ nhiều lần soi cùng khoảnh khắc, không từ một khối thuyết
+minh dài sau một tiếng mở đầu.
+
 Khi dữ kiện gốc và điểm nhìn không đặt tiêu điểm khác, ưu tiên:
 
 1. thay đổi nghe được cho biết cảm xúc hoặc khoảng cách;

@@ -136,7 +136,8 @@ describe("prompt compiler", () => {
     expect(result.compiled).toContain("<ROLEPLAY_INFO>");
     expect(result.compiled.endsWith("</ROLEPLAY_INFO>\n")).toBe(true);
     expect(result.modules[0]?.relativePath).toBe("00-risuai-system-prefix.md");
-    expect(result.modules.at(-1)?.relativePath).toBe("16-final-quality-gate.md");
+    expect(result.modules.at(-2)?.relativePath).toBe("16-vietnamese-contrastive-examples.md");
+    expect(result.modules.at(-1)?.relativePath).toBe("17-final-quality-gate.md");
   });
 
   it("preserves the Vietnamese canon-first roleplay contract", async () => {
@@ -210,6 +211,9 @@ describe("prompt compiler", () => {
     expect(result.compiled).toContain("### Điều kiện bắt buộc phải viết lại");
     expect(result.compiled).toContain("### Sửa bản nháp thất bại");
     expect(result.compiled).toContain("### Phát triển giọng kéo dài");
+    expect(result.compiled).toContain("### Chuỗi phát âm xuyên nhiều dòng");
+    expect(result.compiled).toContain("### Dệt giọng xuyên dòng");
+    expect(result.compiled).toContain("### Cấm văn giám khảo và lời tự biện hộ");
     expect(result.compiled).toContain("### Đối chiếu lỗi và cách sửa");
     expect(result.compiled).toContain("### Phong cách của phản hồi cũ không có thẩm quyền");
     expect(result.compiled).toContain("### Phán quyết chống tái phạm");
@@ -226,6 +230,32 @@ describe("prompt compiler", () => {
     expect(normalized).toContain(
       "Phản hồi đạt yêu cầu phải đọc như được sáng tác trực tiếp bằng tiếng Việt",
     );
+    expect(normalized).toContain("không để một đơn vị âm duy nhất gánh cả đoạn");
+    expect(normalized).toContain("Quy tắc phải biến mất sau khi đã điều khiển câu chữ");
+  });
+
+  it("ships a contiguous contrastive curriculum focused on everyday and intimate execution", async () => {
+    const modulePath = path.resolve("prompts", "16-vietnamese-contrastive-examples.md");
+    const examples = await readFile(modulePath, "utf8");
+    const normalizedExamples = examples.replace(/\s+/g, " ");
+    const numbers = [...examples.matchAll(/^### Ví dụ (\d+)/gm)].map((match) => Number(match[1]));
+
+    expect(numbers).toEqual(Array.from({ length: 73 }, (_, index) => index + 1));
+    expect(examples).toContain("## ĐỜI THƯỜNG: ĐÚNG NGƯỜI, ĐÚNG LƯỢT, KHÔNG BỊA CẢNH");
+    expect(examples).toContain("## CHUỖI ÂM TRỰC TIẾP XUYÊN NHIỀU DÒNG");
+    expect(examples).toContain("### Ví dụ 61 — Một tiếng mở đầu rồi mất giọng");
+    expect(examples).toContain("### Ví dụ 64 — Nhân vật ít hoặc nhỏ tiếng");
+    expect(examples).toContain("### Ví dụ 65 — Nhân vật gần như không rên");
+    expect(examples).toContain("### Ví dụ 66 — Miệng đang bận phải có âm kế");
+    expect(examples).toContain("### Ví dụ 68 — Nhiều người phải có nhiều chuỗi riêng");
+    expect(examples).toContain("### Ví dụ 70 — Không giải thích tiếng vừa phát ra");
+    expect(normalizedExamples).toContain("Không có quota số tiếng và không ép mọi người rên");
+    expect(normalizedExamples).toContain("Phần **SAI** là dữ liệu âm tính");
+    expect(normalizedExamples).toContain(
+      "Không nói âm là gì hoặc không phải gì. Để âm trực tiếp, nguyên nhân ngắn và âm kế tự làm rõ.",
+    );
+    expect(examples).not.toContain("### Ví dụ 1 — Không coi tiếng Việt là ngoại ngữ");
+    expect(examples).not.toContain("Cậu học tiếng Việt từ bao giờ vậy?");
   });
 
   it("preserves distinct solo and harem orchestration and autonomy", async () => {

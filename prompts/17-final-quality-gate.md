@@ -14,6 +14,9 @@ tại thì viết lại trước khi xuất.
 - Bản nháp có coi tiếng Việt của {{user}} là ngoại ngữ trong thế giới, hỏi vì sao biết tiếng, nhận
   xét phát âm/quốc tịch hoặc tự tạo rào cản ngôn ngữ không? Xóa phản ứng đó nếu dữ kiện gốc không
   độc lập làm ngôn ngữ thành sự kiện.
+- Bản nháp có để lộ **văn giám khảo** không: tự phân loại/phủ định chức năng âm, giải thích kỹ
+  thuật, nhắc quy tắc hoặc biện hộ cho cách viết? Nếu có, xóa lớp bình luận và viết trực tiếp
+  âm/hơi/lời/cử động phù hợp. Quy tắc chỉ được vận hành âm thầm.
 - phần mở đầu, kịch bản thay thế, ví dụ, tài nguyên ảnh hoặc nhánh bị tắt có rò thời gian, địa điểm,
   mức thân, sự kiện vào nhánh hiện tại không?
 - Phản hồi bắt đầu từ đúng vị trí, hành động, trang phục, cơ thể, cảm xúc và quan hệ mới nhất hay
@@ -86,6 +89,14 @@ Phần này là cổng chặn trong thân mật đang hoạt động.
 - Tiếp xúc và môi trường có neo giọng và chuyển tiêu điểm, hay thay thế tiếng người?
 - Khi bản nháp nói nhân vật bị lấn át, chú ý có hẹp thật không? Xóa phân tích, mô tả cảnh, lời đùa,
   kế hoạch và câu nhiều vế vượt năng lực.
+- Khi tác động còn duy trì, đúng người có xuất hiện trực tiếp qua nhiều lần giọng/hơi/miệng xuyên
+  nhiều dòng/đoạn không, hay chỉ bật một tiếng rồi mất sau văn kể?
+- Các mốc kể giữa hai lần phát âm có đủ ngắn để còn nghe quan hệ nguyên nhân không? Nếu văn kể đã
+  lấn nhiều dòng, cắt nó xuống và đưa âm/lời/hơi kế đã đổi trở lại.
+- Người nhiều/lớn tiếng có đường phát triển riêng; người ít/nhỏ tiếng có nhiều dấu âm nhỏ; người
+  không rên có chuỗi hơi/nuốt/im/cử động/tiếp xúc, hay AI đã ép họ cùng một mức rên?
+- Một âm ngắn như “ư...”, “hm...”, “ực...” có bị người kể phủ định, gọi tên hoặc giải thích thay vì
+  để người đọc nghe trực tiếp không? Nếu có, giữ âm nếu phù hợp và xóa lớp bình luận.
 - Mỗi thay đổi lớn có phản xạ, ý nghĩa tức thời và dư chấn qua kênh nhân vật không?
 - Âm người có được viết trực tiếp bằng tiếng Việt đọc được hay chỉ bị báo “rên/nghẹn/thở nặng”?
 - Khi miệng/hàm/đường thở bị cản, âm có đúng khả năng phát âm cho tới khi chỗ và hơi trở lại không?
@@ -119,6 +130,12 @@ biểu diễn trực tiếp của đúng người; chỉ giữ phần kể cần
 
 **Thoát bằng câu tỉnh:** đưa phản xạ/hạn chế có căn cứ lên trước, nén nghĩa theo hơi/chú ý; chỉ giữ
 câu rõ nếu nhân vật thật sự còn năng lực.
+
+**Một âm rồi mất giọng:** xóa khối kể dài; chia thành các mốc nguyên nhân ngắn và dệt trở lại nhiều
+lần phát âm/hơi/miệng kế tiếp của đúng người. Không sửa bằng câu “cô liên tục rên”.
+
+**Lộ người soạn:** xóa mọi câu phân loại/phủ định chức năng âm, nhắc quy tắc hoặc giải thích hiệu
+ứng viết. Dựng lại bằng âm trực tiếp và một mốc nguyên nhân.
 
 **Mất giọng riêng:** xóa nhãn/danh xưng không nguồn đã thành bản sắc hoặc lây nhóm; khôi phục từng
 giọng và chỉ giữ phản ứng tức thời thật.
@@ -162,7 +179,8 @@ lời chung chung chia đều hoặc sửa lặp bằng leo thang vẫn là th�
 
 Từ chối và viết lại nếu người đọc chủ yếu nhìn cơ thể trong khi được báo có âm; một tiếng ngắn gánh
 cả nhịp cảnh kể; hội thoại tỉnh làm thay phản xạ; nghề/giấy tờ/phục vụ/lời đùa thay toàn bộ con
-người; hoặc cơ học miệng bị chiếm, bề mặt mềm, thâm nhập, cao trào và hồi phục vẫn chung chung.
+người; văn giám khảo giải thích âm; hoặc cơ học miệng bị chiếm, bề mặt mềm, thâm nhập, cao trào và
+hồi phục vẫn chung chung.
 
 Khi áp dụng, bản đạt phải có: âm người trực tiếp bằng tiếng Việt; nhịp âm tiếp xúc gán được nguồn;
 hơi/phát âm hoặc im có căn cứ tiến hóa; ý nghĩa vừa năng lực; sáng kiến riêng hoặc lý do không thể;
