@@ -1,15 +1,14 @@
 # Trình biên dịch bộ lệnh ASMR tiếng Việt
 
-Dự án Node.js + TypeScript nhỏ gọn để quản lý bộ lệnh theo từng mô-đun và ghép chúng thành một tệp
-duy nhất, theo thứ tự tên tệp. Bộ lệnh chỉ tạo phản hồi nhập vai bằng tiếng Việt, giữ hội thoại đời
-thường linh hoạt, tập trung sâu vào ASMR cho cảnh thân mật và bắt buộc chèn ảnh RisuAI khi nhân vật
-có danh sách tài nguyên ảnh hợp lệ.
+Dự án Node.js + TypeScript để quản lý bộ lệnh theo từng mô-đun và ghép chúng thành một tệp duy nhất
+theo thứ tự tên. Bộ lệnh chỉ tạo phản hồi nhập vai bằng tiếng Việt, giữ đời thường linh hoạt, tập
+trung sâu vào ASMR khi cảnh thân mật thật sự hoạt động và dùng ảnh RisuAI đúng nhân vật/trạng thái
+khi có danh sách tài nguyên hợp lệ.
 
-Hệ thống tiếng Việt chuyên biệt xử lý đại từ/vai vế, khẩu ngữ thân mật, mức trực diện của từ chỉ cơ
-thể, lời vỡ dưới áp lực, âm phi từ vựng có thể đọc, giới hạn phát âm khi miệng bị chiếm dụng, nhịp
-tiếp xúc và chống lẫn chữ hoặc cách rên Hàn/Nhật/Anh. Thẻ nhân vật, tri thức nền và tên riêng có thể
-đến từ nguồn ngoại ngữ nhưng toàn bộ nội dung hướng người đọc vẫn được trình bày tự nhiên bằng tiếng
-Việt.
+Hệ thống không còn coi dữ kiện gốc, route, quyền lượt, giọng nhân vật, tự chủ, ASMR, cơ học, cảnh
+nhóm, tiếng Việt và ảnh là các checklist rời. Mỗi module vẫn có trọng tâm riêng nhưng các câu lệnh
+được nối bằng quan hệ điều kiện và hệ quả, để model áp dụng chúng đồng thời trong cùng khoảnh khắc
+thay vì nhớ từng luật độc lập rồi vá kết quả ở cuối.
 
 ## Yêu cầu
 
@@ -38,6 +37,7 @@ pnpm check:prompts              # Kiểm tra tệp tổng hợp có mới hay kh
 pnpm check                      # TypeScript và ESLint
 pnpm test                       # Vitest
 pnpm build                      # Biên dịch CLI vào dist/
+pnpm zip:handoff                # ZIP nguồn cần thiết để gửi cho AI khác
 pnpm ci                         # Chạy toàn bộ kiểm tra
 ```
 
@@ -48,18 +48,36 @@ pnpm dev --source prompts --output generated/MASTER_PROMPT.md
 pnpm dev --stdout
 ```
 
+## Đóng gói để chuyển cho AI khác
+
+Chạy `pnpm zip:handoff` để tạo ZIP trong `exports/`. Script lấy danh sách bằng
+`git ls-files --cached --others --exclude-standard`, vì vậy nó gồm tệp đang được Git theo dõi và tệp
+mới không bị ignore, nhưng loại `.git`, `node_modules`, `dist`, coverage, master sinh tự động và ZIP
+cũ. Thư mục `exports/` cũng nằm trong `.gitignore`.
+
+```powershell
+pnpm zip:handoff -ListOnly
+pnpm zip:handoff -OutputPath exports\prompt-review.zip
+```
+
+`-ListOnly` chỉ in danh sách dự kiến. `-OutputPath` chọn tên/đường dẫn ZIP; đường dẫn tương đối được
+tính từ gốc dự án.
+
 ## Cấu trúc
 
 ```text
 prompts/                     Các khối bộ lệnh có thể chỉnh sửa riêng
 src/compiler.ts              Khám phá, sắp xếp và ghép mô-đun
 src/cli.ts                   Giao diện dòng lệnh
+scripts/export-project.ps1   Đóng gói tệp Git cần thiết thành ZIP
 test/compiler.test.ts        Kiểm thử tính ổn định của compiler
 generated/MASTER_PROMPT.md   Tệp tổng hợp được sinh tự động
 prompts/16-vietnamese-contrastive-examples.md
-                             Bộ mẫu SAI → sửa lại cho đời thường và ASMR thân mật
+                             Bộ mẫu SAI → VIẾT LẠI tập trung lỗi ASMR thân mật
 standalone/ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md
-                             Bộ lệnh chuyển route và nén ký ức phân tầng
+                             Bộ lệnh chuyển route ngắn và nén ký ức gần/bền
+standalone/RISUAI_RESPONSE_INSTRUCTION_REPLACEMENT.md
+                             RESPONSE_INSTRUCTION mặc định đã Việt hóa + phần chốt cuối
 ```
 
 Trình biên dịch không chèn thời gian tạo tệp, nên cùng một bộ mô-đun luôn tạo ra cùng một kết quả và
@@ -67,20 +85,27 @@ cùng mã SHA-256. Điều này giúp dễ rà soát thay đổi và phát hiệ
 
 ## Bộ ví dụ đối chiếu
 
-`prompts/16-vietnamese-contrastive-examples.md` là lớp giáo huấn bằng trường hợp cụ thể, nằm ngay
-trước cổng chất lượng cuối. Mô-đun hiện có 73 ví dụ được đánh số liên tục, bao phủ đời thường, cầu
-chuyển thân mật, giọng theo tính cách/cường độ, mức từ vựng từ trung tính đến thô trực tiếp, âm
-miệng, cơ học bề mặt, họ tư thế, tự chủ, cảnh nhiều người, cao trào/hồi phục, chống lặp và chuyển
-route.
+`prompts/16-vietnamese-contrastive-examples.md` là lớp giáo huấn bằng trường hợp cụ thể ngay trước
+cổng chất lượng cuối. Mô-đun có 28 ví dụ liên tục, chỉ giữ các lỗi model thường không tự sửa: một âm
+rồi kể dài, nhãn âm thay biểu diễn, lời tỉnh dưới quá tải, mức âm theo tính cách, miệng đang bận, âm
+tiếp xúc, tự chủ, cảnh nhiều người, ảnh, độ sâu, chống lặp và route chiếm quyền lượt.
 
-Nhóm ví dụ mới buộc giọng/hơi/miệng của nhân vật tái xuất qua nhiều dòng khi tác động còn duy trì,
-thay vì một tiếng rồi tràn mô tả. Người nhiều/lớn tiếng, ít/nhỏ tiếng và gần như không rên dùng các
-kênh khác nhau; không có quota tiếng rên. Phần kể chỉ làm cầu ngắn giữa các lần phát âm hoặc dấu âm
-kế tiếp.
+Các ví dụ không chỉ sửa riêng âm thanh: mỗi bản viết lại nối nguồn, trạng thái, giọng, cơ học, tự
+chủ, tuyến nhóm và quyền lượt. Khi tác động còn duy trì, giọng/hơi/miệng tái xuất qua nhiều dòng
+thay vì một tiếng rồi tràn mô tả; người nhiều, ít hoặc không rên dùng kênh đúng tính cách, không
+theo quota.
 
-Các đoạn **SAI** là dữ liệu âm tính, không phải văn mẫu để sao chép. Đặc biệt, đầu ra không được lộ
-giọng người chấm bài như “đây không phải tiếng rên mà...”, tự gọi tên loại âm, nhắc prompt hoặc giải
-thích vì sao đang viết theo một quy tắc. Quy tắc chỉ điều khiển văn và phải biến mất khỏi cảnh.
+Các đoạn **SAI** là dữ liệu âm tính, không phải văn mẫu, lịch sử route hay kho câu để sao chép. Nếu
+bản nháp mắc cùng cấu trúc, model phải giữ dữ kiện đúng rồi dựng lại toàn đoạn từ nguyên nhân; không
+vá bằng cách nối thêm một tiếng, ảnh, từ tục hoặc lời giải thích kỹ thuật.
+
+## Khung dòng và mật độ quy tắc
+
+File 00 là khung hệ thống chung đầy đủ của RisuAI và được giữ nguyên. Các module 01–17 giữ đúng số
+dòng đã khóa trong kiểm thử, nhưng mỗi dòng nội dung được viết dày hơn để liên kết các quy tắc liên
+quan. Mốc 90.000 ký tự là ngân sách mềm: compiler chỉ cảnh báo khi vượt, không chặn biên dịch. Các
+tệp trong `prompts/` và `standalone/` được loại khỏi Prettier để formatter không tự gộp khung dòng;
+TypeScript, cấu hình và README vẫn dùng định dạng tự động bình thường.
 
 ## Phạm vi tiếng Việt
 
@@ -94,16 +119,14 @@ thích vì sao đang viết theo một quy tắc. Quy tắc chỉ điều khiể
 
 ## Chuyển route và ký ức dài hạn
 
-`standalone/ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md` thay thế hoàn toàn bộ lệnh bàn giao hội thoại
-cũ. Route là một đoạn liên tục của cùng dòng nhập vai, không phải nhánh hoặc thế giới mới. Route có
-thể kết thúc khi chuỗi hành động đã hoàn thành hoặc khi vẫn đang dở nhưng cần chuyển sang cửa sổ hội
-thoại mới.
+`standalone/ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md` thay bộ lệnh bàn giao cũ bằng gói ngắn. Route là
+một đoạn liên tục của cùng dòng nhập vai, không phải nhánh hoặc thế giới mới; có thể chuyển khi
+chuỗi hành động đã hoàn thành hoặc vẫn đang dở nhưng cần sang cửa sổ hội thoại mới.
 
-Khi chuyển route, trạng thái cuối được giữ nguyên làm cầu nối. Route vừa kết thúc được giữ chi tiết;
-các route gần giữ nguyên nhân và hệ quả chính; route xa dần được nén thành ký ức cốt lõi và hợp nhất
-thành ký ức dài hạn. Những việc chưa giải quyết, bước ngoặt quan hệ, lời hứa, bí mật, thương tích,
-kiến thức và hậu quả lâu dài không được mất chỉ vì route đã cũ. Ký ức được theo dõi riêng theo điều
-từng nhân vật thật sự biết, thay vì biến cả nhóm thành một trí nhớ chung.
+Cầu nối hiện tại là phần duy nhất giữ đủ chi tiết để đáp ngay. Route gần chỉ giữ nguyên nhân, quyết
+định, hệ quả và việc dở; route xa được hợp nhất thành ký ức bền. Mỗi sự thật xuất hiện một lần, ký
+ức được theo dõi theo người biết và route càng cũ càng ngắn, nên gói không tăng gần tuyến tính theo
+log.
 
 Để tạo route kế tiếp, đưa cho bộ lệnh chuyển route: gói `<ROLEPLAY_CHANGE_ROUTE>` gần nhất nếu có,
 phần hội thoại phát sinh trong route hiện tại, lượt cuối đang chờ và các nguồn nhân vật/thế giới cần
@@ -123,10 +146,10 @@ dùng thứ tự sau:
    `<ROLEPLAY_INFO>` khác.
 4. Thẻ nhân vật, hồ sơ nhân vật người dùng, các mục tri thức thế giới đang hoạt động và bộ nhớ do
    RisuAI chèn.
-5. `standalone/RISUAI_RESPONSE_INSTRUCTION_REPLACEMENT.md` thay cho `RESPONSE_INSTRUCTION` mặc định
-   nếu nền tảng cho phép sửa khối đó. Tệp này đã chứa `<FINAL_EXECUTION_OVERRIDE>` ngay trước
-   `</RESPONSE_INSTRUCTION>`, vì vậy không chèn thêm phần chốt cuối hoặc phần điền trước riêng cho
-   AI.
+5. `standalone/RISUAI_RESPONSE_INSTRUCTION_REPLACEMENT.md` thay cho khối mặc định nếu nền tảng cho
+   phép. Tệp giữ đầy đủ mọi mục/chỉ dẫn mặc định của RisuAI đã dịch sang tiếng Việt, sau đó nối
+   `<FINAL_EXECUTION_OVERRIDE>` ngay trước `</RESPONSE_INSTRUCTION>`; không cần chèn thêm phần chốt
+   hoặc phần điền trước riêng cho AI.
 
 Không chuyển toàn bộ master dài xuống vị trí cuối: làm vậy tăng độ gần của luật phong cách nhưng đẩy
 thẻ nhân vật và tri thức nền ra xa phản hồi. Phần chốt cuối đã được ghép vào cuối chỉ dẫn phản hồi

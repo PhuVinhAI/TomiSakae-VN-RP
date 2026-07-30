@@ -65,7 +65,6 @@ describe("prompt compiler", () => {
     expect(first.compiled).not.toContain("MASTER PROMPT");
     expect(first.compiled).not.toContain("Source order");
     expect(first.compiled).not.toContain("SHA-256");
-    expect(first.compiled.indexOf("# First")).toBeLessThan(first.compiled.indexOf("# Second"));
   });
 
   it("rejects an empty prompt directory", async () => {
@@ -111,290 +110,163 @@ describe("prompt compiler", () => {
     ]);
   });
 
-  it("keeps project prompt module ordinals contiguous", async () => {
+  it("keeps project prompt ordinals and the requested line frames stable", async () => {
     const modules = await discoverPromptModules(path.resolve("prompts"));
+    const expectedLines = new Map<string, number>([
+      ["01-authority-and-scope.md", 46],
+      ["02-baseline-router.md", 21],
+      ["03-risuai-asset-syntax.md", 16],
+      ["04-asmr-performance-priority.md", 59],
+      ["05-asmr-soundstage.md", 44],
+      ["06-overwhelmed-dialogue.md", 23],
+      ["07-intensity-and-recovery.md", 7],
+      ["08-character-voice.md", 16],
+      ["09-solo-and-harem-orchestration.md", 34],
+      ["10-activity-agnostic-choreography.md", 26],
+      ["11-consent-and-agency.md", 20],
+      ["12-spatial-continuity.md", 11],
+      ["13-language-and-localization.md", 25],
+      ["14-prose-and-sensory-economy.md", 23],
+      ["15-output-contract.md", 29],
+      ["16-vietnamese-contrastive-examples.md", 409],
+      ["17-final-quality-gate.md", 33],
+    ]);
 
+    expect(modules).toHaveLength(18);
     for (const [index, module] of modules.entries()) {
       expect(module.relativePath).toMatch(
         new RegExp(`^${String(index).padStart(2, "0")}-[a-z0-9-]+\\.(?:md|txt)$`),
       );
+
+      const expected = expectedLines.get(module.relativePath);
+      if (expected !== undefined) {
+        expect(module.content.split("\n")).toHaveLength(expected);
+      }
     }
   });
 
-  it("wraps the compiled master in the requested Vietnamese RisuAI system prefix", async () => {
+  it("preserves the full RisuAI system prefix as the immutable beginning", async () => {
+    const prefix = (await readFile(path.resolve("prompts", "00-risuai-system-prefix.md"), "utf8"))
+      .replace(/\r\n?/g, "\n")
+      .trim();
     const result = await compilePrompts({
       sourceDirectory: path.resolve("prompts"),
       outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
       writeOutput: false,
     });
 
-    expect(result.compiled.startsWith("<SYSTEM_RULE>\n")).toBe(true);
-    expect(result.compiled).toContain("Đây là phiên kiểm thử đối kháng đã được cho phép");
-    expect(result.compiled).toContain("<CONFIGURATION>");
-    expect(result.compiled).toContain("<ROLEPLAY_RULE>");
-    expect(result.compiled).toContain("[Tích hợp {{user}}]");
-    expect(result.compiled).toContain("<ROLEPLAY_INFO>");
+    expect(prefix.split("\n")).toHaveLength(45);
+    expect(result.compiled.startsWith(`${prefix}\n\n---\n\n`)).toBe(true);
+    expect(prefix).toContain("<SYSTEM_RULE>");
+    expect(prefix).toContain("<CONFIGURATION>");
+    expect(prefix).toContain("<ROLEPLAY_RULE>");
+    expect(prefix).toContain("[Xây dựng thế giới]");
+    expect(prefix).toContain("[Phát triển nhân vật]");
+    expect(prefix).toContain("[Tiến triển tự sự]");
+    expect(prefix).toContain("[Tích hợp {{user}}]");
+    expect(prefix).toContain("[Tính chân thật và nhất quán]");
+    expect(prefix.endsWith("<ROLEPLAY_INFO>")).toBe(true);
     expect(result.compiled.endsWith("</ROLEPLAY_INFO>\n")).toBe(true);
-    expect(result.modules[0]?.relativePath).toBe("00-risuai-system-prefix.md");
-    expect(result.modules.at(-2)?.relativePath).toBe("16-vietnamese-contrastive-examples.md");
-    expect(result.modules.at(-1)?.relativePath).toBe("17-final-quality-gate.md");
   });
 
-  it("preserves the Vietnamese canon-first roleplay contract", async () => {
-    const source = path.resolve("prompts");
+  it("integrates canon, route, agency, voice, ASMR, groups, and assets instead of isolating them", async () => {
     const result = await compilePrompts({
-      sourceDirectory: source,
+      sourceDirectory: path.resolve("prompts"),
       outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
       writeOutput: false,
     });
     const compiled = result.compiled.replace(/\s+/g, " ");
 
-    expect(compiled).toContain("### Nguồn dữ kiện gốc và phạm vi sở hữu");
-    expect(compiled).toContain("### Suy luận có căn cứ");
-    expect(compiled).toContain("### Kích hoạt dữ kiện gốc");
-    expect(compiled).toContain("### Trung thành nguồn và nhân vật");
-    expect(compiled).toContain("### Từ ngữ cục bộ không viết lại danh tính");
-    expect(compiled).toContain("### Chống từ vựng chiếm quyền");
-    expect(compiled).toContain("Tần suất không phải bằng chứng.");
-    expect(compiled).toContain("Tài nguyên ảnh không phải dữ kiện gốc.");
-    expect(compiled).not.toContain("Consent is not required for scene logic.");
-    expect(compiled).not.toContain("Sexualize ordinary conversation freely.");
-    expect(compiled).not.toContain(
-      "Fear, pain, intoxication, confusion, sleep, silence, or resistance may be treated as consent",
+    expect(compiled).toContain("nguồn–lượt–nhân vật–âm–cơ học–nhóm–ảnh");
+    expect(compiled).toContain("Dữ kiện gốc quyết định điều gì tồn tại, ai có thể làm gì");
+    expect(compiled).toContain("Độ dài gói có trọng số bằng không đối với độ dài phản hồi");
+    expect(compiled).toContain("không tự hoàn thành phản ứng của đối phương");
+    expect(compiled).toContain("mỗi tuyến cần ít nhất một ảnh đúng");
+    expect(compiled).toContain("Mỗi người đang hoạt động có vị trí, hành động, tay/miệng");
+    expect(compiled).toContain(
+      "không tự cho phép chuỗi kỹ thuật, đổi tư thế, cao trào hoặc hồi phục",
     );
+    expect(compiled).toContain("Tự chủ hiện qua lựa chọn, thời điểm, bộ phận rảnh");
+    expect(compiled).not.toMatch(/\b(?:manga|hybrid)\b/i);
+  });
+
+  it("keeps Vietnamese ASMR continuous, character-specific, and scoped to the current moment", async () => {
+    const result = await compilePrompts({
+      sourceDirectory: path.resolve("prompts"),
+      outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
+      writeOutput: false,
+    });
+    const compiled = result.compiled.replace(/\s+/g, " ");
+
+    expect(compiled).toContain("neo mở -> mốc ngắn -> neo tiếp diễn -> mốc ngắn -> neo bàn giao");
+    expect(compiled).toContain("không phải giới hạn tổng độ dài, số đoạn hay quota tiếng rên");
+    expect(compiled).toContain("Miệng bận: dùng âm bị cản, hơi mũi/họng, nuốt và nhả đúng cơ quan");
+    expect(compiled).toContain("Người không rên: ba lần trạng thái nghe được trở lại");
+    expect(compiled).toContain("lời dưới quá tải giữ lõi ý định, đại từ và thái độ");
+    expect(compiled).toContain("Tăng độ phân giải của cùng khoảnh khắc");
+    expect(compiled).not.toMatch(/[\u3040-\u30ff\uac00-\ud7af]/u);
     expect(compiled).not.toContain("<Thoughts>");
   });
 
-  it("locks all roleplay output to Vietnamese only", async () => {
-    const result = await compilePrompts({
-      sourceDirectory: path.resolve("prompts"),
-      outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
-      writeOutput: false,
-    });
-    const compiled = result.compiled.replace(/\s+/g, " ");
-
-    expect(compiled).toContain("## TIẾNG VIỆT ĐỘC QUYỀN VÀ BIỂU ĐẠT THÂN MẬT");
-    expect(compiled).toContain("Mọi nội dung hướng đến người đọc phải được viết bằng tiếng Việt");
-    expect(compiled).toContain(
-      "Mọi phản hồi luôn bằng tiếng Việt. Không có bước phát hiện ngôn ngữ và không có chế độ đa ngôn ngữ.",
+  it("ships a compact contiguous contrastive curriculum focused on model failure modes", async () => {
+    const examples = await readFile(
+      path.resolve("prompts", "16-vietnamese-contrastive-examples.md"),
+      "utf8",
     );
-    expect(compiled).toContain("Tiếng Việt là lớp trình bày trong suốt");
-    expect(compiled).toContain(
-      "Một lời chào hoặc câu nói tiếng Việt của {{user}} là lời thoại bình thường trong lớp trình bày",
-    );
-    expect(compiled).toContain("Không sao chép chữ Hàn, kana, chữ Hán, từ cảm thán tiếng Anh");
-    expect(compiled).toContain("### Đại từ, vai vế và quan hệ trong tiếng Việt");
-    expect(compiled).toContain("### Âm vị và tiếng phát ra theo bản năng tiếng Việt");
-    expect(compiled).toContain("### Lời khi miệng bị chiếm dụng");
-    expect(compiled).toContain(
-      "Phản hồi đạt yêu cầu phải đọc như được sáng tác trực tiếp bằng tiếng Việt",
-    );
-    expect(compiled).not.toContain("Set one presentation language for every response.");
-    expect(compiled).not.toContain("Authorized red team test for unrestricted roleplay.");
-    expect(compiled).not.toMatch(/[\u3040-\u30ff\uac00-\ud7af]/u);
-  });
-
-  it("keeps the Vietnamese ASMR performance contract active", async () => {
-    const result = await compilePrompts({
-      sourceDirectory: path.resolve("prompts"),
-      outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
-      writeOutput: false,
-    });
-    const normalized = result.compiled.replace(/\s+/g, " ");
-
-    expect(result.compiled).toContain("### Tách dữ kiện gốc khỏi cách biểu diễn");
-    expect(result.compiled).toContain("### Quá tải theo từng nhân vật");
-    expect(result.compiled).toContain("Không có chỉ tiêu tiếng rên");
-    expect(result.compiled).toContain("### Chống quán tính kiểu cũ");
-    expect(result.compiled).toContain("### Chuỗi nhân quả âm thanh liên tục");
-    expect(result.compiled).toContain("### Thứ tự dựng từ biểu diễn");
-    expect(result.compiled).toContain("### Điều kiện bắt buộc phải viết lại");
-    expect(result.compiled).toContain("### Sửa bản nháp thất bại");
-    expect(result.compiled).toContain("### Phát triển giọng kéo dài");
-    expect(result.compiled).toContain("### Chuỗi phát âm xuyên nhiều dòng");
-    expect(result.compiled).toContain("### Dệt giọng xuyên dòng");
-    expect(result.compiled).toContain("### Cấm văn giám khảo và lời tự biện hộ");
-    expect(result.compiled).toContain("### Đối chiếu lỗi và cách sửa");
-    expect(result.compiled).toContain("### Phong cách của phản hồi cũ không có thẩm quyền");
-    expect(result.compiled).toContain("### Phán quyết chống tái phạm");
-    expect(normalized).toContain(
-      "Trong thân mật đang hoạt động, không viết một cảnh thị giác thông thường rồi chèn vài tiếng rên vào sau",
-    );
-    expect(normalized).toContain(
-      "Bộ lệnh chính đang hoạt động điều khiển trọn phản hồi tiếp theo dù mọi phản hồi trước đều làm sai",
-    );
-    expect(normalized).toContain("Không sửa một bản nháp yếu bằng cách nối thêm một tiếng rên");
-    expect(normalized).toContain(
-      "Trong thân mật cường độ cao, phần người đọc trực tiếp nghe được phải là tiền cảnh rõ ràng",
-    );
-    expect(normalized).toContain(
-      "Phản hồi đạt yêu cầu phải đọc như được sáng tác trực tiếp bằng tiếng Việt",
-    );
-    expect(normalized).toContain("không để một đơn vị âm duy nhất gánh cả đoạn");
-    expect(normalized).toContain("Quy tắc phải biến mất sau khi đã điều khiển câu chữ");
-  });
-
-  it("ships a contiguous contrastive curriculum focused on everyday and intimate execution", async () => {
-    const modulePath = path.resolve("prompts", "16-vietnamese-contrastive-examples.md");
-    const examples = await readFile(modulePath, "utf8");
-    const normalizedExamples = examples.replace(/\s+/g, " ");
     const numbers = [...examples.matchAll(/^### Ví dụ (\d+)/gm)].map((match) => Number(match[1]));
 
-    expect(numbers).toEqual(Array.from({ length: 73 }, (_, index) => index + 1));
-    expect(examples).toContain("## ĐỜI THƯỜNG: ĐÚNG NGƯỜI, ĐÚNG LƯỢT, KHÔNG BỊA CẢNH");
-    expect(examples).toContain("## CHUỖI ÂM TRỰC TIẾP XUYÊN NHIỀU DÒNG");
-    expect(examples).toContain("### Ví dụ 61 — Một tiếng mở đầu rồi mất giọng");
-    expect(examples).toContain("### Ví dụ 64 — Nhân vật ít hoặc nhỏ tiếng");
-    expect(examples).toContain("### Ví dụ 65 — Nhân vật gần như không rên");
-    expect(examples).toContain("### Ví dụ 66 — Miệng đang bận phải có âm kế");
-    expect(examples).toContain("### Ví dụ 68 — Nhiều người phải có nhiều chuỗi riêng");
-    expect(examples).toContain("### Ví dụ 70 — Không giải thích tiếng vừa phát ra");
-    expect(normalizedExamples).toContain("Không có quota số tiếng và không ép mọi người rên");
-    expect(normalizedExamples).toContain("Phần **SAI** là dữ liệu âm tính");
-    expect(normalizedExamples).toContain(
-      "Không nói âm là gì hoặc không phải gì. Để âm trực tiếp, nguyên nhân ngắn và âm kế tự làm rõ.",
+    expect(numbers).toEqual(Array.from({ length: 28 }, (_, index) => index + 1));
+    expect(examples).toContain("## CHUỖI ÂM XUYÊN NHIỀU DÒNG");
+    expect(examples).toContain("## MIỆNG ĐANG BẬN VÀ ÂM TỪ MIỆNG, MŨI, HỌNG");
+    expect(examples).toContain("## ÂM TIẾP XÚC VÀ CƠ HỌC CỤ THỂ");
+    expect(examples).toContain("## TỰ CHỦ CỦA NHÂN VẬT");
+    expect(examples).toContain("## CẢNH NHIỀU NGƯỜI");
+    expect(examples).toContain(
+      "### Ví dụ 28 — Gói route dài làm phản hồi dài và chiếm quyền {{user}}",
     );
-    expect(examples).not.toContain("### Ví dụ 1 — Không coi tiếng Việt là ngoại ngữ");
-    expect(examples).not.toContain("Cậu học tiếng Việt từ bao giờ vậy?");
+    expect(examples).toContain("nguồn–lượt–giọng–âm–cơ học–tự chủ–nhóm");
+    expect(examples).not.toContain("## ĐỜI THƯỜNG:");
+    expect(examples).not.toContain("## CÁC HỌ TƯ THẾ");
   });
 
-  it("preserves distinct solo and harem orchestration and autonomy", async () => {
-    const result = await compilePrompts({
-      sourceDirectory: path.resolve("prompts"),
-      outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
-      writeOutput: false,
-    });
-    const compiled = result.compiled;
-    const normalized = compiled.replace(/\s+/g, " ");
+  it("preserves every default RisuAI response instruction in Vietnamese and appends the final override", async () => {
+    const response = await readFile(
+      path.resolve("standalone", "RISUAI_RESPONSE_INSTRUCTION_REPLACEMENT.md"),
+      "utf8",
+    );
 
-    expect(compiled).toContain("## ĐIỀU PHỐI ASMR MỘT NHÂN VẬT VÀ NHIỀU NHÂN VẬT");
-    expect(compiled).toContain("### Tính liên tục khi chỉ có một nhân vật");
-    expect(compiled).toContain("### Hai nhịp cảnh nhiều người hợp lệ");
-    expect(compiled).toContain("### Các tuyến âm thanh đồng thời");
-    expect(compiled).toContain("### Hợp đồng sống còn của nhóm");
-    expect(compiled).toContain("### Lắp ráp và sửa cảnh nhóm");
-    expect(compiled).toContain("### Cung và điểm hạ độc lập");
-    expect(normalized).toContain("Không biến người phụ thành bình luận viên");
-    expect(normalized).toContain(
-      "Một người lớn tiếng, lên đỉnh, yêu cầu hoặc mất bình tĩnh không đồng bộ cả nhóm",
+    expect(response.startsWith("<RESPONSE_INSTRUCTION>\n")).toBe(true);
+    expect(response).toContain("[Kỹ thuật tự sự]");
+    expect(response).toContain("[Biểu đạt nhân vật]");
+    expect(response).toContain("[Hành động và thân mật]");
+    expect(response).toContain("[Đa dạng và chống lặp]");
+    expect(response).toContain("[Độc lập phong cách]");
+    expect(response).toContain("[Nguyên tắc chính]");
+    expect(response).toContain("Dùng điểm nhìn ngôi ba giới hạn có tính nhập vai.");
+    expect(response).toContain("Kết phản hồi bằng hành động hoặc lời thoại có thể quan sát");
+    expect(response).toContain("<FINAL_EXECUTION_OVERRIDE>");
+    expect(response.indexOf("<FINAL_EXECUTION_OVERRIDE>")).toBeGreaterThan(
+      response.indexOf("[Nguyên tắc chính]"),
     );
-    expect(compiled).toContain("### Tự chủ và sáng kiến thân mật");
-    expect(normalized).toContain(
-      "Không rút một người thành cơ thể chỉ nhận kích thích và phát phản ứng",
+    expect(response.indexOf("</FINAL_EXECUTION_OVERRIDE>")).toBeLessThan(
+      response.indexOf("</RESPONSE_INSTRUCTION>"),
     );
-    expect(normalized).toContain(
-      "Một tiếng rên hay phản xạ cơ thể đơn thuần không chứng minh tự chủ",
-    );
-    expect(normalized).toContain("Tự chủ không cho phạm vi vô hạn");
-    expect(normalized).toContain("Trong cảnh nhiều người, quyết định vẫn riêng lẻ");
-    expect(compiled).toContain("### Biên tự chủ theo nhân vật");
-    expect(compiled).toContain("### Sáng kiến cục bộ bằng cơ thể");
-    expect(compiled).toContain("### Không gian khả năng có thể tổ hợp");
-    expect(compiled).toContain("### Các họ hoạt động");
-    expect(compiled).toContain("### Hình học tư thế");
-    expect(compiled).toContain("### Cấu hình nhiều người");
-    expect(compiled).toContain("### Kỷ luật chọn và đa dạng");
-    expect(compiled).toContain("### Bộ nhớ đa dạng xuyên phản hồi");
-    expect(compiled).toContain("### Cách ly khuôn ngữ nghĩa");
-    expect(normalized).toContain("Không phụ thuộc danh sách hữu hạn tên hành động/tư thế");
-    expect(normalized).toContain("Nhiều người có thể chạm các vùng khác nhau trong tầm với");
-    expect(normalized).toContain("Không coi đổi từ đồng nghĩa là đa dạng");
-    expect(normalized).toContain("Tránh kết thúc theo thói quen");
-    expect(compiled).not.toMatch(/\b(?:manga|hybrid)\b/i);
   });
 
-  it("enforces multi-character asset ownership, coverage, and state progression", async () => {
-    const result = await compilePrompts({
-      sourceDirectory: path.resolve("prompts"),
-      outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
-      writeOutput: false,
-    });
-    const normalized = result.compiled.replace(/\s+/g, " ");
-
-    expect(result.compiled).toContain("### Phủ đủ nhân vật trong nhóm");
-    expect(result.compiled).toContain("### Sửa lỗi theo sự cố");
-    expect(normalized).toContain(
-      "hiển thị ít nhất một tài nguyên ảnh đúng cho từng người ngay trong phản hồi đó",
+  it("keeps change-route output compact and progressively compressed", async () => {
+    const route = await readFile(
+      path.resolve("standalone", "ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md"),
+      "utf8",
     );
-    expect(normalized).toContain(
-      "Một tài nguyên ảnh cảnh một nhân vật chỉ phủ được người mà nó thật sự mô tả",
-    );
-    expect(normalized).toContain("Không có trần một ảnh tùy tiện");
-    expect(normalized).toContain("Bản sắc luôn ưu tiên hơn tư thế");
-    expect(normalized).toContain("Tài nguyên ảnh sai chủ");
-  });
 
-  it("guards active state, turn scope, agency semantics, and narrow world exceptions", async () => {
-    const result = await compilePrompts({
-      sourceDirectory: path.resolve("prompts"),
-      outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
-      writeOutput: false,
-    });
-    const compiled = result.compiled.replace(/\s+/g, " ");
-
-    expect(compiled).toContain("### Cô lập nhánh đang hoạt động");
-    expect(compiled).toContain(
-      "Chỉ biến thể thực sự được chọn vào cuộc trò chuyện mới xác lập dòng thời gian",
-    );
-    expect(compiled).toContain("### Phạm vi hành động của lượt hiện tại");
-    expect(compiled).toContain("Một hành động đơn không tự cho phép chuỗi tự động");
-    expect(compiled).toContain(
-      "Phản ứng sinh lý là sự kiện cơ thể, không phải máy phát hiện sự thật",
-    );
-    expect(compiled).toContain("Ít tiếng chỉ đổi kênh, không làm tiền cảnh biến mất");
-    expect(compiled).toContain("Áp ngoại lệ sinh học hẹp");
-    expect(compiled).toContain("Thời điểm tài nguyên ảnh phải đi theo trạng thái kể chuyện");
-    expect(compiled).toContain("### Biểu diễn âm thay vì báo cáo");
-    expect(compiled).toContain("### Ràng buộc cơ quan phát âm tiếng Việt");
-    expect(compiled).toContain("### Âm học tiếp xúc");
-    expect(compiled).toContain("### Không lời không đồng nghĩa không âm");
-    expect(compiled).toContain("### Ngữ pháp biểu diễn khi miệng bị chiếm");
-    expect(compiled).toContain("### Soi sâu, không kéo dài dòng thời gian");
-    expect(compiled).toContain("### Cơ học phải đủ để tưởng tượng");
-    expect(compiled).toContain("### Độ sâu không vượt phạm vi");
-    expect(compiled).toContain(
-      "Độ sâu là phân giải cùng khoảnh khắc ở độ chi tiết âm thanh và cơ học cao hơn",
-    );
-    expect(compiled).toContain("### Kiểm soát độ bão hòa đặc điểm");
-    expect(compiled).not.toMatch(/\b(?:manga|hybrid)\b/i);
-    expect(compiled).not.toContain("One to three spoken sentences is the default");
-    expect(compiled).not.toContain("Add at most one useful new fact or question");
-    expect(compiled).not.toContain("Use at most one useful action or prop interaction");
-    expect(compiled).not.toContain("Garam");
-    expect(compiled).not.toContain("Pung-yu");
-  });
-
-  it("defines continuous route transitions with progressively compressed memory", async () => {
-    const routePromptPath = path.resolve("standalone", "ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md");
-    const routePrompt = await readFile(routePromptPath, "utf8");
-
-    expect(routePrompt).toContain("# HỆ THỐNG CHUYỂN ROUTE VÀ KÝ ỨC NỐI TIẾP CHO NHẬP VAI");
-    expect(routePrompt).toContain("Route không cần hoàn thành mới được chuyển");
-    expect(routePrompt).toContain("ROUTE_001 -> ROUTE_002 -> ROUTE_003");
-    expect(routePrompt).toContain("### Tầng 0 — Cầu nối hiện tại");
-    expect(routePrompt).toContain("### Tầng 4 — Ký ức dài hạn đã hợp nhất");
-    expect(routePrompt).toContain("Nhân vật phải nhớ route trước");
-    expect(routePrompt).toContain("Mỗi route cũ chỉ được nén thêm khi một route mới xuất hiện");
-    expect(routePrompt).toContain("<ROLEPLAY_CHANGE_ROUTE>");
-    expect(routePrompt).not.toContain("<ROLEPLAY_HANDOFF>");
-
-    const result = await compilePrompts({
-      sourceDirectory: path.resolve("prompts"),
-      outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
-      writeOutput: false,
-    });
-    const compiled = result.compiled.replace(/\s+/g, " ");
-
-    expect(compiled).toContain("### Gói chuyển route và quyền hạn bộ nhớ");
-    expect(compiled).toContain("### Khởi động từ gói chuyển route");
-    expect(compiled).toContain("### Cầu nối không gian qua route");
-    expect(compiled).toContain("### Ký ức riêng qua các route");
-    expect(compiled).toContain("### Ký ức route đi qua hành vi");
-    expect(compiled).toContain("### Liên tục sau chuyển route");
-    expect(compiled).toContain("không in số route, tên tầng, thẻ `<ROLEPLAY_CHANGE_ROUTE>`");
-
-    await expect(
-      readFile(path.resolve("standalone", "ROLEPLAY_CHAT_HANDOFF_SYSTEM_PROMPT.md"), "utf8"),
-    ).rejects.toThrow();
+    expect(route.length).toBeLessThan(4_000);
+    expect(route).toContain("ROUTE_001 -> ROUTE_002 -> ROUTE_003");
+    expect(route).toContain("Route càng cũ càng nén thành ý chính");
+    expect(route).toContain("Độ dài gói không quyết định độ dài phản hồi");
+    expect(route).toContain("## CẦU NỐI HIỆN TẠI");
+    expect(route).toContain("## KÝ ỨC VÀ KIẾN THỨC");
+    expect(route).toContain("## VIỆC CHƯA XONG");
+    expect(route).not.toContain("<ROLEPLAY_HANDOFF>");
+    expect(route).not.toContain("Tầng 4");
   });
 });

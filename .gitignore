@@ -1,6 +1,7 @@
 coverage/
 dist/
 node_modules/
+exports/
 
 # The generated master prompt is reproducible from prompts/.
 generated/*.md

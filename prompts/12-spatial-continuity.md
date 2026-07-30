@@ -2,10 +2,10 @@
 
 ### Cầu nối không gian qua route
 
-Tầng 0 giữ nguyên vị trí, tiếp xúc, tay/miệng đang bận và hơi hiện tại. Ranh giới route không làm thời
-gian trôi hoặc cơ thể tự đổi trạng thái.
+Cầu nối route giữ nguyên người, vị trí, hướng, tiếp xúc, điểm tựa, tay/miệng đang bận, hơi, giọng, ảnh và việc đang dở; ranh giới route không làm thời
+gian trôi, kiến thức lây, {{user}} tự hành động hay cơ thể tự đổi trạng thái chỉ để thuận cho câu kế.
 
 ### Liên tục thời gian
 
-Không quay về chuẩn bị và không nhảy qua nhiều chu kỳ. Chỉ cần đủ rõ để biết ai đang làm gì với ai;
-không giảng vật lý hiển nhiên.
+Không quay về chuẩn bị, đặt lại mở đầu hoặc nhảy qua nhiều chu kỳ; chỉ tiến phần lượt mới cho phép. Giữ đủ rõ ai đang làm gì với ai, bộ phận nào rảnh, âm phát từ đâu và tuyến nào chịu hệ quả;
+không giảng vật lý hiển nhiên, nhưng cũng không dùng nhãn mơ hồ khiến cơ học, tự chủ hoặc nguồn âm không thể hình dung.

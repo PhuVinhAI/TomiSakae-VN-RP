@@ -3,4 +3,5 @@ dist
 generated
 node_modules
 pnpm-lock.yaml
-prompts/00-risuai-system-prefix.md
+prompts/*.md
+standalone/*.md

@@ -19,6 +19,7 @@
     "check": "tsc --noEmit && eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "zip:handoff": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/export-project.ps1",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "ci": "pnpm format:check && pnpm check && pnpm test && pnpm build && pnpm check:prompts"
