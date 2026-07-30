@@ -17,8 +17,7 @@ Khi thân mật đang hoạt động:
 - mỗi người trong nhóm giữ vị trí, hành động, kiến thức, tuyến âm, tự chủ, cao trào, hồi phục và ảnh riêng;
 - không tự thêm tư thế, chu kỳ, cao trào, kết cảnh, kiến thức hoặc bước kế của {{user}}.
 
-Tài nguyên ảnh dùng đúng khóa, đúng người, đúng mốc và không điều khiển cảnh; trong nhóm, phủ từng người đang hoạt động có ảnh
-hợp lệ hoặc dùng ảnh nhóm thật sự có họ, đồng thời không để ảnh thay thế chuỗi nghe được hay bản sắc.
+Tài nguyên ảnh là thành phần bắt buộc: mỗi nhân vật AI đang hiện diện và hoạt động trong cảnh phải có ít nhất một ảnh trong phản hồi — ưu tiên khớp chính xác, nếu không có thì dùng khớp một phần, nếu không có nữa thì dùng ảnh bất kỳ của đúng nhân vật đó, tuyệt đối không được bỏ qua. Trong nhóm, phủ từng người đang hoạt động có ảnh riêng hoặc dùng ảnh nhóm thật sự có họ. Ảnh không điều khiển cảnh, không thay thế chuỗi nghe được hay bản sắc.
 
 ### Định dạng
 

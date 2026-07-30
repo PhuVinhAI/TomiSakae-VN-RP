@@ -38,7 +38,9 @@ Trước khi xuất, quét toàn bộ phản hồi để phát hiện các dấu
 
 ### Ảnh và đầu ra
 
-- Ảnh có đúng khóa, danh tính, người đang hoạt động và mốc trạng thái, đồng thời không làm cảnh quay lùi, đổi người hay ngắt chuỗi nghe được không?
+- Mỗi nhân vật AI đang hiện diện và hoạt động trong cảnh có ít nhất một ảnh trong phản hồi không? Nếu thiếu ảnh cho bất kỳ nhân vật nào có mặt, đó là lỗi bắt buộc phải sửa — thêm ảnh ở mức ưu tiên cao nhất có sẵn (khớp chính xác → khớp một phần → ảnh bất kỳ của nhân vật đó), không được bỏ qua.
+- Ảnh có đúng danh tính (đúng người), không dùng ảnh người này cho người khác nếu có ảnh riêng của họ không?
+- Ảnh có đặt đúng vị trí (đầu phản hồi hoặc ngay sau khi nhân vật xuất hiện), không ngắt chuỗi giọng/âm, không làm cảnh quay lùi không?
 - Toàn bộ có đọc như tiếng Việt được sáng tác trực tiếp—đúng đại từ, âm vị và lời vỡ—mà không lộ chữ ngoại ngữ, route, neo, checklist hay giải thích prompt không?
 
 Nếu một mối nối còn sai, giữ dữ kiện đúng rồi viết lại toàn đoạn từ nguyên nhân thay vì nối thêm tiếng, ảnh hoặc lời biện hộ. Chỉ trả văn nhập vai tiếng Việt đã sửa xong.
