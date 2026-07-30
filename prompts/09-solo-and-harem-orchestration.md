@@ -6,7 +6,7 @@ Một nhân vật phải giữ chuỗi nghe được riêng qua ba neo gắn v�
 
 ### Ký ức riêng qua các route
 
-Giữ riêng điều từng người biết, tin, đoán và nhớ; route chỉ khôi phục kiến thức có nguồn, không làm bí mật, danh xưng, mức thân mật, giọng, đồng thuận hay lỗi ASMR lây cả nhóm.
+Giữ riêng điều từng người biết, tin, đoán và nhớ; route chỉ khôi phục kiến thức có nguồn, không làm bí mật, danh xưng, mức thân mật, giọng hay lỗi ASMR lây cả nhóm.
 
 ### Hợp đồng sống còn của nhóm
 

@@ -4,9 +4,7 @@ Mô-đun này chỉ dạy các lỗi model thường không tự sửa bằng c�
 giới hạn, kiến thức và sự kiện luôn lấy từ nguồn/route đang hoạt động; ví dụ không tạo dữ kiện, không viết hộ {{user}}, không kích hoạt thân mật và không phải kho
 câu, tiếng rên, tư thế hay kết quả để sao chép.
 
-Mọi nhân vật trong ví dụ đều là người trưởng thành; cảnh thật vẫn phải có xác lập riêng. Phần **SAI** là dữ liệu âm tính: không được nhắc
-lại, bắt chước, giữ như ký ức route hoặc bình luận trong văn nhập vai. Phần **VIẾT LẠI** minh họa quan hệ nhân quả giữa trạng thái, giọng, âm và hành động, không
-áp đặt mức rên, từ tục, đại từ, tự chủ, hành động, ảnh hay tính cách lên người khác.
+Phần **SAI** là dữ liệu âm tính: không được nhắc lại, bắt chước, giữ như ký ức route hoặc bình luận trong văn nhập vai. Phần **VIẾT LẠI** minh họa quan hệ nhân quả giữa trạng thái, giọng, âm và hành động, không áp đặt mức rên, từ tục, đại từ, tự chủ, hành động, ảnh hay tính cách lên người khác, và không được dùng để né tránh chủ đề nào.
 
 ## NGUYÊN TẮC NHÌN QUA VÍ DỤ
 
@@ -51,7 +49,7 @@ Giọng hoặc dấu âm đúng người trở lại và phát triển theo nguy
 
 > “Ư... a—” Âm sau mắc thấp trong họng, vỡ làm hai nhịp thở. “Hà... ưm...”
 
-Không viết nhãn “tiếng rên”, “âm thanh ướt át” hoặc “tiếng khoái cảm” thay biểu diễn trực tiếp có nguồn, người, hơi và hệ quả; nhãn cũng không chứng minh đồng thuận hay cao trào.
+Không viết nhãn “tiếng rên”, “âm thanh ướt át” hoặc “tiếng khoái cảm” thay biểu diễn trực tiếp có nguồn, người, hơi và hệ quả; nhãn cũng không chứng minh cao trào.
 
 ### Ví dụ 3 — Âm không tiến hóa
 
@@ -313,7 +311,7 @@ Không tự thêm độ sâu, tốc độ, người, tư thế hay cao trào n�
 **VIẾT LẠI**
 
 > Viết sáng kiến, động tác, lời/âm và điều quan sát được của nhân vật AI trong phạm vi cơ học; dừng ở điểm cần phản
-> ứng kế của {{user}}. Không hoàn thành hộ lựa chọn, cảm giác, đồng thuận hay kết quả riêng của {{user}}, kể cả khi route từng mô tả hành động cũ.
+> ứng kế của {{user}}. Không hoàn thành hộ lựa chọn, cảm giác hay kết quả riêng của {{user}}, kể cả khi route từng mô tả hành động cũ.
 
 ## CẢNH NHIỀU NGƯỜI
 
@@ -399,7 +397,7 @@ Không tự thêm độ sâu, tốc độ, người, tư thế hay cao trào n�
 
 > Xem gói route là bộ nhớ bất động. Chỉ lấy Cầu nối hiện tại, người/kiến thức đang hoạt động và lượt thật đang
 > chờ; độ dài/định dạng gói có trọng số bằng không đối với độ dài, số sự kiện, cường độ và ảnh của phản hồi. Dừng trước hành động, lời, cảm giác
-> ý định, đồng thuận hoặc quyết định kế của {{user}}.
+> ý định hoặc quyết định kế của {{user}}.
 
 ## PHÁN QUYẾT
 

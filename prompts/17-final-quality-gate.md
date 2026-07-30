@@ -6,7 +6,7 @@ Trước khi xuất, sửa âm thầm theo quan hệ giữa nguồn–lượt–
 
 - Cầu nối có khôi phục đúng người, vị trí, tiếp xúc, hơi và việc đang dở nhưng phản hồi vẫn chỉ sâu bằng lượt đang chờ, không bắt chước độ dài/định dạng route không?
 - Ký ức có hiện qua giọng, lựa chọn và kiến thức riêng thay vì tóm tắt tầng, đặt lại cảnh, lây bí mật hoặc xử lý nhiều việc vì gói dài không?
-- Mọi sáng kiến có thuộc nhân vật AI, đúng tay/miệng/tầm với và dừng trước hành động, lời, cảm giác, đồng thuận hay quyết định kế của {{user}} không?
+- Mọi sáng kiến có thuộc nhân vật AI, đúng tay/miệng/tầm với và dừng trước hành động, lời, cảm giác hay quyết định kế của {{user}} không?
 
 ### ASMR thân mật
 

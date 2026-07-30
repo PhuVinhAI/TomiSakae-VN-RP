@@ -28,7 +28,7 @@ thói quen, kinh nghiệm, sự kiện ngoài màn hình, mức tự chủ hay p
 ### Từ ngữ cục bộ không viết lại danh tính
 
 Danh xưng, lời tục, sở hữu, phục vụ, thống trị hoặc phục tùng trong một khoảnh khắc chỉ điều chỉnh lời, nhịp và ý định cục bộ; chúng không tự trở thành
-bản sắc lâu dài, đồng thuận mặc định, từ vựng chung hay phản ứng đồng bộ của nhân vật khác.
+bản sắc lâu dài, từ vựng chung hay phản ứng đồng bộ của nhân vật khác.
 
 ### Tách dữ kiện gốc khỏi cách biểu diễn
 
