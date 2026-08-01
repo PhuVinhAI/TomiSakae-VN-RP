@@ -73,7 +73,7 @@ scripts/export-project.ps1   Đóng gói tệp Git cần thiết thành ZIP
 test/compiler.test.ts        Kiểm thử tính ổn định của compiler
 generated/MASTER_PROMPT.md   Tệp tổng hợp được sinh tự động
 prompts/16-vietnamese-contrastive-examples.md
-                             Bộ mẫu SAI → VIẾT LẠI tập trung lỗi ASMR thân mật
+                             109 ví dụ dương tiếng Việt cho solo và harem
 standalone/ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md
                              Bộ lệnh chuyển route ngắn và nén ký ức gần/bền
 standalone/RISUAI_RESPONSE_INSTRUCTION_REPLACEMENT.md
@@ -85,19 +85,23 @@ cùng mã SHA-256. Điều này giúp dễ rà soát thay đổi và phát hiệ
 
 ## Bộ ví dụ đối chiếu
 
-`prompts/16-vietnamese-contrastive-examples.md` là lớp giáo huấn bằng trường hợp cụ thể ngay trước
-cổng chất lượng cuối. Mô-đun có 28 ví dụ liên tục, chỉ giữ các lỗi model thường không tự sửa: một âm
-rồi kể dài, nhãn âm thay biểu diễn, lời tỉnh dưới quá tải, mức âm theo tính cách, miệng đang bận, âm
-tiếp xúc, tự chủ, cảnh nhiều người, ảnh, độ sâu, chống lặp và route chiếm quyền lượt.
+`prompts/16-vietnamese-contrastive-examples.md` là lớp giáo huấn bằng 109 ví dụ dương liên tục ngay
+trước cổng chất lượng cuối. Phần hướng dẫn được viết bằng tiếng Việt tự nhiên; 231 dòng văn mẫu được
+giữ nguyên từng câu chữ từ nhánh nguồn. Các ví dụ bao quát quyền nguồn, ranh giới lượt, giọng nhân
+vật, miệng đang bận, âm tiếp xúc, cảm giác bên trong, tự chủ, solo, harem hợp tác/cạnh tranh/phân
+cấp/luân phiên, chịch tập thể, ảnh, chống lặp, từ vựng đời thường trực tiếp và nhiều dạng thân mật.
 
-Các ví dụ không chỉ sửa riêng âm thanh: mỗi bản viết lại nối nguồn, trạng thái, giọng, cơ học, tự
-chủ, tuyến nhóm và quyền lượt. Khi tác động còn duy trì, giọng/hơi/miệng tái xuất qua nhiều dòng
-thay vì một tiếng rồi tràn mô tả; người nhiều, ít hoặc không rên dùng kênh đúng tính cách, không
-theo quota.
+Âm thanh luôn gắn với nguồn, nguyên nhân, cảm giác và hệ quả thay vì đứng thành một khối riêng. Nhân
+vật có thể rên dài, ngắn, đứt quãng, rất ít, im lặng hoặc phát âm vô nghĩa tùy tính cách và trạng
+thái; không có quota dòng, mẫu nguyên âm, độ dài chữ hay khuôn cao trào bắt buộc. Khi nhân vật còn
+tỉnh táo và nói ổn, lời tự nhiên có nghĩa được ưu tiên. Khi miệng bận hoặc khoái cảm quá cao, âm
+tiết bị cản, tiếng rên phản xạ và âm vô nghĩa đều hợp lệ; điều bị cấm là dùng một âm cô lập rồi để
+văn kể dài nói thay toàn bộ trải nghiệm và làm giọng nhân vật biến mất.
 
-Các đoạn **SAI** là dữ liệu âm tính, không phải văn mẫu, lịch sử route hay kho câu để sao chép. Nếu
-bản nháp mắc cùng cấu trúc, model phải giữ dữ kiện đúng rồi dựng lại toàn đoạn từ nguyên nhân; không
-vá bằng cách nối thêm một tiếng, ảnh, từ tục hoặc lời giải thích kỹ thuật.
+Các ví dụ là khuôn quan hệ giữa trạng thái, âm, tiếp xúc, cảm giác, ham muốn, lựa chọn và dư âm,
+không phải kho câu hoặc danh mục hành động để sao chép. Model phải giữ dữ kiện, giọng, ranh giới và
+quyền lượt hiện tại; chỉ học cấu trúc nhân quả, không bê câu chữ, cường độ, giải phẫu hay kết quả
+sang cảnh khác.
 
 ## Khung dòng và mật độ quy tắc
 
@@ -133,6 +137,12 @@ phần hội thoại phát sinh trong route hiện tại, lượt cuối đang c
 thiết. Trong cuộc trò chuyện mới, đặt gói được sinh vào lớp bộ nhớ sau thẻ nhân vật và tri thức thế
 giới nhưng trước lượt hội thoại cần trả lời. Không cần gắn lại toàn bộ log của các route cũ đã được
 nén trong gói.
+
+Gói sinh ra kết thúc bằng `<USER_NEXT_PROMPT>`. Trước khi gửi gói cho model nhận, thay dòng giữ chỗ
+bằng prompt kế tiếp thật của người dùng. Nếu trường này thiếu, trống hoặc vẫn còn placeholder và
+không có tin nhắn người dùng mới hơn, AI phải đứng yên và chỉ trả
+`Đang chờ prompt kế tiếp của bạn.`; không tiếp tục cảnh, giải quyết việc đang dở, xuất ảnh hoặc viết
+hành động cho {{user}}.
 
 ## Thứ tự chèn khuyến nghị cho RisuAI
 

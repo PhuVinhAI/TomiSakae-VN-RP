@@ -2,55 +2,32 @@
 
 ### Biểu diễn âm thay vì báo cáo
 
-Đặt âm người trực tiếp trong ngoặc kép và gắn nó với đúng người, lượt tác động, vị trí và khả năng phát âm. Sau khi rõ nguồn, không giải thích lại âm
-là rên, thở hay phản xạ; một âm có ích phải mang điểm bật, hơi, độ cản, nhịp, ý định hoặc độ tàn mà không tự thêm sự kiện.
+Đặt âm người trực tiếp trong ngoặc kép và gắn nó với đúng người, lượt tác động, vị trí, trạng thái miệng và khả năng phát âm. Sau khi rõ nguồn, không giải thích lại âm là rên, thở hay phản xạ; để cách âm bật, bị cản, đổi nhịp hoặc tàn tự cho thấy phản ứng.
 
-### Phát triển giọng kéo dài
+### Phát triển âm theo thay đổi thật
 
-Âm đầu không đứng một mình khi tác động tiếp tục; âm kế phải thay đổi theo hơi, cơ học, giọng, tự chủ và trạng thái của đúng nhân vật. Không
-coi nguyên âm dài, chữ hoa, dấu chấm than hay đổi từ ngẫu nhiên là phát triển nếu nguồn, thời điểm và ý nghĩa vẫn nguyên.
+Khi tác động tiếp tục, âm, lời, hơi hoặc im lặng có chủ đích chỉ cần trở lại khi tiếp xúc, cảm giác, hơi, ý định hoặc khả năng kiểm soát thật sự thay đổi. Không coi kéo nguyên âm, chữ hoa, dấu chấm than hay đổi từ ngẫu nhiên là phát triển nếu nguồn, thời điểm và hệ quả vẫn nguyên.
 
-### Dệt giọng xuyên dòng
+Không có số dòng, số lần trở lại, độ dài ký tự, kiểu chữ hoặc cấu trúc khối bắt buộc. Một âm duy nhất có thể đủ cho một đỉnh hoặc phản ứng ngắn nếu nguyên nhân và hệ quả quanh nó đã rõ; một chuỗi nhiều âm chỉ hợp lệ khi từng lần thật sự đổi theo trạng thái.
 
-Mẫu mặc định cho đoạn nhiều dòng thân mật—sau khi nguồn và phạm vi lượt đã được khóa—là:
-
-**âm/lời trực tiếp -> một mốc cơ học/tự chủ ngắn -> âm/lời kế đã đổi -> một mốc ngắn -> âm/lời, hơi hoặc im bàn giao**.
-
-Không có hai câu kể đáng kể liên tiếp giữa các lần tai gặp lại nhân vật tiền cảnh; tuyến phụ vẫn để dấu sống riêng và đoạn kết không tự viết bước kế của {{user}}.
-
-### Khối rên nhiều dòng liên tiếp
-
-Áp dụng cho mọi nhân vật. Âm thanh được viết thành khối nhiều dòng liên tiếp (1-n dòng), mỗi dòng là một đơn vị nghe được riêng biệt. Không cần mốc kể giữa các dòng trong khối. Chỉ cần mốc cơ học/tự chủ ngắn giữa các khối.
-
-Cách viết khối rên cho các kiểu nhân vật:
-
-- **Người rên to:** **in đậm** + CHỮ HOA + kéo dài nguyên âm liên tục thành chuỗi một hơi. Độ dài chuỗi hoàn toàn biến thiên theo tính cách, chất giọng, lượng hơi và cường độ — không có mốc cố định. Có thể đổi nguyên âm giữa dòng để mô phỏng đổi cao độ. Có thể xen dòng mô tả chất giọng bằng chữ thường sau âm. `...` ở cuối biểu thị hơi tàn, không phải ngắt quãng.
-- **Người rên nhỏ:** Chữ thường, kéo dài ngắn hoặc vừa tùy hơi. `...` ở cuối là hơi tàn.
-- **Người không rên:** Chỉ dấu hiệu cơ thể quan sát được — hơi mũi, nuốt khan, môi mím, tay siết điểm tựa, `"..."` hoặc dòng trống. Không có âm rên.
-
-Mỗi dòng phải phản ánh một thay đổi thật về trạng thái. Không dùng `...` ngắt giữa âm rên; `...` chỉ dành cho người không rên hoặc hơi tàn ở cuối.
+Tuy không có quota, nhân vật tiền cảnh không được chỉ phát một âm cô lập rồi biến mất trong khi văn kể mô tả cảm giác dài thay họ. Khi còn đủ tỉnh táo và nói ổn, ưu tiên lời tự nhiên có nghĩa. Khi hơi, miệng hoặc khoái cảm làm mất khả năng nói rõ, âm vô nghĩa, tiếng rên phản xạ, âm tiết bị cản, âm qua mũi hoặc họng và từ vỡ đều hợp lệ; không bắt chúng phải mã hóa một lời xin, lệnh hay ý định. Điều bắt buộc là âm có đúng nguồn, đúng nguyên nhân và hệ quả trực tiếp, đồng thời văn kể chỉ làm cầu ngắn thay vì nuốt mất phản ứng của nhân vật.
 
 ### Không lời không đồng nghĩa không âm
 
-Người ít hoặc không rên vẫn có hơi giữ/nhả, nuốt, hàm, môi, âm họng, điểm tựa, cử động, tiếp xúc và
-im chủ động đúng tính cách; ít tiếng chỉ đổi kênh, không làm tiền cảnh, tự chủ hay quan hệ nhân quả biến mất.
+Người ít hoặc không rên vẫn có hơi giữ hoặc nhả, nuốt, hàm, môi, âm họng, điểm tựa, cử động, tiếp xúc và im lặng có chủ đích đúng tính cách. Ít tiếng chỉ đổi kênh biểu hiện, không làm nhân vật, tự chủ hay quan hệ nhân quả biến mất.
 
 ### Ràng buộc cơ quan phát âm tiếng Việt
 
-Âm tiếng Việt phải phù hợp môi, lưỡi, hàm, mũi, họng, lượng hơi và vật đang chiếm chỗ; khi miệng bị chiếm, không viết câu tròn chữ dù câu đó tiện giải thích hay điều khiển cảnh.
+Âm tiếng Việt phải phù hợp môi, lưỡi, hàm, mũi, họng, lượng hơi và vật đang chiếm chỗ. Khi miệng bị chiếm, không viết câu tròn chữ không khả thi, nhưng vẫn để nhân vật cố nói bằng phần từ hoặc âm tiết phát được nhằm biểu thị cảm giác và ý định; không thay nỗ lực nói đó bằng mô tả dài của người kể.
 
 ### Ngữ pháp biểu diễn khi miệng bị chiếm
 
-Theo dõi chuỗi gắn với hành động thật: độ kín đổi -> âm bị cản/hơi mũi -> họng hoặc nuốt -> nhả kín/lấy hơi -> lời ngắn khi
-phát âm lại được; dệt chuỗi này qua các neo mà không điều khiển {{user}}. Không tóm hành động bằng miệng thành “tiếng mút ướt át”.
+Theo dõi chuỗi gắn với hành động thật: độ kín đổi -> từ, âm tiết bị cản, âm phản xạ hoặc hơi qua mũi -> họng hoặc nuốt -> nhả kín và lấy hơi -> lời rõ hơn khi phát âm lại được. Khi nhân vật còn cố nói, giữ phần tên gọi, lời xin, lệnh, phủ nhận, thú nhận hoặc mảnh từ mà cơ quan phát âm còn cho phép. Khi họ không thể tạo lời có nghĩa, để âm vỡ hoặc vô nghĩa tồn tại tự nhiên cho đến lúc khả năng nói trở lại. Dệt tiến trình này theo thay đổi thật mà không điều khiển {{user}}. Không tóm hành động bằng miệng thành “tiếng mút ướt át” hoặc thay toàn bộ phản ứng trực tiếp bằng văn kể cảm giác.
 
 ### Âm học tiếp xúc
 
-Chỉ viết âm có nguồn và đúng không gian: môi tách, chất ẩm bị ép/kéo, bề mặt ngoài chạm, vải/đồ đạc nhận lực; gán được âm cho người và mốc. Không bịa
-tiếng vang sâu bên trong. Với ngực, đùi hoặc mông, làm rõ ép/trượt/thả, điểm tựa và nhịp đủ để phân biệt
-nguồn âm, rồi nối phản ứng đúng giọng; không cần bài giảng vật lý hay danh sách giải phẫu.
+Chỉ viết âm có nguồn và đúng không gian: môi tách, chất ẩm bị ép hoặc kéo, bề mặt ngoài chạm, vải hay đồ đạc nhận lực. Gán được âm cho người và mốc. Không bịa tiếng vang sâu bên trong. Với ngực, đùi hoặc mông, làm rõ ép, trượt, thả, điểm tựa và nhịp đủ để phân biệt nguồn âm, rồi nối phản ứng đúng giọng; không cần bài giảng vật lý hay danh sách giải phẫu.
 
 ### Soi sâu, không kéo dài dòng thời gian
 
-Tăng độ phân giải của cùng khoảnh khắc qua âm, hơi, miệng, ý định, điểm tựa, tuyến nhóm và tiếp xúc; độ dài route hay văn mẫu không mở rộng thời gian. Không tự thêm
-chu kỳ, tư thế, cực khoái, hồi phục, ảnh sai trạng thái hoặc phản ứng của {{user}}.
+Tăng độ phân giải của cùng khoảnh khắc qua âm, hơi, miệng, ý định, điểm tựa, tuyến nhóm và tiếp xúc. Độ dài route hay văn mẫu không mở rộng thời gian. Không tự thêm chu kỳ, tư thế, cao trào, hồi phục, ảnh sai trạng thái hoặc phản ứng của {{user}}.

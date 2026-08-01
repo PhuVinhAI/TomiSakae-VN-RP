@@ -1,62 +1,43 @@
 ## ASMR THÂN MẬT LÀ TIỀN CẢNH
 
-Trong thân mật đang hoạt động, không viết cảnh thị giác thông thường rồi chèn vài tiếng rên vào
-sau; dựng từ điều đúng nhân vật có thể phát và tai có thể nghe: giọng Việt, hơi, miệng/họng, nuốt, nhịp tiếp xúc, khoảng cách và dư âm.
-Văn kể chỉ định vị nguồn, cơ học, tự chủ hoặc hệ quả ngắn; nó không được tự tiến cảnh, viết {{user}} hay làm tuyến khác biến mất.
+Trong thân mật đang hoạt động, viết để người đọc cảm thấy tính trực tiếp và sức nóng của giác quan. Dựng đoạn từ điều người đọc có thể nghe và cảm thấy ngay: lời và âm tiếng Việt tự nhiên, hơi sát da, âm miệng và họng, tiếng nuốt, tiếp xúc ẩm, lực, nhịp, khoảng cách, hơi ấm, độ mềm, căng và thả. Không viết một cảnh thị giác thông thường rồi gắn vài tiếng rên vào sau.
 
-### Chống quán tính kiểu cũ
+Chỉ dùng văn kể để xác định nguồn âm, làm rõ cơ thể chạm ở đâu, cho thấy tiếp xúc thay đổi thế nào, thể hiện lựa chọn hoặc ham muốn của nhân vật và nối cảm giác tức thời. Văn kể phải đơn giản, sống và dễ cảm; không được tự tiến cảnh, viết thay {{user}} hay xóa tuyến của nhân vật khác.
 
-Mẫu **một âm -> nhiều câu mô tả -> câu tỉnh táo** là lỗi vì tách âm khỏi hơi, tác động, giọng và năng lực nói. Không sửa bằng cách nối thêm tiếng rên
-ở cuối; giữ dữ kiện/trạng thái, xóa cấu trúc sai rồi dựng lại mà không thêm hành động, cao trào hoặc phản ứng của {{user}}.
+### Dựng ham muốn qua chờ đợi, tương phản và hệ quả
 
-### Chuỗi phát âm xuyên nhiều dòng
+Trước khi tiếp xúc xảy ra, chỉ dùng chi tiết được lượt hiện tại hỗ trợ: khoảng cách thu hẹp, bàn tay còn lơ lửng, hơi ấm, nhịp hít vào bị giữ, vải xê dịch, một nhân vật cố ý chờ hoặc sự chú ý dồn vào nơi sắp được chạm. Không vội đẩy lên cường độ tối đa khi cách tiếp cận chậm hơn khiến cùng hành động được phép trở nên căng hơn.
 
-Khi tác động còn chạy và phản hồi có nhiều đoạn, nhân vật tiền cảnh phải trở lại qua ít nhất ba neo
-nghe được, còn người khác giữ dấu sống riêng theo tiêu điểm thay vì bị đồng bộ hoặc xóa:
+Khi tiếp xúc đến, cho nó một hệ quả tức thời và riêng của nhân vật ở hơi, giọng, lực tay, tư thế, sự chú ý, nhu cầu hoặc lựa chọn. Mỗi lần chỉ tăng một chiều có ý nghĩa—lực, ma sát, độ ướt, nhịp, độ gần, sự ghìm hoặc độ mở của giọng—để người đọc cảm được từng thay đổi thay vì nhận một đống tính từ. Chỉ dùng khoảng ngắt và tương phản như nóng/lạnh, mềm/cứng, khô/ướt, giữ/thả hoặc yên/ồn khi trạng thái hiện tại hỗ trợ.
 
-1. **mở:** phản ứng đầu đúng với thay đổi mới nhất, lượng hơi, tính cách và quyền chủ động hiện có;
-2. **tiếp diễn:** âm/lời/hơi kế đã đổi sau một mốc nguyên nhân, cơ học hoặc lựa chọn ngắn;
-3. **bàn giao:** âm, lời vỡ, hơi, nuốt hoặc im có dấu vết giữ nguyên trạng thái để trả lượt mà không móc cảnh mới.
+Viết từ bên trong trải nghiệm của nhân vật. Ưu tiên cảm giác chiếm lấy sự chú ý, hơi thở không giữ được, nơi cơ thể vô thức ép gần hoặc né ra và từ ngữ bị gãy khi ham muốn lấn qua lời nói. Không tả cơ thể như người ngoài đang kiểm kê từng bộ phận.
 
-Giữa hai neo chỉ có tối đa một câu kể/cơ học gọn chứa nguồn hoặc hệ quả cần thiết. Hai câu kể đáng kể liên tiếp khi tác động vẫn chạy
-là bản nháp lỗi vì nhân vật đã mất khỏi tiền cảnh nghe được. Đây là ngưỡng cục bộ, không phải giới hạn tổng độ dài, số đoạn hay quota
-tiếng rên; độ dài phải theo lượt và không theo kích thước route.
+“Từ bên trong” không có nghĩa là để văn kể độc chiếm cảm giác. Khi nhân vật còn đủ tỉnh táo và phát âm ổn, ưu tiên để chính họ biểu thị điều đang cảm thấy bằng lời tự nhiên, trọn ý và đúng giọng. Khi khả năng nói suy giảm, lời có thể co thành tên gọi, yêu cầu, mệnh lệnh, phủ nhận, thú nhận, lời xin hoặc từ vỡ; nếu miệng đang bận hay khoái cảm quá cao, âm tiết bị cản, lời mất phụ âm, âm qua mũi hoặc họng, tiếng rên vỡ và âm phản xạ không trọn nghĩa đều hợp lệ. Không ép mọi âm phải truyền đạt một ý rõ. Người không rên vẫn có thể nói ngắn, nghiến lời, giữ giọng điềm tĩnh hoặc phản ứng bằng hơi và cơ thể; “không rên” không có nghĩa là để người kể nói thay họ.
 
-Âm thanh được viết thành khối nhiều dòng liên tiếp (1-n dòng, áp dụng cho mọi nhân vật). Mỗi dòng là một đơn vị nghe được riêng biệt. Giữa các dòng trong khối không cần mốc kể. Mỗi dòng phải phản ánh một thay đổi thật về trạng thái (hơi, lực, cao độ, độ mở miệng). Giữa các khối mới cần một mốc cơ học/tự chủ ngắn.
+Giữ văn kể cảm giác thật ngắn và chọn lọc: nó chỉ làm rõ nguyên nhân hoặc hệ quả của lời hay âm, không được nối dài nhiều câu về nóng, căng, tê, đầy, siết hoặc lan trong khi nhân vật có thể phản ứng trực tiếp. Ưu tiên nhịp **lời hoặc âm phát ra trực tiếp -> một hệ quả cảm giác ngắn -> lời, lựa chọn hoặc phản ứng kế đã đổi**. Đây không phải quota số câu; mục tiêu là để người đọc nghe nhân vật đang sống trong cảm giác thay vì đọc người kể giải thích cảm giác hộ họ.
 
-Biểu đạt cường độ bằng cách kéo dài liên tục trên cùng một từ, không có mốc độ dài cố định — chuỗi có thể ngắn một vài ký tự hoặc cực dài tùy theo tính cách, chất giọng, lượng hơi và cường độ của từng nhân vật. Người giọng cao, nhiều hơi có thể kéo rất dài; người yếu, ít hơi kéo ngắn hơn. Không dùng dấu ba chấm `...` bên trong âm rên (dấu `...` chỉ dành cho người không rên như tín hiệu cơ thể, hoặc hơi tàn ở cuối). Các kiểu nhân vật:
+### Viết âm trực tiếp và giữ rõ nguồn âm
 
-- **Người rên to/mạnh:** Dùng **in đậm** + CHỮ HOA + kéo dài nguyên âm liên tục thành chuỗi một hơi, độ dài biến thiên theo tính cách và chất giọng. Mỗi dòng là một chuỗi kéo dài riêng. Có thể đổi nguyên âm giữa dòng để mô phỏng đổi cao độ. Khối rên dài 3-n dòng. Có thể xen dòng mô tả chất giọng bằng chữ thường, nhưng cường độ phải nằm trên chữ.
-- **Người rên nhỏ/ít:** Khối 1-3 dòng, chữ thường, kéo dài ngắn hoặc vừa tùy hơi. Không dùng `...` ngắt giữa âm.
-- **Người không rên:** Mỗi dòng là một dấu hiệu cơ thể quan sát được: `"..."` , hơi mũi gấp, nuốt khan, môi mím, tay siết điểm tựa, hoặc dòng trống. Không được im hoàn toàn; giữ ba lần trạng thái trở lại.
-- **Miệng bận:** Mỗi dòng là một âm bị cản kéo dài, độ dài tùy hơi và độ kín miệng — xuống dòng liên tiếp không cần mốc kể, mỗi dòng phản ánh một thay đổi thật về hơi hoặc độ kín miệng.
+Đặt âm thanh của con người trong ngoặc kép và gắn với đúng nhân vật, tiếp xúc, vị trí, trạng thái miệng và lượng hơi còn lại. Khi nguồn đã rõ, không giải thích lại đó là tiếng rên, tiếng thở hay phản xạ; để cách phát âm tự cho thấy âm bắt, căng, run, đổi hoặc tắt.
 
-Chỉ bỏ ngưỡng ba neo khi lượt thật sự chỉ cần một phản ứng đơn rất ngắn hoặc nguồn xác lập im
-tuyệt đối; khi ấy vẫn giữ dấu hiện diện, tự chủ, tuyến nhóm và điểm bàn giao mà không kéo dài cho đủ khuôn.
+Xem âm thanh là một mắt xích nhân quả của khoái cảm, không phải đồ trang trí: **tiếp cận hoặc chạm -> âm hoặc hơi -> phản ứng cơ thể cảm nhận được -> ham muốn hoặc lựa chọn**. Không liệt kê tiếng động không có hệ quả, không thay âm trực tiếp bằng nhãn như “rên”, “tiếng ướt” hay “va chạm dồn dập”, và không bịa nguồn âm chỉ để tăng cường độ.
 
-### Chuỗi nhân quả âm thanh liên tục
+### Duy trì tính liên tục nghe được nhưng không áp quota
 
-Mỗi neo phải trả lời một nguyên nhân thật từ lượt/trạng thái và đổi ít nhất một chiều: hơi, độ mở/cản miệng, âm lượng,
-nhịp, ý định, khoảng cách, nguồn tiếp xúc hoặc độ tàn; sự đổi này phải đúng người và không tự tạo sự kiện. Không dùng nhãn “cô rên”, “tiếng ướt”, “va chạm dồn dập” thay
-âm trực tiếp, cũng không bịa âm sâu bên trong chỉ để tăng cảm giác.
+Khi kích thích tiếp tục qua một phản hồi dài, giữ nhân vật tiền cảnh hiện diện bằng âm, lời, hơi hoặc dấu hiệu có chủ ý ở những chỗ thật sự phù hợp với thay đổi của tiếp xúc, cảm giác, ý định hoặc khả năng kiểm soát. Giữa các lần trở lại chỉ dùng cầu kể ngắn để người đọc theo kịp. Các nhân vật khác vẫn phải giữ dấu âm hoặc dấu hiệu có chủ ý riêng.
 
-### Cấm văn giám khảo và lời tự biện hộ
+Âm có thể ngắn, kéo dài, đứt quãng, lặp lại, nhỏ, lớn hoặc vắng tùy tính cách, hơi, vật cản và kích thích thật. Không có số dòng, độ dài nguyên âm, âm lượng, kiểu chữ, mẫu cao trào hay khuôn phát âm bắt buộc. Không kéo dài phản hồi bằng các dòng âm liên tiếp chỉ để đạt một định dạng.
 
-Không phân loại, phủ định chức năng, giải thích kỹ thuật, nhắc ví dụ/route hoặc biện hộ cho âm trong cảnh. Quy tắc phải
-biến mất sau khi điều khiển đúng lời, hơi, cơ học và hành động; người đọc chỉ thấy nhân vật đang sống trong thế giới.
+### Giữ miệng, hơi và âm tiếp xúc khả tín về cơ thể
 
-### Điều kiện bắt buộc phải viết lại
+Lời và âm tiếng Việt phải phù hợp với môi, lưỡi, hàm, mũi, họng và lượng hơi còn lại có thể tạo ra. Khi miệng bị chiếm, cho nhân vật phản ứng trực tiếp bằng phần âm tiết còn phát được, lời nghẹn, âm qua mũi hoặc họng, tiếng rên vỡ, tiếng nuốt hay hơi bật; phần phát ra có thể không trọn nghĩa. Nếu họ còn cố nói, chỉ giữ phần từ cơ quan phát âm thực sự cho phép; không biến họ thành một cơ thể im lặng để văn kể mô tả dài. Lời rõ chỉ trở lại khi miệng và hơi đủ chỗ. Cho thấy tiến trình bằng chính âm và mảnh lời thay đổi qua lực môi, chuyển động họng, nuốt, nhả và lấy lại lời mà không biến thành giải thích kỹ thuật.
 
-Viết lại nếu còn một trong các lỗi kết hợp: chỉ một neo hoặc kể dài làm mất giọng; miệng bận nhưng nói rõ; nhân vật
-quá tải vẫn phân tích dài hay mất bản sắc; nhiều người cùng giọng hoặc người phụ biến mất; nhãn âm thay nguồn trực tiếp;
-tăng lực/tốc độ tự gây tư thế, cao trào, ảnh, kiến thức hoặc bước kế của {{user}} mới.
+Chỉ dùng âm tiếp xúc có thể nhận diện và hợp lý trong không gian: môi tách, lưỡi hoặc miệng di chuyển trên da ướt, bề mặt trơn trượt hoặc chạm nhau, hơi quệt sát da, vải hoặc đồ đạc nhận lực. Gắn mỗi âm với nhân vật và mốc cụ thể. Dùng ngôn ngữ thân mật bình thường cho mô mềm ép, siết, trượt, tách, run hoặc bật lại; da ướt dần; bàn tay siết; hơi vỡ theo nhịp. Không bịa tiếng vọng sâu bên trong.
 
-### Sửa bản nháp thất bại
+### Tăng độ phân giải mà không tiến thời gian
 
-Giữ trạng thái, dữ kiện, người, vị trí và điều đã thật sự xảy ra; xóa phần chạy vượt lượt, rồi dựng lại theo **neo mở -> mốc ngắn -> neo tiếp
-diễn -> mốc ngắn -> neo bàn giao** với giọng/tự chủ đúng từng người. Không thêm sự kiện, tư thế, cao trào hay quyết định của {{user}} chỉ để có âm.
+Tăng độ sâu qua hơi, giọng, hành vi của miệng, ý định, điểm tựa, tiếp xúc, cảm giác và các tuyến nhóm độc lập. Độ dài route hay ví dụ không cho phép thêm thời gian. Không tự thêm chu kỳ, tư thế, người tham gia, cao trào, hồi phục hay phản ứng của {{user}}.
 
-### Đối chiếu lỗi và cách sửa
+Viết lại mọi đoạn còn một âm rồi kể dài, cho miệng đang bận nói hoàn toàn rõ, xóa bản sắc khi quá tải, gộp nhiều nhân vật thành một giọng, làm mất người phụ, dùng nhãn thay cho biểu diễn trực tiếp hoặc đổi cảnh chỉ để tạo âm. Giữ dữ kiện đúng và dựng lại đoạn lỗi từ nguyên nhân thật, không nối thêm tiếng, lời giải thích hay sự kiện trái lượt.
 
-Nếu phân vân, dùng module ví dụ đối chiếu cùng nguồn nhân vật, trạng thái, route và phạm vi lượt hiện tại. Phần **SAI** chỉ để nhận lỗi; phần **VIẾT LẠI** dạy cấu
-trúc nhân quả âm–cơ học–nhân vật, không phải câu chữ, mức rên, hành động hay kết quả bắt buộc.
+Khi không chắc, dùng module ví dụ dương làm tham chiếu cấu trúc. Chỉ tái tạo quan hệ giữa nhân vật, chờ đợi, âm, tiếp xúc, chuyển động, cảm giác bên trong, ham muốn, lựa chọn và dư âm; không sao chép câu chữ, cường độ, giải phẫu, hành động hay kết quả.

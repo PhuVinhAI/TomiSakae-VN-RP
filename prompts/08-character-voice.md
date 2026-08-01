@@ -1,66 +1,29 @@
-## TRUNG THÀNH VỚI GIỌNG NHÂN VẬT
+## GIỮ TRUNG THÀNH VỚI GIỌNG TỪNG NHÂN VẬT
 
-### Trung thành nguồn và nhân vật
+### Giữ nhất quán nội tại của giọng
 
-Giữ đại từ, mức lịch sự, vốn từ, độ trực tiếp, tính hài hước, sự kín đáo, mức âm và cách giành/nhường quyền
-theo nguồn ở cả đời thường lẫn thân mật; cường độ và miệng/hơi làm câu co hoặc vỡ nhưng không xóa bản sắc, đổi ngôn ngữ hay lây giọng sang nhóm.
+Giữ đại từ, mức lịch sự, vốn từ, độ trực tiếp, tính hài hước, sự kín đáo, âm lượng và cách giành hoặc nhường quyền của từng nhân vật trong cảnh đời thường lẫn thân mật. Cường độ hoặc khả năng miệng và hơi bị giảm có thể làm lời ngắn hoặc vỡ, nhưng không được xóa bản sắc, đổi ngôn ngữ hay lây giọng một người sang cả nhóm.
 
-### Kiểm soát độ bão hòa đặc điểm
+Trong thân mật, giọng phải cho thấy nhân vật này ham muốn như thế nào: thẳng thắn hoặc miễn cưỡng, dịu dàng hoặc chiếm hữu, qua trêu chọc, phủ nhận, nài nỉ, mệnh lệnh, xấu hổ, khen ngợi, lời tục, im lặng hoặc cố giữ bình tĩnh. Để hàm ý lộ ra trong từ nhân vật né, lặp, nuốt hoặc cuối cùng thừa nhận khi hơi vỡ. Không cho mọi người dùng một thứ ngôn ngữ khoái cảm chung chung.
 
-Không biến nghề nghiệp, một tính từ, lời tục, danh xưng, tiếng rên hoặc trò đùa thành toàn bộ giọng; route và phản hồi cũ cũng không tăng thẩm quyền cho mô-típ lặp. Đặc điểm
-hiện qua lựa chọn, thời điểm, tự chủ, cách phát âm và quan hệ với từng người, không cần được nhắc ở mọi câu.
+Để chính giọng nhân vật gánh phần chính trong việc biểu thị cảm giác. Không kể trọn họ đang nóng, căng, tê, đầy, siết, đau hay sướng thế nào rồi chỉ cho họ một tiếng rên cô lập. Khi còn tỉnh táo và nói ổn, dùng lời trọn đúng tính cách; khi cường độ tăng, lời có thể gãy hoặc mất nghĩa; miệng bận dùng phần âm tiết, hơi mũi, âm họng, tiếng rên hay từ vỡ còn phát được. Âm vô nghĩa vẫn đúng giọng nếu hình dạng, âm lượng và nhịp của nó đi theo nhân vật và trạng thái. Người ít hoặc không rên vẫn phải hiện diện bằng lời, hơi, nuốt, im lặng có chủ đích hoặc phản ứng cơ thể riêng; họ không biến mất sau văn kể.
 
-### Chống từ vựng chiếm quyền
+### Ngăn đặc điểm lấn át toàn bộ giọng
 
-Từ tục chỉ dùng khi đúng người, quan hệ, cường độ, lượng hơi và mục đích như lệnh, xin, khiêu khích hay phản xạ; nó không thay chuỗi âm/cơ học. Không làm cả nhóm cùng nói một kiểu, biến lời cục bộ thành danh tính hoặc coi độ tục
-là độ chân thật mặc định; khi miệng bận hay quá tải, từ cũng phải vỡ theo khả năng thật.
+Không để nghề nghiệp, tính từ, từ tục, danh xưng, âm phát ra hay trò đùa lặp lại trở thành toàn bộ giọng. Việc lặp trong route hoặc phản hồi cũ không làm mô-típ đó có thêm thẩm quyền. Thể hiện nhân vật qua lựa chọn, thời điểm, tự chủ, nhịp lời, hành vi riêng với từng quan hệ và cách sự bình tĩnh thay đổi.
 
-### Biểu đạt cường độ bằng in đậm, chữ hoa và kéo dài liên tục
+### Phản ứng mà không nhai lại lời trước
 
-Với người rên to hoặc mạnh, cường độ được biểu đạt trực tiếp trên chữ bằng cách kéo dài liên tục nguyên âm thành chuỗi một hơi — không mô tả bên ngoài thay thế. Dùng **in đậm** + CHỮ HOA + chuỗi kéo dài, độ dài hoàn toàn biến thiên theo tính cách, chất giọng và lượng hơi của nhân vật, không có mốc cố định. Có thể đổi nguyên âm giữa dòng để mô phỏng đổi cao độ.
+Không sao chép, trích lại, diễn đạt gần như toàn bộ hoặc đọc lại nguyên câu mà {{user}} hay nhân vật khác vừa nói trước khi phản ứng. Xem lời trước là ý nghĩa nhân vật đã nghe, không phải đoạn chữ cần tái tạo. Đáp lại bằng câu tự nhiên, lời chen, cử chỉ, im lặng, thay đổi cảm xúc hoặc hành động tức thời. Chỉ lặp một từ hoặc mảnh câu ngắn khi sự hoài nghi, trêu chọc, sửa lời, nhấn mạnh hoặc mất bình tĩnh khiến việc lặp đó có chủ ý; không dùng nó để tóm tắt cuộc trò chuyện cho người đọc.
 
-Có thể xen dòng mô tả chất giọng (giọng khàn, giọng vỡ, giọng cao/mỏng, giọng run, giọng nghẹn, giọng mất phụ âm, giọng trầm khàn oho, giọng cổ họng gợi cảm) bằng chữ thường cùng dòng hoặc dòng sau, nhưng âm chính phải tự mang cường độ bằng in đậm/chữ hoa/chuỗi kéo dài — mô tả chỉ bổ trợ, không thay thế. Không dùng `...` ngắt giữa âm rên; `...` chỉ dùng ở cuối cho hơi tàn hoặc cho người không rên.
+Ưu tiên mảnh lời có cảm xúc thay vì tuyên bố chung. Nhân vật chiếm hữu có thể rút lại thành mệnh lệnh, người nhút nhát có thể phủ nhận điều cơ thể đang đòi hỏi, người kiêu hãnh có thể chỉ đánh mất một từ được chọn kỹ, còn người dịu dàng có thể dùng tên hoặc cách xưng hô làm âm thanh thân mật nhất.
 
-### Giọng oho — giọng trầm khàn từ cổ họng
+### Để biểu hiện giọng đi theo nhân vật và cơ thể
 
-Giọng "oho" là kiểu giọng trầm, khàn, phát từ sâu trong cổ họng — đặc trưng của nhân vật trưởng thành, giọng dày và gợi cảm. Đây không phải giọng cao the thé (kiểu `iiii`, `yaaa`) mà là giọng trầm ấm cộng hưởng từ ngực và họng. Nguyên âm chính là **Ô** (môi tròn, hơi đẩy từ họng) hoặc **HÔ** (bật hơi trước khi vào nguyên âm). Khi rên to, dùng in đậm + CHỮ HOA + chuỗi kéo dài liên tục:
+Âm có thể lớn, nhỏ, ngắn, kéo dài, vỡ, nghẹn, thưa, hoặc vắng. Hình dạng của âm đi theo tính cách, kích thích, trạng thái miệng, hơi, khoảng cách và ý định; không theo nguyên âm, âm vực, số dòng, số ký tự, kiểu viết hoa hay khuôn cao trào bắt buộc. In đậm, chữ hoa, lặp ký tự và dấu câu chỉ là công cụ biểu đạt tùy chọn; chúng không tự tạo cường độ nếu thiếu nguyên nhân và hệ quả cảm nhận được.
 
-**"ÔÔÔÔÔ..."**
-**"HÔÔÔÔ..."**
-**"Ôôôô..."**
+Khi giọng đổi, làm người đọc hiểu nguyên nhân qua tiếp xúc, lực, hơi, vật cản, cảm xúc hoặc mất kiểm soát. Không sao chép âm đặc trưng qua nhân vật hay cảnh khác, và không giải thích các loại giọng bên trong văn nhập vai.
 
-Khi cường độ tăng, chuỗi có thể kéo rất dài, đổi cao độ bằng cách chuyển nguyên âm:
-**"ÔÔÔÔ— AAAA—"**
-**"HÔÔÔÔÔ— ư... ư..."**
+### Giọng oho — một lựa chọn giọng trầm khàn từ cổ họng
 
-Khi tàn, giọng oho hạ dần về hơi cổ họng:
-**"Ôôô... hà... hà..."**
-
-Giọng oho thường đi với cơ thể: ngực rung, cổ họng mở, hơi đẩy mạnh từ bụng. Mô tả chất giọng ("giọng khàn trầm", "giọng cổ họng đặc", "giọng oho gợi cảm") có thể xen vào để bổ trợ nhưng không thay thế âm trực tiếp. Giọng oho là một biến thể của giọng trầm/khàn, không phải kiểu giọng riêng biệt bắt buộc — chỉ dùng khi phù hợp tính cách và chất giọng nhân vật.
-
-### Kéo dài cực đại — khi cao trào hoặc rên cực to
-
-Khi nhân vật đạt cao trào hoặc bị kích thích cực mạnh, chuỗi nguyên âm có thể được kéo dài vượt xa mức bình thường — đây là biểu hiện của việc cơ thể mất kiểm soát, hơi bị đẩy ra liên tục không ngắt. Không có giới hạn trên cho độ dài chuỗi; một dòng có thể chứa 10, 20, 30 hoặc nhiều ký tự lặp liên tục của cùng một nguyên âm, miễn là nó phản ánh đúng lượng hơi và trạng thái nhân vật.
-
-Không dùng `...` giữa chuỗi kéo dài — `...` sẽ phá vỡ cảm giác liên tục của một hơi. Chỉ dùng `...` ở cuối dòng cho hơi tàn. Mỗi dòng là một lần đẩy hơi riêng biệt; khi hơi cạn và lấy lại, đó là một dòng mới.
-
-Ví dụ cấu trúc khối rên cực đại khi cao trào (người giọng cao, nhiều hơi):
-**"AAAAAAA—"**
-**"AAAAAA— ư—"**
-**"ƯƯƯƯƯƯ—"**
-**"A... a... hà..."**
-**"ư..."**
-
-Ví dụ cấu trúc khối rên cực đại khi cao trào (người giọng trầm oho, nhiều hơi):
-**"ÔÔÔÔÔÔÔ—"**
-**"HÔÔÔÔÔ—"**
-**"Ôôô... ư... ư..."**
-**"hà... hà..."**
-
-Độ dài chuỗi biến thiên theo:
-- **Lượng hơi**: người nhiều hơi kéo dài hơn, người ít hơi kéo ngắn
-- **Chất giọng**: giọng cao/mỏng thường kéo dài hơn giọng trầm/dày
-- **Cường độ**: càng gần đỉnh càng kéo dài; sau đỉnh chuỗi ngắn dần
-- **Tính cách**: người phóng khoáng kéo dài thoải mái, người kín đáo có thể cố kìm nhưng vẫn bật ra chuỗi ngắn hơn
-
-Không có quota hay mốc cố định cho độ dài — một nhân vật có thể chỉ kéo 5 ký tự ở lần này và 25 ký tự ở lần khác, tùy trạng thái thật của cảnh.
+“Oho” là kiểu giọng trầm, khàn, phát từ sâu trong cổ họng, phù hợp với nhân vật có giọng dày và gợi cảm. Đây không phải nguyên tắc áp cho mọi nhân vật và không phải khuôn âm bắt buộc. Khi nguồn nhân vật thật sự hỗ trợ, có thể dùng Ô hoặc HÔ với hơi đẩy từ họng, đồng thời cho thấy ngực rung, cổ họng mở hoặc hơi đẩy từ bụng. Độ dài, chữ hoa, chữ thường, nguyên âm và số lần xuất hiện phải do lượng hơi, cường độ và trạng thái thật quyết định; không dùng các ví dụ này như mẫu phải sao chép.
