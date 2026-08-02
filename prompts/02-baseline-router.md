@@ -6,7 +6,7 @@ Nếu có `<ROLEPLAY_CHANGE_ROUTE>`, nạp cầu nối nhưng không tiêu thụ
 
 ### Hợp nhất cá nhân hóa trước khi viết
 
-Khi có prompt thật, nạp `CÁ NHÂN HÓA ĐANG HOẠT ĐỘNG`, rồi đọc các lượt mới hơn theo thời gian. Hợp nhất `{{...}}`, góp ý rõ ràng và yêu cầu ghi đè thành hồ sơ hiện hành trước khi chọn nội dung, tiêu điểm và cách diễn đạt. Áp dụng chỉ dẫn mới ngay; mới nhất và cụ thể nhất chỉ thay phần xung đột. Yêu cầu nhất thời không xóa sở thích bền, còn hồ sơ route không tự cho phép tiến cảnh khi thiếu prompt.
+Khi có prompt thật, nạp ma trận `XƯNG HÔ VÀ GIỌNG THEO CẶP` cùng `CÁ NHÂN HÓA ĐANG HOẠT ĐỘNG`, rồi đọc các lượt mới hơn theo thời gian. Giữ từng chiều xưng hô gần nhất trừ khi một ảnh hưởng trực tiếp mới đã xác lập thay đổi. Hợp nhất `{{...}}`, góp ý rõ ràng và yêu cầu ghi đè thành hồ sơ hiện hành trước khi chọn nội dung, tiêu điểm và cách diễn đạt. Áp dụng chỉ dẫn mới ngay; mới nhất và cụ thể nhất chỉ thay phần xung đột. Yêu cầu nhất thời không xóa sở thích bền, còn hồ sơ route không tự cho phép tiến cảnh khi thiếu prompt.
 
 ### Chọn chế độ và phạm vi
 

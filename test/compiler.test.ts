@@ -224,6 +224,10 @@ describe("prompt compiler", () => {
     expect(compiled).toContain("Để năng lực hiện tại thắng hình tượng anh hùng");
     expect(compiled).toContain("Tách ý định, cố gắng và hoàn thành");
     expect(compiled).toContain("Mỗi nhân vật phải giữ riêng vị trí, hành động");
+    expect(compiled).toContain("Xưng hô bền theo từng chiều");
+    expect(compiled).toContain("A gọi B không quyết định B gọi A");
+    expect(compiled).toContain("Chuyển route, đổi cảm xúc, thân mật hoặc tình dục tăng");
+    expect(compiled).toContain("cũ -> mới");
     expect(compiled).toContain(
       "không tự cho phép chuỗi kỹ thuật, đổi tư thế, cao trào hoặc hồi phục",
     );
@@ -335,6 +339,8 @@ describe("prompt compiler", () => {
     expect(response).toContain("Khóa đầu ra tiếng Việt tuyệt đối");
     expect(response).toContain("Cá nhân hóa bền và ghi đè có phạm vi");
     expect(response).toContain("Không bỏ qua, làm trái, tự cho hết hạn hoặc chỉ áp dụng một lượt");
+    expect(response).toContain("Nạp và giữ ma trận xưng hô theo từng chiều");
+    expect(response).toContain("không tự cho phép đổi cách nói/gọi");
     expect(
       createHash("sha256")
         .update(response.slice(0, response.indexOf("<FINAL_EXECUTION_OVERRIDE>")).trim(), "utf8")
@@ -354,12 +360,18 @@ describe("prompt compiler", () => {
       "utf8",
     );
 
-    expect(route.length).toBeLessThan(4_000);
+    expect(route.length).toBeLessThan(5_000);
     expect(route).toContain("ROUTE_001 -> ROUTE_002 -> ROUTE_003");
     expect(route).toContain("Route càng cũ càng nén thành ý chính");
     expect(route).toContain("Độ dài gói không quyết định độ dài phản hồi");
     expect(route).toContain("## CẦU NỐI HIỆN TẠI");
     expect(route).toContain("## KÝ ỨC VÀ KIẾN THỨC");
+    expect(route).toContain("## XƯNG HÔ VÀ GIỌNG THEO CẶP");
+    expect(route).toContain("[Người nói] -> [người nghe]");
+    expect(route).toContain("A gọi B không quyết định B gọi A");
+    expect(route).toContain("Chuyển route, cảm xúc, thân mật/tình dục");
+    expect(route).toContain("cũ -> mới");
+    expect(route).toContain("chưa xác lập");
     expect(route).toContain("## VIỆC CHƯA XONG");
     expect(route).toContain("## CÁ NHÂN HÓA ĐANG HOẠT ĐỘNG");
     expect(route).toContain("Chỉ dẫn bền từ `{{...}}`");

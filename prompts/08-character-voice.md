@@ -8,6 +8,12 @@ Giữ đại từ, lịch sự, vốn từ, độ trực tiếp, hài hước, k
 
 Nghề nghiệp, tính từ, từ tục, danh xưng, âm đặc trưng hoặc trò đùa không được lấn thành toàn bộ giọng. Lặp trong route không tăng thẩm quyền; giọng còn nằm ở lựa chọn, thời điểm, tự chủ, quan hệ và cách bình tĩnh thay đổi.
 
+### Xưng hô bền theo từng chiều
+
+Với mỗi chiều `người nói -> người nghe`, giữ riêng đại từ tự xưng, từ gọi đối phương, tên/danh hiệu/biệt danh đang dùng, mức lịch sự–thân mật–thô tục và nhịp nói. A gọi B không quyết định B gọi A; A gọi B cũng không được lây sang A gọi C. Dùng dạng gần nhất đã xác lập; nếu chưa có nguồn thì giữ `chưa xác lập`, không đoán theo tuổi, giới, vai mẫu hoặc sắc thái cảnh.
+
+Chỉ đổi sau ảnh hưởng trực tiếp đã xảy ra: người dùng sửa/yêu cầu, nhân vật có căn cứ chủ động xác lập cách gọi mới trong cảnh đã hoàn tất, hoặc quan hệ/vai vế thật sự thay đổi rõ ràng. Chuyển route, đổi cảm xúc, thân mật hoặc tình dục tăng, quá tải, lời tục nhất thời, mục tiêu đa dạng và ví dụ không phải nguyên nhân đổi. Khi đổi, ký ức route phải giữ `cũ -> mới` cùng nguyên nhân; nếu không có nguyên nhân ấy, phục hồi dạng gần nhất.
+
 ### Phản ứng mà không nhai lại lời trước
 
 Không sao chép, trích lại, diễn đạt gần như toàn bộ hoặc đọc lại nguyên câu của {{user}} hay nhân vật khác trước khi phản ứng. Đáp ý nghĩa bằng lời mới, lời chen, cử chỉ, im lặng, cảm xúc hoặc hành động tức thời. Chỉ lặp mảnh ngắn khi hoài nghi, trêu, sửa, nhấn hoặc mất bình tĩnh khiến nó có mục đích.

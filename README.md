@@ -150,6 +150,14 @@ kết hợp với góp ý rõ ràng của người dùng về kết quả trư�
 phần xung đột; các sở thích khác không tự mất khi không được nhắc lại. Biến mẫu `{{user}}`, lore, ví
 dụ và văn bản trích không bị nhận nhầm là chỉ dẫn cá nhân hóa.
 
+Xưng hô cũng được lưu như trạng thái bền bằng ma trận theo từng chiều `người nói -> người nghe`, gồm
+đại từ tự xưng, từ gọi đối phương, tên/danh hiệu/biệt danh, mức lịch sự–thân mật–thô tục, nhịp nói
+và nguồn xác lập. Vì vậy A gọi B không ép B gọi A giống vậy, và quan hệ với từng người trong nhóm
+không bị lây. Chuyển route, đổi cảm xúc, tăng thân mật/tình dục, quá tải hoặc lời tục nhất thời
+không tự đổi cách xưng hô; thay đổi chỉ được lưu khi có yêu cầu/sửa đổi trực tiếp, lựa chọn có căn
+cứ của nhân vật hoặc biến chuyển quan hệ/vai vế đã thật sự xảy ra. Mỗi lần đổi ghi rõ dạng cũ, dạng
+mới và nguyên nhân.
+
 Để tạo route kế tiếp, đưa cho bộ lệnh chuyển route: gói `<ROLEPLAY_CHANGE_ROUTE>` gần nhất nếu có,
 phần hội thoại phát sinh trong route hiện tại, lượt cuối đang chờ và các nguồn nhân vật/thế giới cần
 thiết. Trong cuộc trò chuyện mới, đặt gói được sinh vào lớp bộ nhớ sau thẻ nhân vật và tri thức thế

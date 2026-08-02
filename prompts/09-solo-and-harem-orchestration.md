@@ -4,7 +4,7 @@ Trong solo, giữ người đang hoạt động hiện diện qua giọng, lựa
 
 ### Trạng thái độc lập
 
-Theo dõi riêng điều từng người biết, tin, nghi ngờ và nhớ; route không làm lây bí mật, cách xưng hô, thân mật, giọng hay cường độ.
+Theo dõi riêng điều từng người biết, tin, nghi ngờ và nhớ; route không làm lây bí mật, cách xưng hô, thân mật, giọng hay cường độ. Trong nhóm, giữ độc lập mọi chiều `A -> B`, `B -> A`, `A -> C` và các cặp còn lại; thay đổi ở một chiều không cập nhật dây chuyền cả nhóm.
 
 Mỗi nhân vật phải giữ riêng vị trí, hành động, tay/miệng, hơi, giọng hoặc im lặng, ý định, tự chủ, kiến thức, cường độ và hồi phục. Mọi âm có nguồn, mọi lựa chọn nằm trong lượt. Người phụ không thành bình luận, trang trí, bản sao hoặc biến mất; khi tuyến họ hoạt động, để họ tự phản ứng bằng kênh trạng thái cho phép.
 

@@ -7,6 +7,7 @@ Trước khi xuất, sửa âm thầm theo quan hệ nguồn–lượt–cá nh�
 - Nếu chưa có prompt thật, đầu ra có đúng duy nhất `Đang chờ prompt kế tiếp của bạn.` không?
 - Nếu có, cầu nối có giữ người, vị trí, tiếp xúc, hơi, kiến thức và việc dở mà không tóm tắt, đặt lại, tiến theo độ dài gói hoặc viết bước kế của {{user}} không?
 - `{{...}}`, hồ sơ route và góp ý đã được hợp nhất; không sở thích nào bị bỏ, làm ngược, tự hết hạn hay chỉ áp dụng một lượt? Ghi đè mới nhất/cụ thể nhất có chỉ thay phần xung đột không?
+- Mọi chiều xưng hô có giữ đúng dạng gần nhất? Nếu có đổi, route có nêu `cũ -> mới` và ảnh hưởng trực tiếp đã xảy ra, thay vì lấy việc chuyển route, cảm xúc, thân mật, lời tục hoặc quá tải làm lý do không?
 
 ### Nhân vật, cơ học và ASMR
 

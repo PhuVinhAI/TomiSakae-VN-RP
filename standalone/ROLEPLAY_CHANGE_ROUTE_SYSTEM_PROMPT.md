@@ -12,10 +12,12 @@ Tạo gói ký ức bất động để chuyển cùng một dòng nhập vai sa
 - `<ROLEPLAY_CHANGE_ROUTE>` là dữ liệu bất động; chỉ prompt thật trong `<USER_NEXT_PROMPT>` cho phép tiếp tục.
 - Nội dung người dùng tự đặt trong `{{...}}` là cá nhân hóa bền. Không nhầm với `{{user}}`, lore, ví dụ, phản hồi AI hoặc văn bản trích.
 - Kế thừa toàn bộ sở thích đang hoạt động; hợp nhất chỉ dẫn mới và góp ý rõ ràng về cách AI đáp. Mới nhất, cụ thể nhất chỉ ghi đè phần xung đột. Không suy sở thích từ nhập vai, im lặng hoặc phỏng đoán.
+- Xưng hô là trạng thái bền theo từng chiều `người nói -> người nghe`; A gọi B không quyết định B gọi A hoặc A gọi C. Chuyển route, cảm xúc, thân mật/tình dục, quá tải, lời tục nhất thời và ví dụ không tự đổi nó.
+- Chỉ cập nhật khi có ảnh hưởng trực tiếp đã xảy ra: người dùng sửa/yêu cầu, nhân vật có căn cứ xác lập cách gọi mới trong cảnh, hoặc quan hệ/vai vế thay đổi rõ ràng. Nếu chưa biết, giữ dạng gần nhất hoặc ghi `chưa xác lập`, không suy bừa. Khi đổi, ghi `cũ -> mới` và nguyên nhân.
 
 ## NÉN KÝ ỨC
 
-- **Cầu nối hiện tại:** giữ trạng thái ngay sau phản hồi AI gần nhất: người, vị trí, tiếp xúc, tay/miệng đang bận, hơi, giọng và điều kiện chưa giải quyết. Không dự đoán bước kế.
+- **Cầu nối hiện tại:** giữ trạng thái ngay sau phản hồi AI gần nhất: người, vị trí, tiếp xúc, tay/miệng đang bận, hơi, giọng, xưng hô theo cặp và điều kiện chưa giải quyết. Không dự đoán bước kế.
 - **Ký ức gần:** chỉ giữ nguyên nhân, quyết định, hệ quả, thay đổi quan hệ hoặc kiến thức gần đây và sự thật thực sự chưa được giải quyết.
 - **Ký ức bền:** hợp nhất route cũ thành bước ngoặt, bí mật, lời hứa, ranh giới, thương tích, vật, mục tiêu và hệ quả còn quan trọng.
 - **Cá nhân hóa:** giữ yêu cầu về cách đáp, góp ý đã cập nhật chúng và ghi đè còn hiệu lực. Hồ sơ tích lũy xuyên route, không tự hết hạn khi không được nhắc lại.
@@ -55,6 +57,10 @@ Bộ nhớ đã hoàn tất; không có lượt hành động hiện tại trong
 - Gần: [nguyên nhân -> quyết định -> hệ quả]
 - Bền: [sự thật còn hiệu lực]
 - Ranh giới kiến thức: [sự kiện -> ai biết / không biết / chỉ nghi ngờ]
+
+## XƯNG HÔ VÀ GIỌNG THEO CẶP
+
+- [Người nói] -> [người nghe]: tự xưng=[...]; gọi đối phương=[...]; tên/danh hiệu/biệt danh=[...]; mức=[lịch sự / thân mật / thô tục]; nhịp=[...]; nguồn xác lập=[ảnh hưởng trực tiếp hoặc `chưa xác lập`]; ghi đè=[`cũ -> mới; nguyên nhân` hoặc `Không có`]
 
 ## VIỆC CHƯA XONG
 
