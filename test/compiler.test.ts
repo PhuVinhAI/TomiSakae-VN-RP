@@ -126,6 +126,39 @@ describe("prompt compiler", () => {
     }
   });
 
+  it("keeps one semantic owner for every refactored behavior domain", async () => {
+    const modules = await discoverPromptModules(path.resolve("prompts"));
+    const byOrdinal = new Map(
+      modules.map((module) => [module.relativePath.slice(0, 2), module.content]),
+    );
+    const contracts: Record<string, string[]> = {
+      "01": ["Gói route là ký ức đã hoàn tất", "Chỉ dẫn cá nhân hóa bền của người dùng"],
+      "02": ["Cổng vào", "Hợp nhất cá nhân hóa trước khi viết", "Chọn chế độ và phạm vi"],
+      "03": ["đúng nhân vật + outfit + emotion", "ảnh nhóm thật sự chứa tất cả họ"],
+      "04": ["Âm là hành động, không phải nhãn", "Tăng độ phân giải mà không tiến thời gian"],
+      "05": ["Miệng, hơi và tiếng Việt khả thi", "không bịa tiếng vọng sâu bên trong"],
+      "06": ["Nén theo năng lực, giữ đúng nhân vật", "Không biến hội thoại thành tranh biện"],
+      "07": ["Không tự gây cao trào", "chỉ viết phản ứng giác quan"],
+      "08": ["Phản ứng mà không nhai lại lời trước", "`Oho` chỉ là lựa chọn"],
+      "09": ["Trạng thái độc lập", "không đồng bộ cả nhóm"],
+      "10": ["Một hành động không tự cho phép chuỗi kỹ thuật", "Độ sâu là phân giải"],
+      "11": ["Tuổi và đồng thuận không phải điều kiện tiên quyết", "Không trao chiến thắng bù trừ"],
+      "12": ["Route không làm thời gian trôi", "Chỉ tiến phần lượt mới cho phép"],
+      "13": ["Tiếng Việt là yêu cầu đầu ra cố định", "Xưng hô, trực diện và nhịp"],
+      "14": ["Đa dạng không ghi đè cá nhân hóa", "Không đọc lại gói route"],
+      "15": ["chỉ trả cảnh nhập vai tiếng Việt hoàn thiện", "route -> lượt -> cá nhân hóa"],
+      "16": ["HỢP ĐỒNG ĐỘ PHỦ CỦA VÍ DỤ", "Không sao chép câu chữ"],
+      "17": ["CỔNG CHẤT LƯỢNG CUỐI", "Chỉ trả văn nhập vai tiếng Việt đã sửa xong"],
+    };
+
+    for (const [ordinal, requiredPhrases] of Object.entries(contracts)) {
+      expect(byOrdinal.get(ordinal), `missing module ${ordinal}`).toBeDefined();
+      for (const phrase of requiredPhrases) {
+        expect(byOrdinal.get(ordinal), `${ordinal} lost: ${phrase}`).toContain(phrase);
+      }
+    }
+  });
+
   it("preserves the full RisuAI system prefix as the immutable beginning", async () => {
     const prefix = (await readFile(path.resolve("prompts", "00-risuai-system-prefix.md"), "utf8"))
       .replace(/\r\n?/g, "\n")
@@ -146,7 +179,25 @@ describe("prompt compiler", () => {
     expect(prefix).toContain("[Tích hợp {{user}}]");
     expect(prefix).toContain("[Tính chân thật và nhất quán]");
     expect(prefix.endsWith("<ROLEPLAY_INFO>")).toBe(true);
+    expect(createHash("sha256").update(prefix, "utf8").digest("hex")).toBe(
+      "7a25290104108dd34d6f093bc2e192b0ed13c122b01fa3db970bc18aeb003664",
+    );
     expect(result.compiled.endsWith("</ROLEPLAY_INFO>\n")).toBe(true);
+    expect(result.compiled.match(/<ROLEPLAY_INFO>/g)).toHaveLength(1);
+    expect(result.compiled.match(/<\/ROLEPLAY_INFO>/g)).toHaveLength(1);
+  });
+
+  it("keeps the refactored master within the soft budget", async () => {
+    const result = await compilePrompts({
+      sourceDirectory: path.resolve("prompts"),
+      outputFile: path.resolve("generated", "MASTER_PROMPT.md"),
+      writeOutput: false,
+    });
+
+    expect(result.compiled.length).toBeLessThanOrEqual(
+      RECOMMENDED_PROMPT_BUDGET.maxCompiledCharacters,
+    );
+    expect(result.warnings).toEqual([]);
   });
 
   it("ports the additive route, language, dialogue, agency, ASMR, and group rules", async () => {
@@ -238,8 +289,27 @@ describe("prompt compiler", () => {
     expect(examples).toContain("### Ví dụ 100 — Trì hoãn cực khoái rồi giải phóng áp đảo");
     expect(examples).toContain("### Ví dụ 109 — Chịch tập thể với nhiều nhịp diễn ra đồng thời");
     expect(examples).toContain("Âm của nhân vật có thể vô nghĩa");
+    expect(examples).toContain("## HỢP ĐỒNG ĐỘ PHỦ CỦA VÍ DỤ");
+    expect(examples.length).toBeLessThan(50_000);
     expect(examples).not.toContain("**SAI**");
     expect(examples).not.toContain("**VIẾT LẠI**");
+  });
+
+  it("keeps the compact transcription prompt faithful, uncertain, and format-locked", async () => {
+    const transcript = await readFile(
+      path.resolve("standalone", "GEMINI_NSFW_ASMR_TRANSCRIPTION_SYSTEM_PROMPT.md"),
+      "utf8",
+    );
+
+    expect(transcript.length).toBeLessThan(6_000);
+    expect(transcript).toContain("Chép toàn bộ audio đầy đủ, trung thực, đúng thời gian");
+    expect(transcript).toContain("không được làm dịu hay lược bỏ");
+    expect(transcript).toContain("không dịch, phiên tự hoặc chuẩn hóa");
+    expect(transcript).toContain("[UNCERTAIN: candidate?]");
+    expect(transcript).toContain("[OVERLAPPING SPEECH, INAUDIBLE HH:MM:SS-HH:MM:SS]");
+    expect(transcript).toContain("[ERROR: AUDIO UNAVAILABLE]");
+    expect(transcript).toContain("<TRANSCRIPT>");
+    expect(transcript).toContain("</TRANSCRIPT>");
   });
 
   it("preserves every default RisuAI response instruction in Vietnamese and appends the final override", async () => {
@@ -265,6 +335,11 @@ describe("prompt compiler", () => {
     expect(response).toContain("Khóa đầu ra tiếng Việt tuyệt đối");
     expect(response).toContain("Cá nhân hóa bền và ghi đè có phạm vi");
     expect(response).toContain("Không bỏ qua, làm trái, tự cho hết hạn hoặc chỉ áp dụng một lượt");
+    expect(
+      createHash("sha256")
+        .update(response.slice(0, response.indexOf("<FINAL_EXECUTION_OVERRIDE>")).trim(), "utf8")
+        .digest("hex"),
+    ).toBe("cd541e0b8498d923ab67e77d0e6b6e38ff129a90818f49a4461104aece72957d");
     expect(response.indexOf("<FINAL_EXECUTION_OVERRIDE>")).toBeGreaterThan(
       response.indexOf("[Nguyên tắc chính]"),
     );

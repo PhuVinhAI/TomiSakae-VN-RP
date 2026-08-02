@@ -86,10 +86,11 @@ cùng mã SHA-256. Điều này giúp dễ rà soát thay đổi và phát hiệ
 ## Bộ ví dụ đối chiếu
 
 `prompts/16-vietnamese-contrastive-examples.md` là lớp giáo huấn bằng 109 ví dụ dương liên tục ngay
-trước cổng chất lượng cuối. Phần hướng dẫn được viết bằng tiếng Việt tự nhiên; 231 dòng văn mẫu được
-giữ nguyên từng câu chữ từ nhánh nguồn. Các ví dụ bao quát quyền nguồn, ranh giới lượt, giọng nhân
-vật, miệng đang bận, âm tiếp xúc, cảm giác bên trong, tự chủ, solo, harem hợp tác/cạnh tranh/phân
-cấp/luân phiên, chịch tập thể, ảnh, chống lặp, từ vựng đời thường trực tiếp và nhiều dạng thân mật.
+trước cổng chất lượng cuối. Một hợp đồng độ phủ chung thay cho phần giải thích lặp sau từng ví dụ;
+231 dòng văn mẫu vẫn được giữ nguyên từng câu chữ và SHA-256 từ nhánh nguồn. Các ví dụ bao quát
+quyền nguồn, ranh giới lượt, giọng nhân vật, miệng đang bận, âm tiếp xúc, cảm giác bên trong, tự
+chủ, solo, harem hợp tác/cạnh tranh/phân cấp/luân phiên, ảnh, chống lặp, từ vựng trực tiếp và nhiều
+dạng thân mật.
 
 Âm thanh luôn gắn với nguồn, nguyên nhân, cảm giác và hệ quả thay vì đứng thành một khối riêng. Nhân
 vật có thể rên dài, ngắn, đứt quãng, rất ít, im lặng hoặc phát âm vô nghĩa tùy tính cách và trạng
@@ -103,13 +104,24 @@ không phải kho câu hoặc danh mục hành động để sao chép. Model ph
 quyền lượt hiện tại; chỉ học cấu trúc nhân quả, không bê câu chữ, cường độ, giải phẫu hay kết quả
 sang cảnh khác.
 
+`pnpm compact:examples` là phép biến đổi lặp lại an toàn: script chỉ giữ tiêu đề nhóm, đủ 109 tiêu
+đề ví dụ và các dòng mẫu, rồi dựng lại hợp đồng chung. Script dừng nếu số thứ tự, số dòng mẫu hoặc
+SHA-256 thay đổi.
+
 ## Khung dòng và mật độ quy tắc
 
-File 00 là khung hệ thống chung đầy đủ của RisuAI và được giữ nguyên. Các module 01–17 giữ đúng số
-dòng đã khóa trong kiểm thử, nhưng mỗi dòng nội dung được viết dày hơn để liên kết các quy tắc liên
-quan. Mốc 90.000 ký tự là ngân sách mềm: compiler chỉ cảnh báo khi vượt, không chặn biên dịch. Các
-tệp trong `prompts/` và `standalone/` được loại khỏi Prettier để formatter không tự gộp khung dòng;
-TypeScript, cấu hình và README vẫn dùng định dạng tự động bình thường.
+File 00 là khung hệ thống chung đầy đủ của RisuAI và được giữ nguyên. Mỗi module 01–17 sở hữu một
+miền hành vi; câu nhắc chéo chỉ giữ khi nó làm nhiệm vụ khác ở router, hợp đồng đầu ra hoặc cổng
+kiểm tra. Cấu trúc này tránh diễn giải lại cùng luật trong nhiều module nhưng vẫn giữ đủ route, cá
+nhân hóa, quyền lượt, giọng, cơ học, nhóm, ảnh và tiếng Việt. Mốc 90.000 ký tự là ngân sách mềm:
+compiler chỉ cảnh báo khi vượt, không chặn biên dịch; kiểm thử dự án còn yêu cầu master thực tế nằm
+trong ngân sách. Các tệp trong `prompts/` và `standalone/` được loại khỏi Prettier; TypeScript, cấu
+hình và README vẫn dùng định dạng tự động bình thường.
+
+Đợt tái cấu trúc dựa trên hướng dẫn chính thức về việc ưu tiên kết quả, bỏ chỉ dẫn/ví dụ không đổi
+hành vi và chạy lại eval sau từng nhóm:
+[Prompting guidance for GPT-5.6 Sol](https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6)
+và [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-engineering).
 
 ## Phạm vi tiếng Việt
 
