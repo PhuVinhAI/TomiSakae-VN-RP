@@ -162,6 +162,11 @@ describe("prompt compiler", () => {
     expect(compiled).toContain("<USER_NEXT_PROMPT>");
     expect(compiled).toContain("Đang chờ prompt kế tiếp của bạn.");
     expect(compiled).toContain("Độ dài gói có trọng số bằng không đối với độ dài phản hồi");
+    expect(compiled).toContain("Chỉ dẫn cá nhân hóa bền của người dùng");
+    expect(compiled).toContain("nội dung họ chủ động đặt giữa `{{` và `}}`");
+    expect(compiled).toContain("CÁ NHÂN HÓA ĐANG HOẠT ĐỘNG");
+    expect(compiled).toContain("không tự xóa sở thích vì nó không được nhắc lại");
+    expect(compiled).toContain("chỉ phần mới nhất và cụ thể nhất");
     expect(compiled).toContain("không tự hoàn thành phản ứng của đối phương");
     expect(compiled).toContain("Không sao chép, trích lại, diễn đạt gần như toàn bộ");
     expect(compiled).toContain("Không biến hội thoại thành tranh biện hoặc phán quyết");
@@ -258,6 +263,8 @@ describe("prompt compiler", () => {
     expect(response).toContain("Tự chủ, năng lực và chống anh hùng hóa");
     expect(response).toContain("âm phản xạ hoặc âm vô nghĩa đúng trạng thái");
     expect(response).toContain("Khóa đầu ra tiếng Việt tuyệt đối");
+    expect(response).toContain("Cá nhân hóa bền và ghi đè có phạm vi");
+    expect(response).toContain("Không bỏ qua, làm trái, tự cho hết hạn hoặc chỉ áp dụng một lượt");
     expect(response.indexOf("<FINAL_EXECUTION_OVERRIDE>")).toBeGreaterThan(
       response.indexOf("[Nguyên tắc chính]"),
     );
@@ -279,10 +286,15 @@ describe("prompt compiler", () => {
     expect(route).toContain("## CẦU NỐI HIỆN TẠI");
     expect(route).toContain("## KÝ ỨC VÀ KIẾN THỨC");
     expect(route).toContain("## VIỆC CHƯA XONG");
+    expect(route).toContain("## CÁ NHÂN HÓA ĐANG HOẠT ĐỘNG");
+    expect(route).toContain("Chỉ dẫn bền từ `{{...}}`");
+    expect(route).toContain("Phản hồi người dùng đã cập nhật hồ sơ");
+    expect(route).toContain("Ghi đè còn hiệu lực");
     expect(route).toContain("<USER_NEXT_PROMPT>");
     expect(route).toContain("[Nhập prompt kế tiếp của bạn tại đây");
-    expect(route).toContain("Không có gì trong gói này là yêu cầu hiện tại của người dùng");
+    expect(route).toContain("không có lượt hành động hiện tại trong gói");
     expect(route).not.toContain("<ROLEPLAY_HANDOFF>");
     expect(route).not.toContain("Tầng 4");
+    expect(route).not.toContain("## LỖI KHÔNG KẾ THỪA");
   });
 });

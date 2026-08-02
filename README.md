@@ -132,6 +132,12 @@ Cầu nối hiện tại là phần duy nhất giữ đủ chi tiết để đá
 ức được theo dõi theo người biết và route càng cũ càng ngắn, nên gói không tăng gần tuyến tính theo
 log.
 
+Gói route còn giữ `CÁ NHÂN HÓA ĐANG HOẠT ĐỘNG` thay cho mục lỗi cũ. Nội dung người dùng tự đặt trong
+`{{...}}` được xem là chỉ dẫn bền: có hiệu lực ngay, tiếp tục qua các phản hồi và route sau, và được
+kết hợp với góp ý rõ ràng của người dùng về kết quả trước. Yêu cầu mới nhất, cụ thể nhất chỉ ghi đè
+phần xung đột; các sở thích khác không tự mất khi không được nhắc lại. Biến mẫu `{{user}}`, lore, ví
+dụ và văn bản trích không bị nhận nhầm là chỉ dẫn cá nhân hóa.
+
 Để tạo route kế tiếp, đưa cho bộ lệnh chuyển route: gói `<ROLEPLAY_CHANGE_ROUTE>` gần nhất nếu có,
 phần hội thoại phát sinh trong route hiện tại, lượt cuối đang chờ và các nguồn nhân vật/thế giới cần
 thiết. Trong cuộc trò chuyện mới, đặt gói được sinh vào lớp bộ nhớ sau thẻ nhân vật và tri thức thế
