@@ -135,34 +135,36 @@ và [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-en
 
 ## Chuyển route và ký ức dài hạn
 
-`standalone/ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md` thay bộ lệnh bàn giao cũ bằng gói ngắn. Route là
-một đoạn liên tục của cùng dòng nhập vai, không phải nhánh hoặc thế giới mới; có thể chuyển khi
-chuỗi hành động đã hoàn thành hoặc vẫn đang dở nhưng cần sang cửa sổ hội thoại mới.
+`standalone/ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md` tạo Route V2 dưới dạng snapshot có kích thước cố
+định, tối đa khoảng 9.500 ký tự. Route vẫn là một đoạn liên tục của cùng dòng nhập vai, không phải
+nhánh hoặc thế giới mới; có thể chuyển khi chuỗi hành động đã hoàn thành hoặc còn đang dở nhưng cần
+sang cửa sổ hội thoại mới.
 
-Cầu nối hiện tại là phần duy nhất giữ đủ chi tiết để đáp ngay. Route gần chỉ giữ nguyên nhân, quyết
-định, hệ quả và việc dở; route xa được hợp nhất thành ký ức bền. Mỗi sự thật xuất hiện một lần, ký
-ức được theo dõi theo người biết và route càng cũ càng ngắn, nên gói không tăng gần tuyến tính theo
-log.
+Mỗi lần tạo route, bộ chuyển đọc snapshot cũ thành bản ghi, áp dụng các lượt mới rồi render lại toàn
+bộ snapshot. `TRẠNG THÁI HIỆN TẠI` luôn bị thay hoàn toàn. Các nhóm còn lại dùng mã ổn định `E`,
+`F`, `K`, `A`, `O`, `P`, `M`: cùng một sự thật cập nhật đúng mã cũ, dữ kiện sai/hết hiệu lực và việc
+đã giải quyết bị xóa, còn mã mới chỉ dành cho dữ kiện thật sự mới. Snapshot chỉ giữ sequence hiện
+tại và cha trực tiếp, không tích lũy danh sách mọi route đã hoàn thành.
 
-Gói route còn giữ `CÁ NHÂN HÓA ĐANG HOẠT ĐỘNG` thay cho mục lỗi cũ. Nội dung người dùng tự đặt trong
-`{{...}}` được xem là chỉ dẫn bền: có hiệu lực ngay, tiếp tục qua các phản hồi và route sau, và được
-kết hợp với góp ý rõ ràng của người dùng về kết quả trước. Yêu cầu mới nhất, cụ thể nhất chỉ ghi đè
-phần xung đột; các sở thích khác không tự mất khi không được nhắc lại. Biến mẫu `{{user}}`, lore, ví
-dụ và văn bản trích không bị nhận nhầm là chỉ dẫn cá nhân hóa.
+Mỗi nhóm có trần riêng: 6 thay đổi gần, 18 sự thật hoạt động, 10 ngoại lệ kiến thức, 10 cặp xưng hô,
+8 việc chưa xong, 10 quy tắc cá nhân hóa và 6 mốc bền. Kiến thức chỉ ghi ngoại lệ ai biết/không
+biết/nghi ngờ và tham chiếu mã sự thật thay vì lặp lại nội dung. Sự kiện cũ không còn tác động được
+làm nguội rồi xóa hoặc nhập thành một mốc bền; nhân vật phụ vắng mặt không còn việc mở cũng bị loại.
 
-Xưng hô cũng được lưu như trạng thái bền bằng ma trận theo từng chiều `người nói -> người nghe`, gồm
-đại từ tự xưng, từ gọi đối phương, tên/danh hiệu/biệt danh, mức lịch sự–thân mật–thô tục, nhịp nói
-và nguồn xác lập. Vì vậy A gọi B không ép B gọi A giống vậy, và quan hệ với từng người trong nhóm
-không bị lây. Chuyển route, đổi cảm xúc, tăng thân mật/tình dục, quá tải hoặc lời tục nhất thời
-không tự đổi cách xưng hô; thay đổi chỉ được lưu khi có yêu cầu/sửa đổi trực tiếp, lựa chọn có căn
-cứ của nhân vật hoặc biến chuyển quan hệ/vai vế đã thật sự xảy ra. Mỗi lần đổi ghi rõ dạng cũ, dạng
-mới và nguyên nhân.
+`CÁ NHÂN HÓA ĐANG HOẠT ĐỘNG` lưu các quy tắc hiện hành đã chuẩn hóa thay cho mục lỗi cũ hoặc nhiều
+bản sao “chỉ dẫn / góp ý / ghi đè”. Nội dung người dùng tự đặt trong `{{...}}` có hiệu lực ngay và
+qua các phản hồi/route sau; góp ý mới nhất, cụ thể nhất chỉ ghi đè phần xung đột. Biến `{{user}}`,
+lore, ví dụ và văn bản trích không bị nhận nhầm là cá nhân hóa.
 
-Để tạo route kế tiếp, đưa cho bộ lệnh chuyển route: gói `<ROLEPLAY_CHANGE_ROUTE>` gần nhất nếu có,
-phần hội thoại phát sinh trong route hiện tại, lượt cuối đang chờ và các nguồn nhân vật/thế giới cần
-thiết. Trong cuộc trò chuyện mới, đặt gói được sinh vào lớp bộ nhớ sau thẻ nhân vật và tri thức thế
-giới nhưng trước lượt hội thoại cần trả lời. Không cần gắn lại toàn bộ log của các route cũ đã được
-nén trong gói.
+`XƯNG HÔ ĐANG HOẠT ĐỘNG` chỉ lưu dạng hiện tại theo từng chiều `người nói -> người nghe`, gồm đại từ
+tự xưng, từ gọi đối phương, tên/danh hiệu/biệt danh, mức và nhịp. A gọi B không ép B gọi A hoặc A
+gọi C giống vậy. Chuyển route, đổi cảm xúc, tăng thân mật/tình dục, quá tải hoặc lời tục nhất thời
+không tự đổi cách xưng hô; chỉ ảnh hưởng trực tiếp đã xảy ra mới cập nhật đúng bản ghi `A`.
+
+Để tạo route kế tiếp, đưa cho bộ chuyển snapshot `<ROLEPLAY_CHANGE_ROUTE>` gần nhất nếu có, các lượt
+đã hoàn tất sau snapshot đó và nguồn nhân vật/thế giới cần thiết. Trong cuộc trò chuyện mới, đặt
+snapshot được sinh vào lớp bộ nhớ sau thẻ nhân vật và tri thức thế giới nhưng trước lượt hội thoại
+cần trả lời. Không gắn lại log hoặc các route cũ đã được snapshot thay thế.
 
 Gói sinh ra kết thúc bằng `<USER_NEXT_PROMPT>`. Trước khi gửi gói cho model nhận, thay dòng giữ chỗ
 bằng prompt kế tiếp thật của người dùng. Nếu trường này thiếu, trống hoặc vẫn còn placeholder và

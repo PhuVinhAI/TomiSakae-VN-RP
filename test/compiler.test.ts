@@ -322,7 +322,7 @@ describe("prompt compiler", () => {
       "utf8",
     );
 
-    expect(response.startsWith("<RESPONSE_INSTRUCTION>\n")).toBe(true);
+    expect(response).toMatch(/^<RESPONSE_INSTRUCTION>\r?\n/);
     expect(response).toContain("[Kỹ thuật tự sự]");
     expect(response).toContain("[Biểu đạt nhân vật]");
     expect(response).toContain("[Hành động và thân mật]");
@@ -339,11 +339,17 @@ describe("prompt compiler", () => {
     expect(response).toContain("Khóa đầu ra tiếng Việt tuyệt đối");
     expect(response).toContain("Cá nhân hóa bền và ghi đè có phạm vi");
     expect(response).toContain("Không bỏ qua, làm trái, tự cho hết hạn hoặc chỉ áp dụng một lượt");
-    expect(response).toContain("Nạp và giữ ma trận xưng hô theo từng chiều");
+    expect(response).toContain("Nạp và giữ `XƯNG HÔ ĐANG HOẠT ĐỘNG` theo từng chiều");
     expect(response).toContain("không tự cho phép đổi cách nói/gọi");
     expect(
       createHash("sha256")
-        .update(response.slice(0, response.indexOf("<FINAL_EXECUTION_OVERRIDE>")).trim(), "utf8")
+        .update(
+          response
+            .slice(0, response.indexOf("<FINAL_EXECUTION_OVERRIDE>"))
+            .replaceAll("\r\n", "\n")
+            .trim(),
+          "utf8",
+        )
         .digest("hex"),
     ).toBe("cd541e0b8498d923ab67e77d0e6b6e38ff129a90818f49a4461104aece72957d");
     expect(response.indexOf("<FINAL_EXECUTION_OVERRIDE>")).toBeGreaterThan(
@@ -354,33 +360,41 @@ describe("prompt compiler", () => {
     );
   });
 
-  it("keeps change-route output compact and progressively compressed", async () => {
+  it("keeps change-route snapshots bounded and updateable", async () => {
     const route = await readFile(
       path.resolve("standalone", "ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md"),
       "utf8",
     );
 
-    expect(route.length).toBeLessThan(5_000);
-    expect(route).toContain("ROUTE_001 -> ROUTE_002 -> ROUTE_003");
-    expect(route).toContain("Route càng cũ càng nén thành ý chính");
-    expect(route).toContain("Độ dài gói không quyết định độ dài phản hồi");
-    expect(route).toContain("## CẦU NỐI HIỆN TẠI");
-    expect(route).toContain("## KÝ ỨC VÀ KIẾN THỨC");
-    expect(route).toContain("## XƯNG HÔ VÀ GIỌNG THEO CẶP");
-    expect(route).toContain("[Người nói] -> [người nghe]");
+    expect(route.length).toBeLessThan(7_500);
+    expect(route).toContain("không vượt quá 9.500 ký tự");
+    expect(route).toContain("Cùng một sự thật phải giữ cùng mã");
+    expect(route).toContain("xóa bản ghi");
+    expect(route).toContain("Thay hoàn toàn `TRẠNG THÁI HIỆN TẠI`");
+    expect(route).toContain("## META");
+    expect(route).toContain("## TRẠNG THÁI HIỆN TẠI");
+    expect(route).toContain("## THAY ĐỔI GẦN NHẤT");
+    expect(route).toContain("## SỰ THẬT HOẠT ĐỘNG");
+    expect(route).toContain("## RANH GIỚI KIẾN THỨC");
+    expect(route).toContain("## XƯNG HÔ ĐANG HOẠT ĐỘNG");
     expect(route).toContain("A gọi B không quyết định B gọi A");
-    expect(route).toContain("Chuyển route, cảm xúc, thân mật/tình dục");
-    expect(route).toContain("cũ -> mới");
     expect(route).toContain("chưa xác lập");
     expect(route).toContain("## VIỆC CHƯA XONG");
     expect(route).toContain("## CÁ NHÂN HÓA ĐANG HOẠT ĐỘNG");
-    expect(route).toContain("Chỉ dẫn bền từ `{{...}}`");
-    expect(route).toContain("Phản hồi người dùng đã cập nhật hồ sơ");
-    expect(route).toContain("Ghi đè còn hiệu lực");
+    expect(route).toContain("## MỐC BỀN");
+    expect(route).toContain("`E`: thay đổi gần nhất, tối đa 6 bản ghi");
+    expect(route).toContain("`F`: sự thật hoạt động, tối đa 18 bản ghi");
+    expect(route).toContain("`K`: ngoại lệ kiến thức, tối đa 10 bản ghi");
+    expect(route).toContain("`A`: cặp xưng hô đang hoạt động, tối đa 10 bản ghi");
+    expect(route).toContain("`O`: việc chưa xong, tối đa 8 bản ghi");
+    expect(route).toContain("`P`: cá nhân hóa đang hoạt động, tối đa 10 quy tắc");
+    expect(route).toContain("`M`: mốc bền, tối đa 6 hệ quả một dòng");
     expect(route).toContain("<USER_NEXT_PROMPT>");
     expect(route).toContain("[Nhập prompt kế tiếp của bạn tại đây");
-    expect(route).toContain("không có lượt hành động hiện tại trong gói");
     expect(route).not.toContain("<ROLEPLAY_HANDOFF>");
+    expect(route).not.toContain("ROUTE_001 -> ROUTE_002 -> ROUTE_003");
+    expect(route).not.toContain("## KÝ ỨC VÀ KIẾN THỨC");
+    expect(route).not.toContain("## XƯNG HÔ VÀ GIỌNG THEO CẶP");
     expect(route).not.toContain("Tầng 4");
     expect(route).not.toContain("## LỖI KHÔNG KẾ THỪA");
   });
