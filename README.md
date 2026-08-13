@@ -135,21 +135,33 @@ và [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-en
 
 ## Chuyển route và ký ức dài hạn
 
-`standalone/ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md` tạo Route V2 dưới dạng snapshot có kích thước cố
-định, tối đa khoảng 9.500 ký tự. Route vẫn là một đoạn liên tục của cùng dòng nhập vai, không phải
-nhánh hoặc thế giới mới; có thể chuyển khi chuỗi hành động đã hoàn thành hoặc còn đang dở nhưng cần
-sang cửa sổ hội thoại mới.
+`standalone/ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md` tạo Route V2.1 dưới dạng snapshot có độ sâu
+thích ứng. Route vẫn là một đoạn liên tục của cùng dòng nhập vai, không phải nhánh hoặc thế giới
+mới; có thể chuyển khi chuỗi hành động đã hoàn thành hoặc còn đang dở nhưng cần sang cửa sổ hội
+thoại mới.
 
 Mỗi lần tạo route, bộ chuyển đọc snapshot cũ thành bản ghi, áp dụng các lượt mới rồi render lại toàn
 bộ snapshot. `TRẠNG THÁI HIỆN TẠI` luôn bị thay hoàn toàn. Các nhóm còn lại dùng mã ổn định `E`,
-`F`, `K`, `A`, `O`, `P`, `M`: cùng một sự thật cập nhật đúng mã cũ, dữ kiện sai/hết hiệu lực và việc
-đã giải quyết bị xóa, còn mã mới chỉ dành cho dữ kiện thật sự mới. Snapshot chỉ giữ sequence hiện
-tại và cha trực tiếp, không tích lũy danh sách mọi route đã hoàn thành.
+`F`, `R`, `K`, `A`, `O`, `P`, `M`: cùng một sự thật cập nhật đúng mã cũ, dữ kiện sai/hết hiệu lực và
+việc đã giải quyết không còn hệ quả bị xóa, còn mã mới chỉ dành cho dữ kiện thật sự mới. Snapshot
+chỉ giữ sequence hiện tại và cha trực tiếp, không tích lũy danh sách mọi route đã hoàn thành.
 
-Mỗi nhóm có trần riêng: 6 thay đổi gần, 18 sự thật hoạt động, 10 ngoại lệ kiến thức, 10 cặp xưng hô,
-8 việc chưa xong, 10 quy tắc cá nhân hóa và 6 mốc bền. Kiến thức chỉ ghi ngoại lệ ai biết/không
-biết/nghi ngờ và tham chiếu mã sự thật thay vì lặp lại nội dung. Sự kiện cũ không còn tác động được
-làm nguội rồi xóa hoặc nhập thành một mốc bền; nhân vật phụ vắng mặt không còn việc mở cũng bị loại.
+Thay vì trần cứng 9.500 ký tự, bộ chuyển chọn ngân sách nhỏ nhất vẫn bảo toàn context: `GỌN` khoảng
+12.000 ký tự, `SÂU` khoảng 18.000 và `MỞ RỘNG` khoảng 24.000. Các mốc này là mục tiêu mềm theo độ
+phức tạp, không phải dung lượng phải dùng hết. Nếu toàn bộ thao tác nén hợp lệ vẫn không đủ,
+`BẢO TOÀN` được vượt 24.000 nhưng phần vượt chỉ chứa dữ kiện thật sự được bảo vệ. Vì vậy route có
+thể lớn theo độ phức tạp chưa giải quyết, không lớn chỉ vì số route đã đi qua.
+
+Số bản ghi của từng nhóm cũng là mục tiêu mật độ thay vì trần xóa tuyệt đối.
+`QUAN HỆ VÀ ĐỘNG CƠ BỀN` giữ nền tâm lý ổn định và nguyên nhân khiến nhân vật thường chọn hoặc tránh
+một hành vi; một phản ứng nhất thời không tự đổi tính cách. `VIỆC CHƯA XONG` và `MỐC BỀN` giữ chuỗi
+tối thiểu `nguyên nhân -> điều đã xảy ra -> hệ quả -> điều còn chờ`, tránh chỉ còn kết luận ngắn
+nhưng mất lý do. Kiến thức vẫn chỉ ghi ngoại lệ ai biết/không biết/nghi ngờ và tham chiếu mã thay vì
+lặp nội dung.
+
+Dữ kiện không bị xóa chỉ vì đã cũ, nhân vật tạm vắng hoặc chưa được nhắc lại vài route. Nó chỉ được
+làm nguội khi AI vẫn hiểu đúng nếu thiếu chi tiết đó; nhân vật phụ chỉ bị loại khi không còn quan
+hệ, bí mật, món nợ, lời hứa, vật, việc mở, kiến thức hoặc khả năng quay lại đã được thiết lập.
 
 `CÁ NHÂN HÓA ĐANG HOẠT ĐỘNG` lưu các quy tắc hiện hành đã chuẩn hóa thay cho mục lỗi cũ hoặc nhiều
 bản sao “chỉ dẫn / góp ý / ghi đè”. Nội dung người dùng tự đặt trong `{{...}}` có hiệu lực ngay và

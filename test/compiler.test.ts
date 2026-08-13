@@ -213,6 +213,8 @@ describe("prompt compiler", () => {
     expect(compiled).toContain("<USER_NEXT_PROMPT>");
     expect(compiled).toContain("Đang chờ prompt kế tiếp của bạn.");
     expect(compiled).toContain("Độ dài gói có trọng số bằng không đối với độ dài phản hồi");
+    expect(compiled).toContain("quan hệ–động cơ bền");
+    expect(compiled).toContain("không chỉ đọc kết luận gần nhất");
     expect(compiled).toContain("Chỉ dẫn cá nhân hóa bền của người dùng");
     expect(compiled).toContain("nội dung họ chủ động đặt giữa `{{` và `}}`");
     expect(compiled).toContain("CÁ NHÂN HÓA ĐANG HOẠT ĐỘNG");
@@ -340,6 +342,8 @@ describe("prompt compiler", () => {
     expect(response).toContain("Cá nhân hóa bền và ghi đè có phạm vi");
     expect(response).toContain("Không bỏ qua, làm trái, tự cho hết hạn hoặc chỉ áp dụng một lượt");
     expect(response).toContain("Nạp và giữ `XƯNG HÔ ĐANG HOẠT ĐỘNG` theo từng chiều");
+    expect(response).toContain("`QUAN HỆ VÀ ĐỘNG CƠ BỀN`");
+    expect(response).toContain("dùng nguyên nhân–hệ quả được giữ để hiểu hành vi");
     expect(response).toContain("không tự cho phép đổi cách nói/gọi");
     expect(
       createHash("sha256")
@@ -360,21 +364,32 @@ describe("prompt compiler", () => {
     );
   });
 
-  it("keeps change-route snapshots bounded and updateable", async () => {
+  it("keeps change-route snapshots adaptive, deep, and updateable", async () => {
     const route = await readFile(
       path.resolve("standalone", "ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md"),
       "utf8",
     );
 
-    expect(route.length).toBeLessThan(7_500);
-    expect(route).toContain("không vượt quá 9.500 ký tự");
+    expect(route.length).toBeLessThan(11_500);
+    expect(route).toContain("Bảo toàn đủ trạng thái truyện");
+    expect(route).toContain("ba mức mục tiêu và một chế độ bảo toàn ngoại lệ");
+    expect(route).toContain("`GỌN`: mục tiêu tối đa 12.000 ký tự");
+    expect(route).toContain("`SÂU`: mục tiêu tối đa 18.000 ký tự");
+    expect(route).toContain("`MỞ RỘNG`: mục tiêu tối đa 24.000 ký tự");
+    expect(route).toContain("`BẢO TOÀN`: được vượt 24.000");
+    expect(route).toContain("không được lớn lên chỉ vì số route");
     expect(route).toContain("Cùng một sự thật phải giữ cùng mã");
-    expect(route).toContain("xóa bản ghi");
+    expect(route).toContain("xóa bản ghi không được bảo vệ trước");
     expect(route).toContain("Thay hoàn toàn `TRẠNG THÁI HIỆN TẠI`");
+    expect(route).toContain("## DỮ KIỆN ĐƯỢC BẢO VỆ");
+    expect(route).toContain("Không xóa hoặc làm phẳng");
+    expect(route).toContain("không tự hết hạn vì cũ");
+    expect(route).toContain("nguyên nhân -> điều đã xảy ra -> hệ quả hiện tại -> điều còn chờ");
     expect(route).toContain("## META");
     expect(route).toContain("## TRẠNG THÁI HIỆN TẠI");
     expect(route).toContain("## THAY ĐỔI GẦN NHẤT");
     expect(route).toContain("## SỰ THẬT HOẠT ĐỘNG");
+    expect(route).toContain("## QUAN HỆ VÀ ĐỘNG CƠ BỀN");
     expect(route).toContain("## RANH GIỚI KIẾN THỨC");
     expect(route).toContain("## XƯNG HÔ ĐANG HOẠT ĐỘNG");
     expect(route).toContain("A gọi B không quyết định B gọi A");
@@ -382,19 +397,26 @@ describe("prompt compiler", () => {
     expect(route).toContain("## VIỆC CHƯA XONG");
     expect(route).toContain("## CÁ NHÂN HÓA ĐANG HOẠT ĐỘNG");
     expect(route).toContain("## MỐC BỀN");
-    expect(route).toContain("`E`: thay đổi gần nhất, tối đa 6 bản ghi");
-    expect(route).toContain("`F`: sự thật hoạt động, tối đa 18 bản ghi");
-    expect(route).toContain("`K`: ngoại lệ kiến thức, tối đa 10 bản ghi");
-    expect(route).toContain("`A`: cặp xưng hô đang hoạt động, tối đa 10 bản ghi");
-    expect(route).toContain("`O`: việc chưa xong, tối đa 8 bản ghi");
-    expect(route).toContain("`P`: cá nhân hóa đang hoạt động, tối đa 10 quy tắc");
-    expect(route).toContain("`M`: mốc bền, tối đa 6 hệ quả một dòng");
+    expect(route).toContain("không phải trần xóa");
+    expect(route).toContain("`E`: khoảng 8 thay đổi gần nhất");
+    expect(route).toContain("`F`: khoảng 30 sự thật hoạt động");
+    expect(route).toContain("`R`: khoảng 16 trạng thái quan hệ–động cơ bền");
+    expect(route).toContain("`K`: khoảng 18 ngoại lệ kiến thức");
+    expect(route).toContain("`A`: khoảng 16 cặp xưng hô");
+    expect(route).toContain("`O`: khoảng 14 việc chưa xong");
+    expect(route).toContain("`P`: khoảng 12 quy tắc cá nhân hóa");
+    expect(route).toContain("`M`: khoảng 12 mốc bền");
+    expect(route).toContain("## KIỂM TRA PHỦ TRƯỚC KHI XUẤT");
+    expect(route).toContain("- version: 2.1");
+    expect(route).toContain("- độ_sâu: [GỌN / SÂU / MỞ RỘNG / BẢO TOÀN]");
     expect(route).toContain("<USER_NEXT_PROMPT>");
     expect(route).toContain("[Nhập prompt kế tiếp của bạn tại đây");
     expect(route).not.toContain("<ROLEPLAY_HANDOFF>");
     expect(route).not.toContain("ROUTE_001 -> ROUTE_002 -> ROUTE_003");
     expect(route).not.toContain("## KÝ ỨC VÀ KIẾN THỨC");
     expect(route).not.toContain("## XƯNG HÔ VÀ GIỌNG THEO CẶP");
+    expect(route).not.toContain("không vượt quá 9.500 ký tự");
+    expect(route).not.toContain("tối đa 6 bản ghi");
     expect(route).not.toContain("Tầng 4");
     expect(route).not.toContain("## LỖI KHÔNG KẾ THỪA");
   });

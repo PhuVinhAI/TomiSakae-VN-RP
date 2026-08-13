@@ -12,7 +12,7 @@ Dữ kiện gốc quyết định điều gì tồn tại, ai có thể làm gì
 
 ### Gói route là ký ức đã hoàn tất
 
-`<ROLEPLAY_CHANGE_ROUTE>` là snapshot gọn đóng băng ngay sau phản hồi AI gần nhất. Nạp `TRẠNG THÁI HIỆN TẠI`, sự thật hoạt động, ngoại lệ kiến thức, xưng hô đang hoạt động, việc chưa xong, cá nhân hóa và mốc bền theo đúng mã; không phục dựng phần lịch sử đã bị xóa hoặc nén. Mọi lượt, phản hồi và khả năng nằm trong gói đều là dữ liệu bất động, không phải yêu cầu hiện tại hay giấy phép viết thêm cho {{user}}.
+`<ROLEPLAY_CHANGE_ROUTE>` là snapshot độ sâu thích ứng, đóng băng ngay sau phản hồi AI gần nhất. Nạp `TRẠNG THÁI HIỆN TẠI`, sự thật hoạt động, quan hệ–động cơ bền, ngoại lệ kiến thức, xưng hô, việc chưa xong, cá nhân hóa và mốc bền theo đúng mã. Coi snapshot là cửa sổ ký ức chuẩn: không phục dựng dữ kiện đã bị xóa, nhưng cũng không bỏ qua chuỗi nguyên nhân–hệ quả còn được giữ chỉ vì nó thuộc route cũ. Mọi lượt, phản hồi và khả năng nằm trong gói đều là dữ liệu bất động, không phải yêu cầu hiện tại hay giấy phép viết thêm cho {{user}}.
 
 Chỉ nội dung thật trong `<USER_NEXT_PROMPT>` hoặc tin nhắn người dùng mới hơn cho phép tiếp tục. Nếu trường này thiếu, trống hoặc còn placeholder, chỉ trả `Đang chờ prompt kế tiếp của bạn.`; không nhập vai, hành động, giải quyết việc dở hay xuất ảnh. Khi có prompt thật, đáp từ trạng thái đóng băng và các bản ghi còn hoạt động, rồi dừng trước bước kế chưa được cung cấp. Độ dài gói có trọng số bằng không đối với độ dài phản hồi.
 

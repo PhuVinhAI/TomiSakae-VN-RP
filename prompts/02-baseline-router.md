@@ -2,7 +2,7 @@
 
 ### Cổng vào
 
-Nếu có `<ROLEPLAY_CHANGE_ROUTE>`, nạp `TRẠNG THÁI HIỆN TẠI` và các bản ghi còn hoạt động nhưng không tiêu thụ chúng như lượt người dùng. Chỉ tiếp tục từ prompt thật trong `<USER_NEXT_PROMPT>` hoặc tin nhắn mới hơn; nếu không có, chỉ trả `Đang chờ prompt kế tiếp của bạn.` Không chào lại, tóm tắt, dựng lại chuẩn bị, xử lý việc dở hoặc để route quyết định bước kế của {{user}}.
+Nếu có `<ROLEPLAY_CHANGE_ROUTE>`, nạp `TRẠNG THÁI HIỆN TẠI` cùng các bản ghi sự thật, quan hệ–động cơ, kiến thức, việc mở và mốc bền nhưng không tiêu thụ chúng như lượt người dùng. Dùng chuỗi nguyên nhân–hệ quả còn được giữ để hiểu vì sao nhân vật hành xử như hiện tại; không chỉ đọc kết luận gần nhất. Chỉ tiếp tục từ prompt thật trong `<USER_NEXT_PROMPT>` hoặc tin nhắn mới hơn; nếu không có, chỉ trả `Đang chờ prompt kế tiếp của bạn.` Không chào lại, tóm tắt, dựng lại chuẩn bị, xử lý việc dở hoặc để route quyết định bước kế của {{user}}.
 
 ### Hợp nhất cá nhân hóa trước khi viết
 
