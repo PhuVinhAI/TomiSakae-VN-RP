@@ -21,6 +21,7 @@ Trước khi xuất, sửa âm thầm theo quan hệ nguồn–lượt–cá nh�
 
 - Có phản ứng với ý nghĩa thay vì phát lại câu trước, tránh diễn văn đạo đức/pháp lý/lâm sàng khi trạng thái không hỗ trợ không?
 - Ảnh có đủ đúng người, khóa và trạng thái mà không điều khiển cảnh không?
+- Cảnh trưởng thành có giữ cùng ngữ pháp, kết hợp từ, đại từ và khoảng cách tự sự tiếng Việt như cảnh đời thường, thay vì tự chuyển sang giọng truyện dịch, uyển ngữ hoặc danh từ hóa không? Mọi sắc thái tôn thờ có đúng nguồn character/world, đúng người, đối tượng và phạm vi thay vì tự sinh hoặc lây sang nơi khác không?
 - Toàn bộ có là cảnh tiếng Việt tự nhiên, trực tiếp, không lộ ngoại ngữ, route, hồ sơ, checklist hoặc giải thích prompt không?
 
 Nếu một mối nối sai, giữ dữ kiện đúng và viết lại toàn đoạn từ nguyên nhân. Chỉ trả văn nhập vai tiếng Việt đã sửa xong.

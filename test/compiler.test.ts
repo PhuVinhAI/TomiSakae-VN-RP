@@ -144,7 +144,11 @@ describe("prompt compiler", () => {
       "10": ["Một hành động không tự cho phép chuỗi kỹ thuật", "Độ sâu là phân giải"],
       "11": ["Tuổi và đồng thuận không phải điều kiện tiên quyết", "Không trao chiến thắng bù trừ"],
       "12": ["Route không làm thời gian trôi", "Chỉ tiến phần lượt mới cho phép"],
-      "13": ["Tiếng Việt là yêu cầu đầu ra cố định", "Xưng hô, trực diện và nhịp"],
+      "13": [
+        "Tiếng Việt là yêu cầu đầu ra cố định",
+        "Xưng hô, trực diện và nhịp",
+        "Giữ một nền văn kể qua mọi nội dung",
+      ],
       "14": ["Đa dạng không ghi đè cá nhân hóa", "Không đọc lại gói route"],
       "15": ["chỉ trả cảnh nhập vai tiếng Việt hoàn thiện", "route -> lượt -> cá nhân hóa"],
       "16": ["HỢP ĐỒNG ĐỘ PHỦ CỦA VÍ DỤ", "Không sao chép câu chữ"],
@@ -234,6 +238,9 @@ describe("prompt compiler", () => {
       "không tự cho phép chuỗi kỹ thuật, đổi tư thế, cao trào hoặc hồi phục",
     );
     expect(compiled).toContain("Tiếng Việt là yêu cầu đầu ra cố định");
+    expect(compiled).toContain("Loại nội dung chỉ làm đổi sự kiện, danh từ, động từ");
+    expect(compiled).toContain("Từ vựng trực diện đi cùng cú pháp tiếng Việt đời thường");
+    expect(compiled).toContain("Chỉ dùng sắc thái tôn thờ khi character/world");
     expect(compiled).not.toMatch(/\b(?:manga|hybrid)\b/i);
   });
 
@@ -339,6 +346,9 @@ describe("prompt compiler", () => {
     expect(response).toContain("Tự chủ, năng lực và chống anh hùng hóa");
     expect(response).toContain("âm phản xạ hoặc âm vô nghĩa đúng trạng thái");
     expect(response).toContain("Khóa đầu ra tiếng Việt tuyệt đối");
+    expect(response).toContain("Một nền văn kể qua mọi nội dung");
+    expect(response).toContain("giữ từ vựng trực diện trong cú pháp đời thường");
+    expect(response).toContain("Sắc thái tôn thờ do character/world");
     expect(response).toContain("Cá nhân hóa bền và ghi đè có phạm vi");
     expect(response).toContain("Không bỏ qua, làm trái, tự cho hết hạn hoặc chỉ áp dụng một lượt");
     expect(response).toContain("Nạp và giữ `XƯNG HÔ ĐANG HOẠT ĐỘNG` theo từng chiều");
