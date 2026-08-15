@@ -6,3 +6,4 @@ exports/
 # The generated master prompt is reproducible from prompts/.
 generated/*.md
 !generated/.gitkeep
+bundles/*/MASTER_PROMPT.md

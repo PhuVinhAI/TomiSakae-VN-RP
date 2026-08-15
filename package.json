@@ -1,7 +1,7 @@
 {
   "name": "asmr-prompt-compiler",
   "version": "1.0.0",
-  "description": "Deterministic compiler for modular ASMR-first prompt files.",
+  "description": "Deterministic compiler for profiled Vietnamese roleplay prompts.",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.9.0",
@@ -12,9 +12,12 @@
     "prompt-compiler": "dist/cli.js"
   },
   "scripts": {
-    "dev": "tsx src/cli.ts",
-    "compile:prompts": "tsx src/cli.ts",
-    "check:prompts": "tsx src/cli.ts --check",
+    "dev": "tsx src/cli.ts --profile nsfw",
+    "compile:prompts": "tsx src/cli.ts --all-profiles",
+    "compile:prompts:nsfw": "tsx src/cli.ts --profile nsfw",
+    "compile:prompts:sfw": "tsx src/cli.ts --profile sfw",
+    "compile:prompts:lite": "tsx src/cli.ts --profile nsfw-lite",
+    "check:prompts": "tsx src/cli.ts --all-profiles --check",
     "build": "tsup",
     "check": "tsc --noEmit && eslint .",
     "test": "vitest run",
@@ -22,7 +25,7 @@
     "zip:handoff": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/export-project.ps1",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "ci": "pnpm format:check && pnpm check && pnpm test && pnpm build && pnpm check:prompts"
+    "ci": "pnpm format:check && pnpm check && pnpm test && pnpm build && pnpm compile:prompts && pnpm check:prompts"
   },
   "dependencies": {
     "commander": "^14.0.2",

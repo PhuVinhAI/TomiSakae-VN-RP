@@ -327,7 +327,7 @@ describe("prompt compiler", () => {
 
   it("preserves every default RisuAI response instruction in Vietnamese and appends the final override", async () => {
     const response = await readFile(
-      path.resolve("standalone", "RISUAI_RESPONSE_INSTRUCTION_REPLACEMENT.md"),
+      path.resolve("bundles", "nsfw", "RESPONSE_INSTRUCTION.md"),
       "utf8",
     );
 
@@ -376,7 +376,7 @@ describe("prompt compiler", () => {
 
   it("keeps change-route snapshots adaptive, deep, and updateable", async () => {
     const route = await readFile(
-      path.resolve("standalone", "ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md"),
+      path.resolve("bundles", "nsfw", "ROLEPLAY_CHANGE_ROUTE.md"),
       "utf8",
     );
 

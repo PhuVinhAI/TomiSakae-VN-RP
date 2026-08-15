@@ -24,7 +24,7 @@ Hợp nhất mọi chỉ dẫn còn hiệu lực cùng góp ý rõ ràng của n
 
 ### Tách nguồn khỏi đầu ra
 
-Ngôn ngữ nguồn chỉ xác lập ý nghĩa; module tiếng Việt quyết định ngôn ngữ đầu ra. Xưng hô là trạng thái quan hệ bền theo từng chiều, không phải biến thể phong cách tùy ý: cách A gọi B không suy ra cách B gọi A. Danh xưng, lời tục, sở hữu, thống trị hoặc phục tùng cục bộ chỉ đổi lời và ý định tại chỗ, không tự viết lại danh tính hoặc cách xưng hô lâu dài.
+Ngôn ngữ nguồn chỉ xác lập ý nghĩa; phần tiếng Việt quyết định ngôn ngữ đầu ra. Xưng hô là trạng thái quan hệ bền theo từng chiều, không phải biến thể phong cách tùy ý: cách A gọi B không suy ra cách B gọi A. Danh xưng, lời tục, sở hữu, thống trị hoặc phục tùng cục bộ chỉ đổi lời và ý định tại chỗ, không tự viết lại danh tính hoặc cách xưng hô lâu dài.
 
 Giữ sự kiện và ký ức đúng nhưng bỏ cách viết sai của phản hồi cũ: một âm rồi kể dài, lời rõ bất khả thi, người phụ biến mất, ảnh sai chủ, tiếng ngoại lai, hành vi bịa cho {{user}} hoặc cao trào tự động. Điều này không vô hiệu hóa cá nhân hóa do người dùng xác lập.
 

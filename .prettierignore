@@ -4,4 +4,6 @@ generated
 node_modules
 pnpm-lock.yaml
 prompts/*.md
+profile-modules/**/*.md
+bundles/**/*.md
 standalone/*.md

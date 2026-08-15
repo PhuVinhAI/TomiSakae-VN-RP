@@ -1,9 +1,25 @@
-# Trình biên dịch bộ lệnh ASMR tiếng Việt
+# Trình biên dịch prompt nhập vai tiếng Việt
 
-Dự án Node.js + TypeScript để quản lý bộ lệnh theo từng mô-đun và ghép chúng thành một tệp duy nhất
-theo thứ tự tên. Bộ lệnh chỉ tạo phản hồi nhập vai bằng tiếng Việt, giữ đời thường linh hoạt, tập
-trung sâu vào ASMR khi cảnh thân mật thật sự hoạt động và dùng ảnh RisuAI đúng nhân vật/trạng thái
-khi có danh sách tài nguyên hợp lệ.
+Dự án Node.js + TypeScript để quản lý prompt theo mô-đun và biên dịch ba profile dùng chung một
+pipeline. Mỗi profile chỉ chọn những module cần thiết, nên phần trạng thái, cá nhân hóa, ảnh và
+tiếng Việt có một nguồn duy nhất thay vì ba bản prompt sao chép rồi lệch nhau.
+
+| Profile     | Mục đích                                                                 | Thư mục sử dụng      |
+| ----------- | ------------------------------------------------------------------------ | -------------------- |
+| `nsfw`      | Bản đầy đủ hiện tại, gồm toàn bộ ASMR, cơ học, cảnh nhóm và 109 ví dụ    | `bundles/nsfw/`      |
+| `sfw`       | Tập trung cốt truyện, thế giới và nhân vật; bỏ module chuyên sâu NSFW    | `bundles/sfw/`       |
+| `nsfw-lite` | Bản NSFW 1-on-1 cho model nhỏ, giữ lõi cần thiết và không nạp ví dụ/nhóm | `bundles/nsfw-lite/` |
+
+`sfw` không phải bộ lọc nội dung. Nó không chủ động mang cơ chế NSFW vào mọi cảnh, nhưng nếu
+character, world và diễn biến hiện tại đi theo hướng đó thì model vẫn tiếp tục theo nguồn, không từ
+chối hoặc bẻ hướng. Sắc thái tôn thờ, phục tùng, tàn nhẫn hay dịu dàng cũng do character/world và
+quan hệ quyết định trong cả ba profile.
+
+Cả ba bundle chứa cùng ba tên file: `MASTER_PROMPT.md`, `RESPONSE_INSTRUCTION.md` và
+`ROLEPLAY_CHANGE_ROUTE.md`. Cả ba master dùng nguyên văn cùng `prompts/00-risuai-system-prefix.md`.
+Ba response instruction giữ nguyên toàn bộ phần mặc định từ bản NSFW; chỉ nội dung nằm trong
+`<FINAL_EXECUTION_OVERRIDE>` được chuyên biệt cho SFW và NSFW Lite. Test sẽ thất bại nếu bất kỳ phần
+nào bên ngoài khối này lệch khỏi bản NSFW.
 
 Hệ thống không còn coi dữ kiện gốc, route, quyền lượt, giọng nhân vật, tự chủ, ASMR, cơ học, cảnh
 nhóm, tiếng Việt và ảnh là các checklist rời. Mỗi module vẫn có trọng tâm riêng nhưng các câu lệnh
@@ -22,18 +38,24 @@ pnpm install
 pnpm compile:prompts
 ```
 
-Tệp tổng hợp được tạo tại `generated/MASTER_PROMPT.md`. Nội dung tệp bắt đầu ngay từ mô-đun đầu
-tiên, không chèn metadata, danh sách nguồn hay lời mở đầu, nên có thể sao chép trực tiếp.
+Lệnh trên sinh `MASTER_PROMPT.md` vào cả ba thư mục bundle. `generated/MASTER_PROMPT.md` vẫn là
+alias giống hệt `bundles/nsfw/MASTER_PROMPT.md` để giữ tương thích với cách dùng cũ. Nội dung mỗi
+master bắt đầu ngay từ mô-đun đầu tiên, không chèn metadata, danh sách nguồn hay lời mở đầu, nên có
+thể sao chép trực tiếp.
 
-Thêm bộ lệnh mới bằng cách tạo tệp `.md` hoặc `.txt` trong `prompts/`. Tên tệp quyết định thứ tự
-ghép; ví dụ `05-dialogue.md` được ghép trước `10-quality.md`. Không cần sửa cấu hình.
+Thêm hoặc đổi module trong `prompts/` hay `profile-modules/`, sau đó khai báo thứ tự sử dụng trong
+manifest tương ứng tại `profiles/`. Bản `nsfw` tiếp tục trỏ tới nguyên bộ `prompts/` cũ để đầu ra
+đầy đủ không đổi.
 
 ## Lệnh
 
 ```bash
-pnpm dev --list                 # Xem thứ tự mô-đun
-pnpm compile:prompts            # Sinh lại bộ lệnh chính
-pnpm check:prompts              # Kiểm tra tệp tổng hợp có mới hay không
+pnpm dev --list                 # Xem thứ tự module của NSFW đầy đủ
+pnpm compile:prompts            # Sinh cả ba profile
+pnpm compile:prompts:nsfw       # Chỉ sinh NSFW đầy đủ + alias cũ
+pnpm compile:prompts:sfw        # Chỉ sinh SFW cốt truyện
+pnpm compile:prompts:lite       # Chỉ sinh NSFW Lite
+pnpm check:prompts              # Kiểm tra mọi master có mới hay không
 pnpm check                      # TypeScript và ESLint
 pnpm test                       # Vitest
 pnpm build                      # Biên dịch CLI vào dist/
@@ -44,8 +66,9 @@ pnpm ci                         # Chạy toàn bộ kiểm tra
 CLI cũng hỗ trợ đường dẫn tùy chỉnh khi cần:
 
 ```bash
+pnpm dev --profile sfw --stdout
+pnpm dev --profile nsfw-lite --list
 pnpm dev --source prompts --output generated/MASTER_PROMPT.md
-pnpm dev --stdout
 ```
 
 ## Đóng gói để chuyển cho AI khác
@@ -66,18 +89,23 @@ tính từ gốc dự án.
 ## Cấu trúc
 
 ```text
-prompts/                     Các khối bộ lệnh có thể chỉnh sửa riêng
-src/compiler.ts              Khám phá, sắp xếp và ghép mô-đun
+profiles/                    Manifest và thứ tự module của ba profile
+bundles/nsfw/                Ba file dùng trực tiếp cho NSFW đầy đủ
+bundles/sfw/                 Ba file dùng trực tiếp cho SFW cốt truyện
+bundles/nsfw-lite/           Ba file dùng trực tiếp cho NSFW 1-on-1 cô đọng
+profile-modules/shared/      Luật dùng chung cho SFW và phần đóng tiếng Việt
+profile-modules/sfw/         Phần cốt truyện chuyên cho SFW
+profile-modules/nsfw-lite/   Lõi, trạng thái và ảnh 1-on-1 cho model nhỏ
+prompts/                     18 module của NSFW đầy đủ hiện tại
+src/compiler.ts              Compiler thư mục thô tương thích cách dùng cũ
+src/profiles.ts              Nạp manifest và biên dịch profile
 src/cli.ts                   Giao diện dòng lệnh
 scripts/export-project.ps1   Đóng gói tệp Git cần thiết thành ZIP
-test/compiler.test.ts        Kiểm thử tính ổn định của compiler
-generated/MASTER_PROMPT.md   Tệp tổng hợp được sinh tự động
+test/compiler.test.ts        Kiểm thử prompt NSFW đầy đủ và compiler gốc
+test/profiles.test.ts        Kiểm thử ranh giới, kích thước và tương thích ba profile
+generated/MASTER_PROMPT.md   Alias tương thích của bundle NSFW
 prompts/16-vietnamese-contrastive-examples.md
                              109 ví dụ dương tiếng Việt cho solo và harem
-standalone/ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md
-                             Bộ lệnh chuyển route ngắn và nén ký ức gần/bền
-standalone/RISUAI_RESPONSE_INSTRUCTION_REPLACEMENT.md
-                             RESPONSE_INSTRUCTION mặc định đã Việt hóa + phần chốt cuối
 ```
 
 Trình biên dịch không chèn thời gian tạo tệp, nên cùng một bộ mô-đun luôn tạo ra cùng một kết quả và
@@ -110,13 +138,12 @@ SHA-256 thay đổi.
 
 ## Khung dòng và mật độ quy tắc
 
-File 00 là khung hệ thống chung đầy đủ của RisuAI và được giữ nguyên. Mỗi module 01–17 sở hữu một
-miền hành vi; câu nhắc chéo chỉ giữ khi nó làm nhiệm vụ khác ở router, hợp đồng đầu ra hoặc cổng
-kiểm tra. Cấu trúc này tránh diễn giải lại cùng luật trong nhiều module nhưng vẫn giữ đủ route, cá
-nhân hóa, quyền lượt, giọng, cơ học, nhóm, ảnh và tiếng Việt. Mốc 90.000 ký tự là ngân sách mềm:
-compiler chỉ cảnh báo khi vượt, không chặn biên dịch; kiểm thử dự án còn yêu cầu master thực tế nằm
-trong ngân sách. Các tệp trong `prompts/` và `standalone/` được loại khỏi Prettier; TypeScript, cấu
-hình và README vẫn dùng định dạng tự động bình thường.
+Trong profile `nsfw`, file 00 là khung hệ thống chung đầy đủ của RisuAI và được giữ nguyên. Mỗi
+module 01–17 sở hữu một miền hành vi; câu nhắc chéo chỉ giữ khi nó làm nhiệm vụ khác ở router, hợp
+đồng đầu ra hoặc cổng kiểm tra. Profile `sfw` và `nsfw-lite` dùng module riêng ngắn hơn nhưng chia
+sẻ cùng luật trạng thái, cá nhân hóa, ảnh và nền tiếng Việt. Ngân sách mềm lần lượt là 90.000,
+24.000 và 20.000 ký tự; compiler chỉ cảnh báo khi vượt, không cắt nội dung. Các tệp prompt Markdown
+được loại khỏi Prettier; TypeScript, JSON cấu hình và README vẫn dùng định dạng tự động bình thường.
 
 Đợt tái cấu trúc dựa trên hướng dẫn chính thức về việc ưu tiên kết quả, bỏ chỉ dẫn/ví dụ không đổi
 hành vi và chạy lại eval sau từng nhóm:
@@ -125,8 +152,8 @@ và [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-en
 
 ## Phạm vi tiếng Việt
 
-- `generated/MASTER_PROMPT.md`, các mô-đun trong `prompts/`, chỉ dẫn phản hồi và bộ lệnh chuyển
-  route đều bắt buộc nội dung hướng người đọc bằng tiếng Việt.
+- Các master/chỉ dẫn trong `bundles/`, mô-đun trong `prompts/` và `profile-modules/`, cùng bộ lệnh
+  chuyển route đều bắt buộc nội dung hướng người đọc bằng tiếng Việt.
 - Chỉ giữ nguyên biến, thẻ XML, khóa tài nguyên ảnh, mã, đường dẫn và tên riêng cần thiết về kỹ
   thuật.
 - bộ lệnh phiên âm Gemini cũng được hướng dẫn hoàn toàn bằng tiếng Việt. Riêng lời nghe thấy trong
@@ -135,10 +162,14 @@ và [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-en
 
 ## Chuyển route và ký ức dài hạn
 
-`standalone/ROLEPLAY_CHANGE_ROUTE_SYSTEM_PROMPT.md` tạo Route V2.1 dưới dạng snapshot có độ sâu
-thích ứng. Route vẫn là một đoạn liên tục của cùng dòng nhập vai, không phải nhánh hoặc thế giới
-mới; có thể chuyển khi chuỗi hành động đã hoàn thành hoặc còn đang dở nhưng cần sang cửa sổ hội
-thoại mới.
+`bundles/nsfw/ROLEPLAY_CHANGE_ROUTE.md` tạo Route V2.1 dưới dạng snapshot có độ sâu thích ứng. Route
+vẫn là một đoạn liên tục của cùng dòng nhập vai, không phải nhánh hoặc thế giới mới; có thể chuyển
+khi chuỗi hành động đã hoàn thành hoặc còn đang dở nhưng cần sang cửa sổ hội thoại mới.
+
+Hai route chuyên biệt dùng cùng nguyên tắc snapshot bất động và cổng `<USER_NEXT_PROMPT>`. Bản SFW
+ưu tiên tuyến truyện, thế giới, quan hệ và kiến thức, không thêm trường cơ học trưởng thành nhưng
+vẫn bảo toàn sự kiện trưởng thành thật sự còn hệ quả. Bản NSFW Lite chỉ theo dõi {{user}} với một
+nhân vật AI, dùng ngân sách nhỏ hơn và không mang cơ chế điều phối cảnh tập thể.
 
 Mỗi lần tạo route, bộ chuyển đọc snapshot cũ thành bản ghi, áp dụng các lượt mới rồi render lại toàn
 bộ snapshot. `TRẠNG THÁI HIỆN TẠI` luôn bị thay hoàn toàn. Các nhóm còn lại dùng mã ổn định `E`,
@@ -191,15 +222,16 @@ dùng thứ tự sau:
 
 1. System/configuration chung của nền tảng.
 2. `ROLEPLAY_RULE` chung.
-3. Dán toàn bộ `generated/MASTER_PROMPT.md` làm prefix thay cho phần từ `<SYSTEM_RULE>` đến hết
-   `<ROLEPLAY_INFO>` cũ. Master đã chứa sẵn các tag mở/đóng này; không lồng nó vào một
+3. Mở thư mục bundle đã chọn và dùng `MASTER_PROMPT.md` làm prefix thay cho phần từ `<SYSTEM_RULE>`
+   đến hết `<ROLEPLAY_INFO>` cũ. Master đã chứa sẵn các tag mở/đóng này; không lồng nó vào một
    `<ROLEPLAY_INFO>` khác.
 4. Thẻ nhân vật, hồ sơ nhân vật người dùng, các mục tri thức thế giới đang hoạt động và bộ nhớ do
    RisuAI chèn.
-5. `standalone/RISUAI_RESPONSE_INSTRUCTION_REPLACEMENT.md` thay cho khối mặc định nếu nền tảng cho
-   phép. Tệp giữ đầy đủ mọi mục/chỉ dẫn mặc định của RisuAI đã dịch sang tiếng Việt, sau đó nối
-   `<FINAL_EXECUTION_OVERRIDE>` ngay trước `</RESPONSE_INSTRUCTION>`; không cần chèn thêm phần chốt
-   hoặc phần điền trước riêng cho AI.
+5. Dùng `RESPONSE_INSTRUCTION.md` trong cùng thư mục bundle. Phần mặc định của cả ba tệp giống hệt
+   nhau; SFW và NSFW Lite chỉ thay `<FINAL_EXECUTION_OVERRIDE>`.
+
+Khi chuyển cửa sổ hội thoại, dùng `ROLEPLAY_CHANGE_ROUTE.md` trong cùng thư mục bundle. Không trộn
+file giữa các bundle vì mật độ và trường trạng thái khác nhau.
 
 Không chuyển toàn bộ master dài xuống vị trí cuối: làm vậy tăng độ gần của luật phong cách nhưng đẩy
 thẻ nhân vật và tri thức nền ra xa phản hồi. Phần chốt cuối đã được ghép vào cuối chỉ dẫn phản hồi

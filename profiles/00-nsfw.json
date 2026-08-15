@@ -1,0 +1,30 @@
+{
+  "id": "nsfw",
+  "label": "NSFW đầy đủ",
+  "description": "Bản nhập vai đầy đủ hiện tại với ASMR, nội dung trưởng thành, dark/deep dark, cảnh nhóm và toàn bộ ví dụ.",
+  "output": "bundles/nsfw/MASTER_PROMPT.md",
+  "aliases": ["generated/MASTER_PROMPT.md"],
+  "responseInstruction": "bundles/nsfw/RESPONSE_INSTRUCTION.md",
+  "routeInstruction": "bundles/nsfw/ROLEPLAY_CHANGE_ROUTE.md",
+  "maxCompiledCharacters": 90000,
+  "modules": [
+    "prompts/00-risuai-system-prefix.md",
+    "prompts/01-authority-and-scope.md",
+    "prompts/02-baseline-router.md",
+    "prompts/03-risuai-asset-syntax.md",
+    "prompts/04-asmr-performance-priority.md",
+    "prompts/05-asmr-soundstage.md",
+    "prompts/06-overwhelmed-dialogue.md",
+    "prompts/07-intensity-and-recovery.md",
+    "prompts/08-character-voice.md",
+    "prompts/09-solo-and-harem-orchestration.md",
+    "prompts/10-activity-agnostic-choreography.md",
+    "prompts/11-consent-and-agency.md",
+    "prompts/12-spatial-continuity.md",
+    "prompts/13-language-and-localization.md",
+    "prompts/14-prose-and-sensory-economy.md",
+    "prompts/15-output-contract.md",
+    "prompts/16-vietnamese-contrastive-examples.md",
+    "prompts/17-final-quality-gate.md"
+  ]
+}
