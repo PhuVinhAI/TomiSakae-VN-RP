@@ -19,6 +19,7 @@ Giữ một dữ kiện khi thiếu nó có thể khiến AI:
 
 - hiểu sai thời gian, địa điểm, người hiện diện, vị trí, khả năng hoặc điểm dừng;
 - quên nguyên nhân của mục tiêu, lựa chọn, ác cảm, tin tưởng, sợ hãi, món nợ, lời hứa hoặc phản bội;
+- quên mục tiêu tức thời, trở ngại, cách tác động đang dùng hoặc trạng thái mà nhân vật đang cố thay đổi;
 - cho nhân vật biết điều họ chưa biết, quên bí mật hoặc biến nghi ngờ thành chắc chắn;
 - bỏ mất tổ chức, phe phái, địa vị, tài nguyên, luật lệ, vật, bằng chứng, thương tích hoặc hậu quả còn tác động;
 - bỏ mất tuyến chính, tuyến phụ, bí ẩn, điều kiện tiên quyết, kế hoạch đã xác lập hoặc việc chưa xong;
@@ -34,6 +35,7 @@ Dữ kiện không tự hết hạn vì cũ hoặc nhân vật tạm vắng. Ch�
 4. Giữ chuỗi tối thiểu `nguyên nhân -> điều đã xảy ra -> hệ quả hiện tại -> điều còn chờ` cho mỗi việc mở hoặc thay đổi quan hệ quan trọng.
 5. Nhân vật chỉ biết điều được ghi trong nguồn kiến thức của họ. Dùng tham chiếu mã thay vì chép lại cùng sự thật.
 6. Nén câu chữ, không nén mất chủ thể, nguyên nhân, tri thức, hệ quả hoặc sắc thái làm đổi lựa chọn nhân vật.
+7. Chỉ cho tổ chức, tài nguyên, thời hạn, thời tiết hoặc hoạt động ngoài cảnh tiến khi có nguyên nhân và đủ thời gian. Giữ chủ thể/nguồn, cơ chế chuyển động, dấu hiệu đã xuất hiện và hệ quả kế tiếp đã được thiết lập; không biến dự đoán thành sự kiện.
 
 ## NGÂN SÁCH
 
@@ -65,6 +67,7 @@ Chỉ trả cấu trúc dưới đây, không thêm lời dẫn, giải thích, 
 - vị trí và hành động đang dở: [...]
 - khả năng/giới hạn tức thời: [...]
 - bầu không khí và áp lực hiện tại có căn cứ: [...]
+- động lực tức thời: [theo từng nhân vật: muốn gì -> trở ngại -> cách tác động -> trạng thái đang cố đổi]
 - điểm dừng: [...]
 
 ## THAY ĐỔI GẦN NHẤT
@@ -73,7 +76,7 @@ Chỉ trả cấu trúc dưới đây, không thêm lời dẫn, giải thích, 
 
 ## THẾ GIỚI VÀ SỰ THẬT HOẠT ĐỘNG
 
-- [F001] [phe phái, luật lệ, tài nguyên, vật, bằng chứng, thương tích, địa vị hoặc sự thật còn tác động]
+- [F001] [phe phái, luật lệ, tài nguyên, vật, bằng chứng, thương tích, địa vị hoặc áp lực còn tác động; nếu đang tiến: nguồn -> cơ chế/thời hạn -> dấu hiệu và hệ quả đã được thiết lập]
 
 ## QUAN HỆ VÀ ĐỘNG CƠ BỀN
 

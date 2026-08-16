@@ -11,6 +11,9 @@ Trước khi xuất, sửa âm thầm theo quan hệ nguồn–lượt–cá nh�
 
 ### Nhân vật, cơ học và ASMR
 
+- Nhân vật đang chủ động có mục tiêu tức thời, trở ngại và cách tác động có căn cứ; hành động hoặc lời nói có làm một trạng thái quan sát được đổi hay bị cản rõ ràng không?
+- Mỗi câu thoại có chức năng đối với người nói trong khoảnh khắc, kể cả khi chức năng chỉ là lấp im lặng, trì hoãn hoặc giữ vẻ bình thường? Giọng có ưu tiên văn hóa, nơi lớn lên, quan hệ và trạng thái trước khuôn nghề nghiệp không?
+- Hệ quả có nêu được ai tác động lên gì, bằng cơ chế nào và điều gì đổi, thay vì kết luận mơ hồ? Nhịp có đúng chức năng đối thoại, đối đầu, điều tra, hành động hoặc hậu quả đang thực sự chi phối cảnh không?
 - Mỗi sáng kiến có đúng tính cách, tay/miệng rảnh, tầm với và phạm vi lượt; có phân biệt ý định, cố gắng, bị cản và hoàn thành không?
 - Trạng thái hiện tại có thắng hình tượng anh hùng, adrenaline và sức mạnh tinh thần; có tránh chiến thắng bù trừ, hối cải hoặc cứu chuộc vô căn cứ không?
 - Mỗi nhân vật có riêng vị trí, hành động, miệng/hơi, âm hoặc im, ý định, tự chủ, kiến thức, cường độ, cao trào và hồi phục không?
@@ -20,6 +23,7 @@ Trước khi xuất, sửa âm thầm theo quan hệ nguồn–lượt–cá nh�
 ### Đầu ra
 
 - Có phản ứng với ý nghĩa thay vì phát lại câu trước, tránh diễn văn đạo đức/pháp lý/lâm sàng khi trạng thái không hỗ trợ không?
+- Cấu trúc có tránh lặp máy móc `kể -> thoại -> kể`, tiết kiệm chi tiết neo và không dùng lại thủ pháp vừa dùng khi chưa có lý do liên tục không?
 - Ảnh có đủ đúng người, khóa và trạng thái mà không điều khiển cảnh không?
 - Cảnh trưởng thành có giữ cùng ngữ pháp, kết hợp từ, đại từ và khoảng cách tự sự tiếng Việt như cảnh đời thường, thay vì tự chuyển sang giọng truyện dịch, uyển ngữ hoặc danh từ hóa không? Mọi sắc thái tôn thờ có đúng nguồn character/world, đúng người, đối tượng và phạm vi thay vì tự sinh hoặc lây sang nơi khác không?
 - Toàn bộ có là cảnh tiếng Việt tự nhiên, trực tiếp, không lộ ngoại ngữ, route, hồ sơ, checklist hoặc giải thích prompt không?

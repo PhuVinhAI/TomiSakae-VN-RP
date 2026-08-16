@@ -380,7 +380,7 @@ describe("prompt compiler", () => {
       "utf8",
     );
 
-    expect(route.length).toBeLessThan(11_500);
+    expect(route.length).toBeLessThan(12_500);
     expect(route).toContain("Bảo toàn đủ trạng thái truyện");
     expect(route).toContain("ba mức mục tiêu và một chế độ bảo toàn ngoại lệ");
     expect(route).toContain("`GỌN`: mục tiêu tối đa 12.000 ký tự");

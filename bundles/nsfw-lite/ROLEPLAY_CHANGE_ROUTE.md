@@ -27,7 +27,8 @@ Không giữ văn phong, câu mẫu, âm thanh trang trí, mô tả lặp, lịc
 2. Thay hoàn toàn trạng thái hiện tại. Không để snapshot dài tự thêm thời gian, chu kỳ, tư thế, cao trào, hồi phục hoặc phản ứng của `{{user}}`.
 3. Mỗi sự thật có một mã ổn định. Cập nhật cùng mã, xóa khi hết hiệu lực, không tạo bản sao diễn đạt khác.
 4. Việc mở giữ chuỗi ngắn `nguyên nhân -> trạng thái hiện tại -> điều còn chờ`.
-5. Nén theo thứ tự: bỏ văn phong và lặp -> xóa việc hết tác động -> rút cú pháp -> dùng tham chiếu mã. Không cắt trạng thái cơ thể, quyền lượt, kiến thức, quan hệ hoặc cá nhân hóa còn cần.
+5. Giữ động lực hiện tại của nhân vật AI theo chuỗi `muốn -> bị cản -> cách tác động`; chỉ cập nhật khi tình thế hoặc lựa chọn thật sự đổi.
+6. Nén theo thứ tự: bỏ văn phong và lặp -> xóa việc hết tác động -> rút cú pháp -> dùng tham chiếu mã. Không cắt trạng thái cơ thể, quyền lượt, kiến thức, quan hệ hoặc cá nhân hóa còn cần.
 
 ## NGÂN SÁCH
 
@@ -56,6 +57,7 @@ Chỉ trả cấu trúc dưới đây, không thêm lời dẫn, giải thích, 
 - nhân vật AI: [...]
 - vị trí/tư thế/tiếp xúc: [...]
 - trạng thái và khả năng nhân vật AI: [...]
+- mục tiêu tức thời/trở ngại/cách tác động của nhân vật AI: [...]
 - điều quan sát được về {{user}}: [...]
 - điểm dừng chưa tự tiến: [...]
 

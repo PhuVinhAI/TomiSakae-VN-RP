@@ -70,6 +70,9 @@ describe("prompt profiles", () => {
       path.join(workspaceDirectory, "bundles", "nsfw", "MASTER_PROMPT.md"),
       path.join(workspaceDirectory, "generated", "MASTER_PROMPT.md"),
     ]);
+    expect(profiled.compiled).toContain("họ muốn gì ngay lúc này, điều gì đang cản");
+    expect(profiled.compiled).toContain("Mỗi câu nói phải là một hành động có mục đích");
+    expect(profiled.compiled).toContain("không chèn cử chỉ chỉ để ngăn hai câu thoại");
   });
 
   it("keeps SFW plot-focused without turning it into a content filter", async () => {
@@ -91,6 +94,9 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain(
       "Sắc thái tôn thờ, phục tùng, lạnh lùng, tàn nhẫn hay dịu dàng do character/world",
     );
+    expect(result.compiled).toContain("muốn gì ngay lúc này -> điều gì đang cản");
+    expect(result.compiled).toContain("Áp lực từ tổ chức, phe phái, tài nguyên, thời hạn");
+    expect(result.compiled).toContain("lời nói hay không tự thắng");
     expect(result.compiled).not.toContain("## NSFW LITE");
     expect(result.compiled).not.toContain("## HỢP ĐỒNG ĐỘ PHỦ CỦA VÍ DỤ");
     expect(result.compiled).not.toContain("## ASMR");
@@ -122,6 +128,8 @@ describe("prompt profiles", () => {
     expect(liteResult.compiled).toContain(
       "sắc thái tôn thờ/đê tiện/thô bạo đã có trong character/world vẫn giữ đúng người",
     );
+    expect(liteResult.compiled).toContain("muốn gì ngay lúc này -> điều gì đang cản");
+    expect(liteResult.compiled).toContain("Không lặp máy móc khuôn kể rồi thoại rồi kể");
     expect(liteResult.compiled).not.toContain("### Ví dụ 1");
     expect(liteResult.compiled).not.toContain("cảnh nhóm");
     expect(liteResult.compiled).not.toContain("ảnh nhóm");
@@ -181,5 +189,25 @@ describe("prompt profiles", () => {
       expect(runtimeText).not.toMatch(/1-on-1|one-on-one/i);
       expect(runtimeText).not.toMatch(/\bstory-\d/i);
     }
+  });
+
+  it("persists the active motive at the appropriate route depth", async () => {
+    const profiles = await loadProjectProfiles();
+    const routeInstructions = await Promise.all(
+      profiles.map(async (profile) => ({
+        id: profile.manifest.id,
+        source: await readFile(profile.routeInstructionFile, "utf8"),
+      })),
+    );
+
+    expect(routeInstructions.find(({ id }) => id === "nsfw")!.source).toContain(
+      "động lực tức thời: [theo từng nhân vật",
+    );
+    expect(routeInstructions.find(({ id }) => id === "sfw")!.source).toContain(
+      "tổ chức, tài nguyên, thời hạn, thời tiết hoặc hoạt động ngoài cảnh",
+    );
+    expect(routeInstructions.find(({ id }) => id === "nsfw-lite")!.source).toContain(
+      "mục tiêu tức thời/trở ngại/cách tác động của nhân vật AI",
+    );
   });
 });

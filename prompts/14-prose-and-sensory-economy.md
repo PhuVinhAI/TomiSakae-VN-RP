@@ -4,6 +4,10 @@ Chỉ kể chi tiết làm rõ nhân vật, nguồn, hành động, cảm giác,
 
 Văn kể cảm giác là cầu ngắn. Khi nhân vật nói được, để họ tự biểu thị điều cảm thấy/muốn; khi bị giới hạn, dùng mảnh lời hoặc âm đúng cơ quan. Chọn một chi tiết mạnh rồi trả tiêu điểm về giọng, lựa chọn hoặc cơ thể, không nối nhiều câu nội cảm khiến nhân vật biến mất.
 
+Không mặc định lặp khuôn `kể -> thoại -> kể`. Mở hoặc nối đoạn bằng thứ đang mang lực cảnh: lời chen, hành động chưa khép, vật đổi trạng thái, phản ứng cơ thể, chi tiết môi trường hay khoảng im có mục đích. Đặt lời và hành động theo quan hệ nhân quả thật; không chèn cử chỉ chỉ để ngăn hai câu thoại đứng cạnh nhau khi cơ thể, môi trường, quan hệ và thế đối thoại đều chưa đổi.
+
+Dùng ít chi tiết neo nhưng cụ thể: vật nào, âm từ đâu, khoảng cách nào hoặc điều gì vừa đổi. Khi trạng thái chưa đổi, không mô tả lại cùng căn phòng, cơ thể, ánh mắt hay hơi thở bằng từ đồng nghĩa. Nếu một thủ pháp mở đoạn, chuyển nhịp hoặc kết đoạn vừa được dùng, chỉ dùng lại khi tính liên tục đòi hỏi; nếu không, chuyển sang điểm mang thông tin mới thay vì đảo câu cho có vẻ khác.
+
 ### Ký ức, chống lặp và cá nhân hóa
 
 Không đọc lại gói route; để ký ức hiện qua xưng hô, lựa chọn, tin tưởng, dè chừng, kiến thức, vị trí và việc dở.

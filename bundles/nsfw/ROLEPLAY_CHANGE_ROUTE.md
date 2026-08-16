@@ -27,6 +27,7 @@ Không xóa hoặc làm phẳng một dữ kiện còn đúng nếu thiếu nó 
 
 - hiểu sai trạng thái cơ thể, vị trí, quyền lượt, đồng thuận, ranh giới hoặc khả năng hiện tại;
 - quên nguyên nhân của mục tiêu, lựa chọn, ác cảm, tin tưởng, sợ hãi, món nợ, lời hứa, phản bội hoặc thay đổi quan hệ;
+- quên mục tiêu tức thời, trở ngại, cách tác động đang dùng hoặc trạng thái mà nhân vật đang cố thay đổi;
 - cho nhân vật biết điều họ chưa biết, quên bí mật họ biết, hoặc biến nghi ngờ thành chắc chắn;
 - quên vật, bằng chứng, thương tích, năng lực, giới hạn, địa vị hoặc hệ quả còn có thể tác động;
 - bỏ mất việc mở, điều kiện tiên quyết, lời hẹn, kế hoạch đã xác lập, bí ẩn hoặc mồi truyện chưa được giải quyết;
@@ -50,8 +51,9 @@ Dữ kiện được bảo vệ không tự hết hạn vì cũ, nhân vật t�
    - việc đang chờ ở `VIỆC CHƯA XONG`;
    - bước ngoặt đã khép cảnh nhưng còn hệ quả nhân quả ở `MỐC BỀN`.
 6. Với mỗi việc mở hoặc hành vi tương lai phụ thuộc quá khứ, giữ đủ chuỗi tối thiểu `nguyên nhân -> điều đã xảy ra -> hệ quả hiện tại -> điều còn chờ`. Không chỉ giữ kết luận rời khỏi nguyên nhân.
-7. Làm nguội dữ liệu chỉ khi AI vẫn có thể hiểu đúng nếu thiếu chi tiết đó. Sự kiện gần hết tác động có thể nhập vào mốc bền; nhiều mốc chỉ được hợp nhất khi không làm mất chủ thể, nguyên nhân, tri thức hoặc hệ quả riêng.
-8. `META` chỉ giữ sequence hiện tại và cha trực tiếp. Snapshot đầu dùng `route_seq: 1`, `parent_seq: none`; snapshot sau tăng đúng 1. Với số cũ trùng/sai, lấy số hợp lệ lớn nhất làm cha. `trạng thái` phải thuộc enum được cho.
+7. Với áp lực ngoài cảnh, chỉ cập nhật khi có nguồn, thời gian trôi hoặc hành động đủ làm nó tiến. Giữ chủ thể tạo áp lực, tài nguyên/thời hạn liên quan, cơ chế chuyển động, dấu hiệu đã lộ và hệ quả kế tiếp đã được thiết lập; không đoán biến cố chưa xảy ra.
+8. Làm nguội dữ liệu chỉ khi AI vẫn có thể hiểu đúng nếu thiếu chi tiết đó. Sự kiện gần hết tác động có thể nhập vào mốc bền; nhiều mốc chỉ được hợp nhất khi không làm mất chủ thể, nguyên nhân, tri thức hoặc hệ quả riêng.
+9. `META` chỉ giữ sequence hiện tại và cha trực tiếp. Snapshot đầu dùng `route_seq: 1`, `parent_seq: none`; snapshot sau tăng đúng 1. Với số cũ trùng/sai, lấy số hợp lệ lớn nhất làm cha. `trạng thái` phải thuộc enum được cho.
 
 ## NGÂN SÁCH ĐỘ SÂU
 
@@ -126,6 +128,7 @@ Chỉ trả cấu trúc dưới đây, không thêm lời dẫn, giải thích, 
 - vị trí/tiếp xúc/cơ học: [...]
 - khả năng tức thời: [tay, miệng, hơi, giọng, di chuyển, tự chủ và giới hạn liên quan]
 - sắc thái hiện tại có căn cứ: [...]
+- động lực tức thời: [theo từng nhân vật: muốn gì -> trở ngại -> cách tác động -> trạng thái đang cố đổi]
 - điểm dừng: [điều đang dở nhưng chưa tự tiến thêm]
 
 ## THAY ĐỔI GẦN NHẤT
@@ -134,7 +137,7 @@ Chỉ trả cấu trúc dưới đây, không thêm lời dẫn, giải thích, 
 
 ## SỰ THẬT HOẠT ĐỘNG
 
-- [F001] [một sự thật còn tác động ngoài trạng thái tức thời]
+- [F001] [một sự thật còn tác động ngoài trạng thái tức thời; nếu là áp lực đang tiến: chủ thể/nguồn -> cơ chế/tài nguyên/thời hạn -> dấu hiệu và hệ quả đã được thiết lập]
 
 ## QUAN HỆ VÀ ĐỘNG CƠ BỀN
 

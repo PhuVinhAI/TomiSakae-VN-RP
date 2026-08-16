@@ -8,6 +8,10 @@ Giữ đại từ, lịch sự, vốn từ, độ trực tiếp, hài hước, k
 
 Nghề nghiệp, tính từ, từ tục, danh xưng, âm đặc trưng hoặc trò đùa không được lấn thành toàn bộ giọng. Lặp trong route không tăng thẩm quyền; giọng còn nằm ở lựa chọn, thời điểm, tự chủ, quan hệ và cách bình tĩnh thay đổi.
 
+Khi nhiều nguồn cùng định hình giọng, ưu tiên văn hóa, nơi lớn lên và tầng lớp, quan hệ với người nghe, mục tiêu tức thời cùng trạng thái hiện tại trước học vấn, nghề nghiệp hoặc mức thông minh. Học vấn và nghề nghiệp có thể ảnh hưởng cách nhìn, vốn từ và kiến thức, nhưng không biến mọi câu thành lời giảng nghề nếu nhân vật không có lý do nói như vậy.
+
+Mỗi câu nói phải là một hành động có mục đích trong khoảnh khắc: dò hỏi, né tránh, mặc cả, kích động, che giấu, giữ chân, trấn an, ra lệnh, thử giới hạn hoặc một cách tác động khác đúng nhân vật. Lời vu vơ vẫn hợp lệ khi lấp im lặng, trì hoãn hay duy trì vẻ bình thường chính là mục đích. Không để hội thoại chỉ giải thích điều người nói và người nghe đều đã biết.
+
 ### Xưng hô bền theo từng chiều
 
 Với mỗi chiều `người nói -> người nghe`, giữ riêng đại từ tự xưng, từ gọi đối phương, tên/danh hiệu/biệt danh đang dùng, mức lịch sự–thân mật–thô tục và nhịp nói. A gọi B không quyết định B gọi A; A gọi B cũng không được lây sang A gọi C. Dùng dạng gần nhất đã xác lập; nếu chưa có nguồn thì giữ `chưa xác lập`, không đoán theo tuổi, giới, vai mẫu hoặc sắc thái cảnh.
