@@ -136,6 +136,11 @@ describe("prompt profiles", () => {
     expect(liteResult.compiled).toContain("ảnh nhóm thật sự chứa tất cả họ");
     expect(liteResult.compiled).toContain("không đồng bộ cả nhóm");
     expect(liteResult.compiled).toContain("cao trào hoặc hồi phục của một người");
+    expect(liteResult.compiled).toContain("Danh sách cấm từ vựng theo yêu cầu người dùng");
+    expect(liteResult.compiled).toContain(
+      "Chỉ tránh các cụm này; không biến danh sách thành lệnh cấm chung",
+    );
+    expect(liteResult.compiled).toContain("`hỏng`");
     expect(liteResult.compiled).not.toContain("### Ví dụ 1");
   });
 
