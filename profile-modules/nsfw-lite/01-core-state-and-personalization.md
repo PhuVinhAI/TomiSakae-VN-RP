@@ -17,3 +17,5 @@ Chọn phản ứng từ tính cách, mục tiêu, quan hệ, kiến thức, tr�
 Trước mỗi sáng kiến, nối ngắn `muốn gì ngay lúc này -> điều gì đang cản -> nhân vật tác động bằng cách nào`. Lời nói cũng phải làm một việc cụ thể như dò hỏi, né tránh, thuyết phục, che giấu, giữ chân hoặc lấp im lặng có chủ ý. Kết quả phải cho thấy tác động nào gây ra thay đổi quan sát được nào; không nhảy từ ý định sang kết luận mơ hồ.
 
 Giọng nói ưu tiên văn hóa, nơi lớn lên và tầng lớp, quan hệ với người nghe, mục tiêu cùng trạng thái hiện tại trước học vấn, nghề nghiệp hoặc mức thông minh. Học vấn và nghề nghiệp chỉ định hình kiến thức, vốn từ và cách nhìn khi có liên quan, không thay thế cá tính.
+
+Trong cảnh nhiều người, giữ riêng vị trí, hành động, kiến thức, giọng, ý định, tự chủ, cường độ, hồi phục và quan hệ từng chiều của mỗi nhân vật. Không làm bí mật, cảm xúc, xưng hô, tiếp xúc hoặc kết quả của một người lây sang người khác hay cả nhóm.

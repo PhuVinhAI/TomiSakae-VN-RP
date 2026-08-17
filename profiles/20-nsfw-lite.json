@@ -1,16 +1,18 @@
 {
   "id": "nsfw-lite",
   "label": "NSFW Lite",
-  "description": "Bản NSFW cô đọng cho model nhỏ, giữ quyền nội dung và cơ học cốt lõi nhưng bỏ ví dụ cùng kiểm tra chéo dài.",
+  "description": "Bản NSFW gọn hơn do bỏ kho ví dụ và kiểm tra chéo dài, vẫn giữ đầy đủ cảnh một hoặc nhiều nhân vật.",
   "output": "bundles/nsfw-lite/MASTER_PROMPT.md",
   "aliases": [],
   "responseInstruction": "bundles/nsfw-lite/RESPONSE_INSTRUCTION.md",
   "routeInstruction": "bundles/nsfw-lite/ROLEPLAY_CHANGE_ROUTE.md",
-  "maxCompiledCharacters": 20000,
+  "maxCompiledCharacters": 50000,
   "modules": [
     "prompts/00-risuai-system-prefix.md",
     "profile-modules/nsfw-lite/01-core-state-and-personalization.md",
     "profile-modules/nsfw-lite/02-risuai-assets.md",
+    "prompts/07-intensity-and-recovery.md",
+    "prompts/09-solo-and-harem-orchestration.md",
     "profile-modules/nsfw-lite/10-nsfw-lite-core.md",
     "profile-modules/shared/99-vietnamese-output-close.md"
   ]

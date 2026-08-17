@@ -103,21 +103,23 @@ describe("prompt profiles", () => {
     expect(result.compiled).not.toContain("cao trào");
   });
 
-  it("keeps NSFW Lite compact while preserving the core unrestricted behavior", async () => {
+  it("keeps NSFW Lite unrestricted and fully capable of multi-character scenes", async () => {
     const profiles = await loadProjectProfiles();
-    const nsfw = profiles.find(({ manifest }) => manifest.id === "nsfw")!;
     const lite = profiles.find(({ manifest }) => manifest.id === "nsfw-lite")!;
-    const [fullResult, liteResult] = await Promise.all([
-      compilePromptProfile({ profile: nsfw, writeOutput: false }),
-      compilePromptProfile({ profile: lite, writeOutput: false }),
-    ]);
+    const liteResult = await compilePromptProfile({ profile: lite, writeOutput: false });
+    const liteResponse = await readFile(lite.responseInstructionFile, "utf8");
 
     expect(liteResult.compiled.length).toBeLessThanOrEqual(lite.manifest.maxCompiledCharacters);
-    expect(liteResult.compiled.length).toBeLessThan(fullResult.compiled.length / 5);
+    expect(liteResponse).toContain("nhiều người");
+    expect(liteResponse).toContain("ảnh nhóm thật sự chứa họ");
+    expect(liteResponse).not.toContain("Chỉ theo dõi {{user}} và một nhân vật AI");
+    expect(liteResponse).not.toContain("không tạo, điều phối, cân bằng hoặc duy trì cảnh tập thể");
     expect(liteResult.modules.map(({ relativePath }) => relativePath)).toEqual([
       "prompts/00-risuai-system-prefix.md",
       "profile-modules/nsfw-lite/01-core-state-and-personalization.md",
       "profile-modules/nsfw-lite/02-risuai-assets.md",
+      "prompts/07-intensity-and-recovery.md",
+      "prompts/09-solo-and-harem-orchestration.md",
       "profile-modules/nsfw-lite/10-nsfw-lite-core.md",
       "profile-modules/shared/99-vietnamese-output-close.md",
     ]);
@@ -130,10 +132,11 @@ describe("prompt profiles", () => {
     );
     expect(liteResult.compiled).toContain("muốn gì ngay lúc này -> điều gì đang cản");
     expect(liteResult.compiled).toContain("Không lặp máy móc khuôn kể rồi thoại rồi kể");
+    expect(liteResult.compiled).toContain("## ĐIỀU PHỐI CẢNH MỘT VÀ NHIỀU NHÂN VẬT");
+    expect(liteResult.compiled).toContain("ảnh nhóm thật sự chứa tất cả họ");
+    expect(liteResult.compiled).toContain("không đồng bộ cả nhóm");
+    expect(liteResult.compiled).toContain("cao trào hoặc hồi phục của một người");
     expect(liteResult.compiled).not.toContain("### Ví dụ 1");
-    expect(liteResult.compiled).not.toContain("cảnh nhóm");
-    expect(liteResult.compiled).not.toContain("ảnh nhóm");
-    expect(liteResult.compiled).not.toContain("nhiều nhân vật");
   });
 
   it("balances the ROLEPLAY_INFO wrapper in every compiled profile", async () => {
@@ -207,7 +210,10 @@ describe("prompt profiles", () => {
       "tổ chức, tài nguyên, thời hạn, thời tiết hoặc hoạt động ngoài cảnh",
     );
     expect(routeInstructions.find(({ id }) => id === "nsfw-lite")!.source).toContain(
-      "mục tiêu tức thời/trở ngại/cách tác động của nhân vật AI",
+      "động lực từng nhân vật AI",
+    );
+    expect(routeInstructions.find(({ id }) => id === "nsfw-lite")!.source).toContain(
+      "Không có trần ký tự cứng",
     );
   });
 });
