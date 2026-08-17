@@ -121,7 +121,7 @@ describe("prompt profiles", () => {
       "prompts/07-intensity-and-recovery.md",
       "prompts/09-solo-and-harem-orchestration.md",
       "profile-modules/nsfw-lite/10-nsfw-lite-core.md",
-      "profile-modules/shared/99-vietnamese-output-close.md",
+      "profile-modules/nsfw-lite/99-vietnamese-output-close.md",
     ]);
     expect(liteResult.compiled).toContain("## CẢNH TRƯỞNG THÀNH CÔ ĐỌNG");
     expect(liteResult.compiled).toContain("dark/deep dark");
@@ -130,15 +130,32 @@ describe("prompt profiles", () => {
     expect(liteResult.compiled).toContain(
       "sắc thái tôn thờ/đê tiện/thô bạo đã có trong character/world vẫn giữ đúng người",
     );
+    expect(liteResult.compiled).toContain("không được để lọt bất kỳ ký tự Hangul nào");
+    expect(liteResult.compiled).toContain(
+      "Tên riêng Hàn phải dùng cách viết Latin/Anh chính thức của canon",
+    );
+    expect(liteResult.compiled).toContain("Cấm lách khóa bằng dạng");
+    expect(liteResult.compiled).toContain("một từ/cụm tiếng Anh có thể tránh");
+    expect(liteResponse).toContain("Không được có bất kỳ ký tự Hangul nào");
+    expect(liteResponse).toContain("Cấm xuất nguyên văn ngoại ngữ rồi ghi nghĩa Việt trong ngoặc");
+    expect(liteResponse).toContain("tiếng Anh có thể thay");
+    expect(liteResult.compiled).not.toMatch(
+      /[\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff]/u,
+    );
+    expect(liteResponse).not.toMatch(
+      /[\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff]/u,
+    );
     expect(liteResult.compiled).toContain("muốn gì ngay lúc này -> điều gì đang cản");
     expect(liteResult.compiled).toContain("Không lặp máy móc khuôn kể rồi thoại rồi kể");
     expect(liteResult.compiled).toContain("## ĐIỀU PHỐI CẢNH MỘT VÀ NHIỀU NHÂN VẬT");
     expect(liteResult.compiled).toContain("ảnh nhóm thật sự chứa tất cả họ");
     expect(liteResult.compiled).toContain("không đồng bộ cả nhóm");
     expect(liteResult.compiled).toContain("cao trào hoặc hồi phục của một người");
-    expect(liteResult.compiled).toContain("Danh sách cấm từ vựng theo yêu cầu người dùng");
     expect(liteResult.compiled).toContain(
-      "Chỉ tránh các cụm này; không biến danh sách thành lệnh cấm chung",
+      "Danh sách cấm từ vựng trong lời thoại/cảnh thân mật theo yêu cầu người dùng",
+    );
+    expect(liteResult.compiled).toContain(
+      "Chỉ tránh đúng các mục này trong phạm vi cảnh thân mật; không biến danh sách thành lệnh cấm chung",
     );
     expect(liteResult.compiled).toContain("`hỏng`");
     expect(liteResult.compiled).not.toContain("### Ví dụ 1");
