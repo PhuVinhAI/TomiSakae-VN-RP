@@ -130,15 +130,17 @@ describe("prompt profiles", () => {
     expect(liteResult.compiled).toContain(
       "sắc thái tôn thờ/đê tiện/thô bạo đã có trong character/world vẫn giữ đúng người",
     );
-    expect(liteResult.compiled).toContain("không được để lọt bất kỳ ký tự Hangul nào");
+    expect(liteResult.compiled).toContain("Khóa chữ Hàn áp dụng cho toàn bộ phần văn cảnh");
+    expect(liteResult.compiled).toContain("Chỉ hai loại được Latin hóa");
     expect(liteResult.compiled).toContain(
-      "Tên riêng Hàn phải dùng cách viết Latin/Anh chính thức của canon",
+      "Không được xuất cùng một nội dung bằng nhiều ngôn ngữ dưới bất kỳ hình thức nào",
     );
-    expect(liteResult.compiled).toContain("Cấm lách khóa bằng dạng");
-    expect(liteResult.compiled).toContain("một từ/cụm tiếng Anh có thể tránh");
+    expect(liteResult.compiled).toContain("Bất kỳ từ hoặc chuỗi Hàn nào không thuộc hai loại đó");
     expect(liteResponse).toContain("Không được có bất kỳ ký tự Hangul nào");
-    expect(liteResponse).toContain("Cấm xuất nguyên văn ngoại ngữ rồi ghi nghĩa Việt trong ngoặc");
-    expect(liteResponse).toContain("tiếng Anh có thể thay");
+    expect(liteResponse).toContain(
+      "Không được xuất cùng một nội dung bằng nhiều ngôn ngữ dưới bất kỳ hình thức nào",
+    );
+    expect(liteResponse).toContain("số ký tự Hangul bằng không");
     expect(liteResult.compiled).not.toMatch(
       /[\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff]/u,
     );
