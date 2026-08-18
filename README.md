@@ -1,25 +1,26 @@
 # Trình biên dịch prompt nhập vai tiếng Việt
 
-Dự án Node.js + TypeScript để quản lý prompt theo mô-đun và biên dịch ba profile dùng chung một
+Dự án Node.js + TypeScript để quản lý prompt theo mô-đun và biên dịch bốn profile dùng chung một
 pipeline. Mỗi profile chỉ chọn những module cần thiết, nên phần trạng thái, cá nhân hóa, ảnh và
 tiếng Việt có một nguồn duy nhất thay vì ba bản prompt sao chép rồi lệch nhau.
 
-| Profile     | Mục đích                                                                 | Thư mục sử dụng      |
-| ----------- | ------------------------------------------------------------------------ | -------------------- |
-| `nsfw`      | Bản đầy đủ hiện tại, gồm toàn bộ ASMR, cơ học, cảnh nhóm và 109 ví dụ    | `bundles/nsfw/`      |
-| `sfw`       | Tập trung cốt truyện, thế giới và nhân vật; bỏ module chuyên sâu NSFW    | `bundles/sfw/`       |
-| `nsfw-lite` | Bản NSFW 1-on-1 cho model nhỏ, giữ lõi cần thiết và không nạp ví dụ/nhóm | `bundles/nsfw-lite/` |
+| Profile        | Mục đích                                                                 | Thư mục sử dụng         |
+| -------------- | ------------------------------------------------------------------------ | ----------------------- |
+| `nsfw`         | Bản đầy đủ hiện tại, gồm toàn bộ ASMR, cơ học, cảnh nhóm và 109 ví dụ    | `bundles/nsfw/`         |
+| `sfw`          | Tập trung cốt truyện, thế giới và nhân vật; bỏ module chuyên sâu NSFW    | `bundles/sfw/`          |
+| `nsfw-lite`    | Bản NSFW 1-on-1 cho model nhỏ, giữ lõi cần thiết và không nạp ví dụ/nhóm | `bundles/nsfw-lite/`    |
+| `nsfw-lite-en` | Lõi điều khiển tiếng Anh tối ưu cho Gemma 4; cảnh vẫn xuất tiếng Việt    | `bundles/nsfw-lite-en/` |
 
 `sfw` không phải bộ lọc nội dung. Nó không chủ động mang cơ chế NSFW vào mọi cảnh, nhưng nếu
 character, world và diễn biến hiện tại đi theo hướng đó thì model vẫn tiếp tục theo nguồn, không từ
 chối hoặc bẻ hướng. Sắc thái tôn thờ, phục tùng, tàn nhẫn hay dịu dàng cũng do character/world và
-quan hệ quyết định trong cả ba profile.
+quan hệ quyết định trong mọi profile.
 
-Cả ba bundle chứa cùng ba tên file: `MASTER_PROMPT.md`, `RESPONSE_INSTRUCTION.md` và
-`ROLEPLAY_CHANGE_ROUTE.md`. Cả ba master dùng nguyên văn cùng `prompts/00-risuai-system-prefix.md`.
-Ba response instruction giữ nguyên toàn bộ phần mặc định từ bản NSFW; chỉ nội dung nằm trong
-`<FINAL_EXECUTION_OVERRIDE>` được chuyên biệt cho SFW và NSFW Lite. Test sẽ thất bại nếu bất kỳ phần
-nào bên ngoài khối này lệch khỏi bản NSFW.
+Cả bốn bundle chứa cùng ba tên file: `MASTER_PROMPT.md`, `RESPONSE_INSTRUCTION.md` và
+`ROLEPLAY_CHANGE_ROUTE.md`. Ba profile cũ dùng nguyên văn `prompts/00-risuai-system-prefix.md` và
+giữ chung response shell từ bản NSFW. `nsfw-lite-en` dùng system prefix, response instruction và
+route instruction riêng bằng tiếng Anh; chỉ hợp đồng đầu ra của nó bắt buộc cảnh nhập vai tiếng
+Việt.
 
 Hệ thống không còn coi dữ kiện gốc, route, quyền lượt, giọng nhân vật, tự chủ, ASMR, cơ học, cảnh
 nhóm, tiếng Việt và ảnh là các checklist rời. Mỗi module vẫn có trọng tâm riêng nhưng các câu lệnh
@@ -51,10 +52,11 @@ manifest tương ứng tại `profiles/`. Bản `nsfw` tiếp tục trỏ tới 
 
 ```bash
 pnpm dev --list                 # Xem thứ tự module của NSFW đầy đủ
-pnpm compile:prompts            # Sinh cả ba profile
+pnpm compile:prompts            # Sinh cả bốn profile
 pnpm compile:prompts:nsfw       # Chỉ sinh NSFW đầy đủ + alias cũ
 pnpm compile:prompts:sfw        # Chỉ sinh SFW cốt truyện
 pnpm compile:prompts:lite       # Chỉ sinh NSFW Lite
+pnpm compile:prompts:lite:en    # Chỉ sinh NSFW Lite English cho Gemma 4
 pnpm check:prompts              # Kiểm tra mọi master có mới hay không
 pnpm check                      # TypeScript và ESLint
 pnpm test                       # Vitest
@@ -68,6 +70,7 @@ CLI cũng hỗ trợ đường dẫn tùy chỉnh khi cần:
 ```bash
 pnpm dev --profile sfw --stdout
 pnpm dev --profile nsfw-lite --list
+pnpm dev --profile nsfw-lite-en --list
 pnpm dev --source prompts --output generated/MASTER_PROMPT.md
 ```
 
@@ -89,20 +92,22 @@ tính từ gốc dự án.
 ## Cấu trúc
 
 ```text
-profiles/                    Manifest và thứ tự module của ba profile
+profiles/                    Manifest và thứ tự module của bốn profile
 bundles/nsfw/                Ba file dùng trực tiếp cho NSFW đầy đủ
 bundles/sfw/                 Ba file dùng trực tiếp cho SFW cốt truyện
 bundles/nsfw-lite/           Ba file dùng trực tiếp cho NSFW 1-on-1 cô đọng
+bundles/nsfw-lite-en/        Ba file điều khiển tiếng Anh dành cho Gemma 4
 profile-modules/shared/      Luật dùng chung cho SFW và phần đóng tiếng Việt
 profile-modules/sfw/         Phần cốt truyện chuyên cho SFW
 profile-modules/nsfw-lite/   Lõi, trạng thái và ảnh 1-on-1 cho model nhỏ
+profile-modules/nsfw-lite-en/ Luật atomic, data boundary và output contract tiếng Anh
 prompts/                     18 module của NSFW đầy đủ hiện tại
 src/compiler.ts              Compiler thư mục thô tương thích cách dùng cũ
 src/profiles.ts              Nạp manifest và biên dịch profile
 src/cli.ts                   Giao diện dòng lệnh
 scripts/export-project.ps1   Đóng gói tệp Git cần thiết thành ZIP
 test/compiler.test.ts        Kiểm thử prompt NSFW đầy đủ và compiler gốc
-test/profiles.test.ts        Kiểm thử ranh giới, kích thước và tương thích ba profile
+test/profiles.test.ts        Kiểm thử ranh giới, kích thước và tương thích bốn profile
 generated/MASTER_PROMPT.md   Alias tương thích của bundle NSFW
 prompts/16-vietnamese-contrastive-examples.md
                              109 ví dụ dương tiếng Việt cho solo và harem
@@ -141,8 +146,9 @@ SHA-256 thay đổi.
 Trong profile `nsfw`, file 00 là khung hệ thống chung đầy đủ của RisuAI và được giữ nguyên. Mỗi
 module 01–17 sở hữu một miền hành vi; câu nhắc chéo chỉ giữ khi nó làm nhiệm vụ khác ở router, hợp
 đồng đầu ra hoặc cổng kiểm tra. Profile `sfw` và `nsfw-lite` dùng module riêng ngắn hơn nhưng chia
-sẻ cùng luật trạng thái, cá nhân hóa, ảnh và nền tiếng Việt. Ngân sách mềm lần lượt là 90.000,
-24.000 và 20.000 ký tự; compiler chỉ cảnh báo khi vượt, không cắt nội dung. Các tệp prompt Markdown
+sẻ cùng luật trạng thái, cá nhân hóa, ảnh và nền tiếng Việt. `nsfw-lite-en` tách thành sáu lớp tiếng
+Anh theo hierarchy–data–task–contract, nhưng vẫn khóa cảnh đầu ra bằng tiếng Việt. Ngân sách mềm do
+từng manifest quy định; compiler chỉ cảnh báo khi vượt, không cắt nội dung. Các tệp prompt Markdown
 được loại khỏi Prettier; TypeScript, JSON cấu hình và README vẫn dùng định dạng tự động bình thường.
 
 Đợt tái cấu trúc dựa trên hướng dẫn chính thức về việc ưu tiên kết quả, bỏ chỉ dẫn/ví dụ không đổi
@@ -150,10 +156,42 @@ hành vi và chạy lại eval sau từng nhóm:
 [Prompting guidance for GPT-5.6 Sol](https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6)
 và [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-engineering).
 
+## NSFW Lite English cho Gemma 4
+
+`nsfw-lite-en` là bản thiết kế lại, không phải bản dịch từng câu của `nsfw-lite`. Bảy lớp system
+prompt lần lượt tách mục tiêu/hierarchy, data boundary và trạng thái, character–trajectory control,
+ảnh, scene engine, khóa tiếng Việt và output contract. Mỗi luật có một mã ổn định và một yêu cầu
+kiểm chứng được; fallback cùng silent validation nằm gần điểm xuất để giảm lỗi quên luật khi context
+dài.
+
+Khi dùng Transformers hoặc inference stack có chat template, truyền `MASTER_PROMPT.md` bằng native
+`system` role và để tokenizer tự thêm control token Gemma 4. Không chép thủ công `<|turn>system`
+hoặc `<|turn>model>` vào nội dung nếu stack đã gọi `apply_chat_template`. Nếu backend hỗ trợ
+thinking mode, bật ở cấp conversation; prompt chỉ yêu cầu kiểm tra ngầm và không yêu cầu in
+chain-of-thought.
+
+Đọc [GEMMA4_SETUP.md](bundles/nsfw-lite-en/GEMMA4_SETUP.md) trước khi chạy local. File này tách các
+lỗi không thể chữa bằng prompt: sai chat template/Jinja, control token bị chèn hai lần, backend hoặc
+state cache sinh ký tự rác, reasoning loop, context hiệu dụng thấp hơn context quảng cáo, và khác
+biệt giữa checkpoint/quantization. Khuyến nghị khởi đầu là thinking tắt cho character chat/ERP đơn,
+context 16K–32K và native Gemma 4 template; chỉ bật thinking có ngân sách cho RPG nhiều luật.
+
+Lớp character–trajectory mới chống các lỗi cộng đồng báo cáo: personality bị san phẳng khi ERP,
+flirt tự nhảy sang sex, NPC quá dễ bị thuyết phục, intimacy tự biến thành tình yêu/cứu chuộc, swipe
+chỉ đổi từ nhưng giữ cùng đường diễn biến, trope/slop và câu kết kiểu trợ lý đưa lựa chọn. Route mới
+giữ `CHARACTER ANCHORS` cùng áp lực trajectory hiện tại để giảm drift khi hội thoại dài.
+
+Thiết kế này bám các nguyên tắc trong nghiên cứu được cung cấp: luật bất biến ở system, hierarchy
+rõ, reference là data, contract cụ thể, fallback xác định và output-side self-review. Tham khảo
+[Gemma 4 model card](https://ai.google.dev/gemma/docs/core/model_card_4),
+[Gemma 4 prompt formatting](https://ai.google.dev/gemma/docs/core/prompt-formatting-gemma4) và
+[thinking mode](https://ai.google.dev/gemma/docs/capabilities/thinking).
+
 ## Phạm vi tiếng Việt
 
-- Các master/chỉ dẫn trong `bundles/`, mô-đun trong `prompts/` và `profile-modules/`, cùng bộ lệnh
-  chuyển route đều bắt buộc nội dung hướng người đọc bằng tiếng Việt.
+- Ba profile cũ viết cả luật điều khiển và nội dung hướng người đọc bằng tiếng Việt.
+- `nsfw-lite-en` viết luật điều khiển bằng tiếng Anh nhưng hợp đồng đầu ra vẫn bắt buộc cảnh nhập
+  vai hướng người đọc bằng tiếng Việt.
 - Chỉ giữ nguyên biến, thẻ XML, khóa tài nguyên ảnh, mã, đường dẫn và tên riêng cần thiết về kỹ
   thuật.
 - bộ lệnh phiên âm Gemini cũng được hướng dẫn hoàn toàn bằng tiếng Việt. Riêng lời nghe thấy trong
@@ -166,10 +204,11 @@ và [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-en
 vẫn là một đoạn liên tục của cùng dòng nhập vai, không phải nhánh hoặc thế giới mới; có thể chuyển
 khi chuỗi hành động đã hoàn thành hoặc còn đang dở nhưng cần sang cửa sổ hội thoại mới.
 
-Hai route chuyên biệt dùng cùng nguyên tắc snapshot bất động và cổng `<USER_NEXT_PROMPT>`. Bản SFW
-ưu tiên tuyến truyện, thế giới, quan hệ và kiến thức, không thêm trường cơ học trưởng thành nhưng
-vẫn bảo toàn sự kiện trưởng thành thật sự còn hệ quả. Bản NSFW Lite chỉ theo dõi {{user}} với một
-nhân vật AI, dùng ngân sách nhỏ hơn và không mang cơ chế điều phối cảnh tập thể.
+Ba route chuyên biệt dùng cùng nguyên tắc snapshot bất động và cổng `<USER_NEXT_PROMPT>`. Bản SFW ưu
+tiên tuyến truyện, thế giới, quan hệ và kiến thức, không thêm trường cơ học trưởng thành nhưng vẫn
+bảo toàn sự kiện trưởng thành thật sự còn hệ quả. Hai bản NSFW Lite giữ trạng thái độc lập cho một
+hoặc nhiều nhân vật với mật độ gọn hơn; bản English dùng nhãn snapshot tiếng Anh nhưng giữ cùng
+quyền lượt và cổng prompt thật.
 
 Mỗi lần tạo route, bộ chuyển đọc snapshot cũ thành bản ghi, áp dụng các lượt mới rồi render lại toàn
 bộ snapshot. `TRẠNG THÁI HIỆN TẠI` luôn bị thay hoàn toàn. Các nhóm còn lại dùng mã ổn định `E`,
@@ -227,8 +266,8 @@ dùng thứ tự sau:
    `<ROLEPLAY_INFO>` khác.
 4. Thẻ nhân vật, hồ sơ nhân vật người dùng, các mục tri thức thế giới đang hoạt động và bộ nhớ do
    RisuAI chèn.
-5. Dùng `RESPONSE_INSTRUCTION.md` trong cùng thư mục bundle. Phần mặc định của cả ba tệp giống hệt
-   nhau; SFW và NSFW Lite chỉ thay `<FINAL_EXECUTION_OVERRIDE>`.
+5. Dùng `RESPONSE_INSTRUCTION.md` trong cùng thư mục bundle. Ba profile cũ giữ cùng response shell;
+   `nsfw-lite-en` dùng response instruction riêng và không có `<FINAL_EXECUTION_OVERRIDE>`.
 
 Khi chuyển cửa sổ hội thoại, dùng `ROLEPLAY_CHANGE_ROUTE.md` trong cùng thư mục bundle. Không trộn
 file giữa các bundle vì mật độ và trường trạng thái khác nhau.

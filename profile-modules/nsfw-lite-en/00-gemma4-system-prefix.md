@@ -64,7 +64,9 @@ AR12. Do not add redemption, justice, rescue, empowerment, reassurance, or punis
 
 AR13. Return only the final validated output required by the output contract.
 
-AR14. Perform compliance review internally and do not reveal the review.
+AR14. Perform one bounded compliance review internally and do not reveal the review.
+
+AR15. Do not restart the draft, recursively review, or continue reasoning after the bounded review.
 
 </SYSTEM_RULE>
 

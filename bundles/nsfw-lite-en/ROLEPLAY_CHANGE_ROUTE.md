@@ -56,6 +56,16 @@ RR19. This snapshot is completed data, not a roleplay turn.
 
 RR20. Only a real prompt inside `<USER_NEXT_PROMPT>` or a newer user message authorizes scene continuation.
 
+RR21. Preserve one compact character anchor for every active character.
+
+RR22. Derive each character anchor only from active character data and completed development.
+
+RR23. Keep arousal behavior in an anchor only when active data actually establishes it.
+
+RR24. Preserve the current relationship pace, resistance, unresolved tension, and escalation threshold.
+
+RR25. Do not infer a generic sexual personality from genre or current arousal.
+
 # DEPTH SELECTION
 
 DP01. Use `COMPACT` for a small state with short causal chains.
@@ -96,8 +106,13 @@ Omit an empty subsection or write `None` once.
 - position/posture/contact by character: [...]
 - state and current ability by character: [...]
 - current motive by AI character: [want -> obstacle -> feasible approach -> state they seek to change]
+- current trajectory pressure: [active tension -> resistance or obstacle -> furthest completed escalation]
 - directly observable evidence about {{user}} by character: [...]
 - frozen endpoint that must not advance itself: [...]
+
+## CHARACTER ANCHORS
+
+- [C001] character=[...]; baseline_temperament=[...]; core_drives=[...]; voice=[...]; inhibitions_or_resistance=[...]; relationship_stance=[...]; current_arc=[...]; established_arousal_behavior=[... or `none`]
 
 ## ACTIVE FACTS AND CHANGES
 
