@@ -25,25 +25,36 @@ function responseInstructionShell(source: string): string {
 }
 
 describe("prompt profiles", () => {
-  it("discovers the three product profiles in manifest order", async () => {
+  it("discovers the four product profiles in manifest order", async () => {
     const profiles = await loadProjectProfiles();
 
-    expect(profiles.map(({ manifest }) => manifest.id)).toEqual(["nsfw", "sfw", "nsfw-lite"]);
+    expect(profiles.map(({ manifest }) => manifest.id)).toEqual([
+      "nsfw",
+      "sfw",
+      "nsfw-lite",
+      "nsfw-lite-en",
+    ]);
     expect(profiles.map(({ manifest }) => manifest.responseInstruction)).toEqual([
       "bundles/nsfw/RESPONSE_INSTRUCTION.md",
       "bundles/sfw/RESPONSE_INSTRUCTION.md",
       "bundles/nsfw-lite/RESPONSE_INSTRUCTION.md",
+      "bundles/nsfw-lite-en/RESPONSE_INSTRUCTION.md",
     ]);
     expect(profiles.map(({ manifest }) => manifest.routeInstruction)).toEqual([
       "bundles/nsfw/ROLEPLAY_CHANGE_ROUTE.md",
       "bundles/sfw/ROLEPLAY_CHANGE_ROUTE.md",
       "bundles/nsfw-lite/ROLEPLAY_CHANGE_ROUTE.md",
+      "bundles/nsfw-lite-en/ROLEPLAY_CHANGE_ROUTE.md",
     ]);
 
     for (const profile of profiles) {
       const responseInstruction = await readFile(profile.responseInstructionFile, "utf8");
       const routeInstruction = await readFile(profile.routeInstructionFile, "utf8");
-      expect(profile.manifest.modules[0]).toBe("prompts/00-risuai-system-prefix.md");
+      expect(profile.manifest.modules[0]).toBe(
+        profile.manifest.id === "nsfw-lite-en"
+          ? "profile-modules/nsfw-lite-en/00-gemma4-system-prefix.md"
+          : "prompts/00-risuai-system-prefix.md",
+      );
       expect(count(responseInstruction, "<RESPONSE_INSTRUCTION>")).toBe(1);
       expect(count(responseInstruction, "</RESPONSE_INSTRUCTION>")).toBe(1);
       expect(routeInstruction).toContain("<ROLEPLAY_CHANGE_ROUTE>");
@@ -173,6 +184,51 @@ describe("prompt profiles", () => {
     expect(liteResult.compiled).not.toContain("### Ví dụ 1");
   });
 
+  it("builds an English Gemma 4 control prompt with a Vietnamese output contract", async () => {
+    const profiles = await loadProjectProfiles();
+    const gemma = profiles.find(({ manifest }) => manifest.id === "nsfw-lite-en")!;
+    const result = await compilePromptProfile({ profile: gemma, writeOutput: false });
+    const response = await readFile(gemma.responseInstructionFile, "utf8");
+    const route = await readFile(gemma.routeInstructionFile, "utf8");
+
+    expect(result.modules.map(({ relativePath }) => relativePath)).toEqual([
+      "profile-modules/nsfw-lite-en/00-gemma4-system-prefix.md",
+      "profile-modules/nsfw-lite-en/10-authority-state-and-turn.md",
+      "profile-modules/nsfw-lite-en/20-risuai-assets.md",
+      "profile-modules/nsfw-lite-en/30-scene-engine.md",
+      "profile-modules/nsfw-lite-en/40-vietnamese-localization.md",
+      "profile-modules/nsfw-lite-en/99-output-contract.md",
+    ]);
+    expect(result.compiled.length).toBeLessThanOrEqual(gemma.manifest.maxCompiledCharacters);
+    expect(result.compiled).toContain("# PRIMARY OBJECTIVE");
+    expect(result.compiled).toContain("# INSTRUCTION PRIORITY");
+    expect(result.compiled).toContain("# DATA BOUNDARY");
+    expect(result.compiled).toContain("# ACTIVE RULES");
+    expect(result.compiled).toContain("# OUTPUT CONTRACT");
+    expect(result.compiled).toContain("# SILENT VALIDATION");
+    expect(result.compiled).toContain("IP01.");
+    expect(result.compiled).toContain("DB01.");
+    expect(result.compiled).toContain("OC01.");
+    expect(result.compiled).toContain("VR10.");
+    expect(result.compiled).toContain("OUTPUT_LANGUAGE").toBe(false);
+    expect(result.compiled).toContain("zero Hangul characters");
+    expect(result.compiled).toContain("every sound and every description of sound");
+    expect(result.compiled).toContain("appearance, clothing, material, hairstyle, position");
+    expect(result.compiled).toContain("Đang chờ prompt kế tiếp của bạn.");
+    expect(result.compiled).not.toContain("## NGUỒN, LƯỢT VÀ TRẠNG THÁI");
+    expect(response).toContain("OUTPUT_LANGUAGE: Vietnamese");
+    expect(response).toContain("FORBIDDEN_ELEMENTS:");
+    expect(response).toContain("# SILENT FINAL REVIEW");
+    expect(response).toContain("Return only the validated final scene");
+    expect(route).toContain("# INSTRUCTION PRIORITY");
+    expect(route).toContain("# OUTPUT CONTRACT");
+    expect(route).toContain("current motive by AI character");
+    expect(route).toContain("Use no hard character ceiling");
+    expect(`${result.compiled}\n${response}`).not.toMatch(
+      /[\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff]/u,
+    );
+  });
+
   it("balances the ROLEPLAY_INFO wrapper in every compiled profile", async () => {
     const profiles = await loadProjectProfiles();
     const results = await Promise.all(
@@ -187,8 +243,10 @@ describe("prompt profiles", () => {
     }
   });
 
-  it("shares the exact NSFW system prefix and response shell across all profiles", async () => {
-    const profiles = await loadProjectProfiles();
+  it("keeps the exact NSFW system prefix and response shell across the three legacy profiles", async () => {
+    const profiles = (await loadProjectProfiles()).filter(
+      ({ manifest }) => manifest.id !== "nsfw-lite-en",
+    );
     const expectedPrefix = (
       await readFile(path.join(workspaceDirectory, "prompts", "00-risuai-system-prefix.md"), "utf8")
     )
@@ -248,6 +306,12 @@ describe("prompt profiles", () => {
     );
     expect(routeInstructions.find(({ id }) => id === "nsfw-lite")!.source).toContain(
       "Không có trần ký tự cứng",
+    );
+    expect(routeInstructions.find(({ id }) => id === "nsfw-lite-en")!.source).toContain(
+      "current motive by AI character",
+    );
+    expect(routeInstructions.find(({ id }) => id === "nsfw-lite-en")!.source).toContain(
+      "Use no hard character ceiling",
     );
   });
 });
