@@ -136,11 +136,21 @@ describe("prompt profiles", () => {
       "Không được xuất cùng một nội dung bằng nhiều ngôn ngữ dưới bất kỳ hình thức nào",
     );
     expect(liteResult.compiled).toContain("Bất kỳ từ hoặc chuỗi Hàn nào không thuộc hai loại đó");
+    expect(liteResult.compiled).toContain(
+      "Trong cảnh quan hệ, mọi âm thanh và cách mô tả âm thanh phải được viết bằng tiếng Việt tự nhiên",
+    );
     expect(liteResponse).toContain("Không được có bất kỳ ký tự Hangul nào");
+    expect(liteResponse).toContain("cấm dùng bất kỳ từ hoặc chuỗi tiếng Anh nào");
     expect(liteResponse).toContain(
       "Không được xuất cùng một nội dung bằng nhiều ngôn ngữ dưới bất kỳ hình thức nào",
     );
     expect(liteResponse).toContain("số ký tự Hangul bằng không");
+    expect(liteResult.compiled).toContain(
+      "Mọi mô tả ngoại hình, trang phục, chất liệu, kiểu tóc, tư thế và hoạt động quan hệ phải dùng từ tiếng Việt",
+    );
+    expect(liteResponse).toContain(
+      "Mọi mô tả ngoại hình, trang phục, chất liệu, kiểu tóc, tư thế và hoạt động quan hệ phải dùng từ tiếng Việt",
+    );
     expect(liteResult.compiled).not.toMatch(
       /[\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff]/u,
     );
