@@ -202,11 +202,32 @@ describe("prompt profiles", () => {
     ]);
     expect(result.compiled.length).toBeLessThanOrEqual(gemma.manifest.maxCompiledCharacters);
     expect(result.compiled).toContain("# PRIMARY OBJECTIVE");
+    expect(result.compiled).toContain("<CONFIGURATION>");
+    expect(result.compiled).toContain("</CONFIGURATION>");
+    expect(result.compiled).toContain("<ROLEPLAY_RULE>");
+    expect(result.compiled).toContain("</ROLEPLAY_RULE>");
     expect(result.compiled).toContain("# INSTRUCTION PRIORITY");
     expect(result.compiled).toContain("# DATA BOUNDARY");
     expect(result.compiled).toContain("# ACTIVE RULES");
     expect(result.compiled).toContain("# OUTPUT CONTRACT");
     expect(result.compiled).toContain("# SILENT VALIDATION");
+    expect(result.compiled.match(/<SYSTEM_RULE>/g)).toHaveLength(1);
+    expect(result.compiled.match(/<\/SYSTEM_RULE>/g)).toHaveLength(1);
+    expect(result.compiled.match(/<CONFIGURATION>/g)).toHaveLength(1);
+    expect(result.compiled.match(/<\/CONFIGURATION>/g)).toHaveLength(1);
+    expect(result.compiled.match(/<ROLEPLAY_RULE>/g)).toHaveLength(1);
+    expect(result.compiled.match(/<\/ROLEPLAY_RULE>/g)).toHaveLength(1);
+    expect(result.compiled.match(/<ROLEPLAY_INFO>/g)).toHaveLength(1);
+    expect(result.compiled.match(/<\/ROLEPLAY_INFO>/g)).toHaveLength(1);
+    expect(result.compiled.indexOf("<SYSTEM_RULE>")).toBeLessThan(
+      result.compiled.indexOf("<CONFIGURATION>"),
+    );
+    expect(result.compiled.indexOf("<CONFIGURATION>")).toBeLessThan(
+      result.compiled.indexOf("<ROLEPLAY_RULE>"),
+    );
+    expect(result.compiled.indexOf("<ROLEPLAY_RULE>")).toBeLessThan(
+      result.compiled.indexOf("<ROLEPLAY_INFO>"),
+    );
     expect(result.compiled).toContain("IP01.");
     expect(result.compiled).toContain("DB01.");
     expect(result.compiled).toContain("OC01.");
