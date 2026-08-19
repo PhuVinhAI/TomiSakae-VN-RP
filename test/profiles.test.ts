@@ -25,7 +25,7 @@ function responseInstructionShell(source: string): string {
 }
 
 describe("prompt profiles", () => {
-  it("discovers the five product profiles in manifest order", async () => {
+  it("discovers the six product profiles in manifest order", async () => {
     const profiles = await loadProjectProfiles();
 
     expect(profiles.map(({ manifest }) => manifest.id)).toEqual([
@@ -34,6 +34,7 @@ describe("prompt profiles", () => {
       "nsfw-lite",
       "nsfw-lite-en",
       "nsfw-lite-gemini3-en",
+      "nsfw-lite-mimo25-pro-en",
     ]);
     expect(profiles.map(({ manifest }) => manifest.responseInstruction)).toEqual([
       "bundles/nsfw/RESPONSE_INSTRUCTION.md",
@@ -41,11 +42,13 @@ describe("prompt profiles", () => {
       "bundles/nsfw-lite/RESPONSE_INSTRUCTION.md",
       "bundles/nsfw-lite-en/RESPONSE_INSTRUCTION.md",
       "bundles/nsfw-lite-gemini3-en/RESPONSE_INSTRUCTION.md",
+      "bundles/nsfw-lite-mimo25-pro-en/RESPONSE_INSTRUCTION.md",
     ]);
     expect(profiles.map(({ manifest }) => manifest.routeInstruction)).toEqual([
       "bundles/nsfw/ROLEPLAY_CHANGE_ROUTE.md",
       "bundles/sfw/ROLEPLAY_CHANGE_ROUTE.md",
       "bundles/nsfw-lite/ROLEPLAY_CHANGE_ROUTE.md",
+      undefined,
       undefined,
       undefined,
     ]);
@@ -57,7 +60,9 @@ describe("prompt profiles", () => {
           ? "profile-modules/nsfw-lite-en/00-gemma4-system-prefix.md"
           : profile.manifest.id === "nsfw-lite-gemini3-en"
             ? "profile-modules/nsfw-lite-gemini3-en/00-gemini3-system-prefix.md"
-            : "prompts/00-risuai-system-prefix.md";
+            : profile.manifest.id === "nsfw-lite-mimo25-pro-en"
+              ? "profile-modules/nsfw-lite-mimo25-pro-en/00-mimo25-system-prefix.md"
+              : "prompts/00-risuai-system-prefix.md";
       expect(profile.manifest.modules[0]).toBe(expectedPrefix);
       expect(count(responseInstruction, "<RESPONSE_INSTRUCTION>")).toBe(1);
       expect(count(responseInstruction, "</RESPONSE_INSTRUCTION>")).toBe(1);
@@ -310,6 +315,40 @@ describe("prompt profiles", () => {
     expect(`${result.compiled}\n${response}`).not.toContain("gò bồng đảo");
     expect(`${result.compiled}\n${response}`).not.toContain("gò bòng đảo");
     expect(`${result.compiled}\n${response}`).not.toContain("`hỏng`");
+    expect(`${result.compiled}\n${response}`).not.toMatch(
+      /[\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff]/u,
+    );
+  });
+
+  it("builds a medium-length MiMo 2.5 Pro control prompt with Vietnamese output", async () => {
+    const profiles = await loadProjectProfiles();
+    const mimo = profiles.find(({ manifest }) => manifest.id === "nsfw-lite-mimo25-pro-en")!;
+    const result = await compilePromptProfile({ profile: mimo, writeOutput: false });
+    const response = await readFile(mimo.responseInstructionFile, "utf8");
+
+    expect(mimo.routeInstructionFile).toBeUndefined();
+    expect(result.modules.map(({ relativePath }) => relativePath)).toEqual([
+      "profile-modules/nsfw-lite-mimo25-pro-en/00-mimo25-system-prefix.md",
+      "profile-modules/nsfw-lite-mimo25-pro-en/10-authority-state-and-turn.md",
+      "profile-modules/nsfw-lite-mimo25-pro-en/15-character-trajectory-control.md",
+      "profile-modules/nsfw-lite-mimo25-pro-en/30-scene-engine.md",
+      "profile-modules/nsfw-lite-mimo25-pro-en/40-vietnamese-localization.md",
+      "profile-modules/nsfw-lite-mimo25-pro-en/99-output-contract.md",
+    ]);
+    expect(result.compiled.length).toBeLessThanOrEqual(mimo.manifest.maxCompiledCharacters);
+    expect(result.compiled).toContain("medium-length");
+    expect(result.compiled).toContain("active state");
+    expect(result.compiled).toContain("clothing actually worn");
+    expect(result.compiled).toContain("Causality comes before novelty");
+    expect(result.compiled).toContain("Do not impose a numeric word or character limit");
+    expect(result.compiled).not.toMatch(/\b\d+\s+(?:words?|paragraphs?|characters?)\b/i);
+    expect(result.compiled).not.toContain("ROLEPLAY_CHANGE_ROUTE");
+    expect(result.compiled).not.toContain("# RISUAI ASSETS");
+    expect(response).toContain("Medium-length, fully developed roleplay prose and dialogue");
+    expect(response).toContain("Do not impose a numeric word or character limit");
+    expect(response).toContain("state ledger");
+    expect(response).toContain("clothing actually worn");
+    expect(response).not.toContain("FAILURE_VALUE");
     expect(`${result.compiled}\n${response}`).not.toMatch(
       /[\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff]/u,
     );

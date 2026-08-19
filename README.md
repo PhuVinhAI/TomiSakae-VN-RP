@@ -1,16 +1,17 @@
 # Trình biên dịch prompt nhập vai tiếng Việt
 
-Dự án Node.js + TypeScript để quản lý prompt theo mô-đun và biên dịch năm profile dùng chung một
+Dự án Node.js + TypeScript để quản lý prompt theo mô-đun và biên dịch sáu profile dùng chung một
 pipeline. Mỗi profile chỉ chọn những module cần thiết, nên phần trạng thái, cá nhân hóa, ảnh và
 tiếng Việt có một nguồn duy nhất thay vì ba bản prompt sao chép rồi lệch nhau.
 
-| Profile                | Mục đích                                                                 | Thư mục sử dụng                 |
-| ---------------------- | ------------------------------------------------------------------------ | ------------------------------- |
-| `nsfw`                 | Bản đầy đủ hiện tại, gồm toàn bộ ASMR, cơ học, cảnh nhóm và 109 ví dụ    | `bundles/nsfw/`                 |
-| `sfw`                  | Tập trung cốt truyện, thế giới và nhân vật; bỏ module chuyên sâu NSFW    | `bundles/sfw/`                  |
-| `nsfw-lite`            | Bản NSFW 1-on-1 cho model nhỏ, giữ lõi cần thiết và không nạp ví dụ/nhóm | `bundles/nsfw-lite/`            |
-| `nsfw-lite-en`         | Lõi điều khiển tiếng Anh tối ưu cho Gemma 4; cảnh vẫn xuất tiếng Việt    | `bundles/nsfw-lite-en/`         |
-| `nsfw-lite-gemini3-en` | Bản tiếng Anh rút gọn cho Gemini 3.x; cảnh vẫn xuất tiếng Việt           | `bundles/nsfw-lite-gemini3-en/` |
+| Profile                   | Mục đích                                                                 | Thư mục sử dụng                    |
+| ------------------------- | ------------------------------------------------------------------------ | ---------------------------------- |
+| `nsfw`                    | Bản đầy đủ hiện tại, gồm toàn bộ ASMR, cơ học, cảnh nhóm và 109 ví dụ    | `bundles/nsfw/`                    |
+| `sfw`                     | Tập trung cốt truyện, thế giới và nhân vật; bỏ module chuyên sâu NSFW    | `bundles/sfw/`                     |
+| `nsfw-lite`               | Bản NSFW 1-on-1 cho model nhỏ, giữ lõi cần thiết và không nạp ví dụ/nhóm | `bundles/nsfw-lite/`               |
+| `nsfw-lite-en`            | Lõi điều khiển tiếng Anh tối ưu cho Gemma 4; cảnh vẫn xuất tiếng Việt    | `bundles/nsfw-lite-en/`            |
+| `nsfw-lite-gemini3-en`    | Bản tiếng Anh rút gọn cho Gemini 3.x; cảnh vẫn xuất tiếng Việt           | `bundles/nsfw-lite-gemini3-en/`    |
+| `nsfw-lite-mimo25-pro-en` | Bản tiếng Anh gọn cho MiMo 2.5 Pro; đầu ra tiếng Việt độ dài trung bình  | `bundles/nsfw-lite-mimo25-pro-en/` |
 
 `sfw` không phải bộ lọc nội dung. Nó không chủ động mang cơ chế NSFW vào mọi cảnh, nhưng nếu
 character, world và diễn biến hiện tại đi theo hướng đó thì model vẫn tiếp tục theo nguồn, không từ
@@ -23,6 +24,8 @@ Ba bundle cũ chứa ba tên file: `MASTER_PROMPT.md`, `RESPONSE_INSTRUCTION.md`
 chung response shell từ bản NSFW. `nsfw-lite-en` dùng system prefix và response instruction riêng
 bằng tiếng Anh; hợp đồng đầu ra của nó bắt buộc cảnh nhập vai tiếng Việt. Bản `nsfw-lite-gemini3-en`
 cũng chỉ có master và response instruction, nhưng được rút gọn riêng cho Gemini 3.x.
+`nsfw-lite-mimo25-pro-en` cũng không có ảnh hoặc route, đồng thời ưu tiên state vật lý và nhịp viết
+trung bình để giảm lỗi continuity và lan man.
 
 Hệ thống không còn coi dữ kiện gốc, route, quyền lượt, giọng nhân vật, tự chủ, ASMR, cơ học, cảnh
 nhóm, tiếng Việt và ảnh là các checklist rời. Mỗi module vẫn có trọng tâm riêng nhưng các câu lệnh
@@ -41,7 +44,7 @@ pnpm install
 pnpm compile:prompts
 ```
 
-Lệnh trên sinh `MASTER_PROMPT.md` vào cả năm thư mục bundle. `generated/MASTER_PROMPT.md` vẫn là
+Lệnh trên sinh `MASTER_PROMPT.md` vào cả sáu thư mục bundle. `generated/MASTER_PROMPT.md` vẫn là
 alias giống hệt `bundles/nsfw/MASTER_PROMPT.md` để giữ tương thích với cách dùng cũ. Nội dung mỗi
 master bắt đầu ngay từ mô-đun đầu tiên, không chèn metadata, danh sách nguồn hay lời mở đầu, nên có
 thể sao chép trực tiếp.
@@ -54,12 +57,13 @@ manifest tương ứng tại `profiles/`. Bản `nsfw` tiếp tục trỏ tới 
 
 ```bash
 pnpm dev --list                 # Xem thứ tự module của NSFW đầy đủ
-pnpm compile:prompts            # Sinh cả năm profile
+pnpm compile:prompts            # Sinh cả sáu profile
 pnpm compile:prompts:nsfw       # Chỉ sinh NSFW đầy đủ + alias cũ
 pnpm compile:prompts:sfw        # Chỉ sinh SFW cốt truyện
 pnpm compile:prompts:lite       # Chỉ sinh NSFW Lite
 pnpm compile:prompts:lite:en    # Chỉ sinh NSFW Lite English cho Gemma 4
 pnpm compile:prompts:lite:gemini3 # Chỉ sinh NSFW Lite English cho Gemini 3.x
+pnpm compile:prompts:lite:mimo25 # Chỉ sinh NSFW Lite English cho MiMo 2.5 Pro
 pnpm check:prompts              # Kiểm tra mọi master có mới hay không
 pnpm check                      # TypeScript và ESLint
 pnpm test                       # Vitest
@@ -75,6 +79,7 @@ pnpm dev --profile sfw --stdout
 pnpm dev --profile nsfw-lite --list
 pnpm dev --profile nsfw-lite-en --list
 pnpm dev --profile nsfw-lite-gemini3-en --list
+pnpm dev --profile nsfw-lite-mimo25-pro-en --list
 pnpm dev --source prompts --output generated/MASTER_PROMPT.md
 ```
 
@@ -96,24 +101,26 @@ tính từ gốc dự án.
 ## Cấu trúc
 
 ```text
-profiles/                    Manifest và thứ tự module của năm profile
+profiles/                    Manifest và thứ tự module của sáu profile
 bundles/nsfw/                Ba file dùng trực tiếp cho NSFW đầy đủ
 bundles/sfw/                 Ba file dùng trực tiếp cho SFW cốt truyện
 bundles/nsfw-lite/           Ba file dùng trực tiếp cho NSFW 1-on-1 cô đọng
 bundles/nsfw-lite-en/        Hai file điều khiển tiếng Anh dành cho Gemma 4
 bundles/nsfw-lite-gemini3-en/ Hai file điều khiển tiếng Anh dành cho Gemini 3.x
+bundles/nsfw-lite-mimo25-pro-en/ Hai file điều khiển tiếng Anh dành cho MiMo 2.5 Pro
 profile-modules/shared/      Luật dùng chung cho SFW và phần đóng tiếng Việt
 profile-modules/sfw/         Phần cốt truyện chuyên cho SFW
 profile-modules/nsfw-lite/   Lõi, trạng thái và ảnh 1-on-1 cho model nhỏ
 profile-modules/nsfw-lite-en/ Luật atomic, data boundary và output contract cho Gemma 4
 profile-modules/nsfw-lite-gemini3-en/ Luật rút gọn và output contract cho Gemini 3.x
+profile-modules/nsfw-lite-mimo25-pro-en/ Luật state, nhịp trung bình và output contract cho MiMo
 prompts/                     18 module của NSFW đầy đủ hiện tại
 src/compiler.ts              Compiler thư mục thô tương thích cách dùng cũ
 src/profiles.ts              Nạp manifest và biên dịch profile
 src/cli.ts                   Giao diện dòng lệnh
 scripts/export-project.ps1   Đóng gói tệp Git cần thiết thành ZIP
 test/compiler.test.ts        Kiểm thử prompt NSFW đầy đủ và compiler gốc
-test/profiles.test.ts        Kiểm thử ranh giới, kích thước và tương thích năm profile
+test/profiles.test.ts        Kiểm thử ranh giới, kích thước và tương thích sáu profile
 generated/MASTER_PROMPT.md   Alias tương thích của bundle NSFW
 prompts/16-vietnamese-contrastive-examples.md
                              109 ví dụ dương tiếng Việt cho solo và harem
@@ -184,6 +191,12 @@ liên tục, nhưng rút các luật trùng cho Gemini 3.x. Nó cho phép chi ti
 hành động có quan hệ nhân quả của nhân vật AI/môi trường, thêm `RESPONSE SHAPE` để tránh phản hồi
 quá ngắn, và dùng hai câu `SILENT CHECK` thay cho danh sách kiểm tra dài. Nó không có ảnh,
 route/change-route, thinking setup riêng hoặc danh sách cấm từ thân mật của bản Gemma.
+
+`nsfw-lite-mimo25-pro-en` nén luật theo hướng dẫn tích cực cho MiMo 2.5 Pro. Trước mỗi lượt, model
+phải dựng lại state hiện tại gồm vị trí, tư thế, quần áo đang mặc, tiếp xúc, thương tích, mệt mỏi,
+mục tiêu và kiến thức để tránh đi vào nơi đã đứng hoặc cởi món không mặc. `RESPONSE SHAPE` yêu cầu
+độ dài trung bình và chỉ hoàn tất một nhịp cảnh hiện tại; không đặt giới hạn số từ, số đoạn hay số
+ký tự, nhưng không được kéo thêm đoạn, nhánh phụ hoặc nhịp mới chỉ để viết dài hơn.
 
 Thiết kế này bám các nguyên tắc trong nghiên cứu được cung cấp: luật bất biến ở system, hierarchy
 rõ, reference là data và contract cụ thể. Tham khảo
