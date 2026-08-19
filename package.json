@@ -18,6 +18,7 @@
     "compile:prompts:sfw": "tsx src/cli.ts --profile sfw",
     "compile:prompts:lite": "tsx src/cli.ts --profile nsfw-lite",
     "compile:prompts:lite:en": "tsx src/cli.ts --profile nsfw-lite-en",
+    "compile:prompts:lite:gemini3": "tsx src/cli.ts --profile nsfw-lite-gemini3-en",
     "check:prompts": "tsx src/cli.ts --all-profiles --check",
     "build": "tsup",
     "check": "tsc --noEmit && eslint .",

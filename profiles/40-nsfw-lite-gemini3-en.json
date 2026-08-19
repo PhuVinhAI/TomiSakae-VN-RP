@@ -1,0 +1,17 @@
+{
+  "id": "nsfw-lite-gemini3-en",
+  "label": "NSFW Lite English — Gemini 3.x",
+  "description": "Concise English control prompt optimized for Gemini 3.x, with Vietnamese roleplay output.",
+  "output": "bundles/nsfw-lite-gemini3-en/MASTER_PROMPT.md",
+  "aliases": [],
+  "responseInstruction": "bundles/nsfw-lite-gemini3-en/RESPONSE_INSTRUCTION.md",
+  "maxCompiledCharacters": 24000,
+  "modules": [
+    "profile-modules/nsfw-lite-gemini3-en/00-gemini3-system-prefix.md",
+    "profile-modules/nsfw-lite-gemini3-en/10-authority-state-and-turn.md",
+    "profile-modules/nsfw-lite-gemini3-en/15-character-trajectory-control.md",
+    "profile-modules/nsfw-lite-gemini3-en/30-scene-engine.md",
+    "profile-modules/nsfw-lite-gemini3-en/40-vietnamese-localization.md",
+    "profile-modules/nsfw-lite-gemini3-en/99-output-contract.md"
+  ]
+}

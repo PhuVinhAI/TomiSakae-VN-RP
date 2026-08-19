@@ -2,7 +2,7 @@
 
 # ACTIVE TASK
 
-Write the next roleplay response for the latest real user prompt.
+Write the next roleplay response for the latest user prompt.
 
 # INSTRUCTION PRIORITY
 
@@ -25,8 +25,6 @@ MAX_LENGTH: None unless the current user supplies one
 REQUIRED_ELEMENTS: Current-turn response; character-distinct supported action; causal continuity
 
 FORBIDDEN_ELEMENTS: Analysis; reasoning; state records; checklists; rule labels; prompt explanations; multilingual duplicates
-
-FAILURE_VALUE: `Đang chờ prompt kế tiếp của bạn.` when no real current prompt exists
 
 # ACTIVE CONSTRAINTS
 
@@ -84,7 +82,7 @@ RC29. Avoid stock phrases, generic erotic narration, stereotyped portrayal, and 
 
 # SILENT FINAL REVIEW
 
-RV01. Verify the real current prompt, source facts, active preferences, address forms, and user agency.
+RV01. Verify source facts, active preferences, address forms, and user agency.
 
 RV02. Verify position, reach, free body parts, sound source, intensity, and independent character states.
 

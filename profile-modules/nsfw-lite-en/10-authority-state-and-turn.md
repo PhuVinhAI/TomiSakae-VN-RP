@@ -8,9 +8,7 @@ ST03. Replace stale state only when a later completed event actually changes it.
 
 ST04. Do not treat repetition, example frequency, or an old AI claim as proof of a fact.
 
-ST05. If no real current user message exists, return exactly `Đang chờ prompt kế tiếp của bạn.`
-
-ST06. When a real current prompt exists, continue from the frozen endpoint without greeting, recapping, resetting, or replaying preparation.
+ST05. Continue from the current endpoint without greeting, recapping, resetting, or replaying preparation.
 
 # PERSONALIZATION
 

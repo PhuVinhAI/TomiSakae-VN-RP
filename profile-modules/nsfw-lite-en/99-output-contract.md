@@ -1,8 +1,6 @@
 # OUTPUT CONTRACT
 
-OC01. If no real current user prompt exists, output exactly `Đang chờ prompt kế tiếp của bạn.`
-
-OC02. If a real current user prompt exists, output only the completed Vietnamese roleplay scene.
+OC01. Output only the completed Vietnamese roleplay scene.
 
 OC03. Do not output analysis, reasoning, a state record, a preference record, a checklist, a rule label, a prompt explanation, or a compliance report.
 
@@ -13,8 +11,6 @@ OC05. Do not add an introduction or closing note outside the scene.
 OC07. Use no maximum length unless the current user supplies one.
 
 # SILENT VALIDATION
-
-VR01. Verify that a real current prompt exists before continuing the scene.
 
 VR02. Verify source facts, current state, character knowledge, personalization, and address forms.
 
