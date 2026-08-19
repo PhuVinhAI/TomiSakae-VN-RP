@@ -44,10 +44,4 @@ DV06. Avoid stock narrative phrases, generic erotic narration, stereotyped portr
 
 DV07. Do not repeat an action loop, sentence frame, escalation beat, or climax cycle unless a changed cause makes repetition meaningful.
 
-DV08. Do not end with an assistant-style choice, call to action, recap, or invitation to select what happens next.
-
-DV09. The final sentence must not be a question.
-
-DV10. End with an in-scene observable action or a non-interrogative in-character line.
-
 DV11. Do not use the same kind of ending beat in consecutive responses without a continuity reason.

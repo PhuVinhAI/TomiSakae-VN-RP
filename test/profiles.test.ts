@@ -190,11 +190,6 @@ describe("prompt profiles", () => {
     const result = await compilePromptProfile({ profile: gemma, writeOutput: false });
     const response = await readFile(gemma.responseInstructionFile, "utf8");
     const route = await readFile(gemma.routeInstructionFile, "utf8");
-    const setup = await readFile(
-      path.join(workspaceDirectory, "bundles", "nsfw-lite-en", "GEMMA4_SETUP.md"),
-      "utf8",
-    );
-
     expect(result.modules.map(({ relativePath }) => relativePath)).toEqual([
       "profile-modules/nsfw-lite-en/00-gemma4-system-prefix.md",
       "profile-modules/nsfw-lite-en/10-authority-state-and-turn.md",
@@ -225,17 +220,17 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain("attempts rather than automatic success");
     expect(result.compiled).toContain("does not semantically repeat");
     expect(result.compiled).toContain("Do not call synonym replacement");
-    expect(result.compiled).toContain("assistant-style choice");
-    expect(result.compiled).toContain("The final sentence must not be a question");
-    expect(result.compiled).toContain("Run this validation once");
+    expect(result.compiled).not.toContain("assistant-style choice");
+    expect(result.compiled).not.toContain("The final sentence must not be a question");
+    expect(result.compiled).not.toContain("bounded compliance review");
     expect(result.compiled).toContain("Đang chờ prompt kế tiếp của bạn.");
     expect(result.compiled).not.toContain("## NGUỒN, LƯỢT VÀ TRẠNG THÁI");
     expect(response).toContain("OUTPUT_LANGUAGE: Vietnamese");
     expect(response).toContain("FORBIDDEN_ELEMENTS:");
     expect(response).toContain("# SILENT FINAL REVIEW");
     expect(response).toContain("generic sexually eager personality");
-    expect(response).toContain("assistant-style choices; final questions");
-    expect(response).toContain("Run one bounded review");
+    expect(response).not.toContain("assistant-style choices; final questions");
+    expect(response).not.toContain("Run one bounded review");
     expect(response).toContain("Return only the validated final scene");
     expect(route).toContain("# INSTRUCTION PRIORITY");
     expect(route).toContain("# OUTPUT CONTRACT");
@@ -244,11 +239,6 @@ describe("prompt profiles", () => {
     expect(route).toContain("current trajectory pressure");
     expect(route).toContain("baseline_temperament");
     expect(route).toContain("Use no hard character ceiling");
-    expect(setup).toContain("Do not use a Gemma 2 or Gemma 3 context template");
-    expect(setup).toContain("thinking disabled for ordinary character chat");
-    expect(setup).toContain("16K–32K context");
-    expect(setup).toContain("temperature alone");
-    expect(setup).toContain("template/backend failure");
     expect(`${result.compiled}\n${response}`).not.toMatch(
       /[\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff]/u,
     );

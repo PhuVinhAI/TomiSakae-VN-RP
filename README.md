@@ -166,26 +166,17 @@ dài.
 
 Khi dùng Transformers hoặc inference stack có chat template, truyền `MASTER_PROMPT.md` bằng native
 `system` role và để tokenizer tự thêm control token Gemma 4. Không chép thủ công `<|turn>system`
-hoặc `<|turn>model>` vào nội dung nếu stack đã gọi `apply_chat_template`. Nếu backend hỗ trợ
-thinking mode, bật ở cấp conversation; prompt chỉ yêu cầu kiểm tra ngầm và không yêu cầu in
-chain-of-thought.
-
-Đọc [GEMMA4_SETUP.md](bundles/nsfw-lite-en/GEMMA4_SETUP.md) trước khi chạy local. File này tách các
-lỗi không thể chữa bằng prompt: sai chat template/Jinja, control token bị chèn hai lần, backend hoặc
-state cache sinh ký tự rác, reasoning loop, context hiệu dụng thấp hơn context quảng cáo, và khác
-biệt giữa checkpoint/quantization. Khuyến nghị khởi đầu là thinking tắt cho character chat/ERP đơn,
-context 16K–32K và native Gemma 4 template; chỉ bật thinking có ngân sách cho RPG nhiều luật.
+hoặc `<|turn>model>` vào nội dung nếu stack đã gọi `apply_chat_template`.
 
 Lớp character–trajectory mới chống các lỗi cộng đồng báo cáo: personality bị san phẳng khi ERP,
 flirt tự nhảy sang sex, NPC quá dễ bị thuyết phục, intimacy tự biến thành tình yêu/cứu chuộc, swipe
-chỉ đổi từ nhưng giữ cùng đường diễn biến, trope/slop và câu kết kiểu trợ lý đưa lựa chọn. Route mới
-giữ `CHARACTER ANCHORS` cùng áp lực trajectory hiện tại để giảm drift khi hội thoại dài.
+chỉ đổi từ nhưng giữ cùng đường diễn biến, trope/slop. Route mới giữ `CHARACTER ANCHORS` cùng áp lực
+trajectory hiện tại để giảm drift khi hội thoại dài.
 
 Thiết kế này bám các nguyên tắc trong nghiên cứu được cung cấp: luật bất biến ở system, hierarchy
-rõ, reference là data, contract cụ thể, fallback xác định và output-side self-review. Tham khảo
+rõ, reference là data và contract cụ thể. Tham khảo
 [Gemma 4 model card](https://ai.google.dev/gemma/docs/core/model_card_4),
-[Gemma 4 prompt formatting](https://ai.google.dev/gemma/docs/core/prompt-formatting-gemma4) và
-[thinking mode](https://ai.google.dev/gemma/docs/capabilities/thinking).
+[Gemma 4 prompt formatting](https://ai.google.dev/gemma/docs/core/prompt-formatting-gemma4).
 
 ## Phạm vi tiếng Việt
 
