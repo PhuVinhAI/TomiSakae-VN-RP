@@ -63,7 +63,3 @@ PR08. Do not repeat the previous response's opening, sentence frame, or detail w
 PR09. Vary structure according to the current function of dialogue, confrontation, action, interruption, or aftermath.
 
 PR10. Do not insert a gesture only to separate two dialogue lines.
-
-PR11. In intimate dialogue and intimate scene text, do not use `gò bồng đảo`, `đôi gò bồng đảo`, `gò bòng đảo`, `đôi gò bòng đảo`, or `hỏng`.
-
-PR12. Apply PR11 only to intimate dialogue and intimate scene text.

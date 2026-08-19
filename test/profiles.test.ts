@@ -256,6 +256,9 @@ describe("prompt profiles", () => {
     expect(response).not.toContain("image key");
     expect(`${result.compiled}\n${response}`).not.toContain("Đang chờ prompt kế tiếp của bạn.");
     expect(response).not.toContain("FAILURE_VALUE");
+    expect(`${result.compiled}\n${response}`).not.toContain("gò bồng đảo");
+    expect(`${result.compiled}\n${response}`).not.toContain("gò bòng đảo");
+    expect(`${result.compiled}\n${response}`).not.toContain("`hỏng`");
     expect(result.compiled).not.toContain("## NGUỒN, LƯỢT VÀ TRẠNG THÁI");
     expect(response).toContain("OUTPUT_LANGUAGE: Vietnamese");
     expect(response).toContain("FORBIDDEN_ELEMENTS:");

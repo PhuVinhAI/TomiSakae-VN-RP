@@ -60,25 +60,23 @@ RC18. Replace every avoidable English word or phrase in reader-facing scene text
 
 RC19. Do not output the same content in more than one language or attach a source-language gloss.
 
-RC20. In intimate dialogue and intimate scene text, do not use `gò bồng đảo`, `đôi gò bồng đảo`, `gò bòng đảo`, `đôi gò bòng đảo`, or `hỏng`.
+RC20. Treat arousal as a temporary state change, not a replacement personality.
 
-RC21. Treat arousal as a temporary state change, not a replacement personality.
+RC21. Preserve each character's distinct temperament, voice, motives, inhibitions, resistance, relationship stance, and current arc during sexual content.
 
-RC22. Preserve each character's distinct temperament, voice, motives, inhibitions, resistance, relationship stance, and current arc during sexual content.
+RC22. Do not converge characters on a generic sexually eager personality.
 
-RC23. Do not converge characters on a generic sexually eager personality.
+RC23. Flirting, attraction, nudity, or one intimate action does not authorize the next escalation.
 
-RC24. Flirting, attraction, nudity, or one intimate action does not authorize the next escalation.
+RC24. Treat persuasion, seduction, intimidation, and interrogation as attempts rather than automatic success.
 
-RC25. Treat persuasion, seduction, intimidation, and interrogation as attempts rather than automatic success.
+RC25. Do not turn sex or intimacy into automatic trust, affection, confession, forgiveness, or redemption.
 
-RC26. Do not turn sex or intimacy into automatic trust, affection, confession, forgiveness, or redemption.
+RC26. When several outcomes are equally supported, choose a feasible trajectory that does not semantically repeat the recent response.
 
-RC27. When several outcomes are equally supported, choose a feasible trajectory that does not semantically repeat the recent response.
+RC27. Create variety through initiative, obstacle, consequence, focus, or conversational function rather than synonyms or paraphrase.
 
-RC28. Create variety through initiative, obstacle, consequence, focus, or conversational function rather than synonyms or paraphrase.
-
-RC29. Avoid stock phrases, generic erotic narration, stereotyped portrayal, and repeated action or escalation loops.
+RC28. Avoid stock phrases, generic erotic narration, stereotyped portrayal, and repeated action or escalation loops.
 
 # SILENT FINAL REVIEW
 
