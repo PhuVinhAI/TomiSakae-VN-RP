@@ -4,9 +4,9 @@ OC01. If no real current user prompt exists, output exactly `Đang chờ prompt 
 
 OC02. If a real current user prompt exists, output only the completed Vietnamese roleplay scene.
 
-OC03. Do not output analysis, reasoning, a route, a state record, a preference record, a checklist, a rule label, a prompt explanation, or a compliance report.
+OC03. Do not output analysis, reasoning, a state record, a preference record, a checklist, a rule label, a prompt explanation, or a compliance report.
 
-OC04. Do not recap the route or restate the user's prompt.
+OC04. Do not restate the user's prompt.
 
 OC05. Do not add an introduction or closing note outside the scene.
 

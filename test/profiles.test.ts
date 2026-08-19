@@ -44,12 +44,11 @@ describe("prompt profiles", () => {
       "bundles/nsfw/ROLEPLAY_CHANGE_ROUTE.md",
       "bundles/sfw/ROLEPLAY_CHANGE_ROUTE.md",
       "bundles/nsfw-lite/ROLEPLAY_CHANGE_ROUTE.md",
-      "bundles/nsfw-lite-en/ROLEPLAY_CHANGE_ROUTE.md",
+      undefined,
     ]);
 
     for (const profile of profiles) {
       const responseInstruction = await readFile(profile.responseInstructionFile, "utf8");
-      const routeInstruction = await readFile(profile.routeInstructionFile, "utf8");
       expect(profile.manifest.modules[0]).toBe(
         profile.manifest.id === "nsfw-lite-en"
           ? "profile-modules/nsfw-lite-en/00-gemma4-system-prefix.md"
@@ -57,10 +56,13 @@ describe("prompt profiles", () => {
       );
       expect(count(responseInstruction, "<RESPONSE_INSTRUCTION>")).toBe(1);
       expect(count(responseInstruction, "</RESPONSE_INSTRUCTION>")).toBe(1);
-      expect(routeInstruction).toContain("<ROLEPLAY_CHANGE_ROUTE>");
-      expect(routeInstruction).toContain("</ROLEPLAY_CHANGE_ROUTE>");
-      expect(routeInstruction).toContain("<USER_NEXT_PROMPT>");
-      expect(routeInstruction).toContain("</USER_NEXT_PROMPT>");
+      if (profile.routeInstructionFile) {
+        const routeInstruction = await readFile(profile.routeInstructionFile, "utf8");
+        expect(routeInstruction).toContain("<ROLEPLAY_CHANGE_ROUTE>");
+        expect(routeInstruction).toContain("</ROLEPLAY_CHANGE_ROUTE>");
+        expect(routeInstruction).toContain("<USER_NEXT_PROMPT>");
+        expect(routeInstruction).toContain("</USER_NEXT_PROMPT>");
+      }
     }
   });
 
@@ -189,7 +191,7 @@ describe("prompt profiles", () => {
     const gemma = profiles.find(({ manifest }) => manifest.id === "nsfw-lite-en")!;
     const result = await compilePromptProfile({ profile: gemma, writeOutput: false });
     const response = await readFile(gemma.responseInstructionFile, "utf8");
-    const route = await readFile(gemma.routeInstructionFile, "utf8");
+    expect(gemma.routeInstructionFile).toBeUndefined();
     expect(result.modules.map(({ relativePath }) => relativePath)).toEqual([
       "profile-modules/nsfw-lite-en/00-gemma4-system-prefix.md",
       "profile-modules/nsfw-lite-en/10-authority-state-and-turn.md",
@@ -235,13 +237,6 @@ describe("prompt profiles", () => {
     expect(response).not.toContain("assistant-style choices; final questions");
     expect(response).not.toContain("Run one bounded review");
     expect(response).toContain("Return only the validated final scene");
-    expect(route).toContain("# INSTRUCTION PRIORITY");
-    expect(route).toContain("# OUTPUT CONTRACT");
-    expect(route).toContain("current motive by AI character");
-    expect(route).toContain("## CHARACTER ANCHORS");
-    expect(route).toContain("current trajectory pressure");
-    expect(route).toContain("baseline_temperament");
-    expect(route).toContain("Use no hard character ceiling");
     expect(`${result.compiled}\n${response}`).not.toMatch(
       /[\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff]/u,
     );
@@ -291,7 +286,9 @@ describe("prompt profiles", () => {
 
     for (const profile of profiles) {
       const responseInstruction = await readFile(profile.responseInstructionFile, "utf8");
-      const routeInstruction = await readFile(profile.routeInstructionFile, "utf8");
+      const routeInstruction = profile.routeInstructionFile
+        ? await readFile(profile.routeInstructionFile, "utf8")
+        : "";
       const result = await compilePromptProfile({ profile, writeOutput: false });
       const runtimeText = `${responseInstruction}\n${routeInstruction}\n${result.compiled}`;
 
@@ -307,10 +304,15 @@ describe("prompt profiles", () => {
   it("persists the active motive at the appropriate route depth", async () => {
     const profiles = await loadProjectProfiles();
     const routeInstructions = await Promise.all(
-      profiles.map(async (profile) => ({
-        id: profile.manifest.id,
-        source: await readFile(profile.routeInstructionFile, "utf8"),
-      })),
+      profiles
+        .filter(
+          (profile): profile is typeof profile & { routeInstructionFile: string } =>
+            profile.routeInstructionFile !== undefined,
+        )
+        .map(async (profile) => ({
+          id: profile.manifest.id,
+          source: await readFile(profile.routeInstructionFile, "utf8"),
+        })),
     );
 
     expect(routeInstructions.find(({ id }) => id === "nsfw")!.source).toContain(
@@ -325,11 +327,6 @@ describe("prompt profiles", () => {
     expect(routeInstructions.find(({ id }) => id === "nsfw-lite")!.source).toContain(
       "Không có trần ký tự cứng",
     );
-    expect(routeInstructions.find(({ id }) => id === "nsfw-lite-en")!.source).toContain(
-      "current motive by AI character",
-    );
-    expect(routeInstructions.find(({ id }) => id === "nsfw-lite-en")!.source).toContain(
-      "Use no hard character ceiling",
-    );
+    expect(routeInstructions.find(({ id }) => id === "nsfw-lite-en")).toBeUndefined();
   });
 });

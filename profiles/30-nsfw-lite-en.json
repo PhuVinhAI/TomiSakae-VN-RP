@@ -5,7 +5,6 @@
   "output": "bundles/nsfw-lite-en/MASTER_PROMPT.md",
   "aliases": [],
   "responseInstruction": "bundles/nsfw-lite-en/RESPONSE_INSTRUCTION.md",
-  "routeInstruction": "bundles/nsfw-lite-en/ROLEPLAY_CHANGE_ROUTE.md",
   "maxCompiledCharacters": 30000,
   "modules": [
     "profile-modules/nsfw-lite-en/00-gemma4-system-prefix.md",

@@ -16,11 +16,11 @@ character, world và diễn biến hiện tại đi theo hướng đó thì mode
 chối hoặc bẻ hướng. Sắc thái tôn thờ, phục tùng, tàn nhẫn hay dịu dàng cũng do character/world và
 quan hệ quyết định trong mọi profile.
 
-Cả bốn bundle chứa cùng ba tên file: `MASTER_PROMPT.md`, `RESPONSE_INSTRUCTION.md` và
-`ROLEPLAY_CHANGE_ROUTE.md`. Ba profile cũ dùng nguyên văn `prompts/00-risuai-system-prefix.md` và
-giữ chung response shell từ bản NSFW. `nsfw-lite-en` dùng system prefix, response instruction và
-route instruction riêng bằng tiếng Anh; chỉ hợp đồng đầu ra của nó bắt buộc cảnh nhập vai tiếng
-Việt.
+Ba bundle cũ chứa ba tên file: `MASTER_PROMPT.md`, `RESPONSE_INSTRUCTION.md` và
+`ROLEPLAY_CHANGE_ROUTE.md`; bundle `nsfw-lite-en` chỉ chứa `MASTER_PROMPT.md` và
+`RESPONSE_INSTRUCTION.md`. Ba profile cũ dùng nguyên văn `prompts/00-risuai-system-prefix.md` và giữ
+chung response shell từ bản NSFW. `nsfw-lite-en` dùng system prefix và response instruction riêng
+bằng tiếng Anh; hợp đồng đầu ra của nó bắt buộc cảnh nhập vai tiếng Việt.
 
 Hệ thống không còn coi dữ kiện gốc, route, quyền lượt, giọng nhân vật, tự chủ, ASMR, cơ học, cảnh
 nhóm, tiếng Việt và ảnh là các checklist rời. Mỗi module vẫn có trọng tâm riêng nhưng các câu lệnh
@@ -96,7 +96,7 @@ profiles/                    Manifest và thứ tự module của bốn profile
 bundles/nsfw/                Ba file dùng trực tiếp cho NSFW đầy đủ
 bundles/sfw/                 Ba file dùng trực tiếp cho SFW cốt truyện
 bundles/nsfw-lite/           Ba file dùng trực tiếp cho NSFW 1-on-1 cô đọng
-bundles/nsfw-lite-en/        Ba file điều khiển tiếng Anh dành cho Gemma 4
+bundles/nsfw-lite-en/        Hai file điều khiển tiếng Anh dành cho Gemma 4
 profile-modules/shared/      Luật dùng chung cho SFW và phần đóng tiếng Việt
 profile-modules/sfw/         Phần cốt truyện chuyên cho SFW
 profile-modules/nsfw-lite/   Lõi, trạng thái và ảnh 1-on-1 cho model nhỏ
@@ -160,7 +160,7 @@ và [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-en
 
 `nsfw-lite-en` là bản thiết kế lại, không phải bản dịch từng câu của `nsfw-lite`. Sáu lớp system
 prompt lần lượt tách mục tiêu/hierarchy, data boundary và trạng thái, character–trajectory control,
-scene engine, khóa tiếng Việt và output contract. Profile này không chứa module hay hợp đồng ảnh
+scene engine, khóa tiếng Việt và output contract. Profile này không chứa module ảnh hoặc route
 RisuAI. Mỗi luật có một mã ổn định và một yêu cầu kiểm chứng được; fallback cùng silent validation
 nằm gần điểm xuất để giảm lỗi quên luật khi context dài.
 
@@ -170,8 +170,8 @@ hoặc `<|turn>model>` vào nội dung nếu stack đã gọi `apply_chat_templa
 
 Lớp character–trajectory mới chống các lỗi cộng đồng báo cáo: personality bị san phẳng khi ERP,
 flirt tự nhảy sang sex, NPC quá dễ bị thuyết phục, intimacy tự biến thành tình yêu/cứu chuộc, swipe
-chỉ đổi từ nhưng giữ cùng đường diễn biến, trope/slop. Route mới giữ `CHARACTER ANCHORS` cùng áp lực
-trajectory hiện tại để giảm drift khi hội thoại dài.
+chỉ đổi từ nhưng giữ cùng đường diễn biến, trope/slop. Các neo nhân vật cùng áp lực trajectory hiện
+tại nằm trong prompt chính để giảm drift khi hội thoại dài.
 
 Thiết kế này bám các nguyên tắc trong nghiên cứu được cung cấp: luật bất biến ở system, hierarchy
 rõ, reference là data và contract cụ thể. Tham khảo
@@ -195,11 +195,11 @@ rõ, reference là data và contract cụ thể. Tham khảo
 vẫn là một đoạn liên tục của cùng dòng nhập vai, không phải nhánh hoặc thế giới mới; có thể chuyển
 khi chuỗi hành động đã hoàn thành hoặc còn đang dở nhưng cần sang cửa sổ hội thoại mới.
 
-Ba route chuyên biệt dùng cùng nguyên tắc snapshot bất động và cổng `<USER_NEXT_PROMPT>`. Bản SFW ưu
-tiên tuyến truyện, thế giới, quan hệ và kiến thức, không thêm trường cơ học trưởng thành nhưng vẫn
-bảo toàn sự kiện trưởng thành thật sự còn hệ quả. Hai bản NSFW Lite giữ trạng thái độc lập cho một
-hoặc nhiều nhân vật với mật độ gọn hơn; bản English dùng nhãn snapshot tiếng Anh nhưng giữ cùng
-quyền lượt và cổng prompt thật.
+Ba route chuyên biệt của ba profile cũ dùng cùng nguyên tắc snapshot bất động và cổng
+`<USER_NEXT_PROMPT>`. Bản SFW ưu tiên tuyến truyện, thế giới, quan hệ và kiến thức, không thêm
+trường cơ học trưởng thành nhưng vẫn bảo toàn sự kiện trưởng thành thật sự còn hệ quả. Hai bản NSFW
+Lite giữ trạng thái độc lập cho một hoặc nhiều nhân vật với mật độ gọn hơn. `nsfw-lite-en` không có
+route/change-route.
 
 Mỗi lần tạo route, bộ chuyển đọc snapshot cũ thành bản ghi, áp dụng các lượt mới rồi render lại toàn
 bộ snapshot. `TRẠNG THÁI HIỆN TẠI` luôn bị thay hoàn toàn. Các nhóm còn lại dùng mã ổn định `E`,
@@ -226,18 +226,18 @@ hệ, bí mật, món nợ, lời hứa, vật, việc mở, kiến thức hoặ
 
 `CÁ NHÂN HÓA ĐANG HOẠT ĐỘNG` lưu các quy tắc hiện hành đã chuẩn hóa thay cho mục lỗi cũ hoặc nhiều
 bản sao “chỉ dẫn / góp ý / ghi đè”. Nội dung người dùng tự đặt trong `{{...}}` có hiệu lực ngay và
-qua các phản hồi/route sau; góp ý mới nhất, cụ thể nhất chỉ ghi đè phần xung đột. Biến `{{user}}`,
-lore, ví dụ và văn bản trích không bị nhận nhầm là cá nhân hóa.
+qua các phản hồi và ngữ cảnh sau; góp ý mới nhất, cụ thể nhất chỉ ghi đè phần xung đột. Biến
+`{{user}}`, lore, ví dụ và văn bản trích không bị nhận nhầm là cá nhân hóa.
 
 `XƯNG HÔ ĐANG HOẠT ĐỘNG` chỉ lưu dạng hiện tại theo từng chiều `người nói -> người nghe`, gồm đại từ
 tự xưng, từ gọi đối phương, tên/danh hiệu/biệt danh, mức và nhịp. A gọi B không ép B gọi A hoặc A
-gọi C giống vậy. Chuyển route, đổi cảm xúc, tăng thân mật/tình dục, quá tải hoặc lời tục nhất thời
-không tự đổi cách xưng hô; chỉ ảnh hưởng trực tiếp đã xảy ra mới cập nhật đúng bản ghi `A`.
+gọi C giống vậy. Đổi cảm xúc, tăng thân mật/tình dục, quá tải hoặc lời tục nhất thời không tự đổi
+cách xưng hô; chỉ ảnh hưởng trực tiếp đã xảy ra mới cập nhật đúng bản ghi `A`.
 
-Để tạo route kế tiếp, đưa cho bộ chuyển snapshot `<ROLEPLAY_CHANGE_ROUTE>` gần nhất nếu có, các lượt
-đã hoàn tất sau snapshot đó và nguồn nhân vật/thế giới cần thiết. Trong cuộc trò chuyện mới, đặt
-snapshot được sinh vào lớp bộ nhớ sau thẻ nhân vật và tri thức thế giới nhưng trước lượt hội thoại
-cần trả lời. Không gắn lại log hoặc các route cũ đã được snapshot thay thế.
+Để tạo route kế tiếp cho ba profile cũ, đưa cho bộ chuyển snapshot `<ROLEPLAY_CHANGE_ROUTE>` gần
+nhất nếu có, các lượt đã hoàn tất sau snapshot đó và nguồn nhân vật/thế giới cần thiết. Trong cuộc
+trò chuyện mới, đặt snapshot được sinh vào lớp bộ nhớ sau thẻ nhân vật và tri thức thế giới nhưng
+trước lượt hội thoại cần trả lời. Không gắn lại log hoặc các route cũ đã được snapshot thay thế.
 
 Gói sinh ra kết thúc bằng `<USER_NEXT_PROMPT>`. Trước khi gửi gói cho model nhận, thay dòng giữ chỗ
 bằng prompt kế tiếp thật của người dùng. Nếu trường này thiếu, trống hoặc vẫn còn placeholder và
@@ -260,8 +260,9 @@ dùng thứ tự sau:
 5. Dùng `RESPONSE_INSTRUCTION.md` trong cùng thư mục bundle. Ba profile cũ giữ cùng response shell;
    `nsfw-lite-en` dùng response instruction riêng và không có `<FINAL_EXECUTION_OVERRIDE>`.
 
-Khi chuyển cửa sổ hội thoại, dùng `ROLEPLAY_CHANGE_ROUTE.md` trong cùng thư mục bundle. Không trộn
-file giữa các bundle vì mật độ và trường trạng thái khác nhau.
+Khi chuyển cửa sổ hội thoại của ba profile cũ, dùng `ROLEPLAY_CHANGE_ROUTE.md` trong cùng thư mục
+bundle. `nsfw-lite-en` không có file change-route; không trộn file giữa các bundle vì mật độ và
+trường trạng thái khác nhau.
 
 Không chuyển toàn bộ master dài xuống vị trí cuối: làm vậy tăng độ gần của luật phong cách nhưng đẩy
 thẻ nhân vật và tri thức nền ra xa phản hồi. Phần chốt cuối đã được ghép vào cuối chỉ dẫn phản hồi

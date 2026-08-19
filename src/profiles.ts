@@ -15,7 +15,7 @@ const ProfileManifestSchema = z.object({
   output: z.string().min(1),
   aliases: z.array(z.string().min(1)).default([]),
   responseInstruction: z.string().min(1),
-  routeInstruction: z.string().min(1),
+  routeInstruction: z.string().min(1).optional(),
   maxCompiledCharacters: z.number().int().positive(),
   modules: z.array(z.string().min(1)).min(1),
 });
@@ -26,7 +26,7 @@ export interface LoadedPromptProfile {
   manifestFile: string;
   workspaceDirectory: string;
   responseInstructionFile: string;
-  routeInstructionFile: string;
+  routeInstructionFile: string | undefined;
   manifest: PromptProfileManifest;
 }
 
@@ -107,16 +107,19 @@ export async function loadPromptProfileManifest(
     throw new Error(`Response instruction wrapper is invalid for profile: ${parsed.id}`);
   }
 
-  const routeInstructionFile = resolveWithinWorkspace(absoluteWorkspace, parsed.routeInstruction);
-  const routeInstruction = normalizeNewlines(await readFile(routeInstructionFile, "utf8")).trim();
+  let routeInstructionFile: string | undefined;
+  if (parsed.routeInstruction) {
+    routeInstructionFile = resolveWithinWorkspace(absoluteWorkspace, parsed.routeInstruction);
+    const routeInstruction = normalizeNewlines(await readFile(routeInstructionFile, "utf8")).trim();
 
-  if (
-    !routeInstruction.includes("<ROLEPLAY_CHANGE_ROUTE>") ||
-    !routeInstruction.includes("</ROLEPLAY_CHANGE_ROUTE>") ||
-    !routeInstruction.includes("<USER_NEXT_PROMPT>") ||
-    !routeInstruction.includes("</USER_NEXT_PROMPT>")
-  ) {
-    throw new Error(`Route instruction wrapper is invalid for profile: ${parsed.id}`);
+    if (
+      !routeInstruction.includes("<ROLEPLAY_CHANGE_ROUTE>") ||
+      !routeInstruction.includes("</ROLEPLAY_CHANGE_ROUTE>") ||
+      !routeInstruction.includes("<USER_NEXT_PROMPT>") ||
+      !routeInstruction.includes("</USER_NEXT_PROMPT>")
+    ) {
+      throw new Error(`Route instruction wrapper is invalid for profile: ${parsed.id}`);
+    }
   }
 
   return {
