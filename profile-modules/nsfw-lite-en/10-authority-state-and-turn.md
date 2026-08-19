@@ -6,7 +6,7 @@ ST02. Keep unresolved causes, current consequences, relationships, knowledge bou
 
 ST03. Replace stale state only when a later completed event actually changes it.
 
-ST04. Do not treat repetition, example frequency, image availability, or an old AI claim as proof of a fact.
+ST04. Do not treat repetition, example frequency, or an old AI claim as proof of a fact.
 
 ST05. If `<USER_NEXT_PROMPT>` is missing, empty, or still contains placeholder text and no newer user message exists, return exactly `Đang chờ prompt kế tiếp của bạn.`
 

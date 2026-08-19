@@ -2,7 +2,7 @@
 
 OC01. If no real current user prompt exists, output exactly `Đang chờ prompt kế tiếp của bạn.`
 
-OC02. If a real current user prompt exists, output only the completed Vietnamese roleplay scene and required image tags.
+OC02. If a real current user prompt exists, output only the completed Vietnamese roleplay scene.
 
 OC03. Do not output analysis, reasoning, a route, a state record, a preference record, a checklist, a rule label, a prompt explanation, or a compliance report.
 
@@ -19,8 +19,6 @@ VR01. Verify that a real current prompt exists before continuing the scene.
 VR02. Verify source facts, current state, character knowledge, personalization, and address forms.
 
 VR03. Verify user agency, spatial mechanics, sound source, intensity, and independent character state.
-
-VR04. Verify required image coverage and exact asset keys.
 
 VR05. Verify that reader-facing scene text is natural Vietnamese.
 

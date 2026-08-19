@@ -158,11 +158,11 @@ và [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-en
 
 ## NSFW Lite English cho Gemma 4
 
-`nsfw-lite-en` là bản thiết kế lại, không phải bản dịch từng câu của `nsfw-lite`. Bảy lớp system
+`nsfw-lite-en` là bản thiết kế lại, không phải bản dịch từng câu của `nsfw-lite`. Sáu lớp system
 prompt lần lượt tách mục tiêu/hierarchy, data boundary và trạng thái, character–trajectory control,
-ảnh, scene engine, khóa tiếng Việt và output contract. Mỗi luật có một mã ổn định và một yêu cầu
-kiểm chứng được; fallback cùng silent validation nằm gần điểm xuất để giảm lỗi quên luật khi context
-dài.
+scene engine, khóa tiếng Việt và output contract. Profile này không chứa module hay hợp đồng ảnh
+RisuAI. Mỗi luật có một mã ổn định và một yêu cầu kiểm chứng được; fallback cùng silent validation
+nằm gần điểm xuất để giảm lỗi quên luật khi context dài.
 
 Khi dùng Transformers hoặc inference stack có chat template, truyền `MASTER_PROMPT.md` bằng native
 `system` role và để tokenizer tự thêm control token Gemma 4. Không chép thủ công `<|turn>system`
@@ -183,8 +183,8 @@ rõ, reference là data và contract cụ thể. Tham khảo
 - Ba profile cũ viết cả luật điều khiển và nội dung hướng người đọc bằng tiếng Việt.
 - `nsfw-lite-en` viết luật điều khiển bằng tiếng Anh nhưng hợp đồng đầu ra vẫn bắt buộc cảnh nhập
   vai hướng người đọc bằng tiếng Việt.
-- Chỉ giữ nguyên biến, thẻ XML, khóa tài nguyên ảnh, mã, đường dẫn và tên riêng cần thiết về kỹ
-  thuật.
+- Bản tiếng Anh chỉ giữ nguyên biến, thẻ XML, chuỗi máy bắt buộc, mã, đường dẫn và tên riêng cần
+  thiết về kỹ thuật; nó không xử lý khóa tài nguyên ảnh.
 - bộ lệnh phiên âm Gemini cũng được hướng dẫn hoàn toàn bằng tiếng Việt. Riêng lời nghe thấy trong
   audio vẫn phải chép nguyên ngôn ngữ nguồn để bảo toàn tính nguyên văn; đây là ngoại lệ kỹ thuật
   của tác vụ phiên âm, không phải hỗ trợ đa ngôn ngữ cho nhập vai.

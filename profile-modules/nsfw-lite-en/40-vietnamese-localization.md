@@ -18,7 +18,7 @@ VL08. Translate every other Korean word or string into natural Vietnamese.
 
 VL09. Replace every avoidable English word or phrase in reader-facing scene text with Vietnamese wording.
 
-VL10. Preserve only Latin-script personal names, Latin-script proper place names, variables, tags, exact image keys, and required machine strings.
+VL10. Preserve only Latin-script personal names, Latin-script proper place names, variables, tags, and required machine strings.
 
 VL11. Do not present the same content in more than one language.
 

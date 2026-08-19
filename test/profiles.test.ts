@@ -194,7 +194,6 @@ describe("prompt profiles", () => {
       "profile-modules/nsfw-lite-en/00-gemma4-system-prefix.md",
       "profile-modules/nsfw-lite-en/10-authority-state-and-turn.md",
       "profile-modules/nsfw-lite-en/15-character-trajectory-control.md",
-      "profile-modules/nsfw-lite-en/20-risuai-assets.md",
       "profile-modules/nsfw-lite-en/30-scene-engine.md",
       "profile-modules/nsfw-lite-en/40-vietnamese-localization.md",
       "profile-modules/nsfw-lite-en/99-output-contract.md",
@@ -223,6 +222,10 @@ describe("prompt profiles", () => {
     expect(result.compiled).not.toContain("assistant-style choice");
     expect(result.compiled).not.toContain("The final sentence must not be a question");
     expect(result.compiled).not.toContain("bounded compliance review");
+    expect(result.compiled).not.toContain("# RISUAI ASSETS");
+    expect(result.compiled).not.toContain("required image tags");
+    expect(response).not.toContain("RisuAI image tags");
+    expect(response).not.toContain("image key");
     expect(result.compiled).toContain("Đang chờ prompt kế tiếp của bạn.");
     expect(result.compiled).not.toContain("## NGUỒN, LƯỢT VÀ TRẠNG THÁI");
     expect(response).toContain("OUTPUT_LANGUAGE: Vietnamese");
