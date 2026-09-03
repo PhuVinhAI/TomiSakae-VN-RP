@@ -207,6 +207,7 @@ describe("prompt profiles", () => {
       "profile-modules/nsfw-lite-en/10-authority-state-and-turn.md",
       "profile-modules/nsfw-lite-en/15-character-trajectory-control.md",
       "profile-modules/nsfw-lite-en/30-scene-engine.md",
+      "profile-modules/nsfw-lite-en/35-image-context-and-selection.md",
       "profile-modules/nsfw-lite-en/40-vietnamese-localization.md",
       "profile-modules/nsfw-lite-en/99-output-contract.md",
     ]);
@@ -252,13 +253,72 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain("attempts rather than automatic success");
     expect(result.compiled).toContain("does not semantically repeat");
     expect(result.compiled).toContain("Do not call synonym replacement");
+    expect(result.compiled).toContain("Match pacing to the current cause-and-effect state");
+    expect(result.compiled).toContain(
+      "preserving any style explicitly established by the source data",
+    );
+    expect(result.compiled).toContain("Treat previous AI prose as continuity evidence only");
+    expect(result.compiled).toContain(
+      "Separate durable facts and active causes from disposable wording",
+    );
+    expect(result.compiled).toContain(
+      "advance a new supported beat without recapping or repeating",
+    );
+    expect(result.compiled).toContain(
+      "re-anchor to it immediately and discard obsolete scene assumptions",
+    );
+    expect(result.compiled).toContain("source-defined UI, HUD, metadata, system-update, command");
+    expect(result.compiled).toContain("exact required delimiters, tag names, key names");
+    expect(result.compiled).toContain("Translate only human-readable display values");
+    expect(result.compiled).toContain("authorized output channel, not as RP interference");
+    expect(result.compiled).toContain("including required English or Hangul tokens");
+    expect(result.compiled).toContain("structured block causally continuous with the scene");
+    expect(result.compiled).toContain(
+      "Treat the previous response's macro-structure as disposable",
+    );
+    expect(result.compiled).toContain("Do not infer or repeat a fixed response template");
+    expect(result.compiled).toContain("`{{user}}` and one AI-controlled character");
+    expect(result.compiled).toContain(
+      "abstract high-intensity wording and stock crisis idioms as exceptional",
+    );
+    expect(result.compiled).toContain(
+      "Do not repeat the same high-intensity word or phrase across nearby turns",
+    );
+    expect(result.compiled).toContain(
+      "Separate strong emotion or arousal from loss of control",
+    );
+    expect(response).toContain(
+      "habitual high-intensity wording, stacked emotional markers",
+    );
+    expect(result.compiled).toContain("`{{user}}` and multiple AI-controlled characters");
+    expect(result.compiled).toContain("multiple AI-controlled characters without `{{user}}`");
+    expect(result.compiled).toContain("avoid the recent structural signature");
+    expect(result.compiled).toContain("Returning to an earlier participant arrangement");
+    expect(result.compiled).toContain("does not justify proportional growth, extra slots");
+    expect(result.compiled).toContain(
+      "does not inherit the recent structural signature without a source reason",
+    );
+    expect(result.compiled).toContain("compare beat count, cadence, dialogue density");
     expect(result.compiled).not.toContain("assistant-style choice");
     expect(result.compiled).not.toContain("The final sentence must not be a question");
     expect(result.compiled).not.toContain("bounded compliance review");
     expect(result.compiled).not.toContain("# RISUAI ASSETS");
-    expect(result.compiled).not.toContain("required image tags");
-    expect(response).not.toContain("RisuAI image tags");
-    expect(response).not.toContain("image key");
+    expect(result.compiled).toContain(
+      "Treat an image asset as a representation of the current scene state",
+    );
+    expect(result.compiled).toContain("do not assume `<img>`, a fixed tag, key format");
+    expect(result.compiled).toContain("existing source-provided image keys or identifiers");
+    expect(result.compiled).toContain(
+      "user has not specified an action or progression that leads to a particular image",
+    );
+    expect(result.compiled).toContain("Prefer meaningful diversity across valid source assets");
+    expect(response).toContain("source-required UI, system, or image blocks");
+    expect(response).toContain("Do not assume `<img>`, a fixed tag, key format");
+    expect(response).toContain("existing source-provided image keys or identifiers");
+    expect(response).toContain(
+      "user has not specified an action or progression that leads to a particular image",
+    );
+    expect(response).toContain("Prefer meaningful diversity across valid source assets");
     expect(`${result.compiled}\n${response}`).not.toContain("Đang chờ prompt kế tiếp của bạn.");
     expect(response).not.toContain("FAILURE_VALUE");
     expect(`${result.compiled}\n${response}`).not.toContain("gò bồng đảo");
@@ -272,6 +332,28 @@ describe("prompt profiles", () => {
     expect(response).not.toContain("assistant-style choices; final questions");
     expect(response).not.toContain("Run one bounded review");
     expect(response).toContain("Return only the validated final scene");
+    expect(response).toContain(
+      "previous AI prose as continuity evidence, never as a prose template",
+    );
+    expect(response).toContain("Reuse only durable facts and active causes from prior turns");
+    expect(response).toContain("advance a new supported beat without recap or repeated phrasing");
+    expect(response).toContain("source-required UI, system, or image blocks");
+    expect(response).toContain("Preserve exact required delimiters, tags, keys, attributes");
+    expect(response).toContain("reader-visible UI content");
+    expect(response).toContain("machine syntax");
+    expect(response).toContain("schema-defined UI/system elements triggered by current data");
+    expect(response).toContain("not RP interference");
+    expect(response).toContain("previous response's macro-structure as disposable");
+    expect(response).toContain("fixed response template from recent turns");
+    expect(response).toContain("`{{user}}` and one AI-controlled character");
+    expect(response).toContain("`{{user}}` and multiple AI-controlled characters");
+    expect(response).toContain("multiple AI-controlled characters without `{{user}}`");
+    expect(response).toContain("avoid the recent structural signature");
+    expect(response).toContain("does not reactivate its former cadence");
+    expect(response).toContain("does not justify proportional growth, extra slots");
+    expect(response).toContain(
+      "does not inherit the recent structural signature without a source reason",
+    );
     expect(`${result.compiled}\n${response}`).not.toMatch(
       /[\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff]/u,
     );
