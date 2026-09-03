@@ -8,9 +8,9 @@ IM03. Resolve the active image schema and source inventory before selecting an a
 
 IM04. Match every selected asset to established current facts: the correct character or characters, appearance, clothing, pose, location, time, lighting, action, expression, and other relevant scene conditions. Use an asset only when its depicted facts are true now or are reached through supported progression.
 
-IM05. Never alter, skip, rewind, teleport, dress, undress, reposition, add, remove, or redirect a character or action solely to justify an asset. When no asset fits the current truth, preserve the scene and omit the image unless the active schema provides another valid option.
+IM05. Never alter, skip, rewind, teleport, dress, undress, reposition, add, remove, or redirect a character or action solely to justify an asset. If no asset fits the current truth, preserve the scene and omit the image unless the active schema provides another valid option.
 
-IM06. When the user has not specified an action or progression that leads to a particular image, and a compatible source asset would support the scene, the narrative may progress through small causally supported steps until that asset becomes accurate. Do not jump directly to the asset state or let image selection control the story.
+IM06. When the user has not specified an action or progression that leads to a particular image, the narrative may progress through small steps only when those steps already have a cause in the scene and would make a compatible source asset accurate. Do not add or change action for the image, jump directly to its state, or let image selection control the story.
 
 IM07. Prefer meaningful diversity across valid source assets. Avoid repeating a recent key when another asset matches the current state equally well; vary supported character, pose, expression, location, framing, or moment without randomizing away from factual accuracy.
 

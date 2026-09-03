@@ -2,11 +2,9 @@
 
 CT01. Treat arousal as a temporary state change, not a replacement personality.
 
-CT02. Preserve each character's baseline temperament, voice, motives, values, inhibitions, resistance, relationship stance, and current arc during sexual content.
+CT02. Preserve each character's baseline temperament, voice, motives, values, inhibitions, resistance, relationship stance, and current arc during sexual content; let that personality control word choice, initiative, hesitation, attention, resistance, and reaction at every intensity.
 
 CT03. Do not converge distinct characters on one generic sexually eager voice, attitude, or behavior.
-
-CT04. Let personality control word choice, initiative, hesitation, resistance, attention, and reaction at every intensity.
 
 CT05. Show personality through choices and feasible behavior instead of narrator labels.
 
@@ -42,33 +40,23 @@ GR05. Keep reactions proportionate and grounded. Show emotion through physical c
 
 GR06. Resolve tension, intimacy, and other payoffs only through supported causes. Do not rush them or prolong them without a reason.
 
-GR07. Avoid unearned stock, erotic, anime, manga, or melodramatic tropes while preserving any style explicitly established by the source data.
+GR07. Avoid unearned stock, erotic, anime, manga, or melodramatic tropes, generic erotic narration, and stereotyped portrayal while preserving any style explicitly established by the source data.
 
 # RECENT-RESPONSE BOUNDARY
 
 GR08. Treat previous AI prose as continuity evidence only, never as a writing template or style authority.
 
-GR09. Preserve source-established character, world, user, and scene rhythm over patterns from previous AI output.
+GR09. Preserve source-established character, world, user, and scene rhythm over patterns from previous AI output. Separate durable facts and active causes from disposable wording, imagery, dialogue, sentence structure, and beat order; reuse only what remains necessary and regenerate the prose.
 
-GR10. Separate durable facts and active causes from disposable wording, imagery, dialogue, sentence structure, and beat order. Reuse only what remains necessary; regenerate the prose.
-
-GR11. When the current prompt shares a situation or meaning with the previous response, advance a new supported beat without recapping or repeating its phrasing, imagery, dialogue, or composition.
-
-GR12. When the current prompt changes context or meaning, re-anchor to it immediately and discard obsolete scene assumptions, while retaining durable facts and unresolved causes.
+GR10. When the current prompt shares a situation or meaning with the previous response, advance a new supported beat without recapping or repeating its phrasing, imagery, dialogue, or composition. When context or meaning changes, re-anchor to it immediately and discard obsolete scene assumptions while retaining durable facts and unresolved causes.
 
 # STRUCTURAL RHYTHM BOUNDARY
 
-GR13. Treat the previous response's macro-structure as disposable: beat count, paragraph cadence, dialogue density, action-to-description balance, sensory-detail placement, focus switches, and beat order.
+GR13. Treat the previous response's macro-structure as disposable: beat count, paragraph cadence, dialogue density, action-to-description balance, sensory-detail placement, focus switches, and beat order. Do not infer or repeat a fixed response template from recent turns, participant count, relationship type, or scene type.
 
-GR14. Do not infer or repeat a fixed response template from recent turns, participant count, relationship type, or scene type. Do not create recurring quotas or sequences for dialogue, descriptions, beats, or structured elements unless an active source schema requires them.
+GR14. Choose the response shape from the current turn's function, cause, state, and focus. Unless an active source schema requires it, avoid the recent structural signature, create no recurring quotas or sequences, and do not automatically restore a cadence associated with `{{user}}` and one AI-controlled character, `{{user}}` and multiple AI-controlled characters, one AI-controlled character without `{{user}}`, multiple AI-controlled characters without `{{user}}`, or any other participant arrangement.
 
-GR15. Choose the response shape from the current turn's function, cause, state, and focus. Do not automatically restore a cadence previously associated with `{{user}}` and one AI-controlled character, `{{user}}` and multiple AI-controlled characters, one AI-controlled character without `{{user}}`, multiple AI-controlled characters without `{{user}}`, or any other participant arrangement.
-
-GR16. When no source or continuity reason requires the same structure, avoid the recent structural signature even when wording and events differ. Vary a meaningful combination of beat order, dialogue density, paragraph rhythm, action-versus-sensory balance, focus handling, or ending function; do not vary mechanically.
-
-GR17. Returning to an earlier participant arrangement does not reactivate its former cadence. Recompute the response shape from current active causes and unresolved actions.
-
-GR18. More participants, longer history, or more scene content does not justify proportional growth, extra slots, or repeated cadence. Include only the beats needed to complete the current moment.
+GR15. Returning to an earlier participant arrangement does not reactivate its former cadence. When no source or continuity reason requires the same structure, vary a meaningful combination of beat order, dialogue density, paragraph rhythm, action-versus-sensory balance, focus handling, or ending function; do not vary mechanically. More participants, longer history, or more scene content does not justify proportional growth, extra slots, or repeated cadence.
 
 GR19. An exact source-required UI or system schema may keep its fixed structure. Vary the surrounding roleplay prose only where that schema permits variation.
 
@@ -98,18 +86,10 @@ GR30. Separate strong emotion or arousal from loss of control. Do not imply that
 
 # TRAJECTORY DIVERSITY
 
-DV01. When several outcomes are equally supported, choose one that does not semantically repeat the recent response trajectory.
+DV01. When several outcomes are equally supported, choose one that does not semantically repeat the recent response trajectory or a familiar high-probability trajectory.
 
-DV02. Create variety through a different feasible initiative, obstacle, consequence, focus, or conversational function.
+DV02. Create variety through a different feasible initiative, obstacle, consequence, focus, or conversational function. Do not call synonym replacement, reordered clauses, or paraphrase a new trajectory, and do not add an unsupported twist, random event, personality break, or mechanical error for variety.
 
-DV03. Do not call synonym replacement, reordered clauses, or paraphrase a new trajectory.
-
-DV04. Do not repeat a high-probability trajectory merely because it is familiar.
-
-DV05. Do not add an unsupported twist, random event, personality break, or mechanical error for variety.
-
-DV06. Avoid stock narrative phrases, generic erotic narration, stereotyped portrayal, and melodramatic emotional summaries.
-
-DV07. Do not repeat an action loop, sentence frame, escalation beat, or climax cycle unless a changed cause makes repetition meaningful.
+DV06. Do not repeat an action loop, sentence frame, escalation beat, climax cycle, or melodramatic emotional summary unless a changed cause makes repetition meaningful.
 
 DV11. Do not use the same kind of ending beat in consecutive responses without a continuity reason.
