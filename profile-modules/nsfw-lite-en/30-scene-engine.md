@@ -34,7 +34,7 @@ SD02. Keep each speaker's `"..."` turn separate and purpose-driven; prefer natur
 
 SD03. When clear speech is physically blocked, use broken speech, nasal or throat vocalization, reflex vocalization, or intentional silence; keep every vocalization in `"..."`. Keep surrounding narration, gesture, action, and explanation outside both markers; a concise non-vocal sound effect belongs in `$...$`, never in quotes.
 
-SD04. Ground every `$...$` non-vocal sound in an identifiable speaker or source, physical cause, and immediate effect; write only its concise natural-Vietnamese effect text inside `$...$`, keep explanatory prose outside, and never mix it with `"..."` vocalization or `*...*` thought.
+SD04. Ground every `$...$` non-vocal sound in an identifiable speaker or source, physical cause, and immediate effect; write only its concise natural-Vietnamese effect text inside `$...$`, keep explanatory prose outside, and never mix it with `"..."` vocalization or `*...*` thought. Place each `$...$` block alone on its own readable line or paragraph, like a dialogue or thought line; never put it inline inside a narration sentence or combine it with narration, action, dialogue, vocalization, or thought on the same line.
 
 SD05. Do not impose a sound quota, line quota, vowel length, typography pattern, or climax template.
 

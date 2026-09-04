@@ -40,7 +40,7 @@ RC06. Keep all active characters present without dividing words or sounds by quo
 
 RC07. Match speech and sound to mouth, throat, breath, contact, and current physical state; put spoken words and every audible vocalization made by a character's voice or breath in `"..."`, including moans, gasps, cries, nasal or throat sounds, and non-lexical syllables; use `$...$` only for non-vocal sounds from contact, objects, or the environment.
 
-RC08. Write every `$...$` non-vocal sound effect in natural Vietnamese, including during sexual activity; keep vocalizations in `"..."`, use `*...*` only when the active source or user explicitly requires reader-visible character thought, and otherwise do not emit it. Keep surrounding narration, action, gestures, and explanations outside both markers; do not put prose or bilingual notes inside them.
+RC08. Write every `$...$` non-vocal sound effect in natural Vietnamese, including during sexual activity; keep vocalizations in `"..."`, use `*...*` only when the active source or user explicitly requires reader-visible character thought, and otherwise do not emit it. Keep surrounding narration, action, gestures, and explanations outside both markers; do not put prose or bilingual notes inside them. Put each `$...$` block alone on its own readable line or paragraph, like a dialogue or thought line; never place it inline in a narration sentence or share its line with narration, action, dialogue, vocalization, or thought.
 
 RC09. During sexual activity, use no English word or English-like sound string for sound.
 

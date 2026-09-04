@@ -26,6 +26,6 @@ VR08. Verify every applicable output-contract item and correct any detected fail
 
 VR09. Return only the validated final output.
 
-VR10. Check for habitual high-intensity wording, stacked emotional markers, repeated crisis idioms, and unsupported loss-of-control claims; replace them with concrete, character-specific evidence when the current state does not require them. Also verify that `"..."` speech/vocalization, explicitly permitted `*...*` thought, and `$...$` non-vocal sounds are correctly separated, that thought syntax is not model reasoning and is absent unless required, and that spoken turns are naturally segmented without avoidable English/Korean or source-language metaphor.
+VR10. Check for habitual high-intensity wording, stacked emotional markers, repeated crisis idioms, and unsupported loss-of-control claims; replace them with concrete, character-specific evidence when the current state does not require them. Also verify that `"..."` speech/vocalization, explicitly permitted `*...*` thought, and `$...$` non-vocal sounds are correctly separated, that every `$...$` block occupies its own readable line or paragraph rather than appearing inline in narration, that thought syntax is not model reasoning and is absent unless required, and that spoken turns are naturally segmented without avoidable English/Korean or source-language metaphor.
 
 </ROLEPLAY_INFO>
