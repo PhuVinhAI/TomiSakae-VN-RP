@@ -245,9 +245,9 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain("VR10.");
     expect(result.compiled).not.toContain("OUTPUT_LANGUAGE");
     expect(result.compiled).toContain("zero Hangul characters");
-    expect(result.compiled).toContain("use `$...$` only for non-vocal sounds");
-    expect(result.compiled).toContain("write only its concise natural-Vietnamese effect text inside `$...$`");
-    expect(result.compiled).toContain("Place each `$...$` block alone on its own readable line or paragraph");
+    expect(result.compiled).toContain("use `§...§` only for non-vocal sounds");
+    expect(result.compiled).toContain("write only its concise natural-Vietnamese effect text inside `§...§`");
+    expect(result.compiled).toContain("Place each `§...§` block alone on its own readable line or paragraph");
     expect(result.compiled).toContain("appearance, clothing, material, hairstyle, position");
     expect(result.compiled).toContain("Treat arousal as a temporary state change");
     expect(result.compiled).toContain("generic sexually eager voice");
@@ -291,12 +291,12 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain("short-to-medium turns");
     expect(result.compiled).toContain("put separate speaker turns on readable lines or paragraphs");
     expect(result.compiled).toContain("reader-visible character thought");
-    expect(result.compiled).toContain("`$...$` non-vocal sound-effect syntax");
+    expect(result.compiled).toContain("`§...§` non-vocal sound-effect syntax");
     expect(response).toContain(
       "habitual high-intensity wording, stacked emotional markers",
     );
     expect(response).toContain('`"..."` speech/vocalization');
-    expect(response).toContain("Put each `$...$` block alone on its own readable line or paragraph");
+    expect(response).toContain("Put each `§...§` block alone on its own readable line or paragraph");
     expect(result.compiled).toContain("`{{user}}` and multiple AI-controlled characters");
     expect(result.compiled).toContain("multiple AI-controlled characters without `{{user}}`");
     expect(result.compiled).toContain("avoid the recent structural signature");

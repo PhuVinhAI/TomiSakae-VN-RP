@@ -1,6 +1,6 @@
 # VIETNAMESE LOCALIZATION
 
-VL01. Write all reader-facing roleplay prose, `"..."` dialogue and vocalization, explicitly permitted `*...*` character thought, and AI-added labels directly in natural Vietnamese; write every non-vocal sound effect as `$...$`.
+VL01. Write all reader-facing roleplay prose, `"..."` dialogue and vocalization, explicitly permitted `*...*` character thought, and AI-added labels directly in natural Vietnamese; write every non-vocal sound effect as `§...§`.
 
 VL02. Treat Korean, English, and every other source language as meaning-bearing data, not output wording.
 

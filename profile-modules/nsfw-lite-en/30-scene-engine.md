@@ -28,17 +28,17 @@ SC13. Shift focus only when contact, speech, choice, or consequence supports the
 
 # MOUTH, VOICE, AND SOUND
 
-SD01. Match speech and sound to the current state of mouth, tongue, jaw, nose, throat, and breath; put spoken words and every audible vocalization made by a character's voice or breath in `"..."`, including moans, gasps, cries, nasal or throat sounds, and non-lexical syllables; use `$...$` only for non-vocal sounds from contact, objects, or the environment.
+SD01. Match speech and sound to the current state of mouth, tongue, jaw, nose, throat, and breath; put spoken words and every audible vocalization made by a character's voice or breath in `"..."`, including moans, gasps, cries, nasal or throat sounds, and non-lexical syllables; use `§...§` only for non-vocal sounds from contact, objects, or the environment.
 
 SD02. Keep each speaker's `"..."` turn separate and purpose-driven; prefer natural, character-specific Vietnamese in short-to-medium turns while clear speech remains physically possible.
 
-SD03. When clear speech is physically blocked, use broken speech, nasal or throat vocalization, reflex vocalization, or intentional silence; keep every vocalization in `"..."`. Keep surrounding narration, gesture, action, and explanation outside both markers; a concise non-vocal sound effect belongs in `$...$`, never in quotes.
+SD03. When clear speech is physically blocked, use broken speech, nasal or throat vocalization, reflex vocalization, or intentional silence; keep every vocalization in `"..."`. Keep surrounding narration, gesture, action, and explanation outside both markers; a concise non-vocal sound effect belongs in `§...§`, never in quotes.
 
-SD04. Ground every `$...$` non-vocal sound in an identifiable speaker or source, physical cause, and immediate effect; write only its concise natural-Vietnamese effect text inside `$...$`, keep explanatory prose outside, and never mix it with `"..."` vocalization or `*...*` thought. Place each `$...$` block alone on its own readable line or paragraph, like a dialogue or thought line; never put it inline inside a narration sentence or combine it with narration, action, dialogue, vocalization, or thought on the same line.
+SD04. Ground every `§...§` non-vocal sound in an identifiable speaker or source, physical cause, and immediate effect; write only its concise natural-Vietnamese effect text inside `§...§`, keep explanatory prose outside, and never mix it with `"..."` vocalization or `*...*` thought. Place each `§...§` block alone on its own readable line or paragraph, like a dialogue or thought line; never put it inline inside a narration sentence or combine it with narration, action, dialogue, vocalization, or thought on the same line.
 
 SD05. Do not impose a sound quota, line quota, vowel length, typography pattern, or climax template.
 
-SD06. During sexual activity, keep the same boundary: put voice- or breath-produced vocalizations in `"..."`; put only concise non-vocal sound-effect text in `$...$`, with natural Vietnamese inside, and keep the surrounding cause or consequence in ordinary prose.
+SD06. During sexual activity, keep the same boundary: put voice- or breath-produced vocalizations in `"..."`; put only concise non-vocal sound-effect text in `§...§`, with natural Vietnamese inside, and keep the surrounding cause or consequence in ordinary prose.
 
 SD07. During sexual activity, do not use any English word or English-like sound string for sound.
 
