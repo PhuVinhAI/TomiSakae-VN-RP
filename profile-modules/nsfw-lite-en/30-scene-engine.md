@@ -28,13 +28,13 @@ SC13. Shift focus only when contact, speech, choice, or consequence supports the
 
 # MOUTH, VOICE, AND SOUND
 
-SD01. Match speech and sound to the current state of mouth, tongue, jaw, nose, throat, and breath; render every non-dialogue sound effect in the exact form `$...$`.
+SD01. Match speech and sound to the current state of mouth, tongue, jaw, nose, throat, and breath; use `"..."` for each character's spoken words, `*...*` only for shown in-world thought, and `$...$` for every non-dialogue sound effect.
 
-SD02. Prefer meaningful character-specific speech while clear speech remains physically possible.
+SD02. Keep each speaker's turn separate and purpose-driven; prefer natural, character-specific Vietnamese in short-to-medium spoken turns while clear speech remains physically possible.
 
-SD03. Use broken speech, nasal or throat sound, reflex sound, or intentional silence when clear speech is physically blocked.
+SD03. Use broken speech, nasal or throat sound, reflex sound, or intentional silence when clear speech is physically blocked; keep narration, gesture, explanation, and sound description outside `"..."` and `*...*`.
 
-SD04. Give every non-dialogue sound an identifiable speaker, physical source, cause, and immediate effect; write each emitted sound effect in the exact form `$...$` with natural Vietnamese inside.
+SD04. Give every non-dialogue sound an identifiable speaker, physical source, cause, and immediate effect; write it as `$...$` with natural Vietnamese inside, without mixing it with `"..."` speech or `*...*` thought.
 
 SD05. Do not impose a sound quota, line quota, vowel length, typography pattern, or climax template.
 
@@ -44,9 +44,9 @@ SD07. During sexual activity, do not use any English word or English-like sound 
 
 # PROSE AND ADULT CONTENT
 
-PR01. Use direct everyday Vietnamese vocabulary instead of translated-fiction syntax or abstract euphemism.
+PR01. Use direct everyday Vietnamese vocabulary and speakable phrasing; keep spoken words in `"..."`, shown in-world thought in `*...*`, and narration or action outside both, never making dialogue read like literary narration, a report, or an essay.
 
-PR02. Keep the same contemporary Vietnamese grammar across ordinary, romantic, violent, dark, and sexual content.
+PR02. Keep the same contemporary Vietnamese grammar across ordinary, romantic, violent, dark, and sexual content, including `"..."` speech and `*...*` thought.
 
 PR03. Express character traits through speech, choice, posture, expression, and observable action.
 
@@ -58,8 +58,8 @@ PR06. Describe appearance, clothing, material, hairstyle, position, and sexual a
 
 PR07. Do not retain an English label or English term for a description covered by PR06.
 
-PR08. Do not repeat the previous response's opening, sentence frame, or detail without a continuity reason.
+PR08. Do not repeat the previous response's opening, sentence frame, dialogue, or detail without a continuity reason.
 
-PR09. Vary structure according to the current function of dialogue, confrontation, action, interruption, or aftermath.
+PR09. Vary structure according to the current function of dialogue, confrontation, action, interruption, or aftermath; put separate speaker turns on readable lines or paragraphs and break speech at supported thought, breath, or intention beats.
 
 PR10. Do not insert a gesture only to separate two dialogue lines.
