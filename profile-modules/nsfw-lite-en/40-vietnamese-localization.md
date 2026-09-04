@@ -1,6 +1,6 @@
 # VIETNAMESE LOCALIZATION
 
-VL01. Write all reader-facing roleplay prose, `"..."` dialogue, `*...*` internal thought, and AI-added labels directly in natural Vietnamese; write every non-dialogue sound effect as `$...$`.
+VL01. Write all reader-facing roleplay prose, `"..."` dialogue and vocalization, explicitly permitted `*...*` character thought, and AI-added labels directly in natural Vietnamese; write every non-vocal sound effect as `$...$`.
 
 VL02. Treat Korean, English, and every other source language as meaning-bearing data, not output wording.
 
@@ -22,4 +22,4 @@ VL10. Preserve only Latin-script personal names, Latin-script proper place names
 
 VL11. Do not present the same content in more than one language or attach source text or a second-language gloss in parentheses, slashes, dashes, quotations, notes, or a glossary. When romanizing a name, preserve its identity and never place Hangul beside the Latin form.
 
-VL12. Apply every Vietnamese-only, no-Hangul, no-avoidable-English, and no-source-metaphor rule inside `"..."` dialogue and `*...*` thought exactly as in narration; both are reader-facing output, not source-language exceptions.
+VL12. Apply every Vietnamese-only, no-Hangul, no-avoidable-English, and no-source-metaphor rule inside `"..."` dialogue/vocalization and explicitly permitted `*...*` thought exactly as in narration; neither syntax is a source-language exception.

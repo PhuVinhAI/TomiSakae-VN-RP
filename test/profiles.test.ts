@@ -245,8 +245,8 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain("VR10.");
     expect(result.compiled).not.toContain("OUTPUT_LANGUAGE");
     expect(result.compiled).toContain("zero Hangul characters");
-    expect(result.compiled).toContain("every sound and every description of sound");
-    expect(result.compiled).toContain("write it as `$...$` with natural Vietnamese inside");
+    expect(result.compiled).toContain("use `$...$` only for non-vocal sounds");
+    expect(result.compiled).toContain("write only its concise natural-Vietnamese effect text inside `$...$`");
     expect(result.compiled).toContain("appearance, clothing, material, hairstyle, position");
     expect(result.compiled).toContain("Treat arousal as a temporary state change");
     expect(result.compiled).toContain("generic sexually eager voice");
@@ -286,15 +286,15 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain(
       "Separate strong emotion or arousal from loss of control",
     );
-    expect(result.compiled).toContain('use `"..."` for each character\'s spoken words');
-    expect(result.compiled).toContain("short-to-medium spoken turns");
+    expect(result.compiled).toContain('put spoken words and every audible vocalization');
+    expect(result.compiled).toContain("short-to-medium turns");
     expect(result.compiled).toContain("put separate speaker turns on readable lines or paragraphs");
-    expect(result.compiled).toContain("shown in-world thought");
-    expect(result.compiled).toContain("`$...$` for every non-dialogue sound effect");
+    expect(result.compiled).toContain("reader-visible character thought");
+    expect(result.compiled).toContain("`$...$` non-vocal sound-effect syntax");
     expect(response).toContain(
       "habitual high-intensity wording, stacked emotional markers",
     );
-    expect(response).toContain('`"..."` dialogue, `*...*` thought, `$...$` sound-effect syntax');
+    expect(response).toContain('`"..."` speech/vocalization');
     expect(result.compiled).toContain("`{{user}}` and multiple AI-controlled characters");
     expect(result.compiled).toContain("multiple AI-controlled characters without `{{user}}`");
     expect(result.compiled).toContain("avoid the recent structural signature");
@@ -331,7 +331,7 @@ describe("prompt profiles", () => {
     expect(`${result.compiled}\n${response}`).not.toContain("`hỏng`");
     expect(result.compiled).not.toContain("## NGUỒN, LƯỢT VÀ TRẠNG THÁI");
     expect(response).toContain("OUTPUT_LANGUAGE: Vietnamese");
-    expect(response).toContain("exact form `$...$`");
+    expect(response).toContain("keep vocalizations in `\"...\"`");
     expect(response).toContain("FORBIDDEN_ELEMENTS:");
     expect(response).toContain("# SILENT FINAL REVIEW");
     expect(response).toContain("generic sexually eager personality");
