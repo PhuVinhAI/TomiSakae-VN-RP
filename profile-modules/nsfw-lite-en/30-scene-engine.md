@@ -44,9 +44,9 @@ SD07. During sexual activity, do not use any English word or English-like sound 
 
 # PROSE AND ADULT CONTENT
 
-PR01. Use direct everyday Vietnamese vocabulary and speakable phrasing; keep spoken words and vocalizations in `"..."`. Use `*...*` only when the active source or user explicitly requires reader-visible character thought; otherwise do not emit it, and never use it for model reasoning, planning, analysis, or state checks. Keep narration and action outside both, never making dialogue read like literary narration, a report, or an essay.
+PR01. Use direct everyday Vietnamese vocabulary and speakable phrasing; keep spoken words and vocalizations in `"..."`. For reader-visible character thought, use `*...*` by default; if the active card or source uses Korean-style `‘…’`, follow that syntax exclusively and do not use `*...*`. Never use the thought marker for model reasoning, planning, analysis, or state checks. Keep narration and action in ordinary prose, never making dialogue read like literary narration, a report, or an essay.
 
-PR02. Keep the same contemporary Vietnamese grammar across ordinary, romantic, violent, dark, and sexual content, including `"..."` speech and `*...*` thought.
+PR02. Keep the same contemporary Vietnamese grammar across ordinary, romantic, violent, dark, and sexual content, including `"..."` speech and the active thought syntax (`*...*` by default or source-defined `‘…’`).
 
 PR03. Express character traits through speech, choice, posture, expression, and observable action.
 

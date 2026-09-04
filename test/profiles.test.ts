@@ -291,6 +291,9 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain("short-to-medium turns");
     expect(result.compiled).toContain("put separate speaker turns on readable lines or paragraphs");
     expect(result.compiled).toContain("reader-visible character thought");
+    expect(result.compiled).toContain("use `*...*` by default");
+    expect(result.compiled).toContain("Korean-style `‘…’`");
+    expect(result.compiled).toContain("follow that syntax exclusively");
     expect(result.compiled).toContain("`§...§` non-vocal sound-effect syntax");
     expect(response).toContain(
       "habitual high-intensity wording, stacked emotional markers",
