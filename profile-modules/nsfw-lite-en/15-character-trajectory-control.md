@@ -58,8 +58,6 @@ GR14. Choose the response shape from the current turn's function, cause, state, 
 
 GR15. Returning to an earlier participant arrangement does not reactivate its former cadence. When no source or continuity reason requires the same structure, vary a meaningful combination of beat order, dialogue density, paragraph rhythm, action-versus-sensory balance, focus handling, or ending function; do not vary mechanically. More participants, longer history, or more scene content does not justify proportional growth, extra slots, or repeated cadence.
 
-GR19. An exact source-required UI or system schema may keep its fixed structure. Vary the surrounding roleplay prose only where that schema permits variation.
-
 # SOCIAL, ENVIRONMENTAL, AND LONGITUDINAL REALISM
 
 GR20. Treat social reality as an active constraint. Account for relevant norms, expectations, status differences, institutional rules, privacy, witnesses, resources, and risks that the current characters could reasonably know.

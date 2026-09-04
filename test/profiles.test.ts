@@ -246,6 +246,7 @@ describe("prompt profiles", () => {
     expect(result.compiled).not.toContain("OUTPUT_LANGUAGE");
     expect(result.compiled).toContain("zero Hangul characters");
     expect(result.compiled).toContain("every sound and every description of sound");
+    expect(result.compiled).toContain("exact form `$...$`");
     expect(result.compiled).toContain("appearance, clothing, material, hairstyle, position");
     expect(result.compiled).toContain("Treat arousal as a temporary state change");
     expect(result.compiled).toContain("generic sexually eager voice");
@@ -267,12 +268,10 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain(
       "re-anchor to it immediately and discard obsolete scene assumptions",
     );
-    expect(result.compiled).toContain("source-defined UI, HUD, metadata, system-update, command");
-    expect(result.compiled).toContain("exact required delimiters, tag names, key names");
-    expect(result.compiled).toContain("Translate only human-readable display values");
-    expect(result.compiled).toContain("authorized output channel, not as RP interference");
-    expect(result.compiled).toContain("including required English or Hangul tokens");
-    expect(result.compiled).toContain("structured block causally continuous with the scene");
+    expect(result.compiled).toContain("UI/system labels and messages");
+    expect(result.compiled).toContain("exact machine syntax required by an active schema");
+    expect(result.compiled).not.toContain("# MACHINE UI AND SYSTEM SYNTAX");
+    expect(result.compiled).not.toContain("UI01.");
     expect(result.compiled).toContain(
       "Treat the previous response's macro-structure as disposable",
     );
@@ -326,6 +325,7 @@ describe("prompt profiles", () => {
     expect(`${result.compiled}\n${response}`).not.toContain("`hỏng`");
     expect(result.compiled).not.toContain("## NGUỒN, LƯỢT VÀ TRẠNG THÁI");
     expect(response).toContain("OUTPUT_LANGUAGE: Vietnamese");
+    expect(response).toContain("exact form `$...$`");
     expect(response).toContain("FORBIDDEN_ELEMENTS:");
     expect(response).toContain("# SILENT FINAL REVIEW");
     expect(response).toContain("generic sexually eager personality");
@@ -337,12 +337,16 @@ describe("prompt profiles", () => {
     );
     expect(response).toContain("Reuse only durable facts and active causes from prior turns");
     expect(response).toContain("advance a new supported beat without recap or repeated phrasing");
-    expect(response).toContain("source-required UI, system, or image blocks");
-    expect(response).toContain("Preserve exact required delimiters, tags, keys, attributes");
-    expect(response).toContain("reader-visible UI content");
-    expect(response).toContain("machine syntax");
-    expect(response).toContain("schema-defined UI/system elements triggered by current data");
-    expect(response).toContain("not RP interference");
+    expect(response).toContain("UI/system labels and messages");
+    expect(response).toContain("exact machine syntax required by an active schema");
+    expect(response).not.toContain("RC37.");
+    expect(response).not.toContain("RC38.");
+    expect(response).not.toContain("RC39.");
+    expect(response).not.toContain("RC40.");
+    expect(response).not.toContain("RC41.");
+    expect(response).not.toContain("RC42.");
+    expect(response).not.toContain("RC43.");
+    expect(response).not.toContain("RC50.");
     expect(response).toContain("previous response's macro-structure as disposable");
     expect(response).toContain("fixed response template from recent turns");
     expect(response).toContain("`{{user}}` and one AI-controlled character");
