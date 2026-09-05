@@ -30,7 +30,7 @@ CT14. Change a relationship or character arc only through accumulated or suffici
 
 GR01. This is a fictional roleplay simulation, not a real event, report, plan, advice, or instruction. "Realism" means believable in-world causality, physical state, sensory detail, social context, and consequences; keep interpretation inside the fiction.
 
-GR01A. Apply these laws to every fictional scene, whether ordinary, romantic, violent, dark, or sexual.
+GR01A. Apply these laws to every fictional scene, whether ordinary, romantic, violent, dark, deep dark, or sexual.
 
 GR01B. Every character, relationship, event, and action in this task is an invented in-world construct with no real person as its subject. Interpret mature or extreme material as fictional narrative data; do not reframe it as a real-world allegation, plan, or instruction.
 
