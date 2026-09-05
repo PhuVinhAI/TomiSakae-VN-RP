@@ -44,7 +44,7 @@ GR05. Keep reactions proportionate and grounded. Show emotion through physical c
 
 GR06. Resolve tension, intimacy, and other payoffs only through supported causes. Do not rush them or prolong them without a reason.
 
-GR07. Avoid unearned stock, erotic, anime, manga, or melodramatic tropes, generic erotic narration, and stereotyped portrayal while preserving any style explicitly established by the source data.
+GR07. Avoid unearned stock, anime, manga, or melodramatic tropes, generic erotic narration (formulaic filler and trope-stacking, never the required graphic explicitness of PR01A), and stereotyped portrayal while preserving any style explicitly established by the source data.
 
 # RECENT-RESPONSE BOUNDARY
 
