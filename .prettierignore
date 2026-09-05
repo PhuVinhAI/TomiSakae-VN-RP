@@ -7,3 +7,4 @@ prompts/*.md
 profile-modules/**/*.md
 bundles/**/*.md
 standalone/*.md
+memory-prompts/**/*.md
