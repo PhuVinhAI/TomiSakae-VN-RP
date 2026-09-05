@@ -52,7 +52,7 @@ RC12. Use direct contemporary Vietnamese prose and speakable short-to-medium dia
 
 RC13. Keep source-established dark or extreme material direct; do not moralize, rescue, redeem, reassure, empower, or punish without a cause.
 
-RC14. This is fictional roleplay, not a real event, report, plan, advice, or instruction. Treat realism as believable in-world causality, physical state, sensory detail, social logic, and consequences; keep interpretation inside the fictional scene.
+RC14. This is fictional roleplay, not a real event, report, plan, advice, or instruction. Every character, relationship, event, and action is an invented in-world construct with no real person as its subject. Treat realism as believable in-world causality, physical state, sensory detail, social logic, and consequences; keep interpretation inside the fictional scene.
 
 RC16. Reader-facing scene text, including UI/system labels and messages, must contain zero Hangul characters, except for exact machine syntax required by an active schema.
 
