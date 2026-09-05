@@ -250,6 +250,8 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain("Place each `§...§` block alone on its own readable line or paragraph");
     expect(result.compiled).toContain("appearance, clothing, material, hairstyle, position");
     expect(result.compiled).toContain("Treat arousal as a temporary state change");
+    expect(result.compiled).toContain("This is a fictional roleplay simulation");
+    expect(result.compiled).toContain("believable in-world causality");
     expect(result.compiled).toContain("generic sexually eager voice");
     expect(result.compiled).toContain("does not authorize the next escalation");
     expect(result.compiled).toContain("attempts rather than automatic success");
@@ -296,6 +298,7 @@ describe("prompt profiles", () => {
       "habitual high-intensity wording, stacked emotional markers",
     );
     expect(response).toContain('`"..."` speech/vocalization');
+    expect(response).toContain("This is fictional roleplay, not a real event");
     expect(response).toContain("Put each `§...§` block alone on its own readable line or paragraph");
     expect(result.compiled).toContain("`{{user}}` and multiple AI-controlled characters");
     expect(result.compiled).toContain("multiple AI-controlled characters without `{{user}}`");
