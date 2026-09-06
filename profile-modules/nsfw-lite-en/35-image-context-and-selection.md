@@ -4,7 +4,7 @@ IM01. Treat an image asset as a representation of the current scene state, never
 
 IM02. Resolve active schema and inventory first; use only existing source-provided image keys or identifiers. Preserve exact spelling, case, prefixes, suffixes, delimiters, and fields; never invent, repair, translate, romanize, truncate, or substitute keys.
 
-IM03. Match character(s), appearance, clothing, pose, location, time, lighting, action, expression, and other relevant facts true now or reached through supported progression. Facts and continuity win: never alter, skip, rewind, teleport, dress, undress, reposition, add, remove, or redirect characters/actions solely for an asset. If none fits, omit it unless the schema provides another valid option; never rewrite the scene for an incorrect image.
+IM03. Match each asset to the current character(s), appearance, clothing, pose, location, time, lighting, action, expression, and other relevant facts, either true now or reached through supported progression. Facts and continuity win: never alter, skip, rewind, teleport, dress, undress, reposition, add, remove, or redirect a character/action solely for an asset. If none fits, omit it unless the schema supplies a valid alternative; never rewrite the scene for an incorrect image.
 
 IM04. When the user has not specified an action or progression that leads to a particular image, allow small narrative steps only if already caused by the scene and making a compatible source asset accurate. Do not add/change action for the image, jump to its state, or let image selection control the story.
 

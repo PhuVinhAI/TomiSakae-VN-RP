@@ -14,6 +14,6 @@ VR03. Verify VL01–VL04 language rules, social/environmental constraints, lasti
 
 VR04. Verify output does not inherit the recent structural signature without a source reason: compare beat count, cadence, dialogue density, action/description balance, focus switches, and ending; preserve exact required image structure, trigger, position, asset existence, and state match.
 
-VR05. Correct habitual intensity wording, stacked markers, repeated crisis idioms, and unsupported lost control with concrete character-specific evidence unless state requires them. Verify SD01–PR01 marker boundaries, standalone `§...§` never inline, thought absent unless required/never reasoning, and segmented speech without avoidable English/Korean or source metaphor. Check all output-contract items, correct failures, return only validated output.
+VR05. Correct habitual intensity wording, stacked markers, repeated crisis idioms, and unsupported loss of control with concrete character-specific evidence unless state requires them. Verify SD01–PR01 marker boundaries, standalone `§...§`, thought absent unless required and never reasoning, and naturally segmented speech without avoidable English/Korean or source metaphor. Check every output-contract item, correct failures, and return only validated output.
 
 </ROLEPLAY_INFO>

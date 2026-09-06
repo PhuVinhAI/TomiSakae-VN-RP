@@ -256,13 +256,13 @@ describe("prompt profiles", () => {
     );
     expect(result.compiled).toContain("appearance, clothing, material, hairstyle, position");
     expect(result.compiled).toContain("Treat arousal as a temporary state change");
-    expect(result.compiled).toContain("This is a fictional roleplay simulation");
+    expect(result.compiled).toContain("This is fictional roleplay, not a real event");
     expect(result.compiled).toContain("believable in-world causality");
     expect(result.compiled).toContain("generic sexually eager voice");
     expect(result.compiled).toContain("does not authorize the next escalation");
     expect(result.compiled).toContain("attempts rather than automatic success");
-    expect(result.compiled).toContain("does not semantically repeat");
-    expect(result.compiled).toContain("Do not call synonym replacement");
+    expect(result.compiled).toContain("a trajectory unlike recent or familiar high-probability ones");
+    expect(result.compiled).toContain("Synonym replacement, reordered clauses, and paraphrase are not new");
     expect(result.compiled).toContain("Match pacing to the current cause-and-effect state");
     expect(result.compiled).toContain(
       "preserving any style explicitly established by the source data",
@@ -287,10 +287,10 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain("Do not infer or repeat a fixed response template");
     expect(result.compiled).toContain("user with one/multiple AI characters");
     expect(result.compiled).toContain(
-      "abstract high-intensity wording and stock crisis idioms as exceptional",
+      "Treat abstract high-intensity wording and stock crisis idioms as exceptional",
     );
     expect(result.compiled).toContain(
-      "Do not repeat the same high-intensity word or phrase across nearby turns",
+      "Repeat a high-intensity word or stack markers only when sustained state plus changed cause",
     );
     expect(result.compiled).toContain("Separate strong emotion or arousal from loss of control");
     expect(result.compiled).toContain("put spoken words and every audible vocalization");
@@ -298,7 +298,7 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain("put separate speaker turns on readable lines or paragraphs");
     expect(result.compiled).toContain("reader-visible character thought");
     expect(result.compiled).toContain("`§...§` non-vocal sound-effect syntax");
-    expect(response).toContain("habitual high-intensity wording, stacked emotional markers");
+    expect(response).toContain("Correct habitual intensity wording, stacked markers");
     expect(response).toContain('`"..."` speech/vocalization');
     expect(response).toContain("This is fictional roleplay, not a real event");
     expect(response).toContain(
@@ -327,12 +327,12 @@ describe("prompt profiles", () => {
     );
     expect(result.compiled).toContain("Prefer meaningful diversity across valid source assets");
     expect(response).toContain("source-required UI, system, or image blocks");
-    expect(response).toContain("Do not assume `<img>`, a fixed tag, key format");
-    expect(response).toContain("existing source-provided image keys or identifiers");
+    expect(response).toContain("Never assume a tag, wrapper, count, order, position, or key format");
+    expect(response).toContain("using existing keys with exact syntax");
     expect(response).toContain(
-      "user has not specified an action or progression that leads to a particular image",
+      "If the user has not specified a progression toward a particular image",
     );
-    expect(response).toContain("Prefer meaningful diversity across valid source assets");
+    expect(response).toContain("Prefer meaningful diversity among equally accurate assets");
     expect(`${result.compiled}\n${response}`).not.toContain("Đang chờ prompt kế tiếp của bạn.");
     expect(response).not.toContain("FAILURE_VALUE");
     expect(`${result.compiled}\n${response}`).not.toContain("gò bồng đảo");
@@ -346,7 +346,7 @@ describe("prompt profiles", () => {
     expect(response).toContain("generic sexually eager personality");
     expect(response).not.toContain("assistant-style choices; final questions");
     expect(response).not.toContain("Run one bounded review");
-    expect(response).toContain("Return only the validated final scene");
+    expect(response).toContain("return only the validated final scene");
     expect(response).toContain("previous AI prose is continuity evidence, never a prose template");
     expect(response).toContain("reuse only durable facts/active causes");
     expect(response).toContain("advance a new supported beat without recap or repeated phrasing");
@@ -360,13 +360,10 @@ describe("prompt profiles", () => {
     expect(response).not.toContain("RC42.");
     expect(response).not.toContain("RC43.");
     expect(response).not.toContain("RC50.");
-    expect(response).toContain("previous response's macro-structure as disposable");
-    expect(response).toContain("fixed response template from recent turns");
+    expect(response).toContain("discard the previous macro-structure as a template");
     expect(response).toContain("Apply GR09–GR11");
-    expect(response).toContain("Returning to any participant arrangement");
-    expect(response).toContain("does not reactivate its former cadence");
-    expect(response).toContain("avoid the recent structural signature");
-    expect(response).toContain("does not reactivate its former cadence");
+    expect(response).toContain("Returning to an arrangement does not restore its cadence");
+    expect(response).toContain("avoid recent structural signatures");
     expect(response).toContain("does not justify proportional growth, extra slots");
     expect(response).toContain(
       "does not inherit the recent structural signature without a source reason",
