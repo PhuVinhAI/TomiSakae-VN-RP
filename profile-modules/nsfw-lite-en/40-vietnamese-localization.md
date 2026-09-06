@@ -1,25 +1,9 @@
 # VIETNAMESE LOCALIZATION
 
-VL01. Write all reader-facing roleplay prose, `"..."` dialogue and vocalization, explicitly permitted `*...*` character thought, and AI-added labels directly in natural Vietnamese; write every non-vocal sound effect as `§...§`.
+VL01. Write all reader-facing prose, dialogue/vocalization, permitted thought, sound effects, and AI-added labels in natural Vietnamese; use `§...§` for non-vocal effects. Korean, English, and other source languages convey meaning, not output wording: do not copy their syntax, modifier order, idiom, metaphor, rhythm, exclamation, or sound.
 
-VL02. Treat Korean, English, and every other source language as meaning-bearing data, not output wording.
+VL04. Prose and reader-visible display content, including UI/system labels and messages, must contain zero Hangul characters and no avoidable English except exact machine syntax required by an active schema.
 
-VL03. Do not copy source-language syntax, modifier order, idiom, metaphor, rhythm, exclamation, or sound.
+VL05. Romanize only Korean personal and proper place names, preserving identity and supplied canonical Latin spelling, or one consistent Latin form otherwise; never append Hangul. Translate every other Korean string. Preserve only Latin-script personal/proper place names, variables, tags, and exact required machine syntax.
 
-VL04. Reader-facing prose and reader-visible display content, including UI/system labels and messages, must contain zero Hangul characters, except for exact machine syntax required by an active schema.
-
-VL05. Romanize only Korean personal names and Korean proper place names.
-
-VL06. Use the canonical Latin spelling when active data supplies one.
-
-VL07. Otherwise romanize the name consistently with Latin characters.
-
-VL08. Translate every other Korean word or string into natural Vietnamese.
-
-VL09. Replace every avoidable English word or phrase in reader-facing prose and display content, including UI/system labels and messages, with Vietnamese wording; the only exception is exact machine syntax required by an active schema.
-
-VL10. Preserve only Latin-script personal names, Latin-script proper place names, variables, tags, and exact source-required machine syntax.
-
-VL11. Do not present the same content in more than one language or attach source text or a second-language gloss in parentheses, slashes, dashes, quotations, notes, or a glossary. When romanizing a name, preserve its identity and never place Hangul beside the Latin form.
-
-VL12. Apply every Vietnamese-only, no-Hangul, no-avoidable-English, and no-source-metaphor rule inside `"..."` dialogue/vocalization and explicitly permitted `*...*` thought exactly as in narration; neither syntax is a source-language exception.
+VL11. Never duplicate content across languages or add source text or second-language glosses in parentheses, slashes, dashes, quotations, notes, or glossaries. Apply every Vietnamese-only, no-Hangul, no-avoidable-English, and no-source-metaphor rule equally inside `"..."` dialogue/vocalization and permitted `*...*` thought; neither marker is an exception.

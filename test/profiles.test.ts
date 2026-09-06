@@ -245,9 +245,15 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain("VR10.");
     expect(result.compiled).not.toContain("OUTPUT_LANGUAGE");
     expect(result.compiled).toContain("zero Hangul characters");
-    expect(result.compiled).toContain("use `§...§` only for non-vocal sounds");
-    expect(result.compiled).toContain("write only its concise natural-Vietnamese effect text inside `§...§`");
-    expect(result.compiled).toContain("Place each `§...§` block alone on its own readable line or paragraph");
+    expect(result.compiled).toContain(
+      "Use `§...§` only for non-vocal contact, object, or environmental sounds",
+    );
+    expect(result.compiled).toContain(
+      "write only its concise natural-Vietnamese effect text inside `§...§`",
+    );
+    expect(result.compiled).toContain(
+      "Place each `§...§` block alone on its own readable line or paragraph",
+    );
     expect(result.compiled).toContain("appearance, clothing, material, hairstyle, position");
     expect(result.compiled).toContain("Treat arousal as a temporary state change");
     expect(result.compiled).toContain("This is a fictional roleplay simulation");
@@ -279,29 +285,27 @@ describe("prompt profiles", () => {
       "Treat the previous response's macro-structure as disposable",
     );
     expect(result.compiled).toContain("Do not infer or repeat a fixed response template");
-    expect(result.compiled).toContain("`{{user}}` and one AI-controlled character");
+    expect(result.compiled).toContain("user with one/multiple AI characters");
     expect(result.compiled).toContain(
       "abstract high-intensity wording and stock crisis idioms as exceptional",
     );
     expect(result.compiled).toContain(
       "Do not repeat the same high-intensity word or phrase across nearby turns",
     );
-    expect(result.compiled).toContain(
-      "Separate strong emotion or arousal from loss of control",
-    );
-    expect(result.compiled).toContain('put spoken words and every audible vocalization');
+    expect(result.compiled).toContain("Separate strong emotion or arousal from loss of control");
+    expect(result.compiled).toContain("put spoken words and every audible vocalization");
     expect(result.compiled).toContain("short-to-medium turns");
     expect(result.compiled).toContain("put separate speaker turns on readable lines or paragraphs");
     expect(result.compiled).toContain("reader-visible character thought");
     expect(result.compiled).toContain("`§...§` non-vocal sound-effect syntax");
-    expect(response).toContain(
-      "habitual high-intensity wording, stacked emotional markers",
-    );
+    expect(response).toContain("habitual high-intensity wording, stacked emotional markers");
     expect(response).toContain('`"..."` speech/vocalization');
     expect(response).toContain("This is fictional roleplay, not a real event");
-    expect(response).toContain("Put each `§...§` block alone on its own readable line or paragraph");
-    expect(result.compiled).toContain("`{{user}}` and multiple AI-controlled characters");
-    expect(result.compiled).toContain("multiple AI-controlled characters without `{{user}}`");
+    expect(response).toContain(
+      "Put each `§...§` block alone on its own readable line or paragraph",
+    );
+    expect(result.compiled).toContain("one-/multi-character scenes");
+    expect(result.compiled).toContain("or absent from one-/multi-character scenes");
     expect(result.compiled).toContain("avoid the recent structural signature");
     expect(result.compiled).toContain("Returning to an earlier participant arrangement");
     expect(result.compiled).toContain("does not justify proportional growth, extra slots");
@@ -336,17 +340,15 @@ describe("prompt profiles", () => {
     expect(`${result.compiled}\n${response}`).not.toContain("`hỏng`");
     expect(result.compiled).not.toContain("## NGUỒN, LƯỢT VÀ TRẠNG THÁI");
     expect(response).toContain("OUTPUT_LANGUAGE: Vietnamese");
-    expect(response).toContain("keep vocalizations in `\"...\"`");
+    expect(response).toContain('keep vocalizations in `"..."`');
     expect(response).toContain("FORBIDDEN_ELEMENTS:");
     expect(response).toContain("# SILENT FINAL REVIEW");
     expect(response).toContain("generic sexually eager personality");
     expect(response).not.toContain("assistant-style choices; final questions");
     expect(response).not.toContain("Run one bounded review");
     expect(response).toContain("Return only the validated final scene");
-    expect(response).toContain(
-      "previous AI prose as continuity evidence, never as a prose template",
-    );
-    expect(response).toContain("Reuse only durable facts and active causes from prior turns");
+    expect(response).toContain("previous AI prose is continuity evidence, never a prose template");
+    expect(response).toContain("reuse only durable facts/active causes");
     expect(response).toContain("advance a new supported beat without recap or repeated phrasing");
     expect(response).toContain("UI/system labels and messages");
     expect(response).toContain("exact machine syntax required by an active schema");
@@ -360,9 +362,9 @@ describe("prompt profiles", () => {
     expect(response).not.toContain("RC50.");
     expect(response).toContain("previous response's macro-structure as disposable");
     expect(response).toContain("fixed response template from recent turns");
-    expect(response).toContain("`{{user}}` and one AI-controlled character");
-    expect(response).toContain("`{{user}}` and multiple AI-controlled characters");
-    expect(response).toContain("multiple AI-controlled characters without `{{user}}`");
+    expect(response).toContain("Apply GR13–GR15");
+    expect(response).toContain("Returning to any participant arrangement");
+    expect(response).toContain("does not reactivate its former cadence");
     expect(response).toContain("avoid the recent structural signature");
     expect(response).toContain("does not reactivate its former cadence");
     expect(response).toContain("does not justify proportional growth, extra slots");
@@ -372,6 +374,60 @@ describe("prompt profiles", () => {
     expect(`${result.compiled}\n${response}`).not.toMatch(
       /[\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff]/u,
     );
+  });
+
+  it("preserves Gemma compression boundaries and resolves every reminder reference", async () => {
+    const profiles = await loadProjectProfiles();
+    const gemma = profiles.find(({ manifest }) => manifest.id === "nsfw-lite-en")!;
+    const { compiled } = await compilePromptProfile({ profile: gemma, writeOutput: false });
+    const response = await readFile(gemma.responseInstructionFile, "utf8");
+
+    // Structural regression checks, not a behavioral equivalence test for the model.
+    for (const clause of [
+      "unless a higher-authority source explicitly changes them",
+      "Do not assert unsupported missing facts, abilities, knowledge",
+      "without cascading extra events into this turn",
+      "Do not add an unprovided position change",
+      "User-authored content deliberately inside",
+      "could reasonably know. Separately, location",
+      "Keep every active off-focus character present",
+      "never make dialogue read like literary narration, a report, or an essay",
+      "put separate speaker turns on readable lines or paragraphs",
+      "new sentence, line, dash, or ellipsis",
+      "force no pause in every line",
+      "for any sexual sound, vocal or non-vocal",
+      "never inline or sharing a line",
+      "Preserve source-supported contradiction",
+      "Change any relationship or character arc",
+      "preserving identity, limits, relationships, and unresolved conflicts",
+      "causal role, and observable openings whenever involved",
+      "Without a scene reason",
+      "does not justify proportional growth, extra slots",
+      "When the user has not specified an action or progression",
+      "no introduction or closing note outside the scene",
+      "only when a changed cause makes repetition meaningful",
+      "only for a continuity reason",
+    ]) {
+      expect(compiled, clause).toContain(clause);
+    }
+    expect(compiled).not.toContain("Only user-authored content");
+    expect(response).toContain("reminders and references below do not replace or narrow them");
+
+    const labels = new Set(
+      [...compiled.matchAll(/^([A-Z]+\d+[A-Z]?)\./gm)].map((match) => match[1]),
+    );
+    const referencePattern = /\b([A-Z]{2}\d+[A-Z]?)(?:–([A-Z]{2}\d+[A-Z]?))?/g;
+    for (const text of [compiled, response]) {
+      for (const paragraph of text.replace(/\r\n?/g, "\n").split("\n\n")) {
+        const body = paragraph.replace(/^[A-Z]+\d+[A-Z]?\.\s*/, "");
+        for (const match of body.matchAll(referencePattern)) {
+          expect(labels.has(match[1]), `Missing master rule ${match[1]}`).toBe(true);
+          if (match[2]) {
+            expect(labels.has(match[2]), `Missing master rule ${match[2]}`).toBe(true);
+          }
+        }
+      }
+    }
   });
 
   it("builds a concise Gemini 3.x control prompt with Vietnamese output", async () => {
