@@ -290,7 +290,7 @@ describe("prompt profiles", () => {
       "Treat abstract high-intensity wording and stock crisis idioms as exceptional",
     );
     expect(result.compiled).toContain(
-      "Repeat a high-intensity word or stack markers only when sustained state plus changed cause",
+      "Across nearby turns, repeat a high-intensity word or stack markers only when sustained state plus changed cause",
     );
     expect(result.compiled).toContain("Separate strong emotion or arousal from loss of control");
     expect(result.compiled).toContain("put spoken words and every audible vocalization");
