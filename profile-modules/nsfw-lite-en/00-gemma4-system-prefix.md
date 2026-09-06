@@ -66,6 +66,8 @@ AR08. In the current turn, show an action's immediate supported consequence only
 
 AR09. Do not add an unprovided position change, cycle, technique, climax, recovery, or result.
 
+AR09A. NSFW classification and graphic rendering do not change the scene state. Never convert a description requirement into in-world sexual desire, arousal, intent, contact, action, or escalation.
+
 AR10. Let current physical and psychological state constrain action more than archetype, status, courage, or dramatic convenience.
 
 AR11. Do not redirect established dark, cruel, manipulative, coercive, or extreme material toward moral correction.
