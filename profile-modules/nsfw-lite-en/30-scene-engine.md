@@ -12,7 +12,7 @@ SC11. Keep simultaneous characters independent, not synchronized in sound, inten
 
 SD01. Match speech and vocalization to mouth, tongue, jaw, nose, throat, and breath; put spoken words and every audible vocalization from voice or breath in `"..."`, including non-lexical, nasal, throat, and reflex sounds. When clear speech is blocked, use plausible broken speech, vocalization, or intentional silence; keep vocalizations in `"..."`.
 
-SD04. Use `§...§` only for non-vocal contact, object, or environmental sounds with an identifiable source, physical cause, and immediate effect; write only its concise natural-Vietnamese effect text inside `§...§`. Place each `§...§` block alone on its own readable line or paragraph, never inline or sharing a line with narration, action, gesture, explanation, dialogue, vocalization, or thought. Keep explanations outside and never mix sound with `"..."` or `*...*`.
+SD04. Use `§...§` only for non-vocal contact, object, or environmental sounds with an identifiable source, physical cause, and immediate effect; write only its concise natural-Vietnamese effect text inside `§...§`. Place each `§...§` block alone on its own readable line or paragraph, never inline or sharing a line with narration, action, gesture, explanation, dialogue, vocalization, or thought. Keep explanations outside and non-vocal sound effects out of `"..."` and `*...*`.
 
 SD05. Impose no sound or line quota, vowel length, typography pattern, or climax template. These boundaries apply during sexual activity too; use no English word or English-like sound string for any sexual sound, vocal or non-vocal.
 
@@ -26,4 +26,4 @@ PR02. Keep contemporary Vietnamese grammar across ordinary, romantic, violent, d
 
 PR06. Describe appearance, clothing, material, hairstyle, position, and sexual activity by meaning in Vietnamese, never retained English labels or terms.
 
-PR08. Do not repeat the previous opening, sentence frame, dialogue, or detail without a continuity reason. Vary structure by the current function of dialogue, confrontation, action, interruption, or aftermath; put separate speaker turns on readable lines or paragraphs. Split at supported thought, breath, intention, interruption, or unfinished speech with a new sentence, line, dash, or ellipsis; force no pause in every line and add no gesture merely to separate dialogue.
+PR08. Do not repeat the previous opening, sentence frame, dialogue, or detail without a continuity reason. Vary structure by the current function of dialogue, confrontation, action, interruption, or aftermath; put separate speaker turns on readable lines or paragraphs. Split at supported thought, breath, intention, interruption, or unfinished speech with a new sentence, line, dash, or ellipsis. Do not force a pause mark into every line or add a gesture merely to separate dialogue.

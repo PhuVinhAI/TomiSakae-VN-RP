@@ -394,7 +394,8 @@ describe("prompt profiles", () => {
       "never make dialogue read like literary narration, a report, or an essay",
       "put separate speaker turns on readable lines or paragraphs",
       "new sentence, line, dash, or ellipsis",
-      "force no pause in every line",
+      "Do not force a pause mark into every line",
+      'non-vocal sound effects out of `"..."` and `*...*`',
       "for any sexual sound, vocal or non-vocal",
       "never inline or sharing a line",
       "Preserve source-supported contradiction",
@@ -412,6 +413,15 @@ describe("prompt profiles", () => {
     }
     expect(compiled).not.toContain("Only user-authored content");
     expect(response).toContain("reminders and references below do not replace or narrow them");
+    expect(response).toContain("Put spoken words and all voice/breath vocalizations");
+    expect(response).not.toContain("Put all words");
+    expect(response).toContain(
+      "Keep narration, action, gestures, explanation, and sound descriptions outside markers",
+    );
+    expect(response).not.toContain("bilingual notes outside markers");
+    expect(response).toContain("never duplicate languages or attach source glosses");
+    expect(compiled).not.toContain("never mix sound with");
+    expect(compiled).not.toContain("force no pause in every line");
 
     const labels = new Set(
       [...compiled.matchAll(/^([A-Z]+\d+[A-Z]?)\./gm)].map((match) => match[1]),
