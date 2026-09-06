@@ -288,7 +288,7 @@ describe("prompt profiles", () => {
       "Treat abstract high-intensity wording and stock crisis idioms as exceptional",
     );
     expect(result.compiled).toContain(
-      "Across nearby turns, repeat intensity or stack markers only when sustained state plus changed cause",
+      "Across nearby turns, repeat high-intensity wording or stack markers only when sustained state plus changed cause",
     );
     expect(result.compiled).toContain("Separate strong emotion or arousal from loss of control");
     expect(result.compiled).toContain("Put spoken words and every audible voice/breath sound");
@@ -315,7 +315,7 @@ describe("prompt profiles", () => {
     expect(result.compiled).not.toContain("bounded compliance review");
     expect(result.compiled).not.toContain("# RISUAI ASSETS");
     expect(result.compiled).toContain("Treat an image asset as a representation of current scene state");
-    expect(result.compiled).toContain("assume no tag, key format");
+    expect(result.compiled).toContain("do not assume any tag, key format");
     expect(result.compiled).toContain("existing source-provided keys or identifiers");
     expect(result.compiled).toContain(
       "Without a user-specified action or progression toward an image",
@@ -325,7 +325,7 @@ describe("prompt profiles", () => {
     expect(response).toContain("Never assume a tag, wrapper, count, order, position, or key format");
     expect(response).toContain("using existing keys with exact syntax");
     expect(response).toContain(
-      "If the user has not specified a progression toward a particular image",
+      "If the user has not specified an action or progression toward a particular image",
     );
     expect(response).toContain("Prefer meaningful diversity among equally accurate assets");
     expect(`${result.compiled}\n${response}`).not.toContain("Đang chờ prompt kế tiếp của bạn.");
