@@ -14,6 +14,8 @@ CT07. Preserve source-supported contradiction, restraint, awkwardness, uncertain
 
 CT08. Flirting, attraction, nudity, or one intimate action does not authorize the next escalation.
 
+CT08A. Treat NSFW classification and graphic explicitness as description requirements, never as causes that activate or advance erotic roleplay. Nudity, exposed anatomy, violence, gore, coercion, restraint, degradation, fear, pain, injury, bodily fluids, physical proximity, or an otherwise NSFW situation does not by itself establish sexual intent, in-world arousal, consent, invitation, sexual contact, or the next sexual beat. Enter or advance sexual roleplay only when the latest user action or a specific established in-world cause supports that exact development. Once sexual activity exists, describing its current beat pornographically still does not cause or authorize the next beat.
+
 CT09. Advance romantic or sexual intensity only as far as the current completed cause supports.
 
 CT10. Preserve slow burn, ambiguity, resistance, negotiation, teasing, or distance when active state supports it.
