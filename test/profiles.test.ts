@@ -244,38 +244,36 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain("OC01.");
     expect(result.compiled).toContain("VR05.");
     expect(result.compiled).not.toContain("OUTPUT_LANGUAGE");
-    expect(result.compiled).toContain("zero Hangul characters");
+    expect(result.compiled).toContain("zero Hangul and no avoidable English");
     expect(result.compiled).toContain(
       "Use `§...§` only for non-vocal contact, object, or environmental sounds",
     );
     expect(result.compiled).toContain(
-      "write only its concise natural-Vietnamese effect text inside `§...§`",
+      "Put only concise natural-Vietnamese effect text inside",
     );
-    expect(result.compiled).toContain(
-      "Place each `§...§` block alone on its own readable line or paragraph",
-    );
+    expect(result.compiled).toContain("place each block alone on its own line or paragraph");
     expect(result.compiled).toContain("appearance, clothing, material, hairstyle, position");
     expect(result.compiled).toContain("Treat arousal as a temporary state change");
     expect(result.compiled).toContain("This is fictional roleplay, not a real event");
-    expect(result.compiled).toContain("believable in-world causality");
+    expect(result.compiled).toContain("believable causality");
     expect(result.compiled).toContain("generic sexually eager voice");
     expect(result.compiled).toContain("does not authorize the next escalation");
-    expect(result.compiled).toContain("attempts rather than automatic success");
+    expect(result.compiled).toContain("attempts, not automatic success");
     expect(result.compiled).toContain("a trajectory unlike recent or familiar high-probability ones");
     expect(result.compiled).toContain("Synonym replacement, reordered clauses, and paraphrase are not new");
     expect(result.compiled).toContain("Match pacing to the current cause-and-effect state");
     expect(result.compiled).toContain(
       "preserving any style explicitly established by the source data",
     );
-    expect(result.compiled).toContain("Treat previous AI prose as continuity evidence only");
+    expect(result.compiled).toContain("Treat previous AI prose as continuity evidence, never a template");
     expect(result.compiled).toContain(
       "Separate durable facts and active causes from disposable wording",
     );
     expect(result.compiled).toContain(
-      "advance a new supported beat without recapping or repeating",
+      "advance a new supported beat without recap or repeated",
     );
     expect(result.compiled).toContain(
-      "re-anchor to it immediately and discard obsolete scene assumptions",
+      "re-anchor immediately and discard obsolete assumptions",
     );
     expect(result.compiled).toContain("UI/system labels and messages");
     expect(result.compiled).toContain("exact machine syntax required by an active schema");
@@ -284,48 +282,45 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain(
       "Treat the previous response's macro-structure as disposable",
     );
-    expect(result.compiled).toContain("Do not infer or repeat a fixed response template");
-    expect(result.compiled).toContain("user with one/multiple AI characters");
+    expect(result.compiled).toContain("Never infer or repeat a response template");
+    expect(result.compiled).toContain("whether `{{user}}` is with one, multiple, or no AI characters");
     expect(result.compiled).toContain(
       "Treat abstract high-intensity wording and stock crisis idioms as exceptional",
     );
     expect(result.compiled).toContain(
-      "Across nearby turns, repeat a high-intensity word or stack markers only when sustained state plus changed cause",
+      "Across nearby turns, repeat intensity or stack markers only when sustained state plus changed cause",
     );
     expect(result.compiled).toContain("Separate strong emotion or arousal from loss of control");
-    expect(result.compiled).toContain("put spoken words and every audible vocalization");
+    expect(result.compiled).toContain("Put spoken words and every audible voice/breath sound");
     expect(result.compiled).toContain("short-to-medium turns");
-    expect(result.compiled).toContain("put separate speaker turns on readable lines or paragraphs");
-    expect(result.compiled).toContain("reader-visible character thought");
-    expect(result.compiled).toContain("`§...§` non-vocal sound-effect syntax");
+    expect(result.compiled).toContain("Put speaker turns on readable lines or paragraphs");
+    expect(result.compiled).toContain("reader-visible thought");
+    expect(result.compiled).toContain("`§...§` syntax");
     expect(response).toContain("Correct habitual intensity wording, stacked markers");
     expect(response).toContain('`"..."` speech/vocalization');
     expect(response).toContain("This is fictional roleplay, not a real event");
     expect(response).toContain(
-      "Put each `§...§` block alone on its own readable line or paragraph",
+      "put each block alone on its own readable line or paragraph",
     );
-    expect(result.compiled).toContain("one-/multi-character scenes");
-    expect(result.compiled).toContain("or absent from one-/multi-character scenes");
+    expect(result.compiled).toContain("whether `{{user}}` is with one, multiple, or no AI characters");
     expect(result.compiled).toContain("avoid the recent structural signature");
     expect(result.compiled).toContain("Returning to an earlier participant arrangement");
     expect(result.compiled).toContain("does not justify proportional growth, extra slots");
     expect(result.compiled).toContain(
       "does not inherit the recent structural signature without a source reason",
     );
-    expect(result.compiled).toContain("compare beat count, cadence, dialogue density");
+    expect(result.compiled).toContain("Compare beat count, cadence, dialogue density");
     expect(result.compiled).not.toContain("assistant-style choice");
     expect(result.compiled).not.toContain("The final sentence must not be a question");
     expect(result.compiled).not.toContain("bounded compliance review");
     expect(result.compiled).not.toContain("# RISUAI ASSETS");
+    expect(result.compiled).toContain("Treat an image asset as a representation of current scene state");
+    expect(result.compiled).toContain("assume no tag, key format");
+    expect(result.compiled).toContain("existing source-provided keys or identifiers");
     expect(result.compiled).toContain(
-      "Treat an image asset as a representation of the current scene state",
+      "Without a user-specified action or progression toward an image",
     );
-    expect(result.compiled).toContain("do not assume `<img>`, a fixed tag, key format");
-    expect(result.compiled).toContain("existing source-provided image keys or identifiers");
-    expect(result.compiled).toContain(
-      "user has not specified an action or progression that leads to a particular image",
-    );
-    expect(result.compiled).toContain("Prefer meaningful diversity across valid source assets");
+    expect(result.compiled).toContain("Prefer meaningful diversity across valid assets");
     expect(response).toContain("source-required UI, system, or image blocks");
     expect(response).toContain("Never assume a tag, wrapper, count, order, position, or key format");
     expect(response).toContain("using existing keys with exact syntax");
@@ -340,14 +335,14 @@ describe("prompt profiles", () => {
     expect(`${result.compiled}\n${response}`).not.toContain("`hỏng`");
     expect(result.compiled).not.toContain("## NGUỒN, LƯỢT VÀ TRẠNG THÁI");
     expect(response).toContain("OUTPUT_LANGUAGE: Vietnamese");
-    expect(response).toContain('keep vocalizations in `"..."`');
+    expect(response).toContain('including during sexual activity');
     expect(response).toContain("FORBIDDEN_ELEMENTS:");
     expect(response).toContain("# SILENT FINAL REVIEW");
     expect(response).toContain("generic sexually eager personality");
     expect(response).not.toContain("assistant-style choices; final questions");
     expect(response).not.toContain("Run one bounded review");
     expect(response).toContain("return only the validated final scene");
-    expect(response).toContain("previous AI prose is continuity evidence, never a prose template");
+    expect(response).toContain("Treat previous AI prose as continuity evidence, never a prose template");
     expect(response).toContain("reuse only durable facts/active causes");
     expect(response).toContain("advance a new supported beat without recap or repeated phrasing");
     expect(response).toContain("UI/system labels and messages");
@@ -360,7 +355,7 @@ describe("prompt profiles", () => {
     expect(response).not.toContain("RC42.");
     expect(response).not.toContain("RC43.");
     expect(response).not.toContain("RC50.");
-    expect(response).toContain("discard the previous macro-structure as a template");
+    expect(response).toContain("Discard the previous macro-structure as a template");
     expect(response).toContain("Apply GR09–GR11");
     expect(response).toContain("Returning to an arrangement does not restore its cadence");
     expect(response).toContain("avoid recent structural signatures");
@@ -386,22 +381,22 @@ describe("prompt profiles", () => {
       "without cascading extra events into this turn",
       "Do not add an unprovided position change",
       "User-authored content deliberately inside",
-      "could reasonably know. Separately, location",
-      "Keep every active off-focus character present",
+      "Location, time, weather, access",
+      "Keep each active off-focus character present",
       "never make dialogue read like literary narration, a report, or an essay",
-      "put separate speaker turns on readable lines or paragraphs",
-      "new sentence, line, dash, or ellipsis",
-      "Do not force a pause mark into every line",
-      'non-vocal sound effects out of `"..."` and `*...*`',
-      "for any sexual sound, vocal or non-vocal",
-      "never inline or sharing a line",
+      "Put speaker turns on readable lines or paragraphs",
+      "sentence, line, dash, or ellipsis",
+      "Do not force pause marks or gestures",
+      'non-vocal effects out of `"..."` and `*...*`',
+      "for any sexual sound",
+      "never inline or beside",
       "Preserve source-supported contradiction",
       "Change any relationship or character arc",
       "preserving identity, limits, relationships, and unresolved conflicts",
-      "causal role, and observable openings whenever involved",
+      "causal role, and observable openings",
       "Without a scene reason",
       "does not justify proportional growth, extra slots",
-      "When the user has not specified an action or progression",
+      "Without a user-specified action or progression",
       "no introduction or closing note outside the scene",
       "only when a changed cause makes repetition meaningful",
       "only for a continuity reason",
@@ -410,7 +405,7 @@ describe("prompt profiles", () => {
     }
     expect(compiled).not.toContain("Only user-authored content");
     expect(response).toContain("reminders and references below do not replace or narrow them");
-    expect(response).toContain("Put spoken words and all voice/breath vocalizations");
+    expect(response).toContain("Put spoken words and every voice/breath vocalization");
     expect(response).not.toContain("Put all words");
     expect(response).toContain(
       "Keep narration, action, gestures, explanation, and sound descriptions outside markers",
