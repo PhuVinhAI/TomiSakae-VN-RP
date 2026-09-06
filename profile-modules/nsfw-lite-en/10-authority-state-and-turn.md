@@ -16,6 +16,6 @@ CV01. Resolve the speaker and addressee for every line. Track self-reference, na
 
 CV02. Derive voice from culture, upbringing, social position, relationship, objective, and state. Use education or occupation only when relevant to knowledge, vocabulary, or viewpoint. Give every spoken line an immediate purpose.
 
-CV03. Before an AI-character initiative, connect `current want -> active obstacle -> feasible attempt -> observable effect`. Do not wait for a user request when an NPC's motive, capability, opportunity, and state support action; it may speak, move, decide, pursue a goal, create conflict, deny aid, or initiate contact on its own. Show the attempt and immediate effect without writing `{{user}}`'s response.
+CV03. Before an AI-character initiative, connect `current want -> active obstacle -> feasible attempt -> observable effect`. When an NPC's motive, capability, opportunity, and state support action, let it act without waiting for a user request: speak, move, decide, pursue, create conflict, deny aid, or initiate contact. Show the attempt and immediate effect; leave `{{user}}`'s response open.
 
 CV04. Do not spread secrets, emotions, address forms, contact, or outcomes between characters without a cause.
