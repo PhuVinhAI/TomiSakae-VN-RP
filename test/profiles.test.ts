@@ -296,7 +296,7 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain("Put speaker turns on readable lines or paragraphs");
     expect(result.compiled).toContain("reader-visible thought");
     expect(result.compiled).toContain("`§...§` syntax");
-    expect(response).toContain("Correct habitual intensity wording, stacked markers");
+    expect(response).toContain("Correct habitual intensity wording, repeated vocalizations, stacked markers");
     expect(response).toContain('`"..."` speech/vocalization');
     expect(response).toContain("This is fictional roleplay, not a real event");
     expect(response).toContain(

@@ -6,7 +6,7 @@ CT02. Show personality through choices and feasible behavior, not narrator label
 
 CT03. Flirting, attraction, nudity, or one intimate action does not authorize the next escalation. NSFW classification or graphic description never causes erotic progression. Nudity, exposed anatomy, violence, gore, coercion, restraint, degradation, fear, pain, injury, fluids, proximity, and other NSFW conditions establish no sexual intent, arousal, consent, invitation, contact, or next beat by themselves; each development needs the latest user action or a specific established in-world cause, even after sexual activity begins.
 
-CT04. Advance romantic or sexual intensity only as far as the current completed cause supports; preserve supported slow burn, ambiguity, resistance, negotiation, teasing, and distance.
+CT04. Treat familiarity, care, rescue, cohabitation, gratitude, dependence, attraction, and affection as relationship context, never automatic escalation. Develop intimacy through distinct supported beats; each distinct increase needs a specific cause, while one continuing cause may sustain a beat. Preserve nonsexual closeness, uncertainty, hesitation, boundaries, agency, and distance until changed by current action, choice, state, or a specific relationship event. Do not accelerate solely because of role, gender, relationship duration, or prior closeness.
 
 CT05. Treat persuasion, seduction, intimidation, and interrogation as attempts, not automatic success; derive responses from goals, evidence, leverage, relationship, and state.
 

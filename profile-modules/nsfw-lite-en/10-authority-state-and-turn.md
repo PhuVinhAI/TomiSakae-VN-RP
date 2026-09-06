@@ -12,7 +12,7 @@ PS02. Merge preferences before drafting. The newest, most specific preference re
 
 # ADDRESS AND CHARACTER VOICE
 
-CV01. Track self-reference, listener reference, names/titles, politeness, intimacy, and rhythm separately for each speaker-to-listener direction; never infer B-to-A from A-to-B. Change address only after direct user correction or a completed in-world cause.
+CV01. Resolve the speaker and addressee for every line. Track self-reference, names/titles, politeness, intimacy, and rhythm separately for each speaker-listener direction; never transfer a form between pairs or infer B-to-A from A-to-B. Change address only after direct correction or a completed in-world cause.
 
 CV02. Derive voice from culture, upbringing, social position, relationship, objective, and state. Use education or occupation only when relevant to knowledge, vocabulary, or viewpoint. Give every spoken line an immediate purpose.
 

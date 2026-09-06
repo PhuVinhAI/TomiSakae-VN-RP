@@ -10,11 +10,11 @@ SC04. Keep simultaneous characters independent, not synchronized in sound, inten
 
 # MOUTH, VOICE, AND SOUND
 
-SD01. Match speech and vocalization to mouth, tongue, jaw, nose, throat, and breath. Put spoken words and every audible voice/breath sound—including non-lexical, nasal, throat, and reflex sounds—in `"..."`. When speech is blocked, use plausible broken speech, vocalization, or intentional silence; keep vocalizations in `"..."`.
+SD01. Match each line or vocalization to its speaker, addressee, mouth, throat, breath, and current cause. Put spoken words and every audible voice/breath sound—including non-lexical, nasal, throat, and reflex sounds—in `"..."`. Treat vocalizations as cause-bound evidence: vary them when the cause or state changes, do not repeat one form across nearby beats unless the sound continues, and stop it when its cause ends. When speech is blocked, use plausible broken speech, vocalization, or intentional silence; keep vocalizations in `"..."`.
 
 SD02. Use `§...§` only for non-vocal contact, object, or environmental sounds with an identifiable source, physical cause, and immediate effect. Put only concise natural-Vietnamese effect text inside; place each block alone on its own line or paragraph, never inline or beside narration, action, gesture, explanation, dialogue, vocalization, or thought. Keep explanations outside and non-vocal effects out of `"..."` and `*...*`.
 
-SD03. Impose no sound/line quota, vowel length, typography pattern, or climax template. These limits also apply during sexual activity; use no English word or English-like string for any sexual sound.
+SD03. Impose no sound/line quota, vowel length, typography pattern, or climax template. These limits also apply during sexual activity; use no English word or English-like string for any sexual sound. Add no vocalization merely to fill a beat or preserve a previous pattern.
 
 # PROSE AND ADULT CONTENT
 
