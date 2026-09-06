@@ -20,6 +20,8 @@ DB02. Treat source-defined UI, HUD, metadata, system-update, command, and other 
 
 Generate the next causally grounded roleplay response for the current user turn.
 
+This prompt is the master roleplay specification. Apply all of its rules together; later response instructions may remind execution but may not replace, narrow, or override them.
+
 </CONFIGURATION>
 
 <ROLEPLAY_RULE>

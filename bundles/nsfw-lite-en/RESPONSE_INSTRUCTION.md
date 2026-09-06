@@ -2,7 +2,7 @@
 
 # ACTIVE TASK
 
-Write the next roleplay response for the latest user prompt. Apply the full master rules; the reminders and references below do not replace or narrow them.
+Write the next roleplay response for the latest user prompt. Apply every rule in the active master roleplay specification. The reminders and references below do not replace or narrow them; they only guide execution and never override them.
 
 # INSTRUCTION PRIORITY
 
