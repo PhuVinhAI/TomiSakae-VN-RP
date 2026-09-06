@@ -242,7 +242,7 @@ describe("prompt profiles", () => {
     expect(result.compiled).toContain("IP01.");
     expect(result.compiled).toContain("DB01.");
     expect(result.compiled).toContain("OC01.");
-    expect(result.compiled).toContain("VR10.");
+    expect(result.compiled).toContain("VR05.");
     expect(result.compiled).not.toContain("OUTPUT_LANGUAGE");
     expect(result.compiled).toContain("zero Hangul characters");
     expect(result.compiled).toContain(
@@ -362,7 +362,7 @@ describe("prompt profiles", () => {
     expect(response).not.toContain("RC50.");
     expect(response).toContain("previous response's macro-structure as disposable");
     expect(response).toContain("fixed response template from recent turns");
-    expect(response).toContain("Apply GR13–GR15");
+    expect(response).toContain("Apply GR09–GR11");
     expect(response).toContain("Returning to any participant arrangement");
     expect(response).toContain("does not reactivate its former cadence");
     expect(response).toContain("avoid the recent structural signature");
@@ -426,6 +426,15 @@ describe("prompt profiles", () => {
     const labels = new Set(
       [...compiled.matchAll(/^([A-Z]+\d+[A-Z]?)\./gm)].map((match) => match[1]),
     );
+    const nextNumber = new Map<string, number>();
+    for (const text of [compiled, response]) {
+      for (const match of text.matchAll(/^(([A-Z]+)\d+[A-Z]?)\./gm)) {
+        const prefix = match[2]!;
+        const expected = nextNumber.get(prefix) ?? 1;
+        expect(match[1]).toBe(`${prefix}${String(expected).padStart(2, "0")}`);
+        nextNumber.set(prefix, expected + 1);
+      }
+    }
     const referencePattern = /\b([A-Z]{2}\d+[A-Z]?)(?:–([A-Z]{2}\d+[A-Z]?))?/g;
     for (const text of [compiled, response]) {
       for (const paragraph of text.replace(/\r\n?/g, "\n").split("\n\n")) {
@@ -434,6 +443,15 @@ describe("prompt profiles", () => {
           expect(labels.has(match[1]), `Missing master rule ${match[1]}`).toBe(true);
           if (match[2]) {
             expect(labels.has(match[2]), `Missing master rule ${match[2]}`).toBe(true);
+            const start = /^([A-Z]+)(\d+)$/.exec(match[1]!)!;
+            const end = /^([A-Z]+)(\d+)$/.exec(match[2])!;
+            if (start[1] === end[1]) {
+              expect(Number(start[2])).toBeLessThanOrEqual(Number(end[2]));
+              for (let number = Number(start[2]); number <= Number(end[2]); number++) {
+                const label = `${start[1]}${String(number).padStart(2, "0")}`;
+                expect(labels.has(label), `Missing rule inside range: ${label}`).toBe(true);
+              }
+            }
           }
         }
       }
