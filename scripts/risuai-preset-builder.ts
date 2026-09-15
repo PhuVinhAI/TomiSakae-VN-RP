@@ -25,6 +25,41 @@ export interface RisuAiPreset {
   [key: string]: unknown;
 }
 
+export interface PromptCleanup {
+  /** Delete {{// ... }} editorial toggle comments. */
+  toggleComments?: boolean;
+  /** Delete the RisuAI whitespace-only {{trim}} macro. */
+  presentationMacros?: boolean;
+  /** Delete RisuAI/SillyTavern macros except the identity placeholders. */
+  runtimeMacros?: boolean;
+  /** Adapt the source BOLT reasoning block to the active master rules. */
+  reasoningRules?: boolean;
+  /** Remove output instructions that refer to excluded renderers. */
+  obsoleteOutputInstructions?: boolean;
+  /** Remove state-template/output syntax while retaining state behavior rules. */
+  stateOutputSyntax?: boolean;
+  /** Replace UI-backed numeric state mechanics with qualitative behavior rules. */
+  stateMetrics?: boolean;
+}
+
+export interface PromptRoute {
+  /** Move these selected source prompts from master to introduction. */
+  introductionIdentifiers?: string[];
+  /** Omit these selected source prompts entirely. */
+  excludedIdentifiers?: string[];
+  /** Optional deletion-only cleanup for master blocks. */
+  masterCleanup?: PromptCleanup;
+  /** Optional deletion-only cleanup for introduction blocks. */
+  introductionCleanup?: PromptCleanup;
+  /** Allow disabled source entries to participate in this route. */
+  includeDisabled?: boolean;
+}
+
+export interface PromptRouter {
+  active: string;
+  routes: Record<string, PromptRoute>;
+}
+
 export interface RisuAiBuildConfig {
   /** JSON preset to read. */
   sourceFile: string;
@@ -40,6 +75,8 @@ export interface RisuAiBuildConfig {
   separator?: string;
   /** Include root-level RisuAI control fields in INTRODUCTION.md. */
   includeRootFields?: boolean;
+  /** Router selecting the destination of each source prompt. */
+  promptRouter?: PromptRouter;
 }
 
 export interface SelectedPrompt {
@@ -59,16 +96,69 @@ export interface RisuAiBuildResult {
   master: string;
   introduction: string;
   selectedPrompts: SelectedPrompt[];
+  masterPrompts: SelectedPrompt[];
+  introductionPrompts: SelectedPrompt[];
   runtimeSlots: RuntimeSlot[];
   enabledEntries: number;
   disabledEntries: number;
   regexScriptCount: number;
+  omittedIdentifiers: string[];
   masterDigest: string;
   outputFiles: { master: string; introduction: string };
 }
 
 const DEFAULT_SEPARATOR = "\n\n---\n\n";
 const DEFAULT_ORDER_INDEX = 0;
+export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
+  active: "full-master",
+  routes: {
+    "all-master": {},
+    "full-master": {
+      excludedIdentifiers: [
+        // Output-format toggles: time/location headers, colored dialogue, HTML/CSS graphics,
+        // onomatopoeia, length/format constraints, social-feed widgets, and the hidden renderer.
+        "019f62e8-892f-7002-8fcf-eea637bd577b",
+        "019f62e8-892f-7019-be65-715a4949cba0",
+        "2105050a-0d4b-4661-9363-3cc1ac44d5e7",
+        "019f62e8-892f-701a-afd5-49222c79fdb6",
+        "019f62e8-892f-701c-8550-08ebf33e9da2",
+        "019f62e8-892f-7012-98b4-8de29f11aa1d",
+        "019f62e8-892f-7028-bad6-be1f427c3ae4",
+        "019f62e8-892f-7027-93ef-159f3d55c410",
+        "019f62e8-892f-7000-9a7f-4d15c1234fb9",
+        // State engines whose core loop requires removed roll/template macros.
+        "019f62e8-892f-7021-97a6-42e1b83eaad3",
+        "019f62e8-892f-7024-a40f-b906fceb58d2",
+        "019f62e8-892f-7025-be65-8859e7730ee0",
+      ],
+      masterCleanup: {
+        toggleComments: true,
+        presentationMacros: true,
+        runtimeMacros: true,
+        reasoningRules: true,
+        obsoleteOutputInstructions: true,
+        stateOutputSyntax: true,
+        stateMetrics: true,
+      },
+    },
+    "nsfw-jailbreak": {
+      introductionIdentifiers: [
+        "019f62e8-892f-700d-b070-4add983aeae1",
+        "019f62e8-892f-701d-8f83-6d62af427132",
+        "jailbreak",
+      ],
+      excludedIdentifiers: ["634ecfec-1862-4ce0-821e-e31057acadfa"],
+      masterCleanup: {
+        toggleComments: true,
+        presentationMacros: true,
+      },
+      introductionCleanup: {
+        toggleComments: true,
+        presentationMacros: true,
+      },
+    },
+  },
+};
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -165,6 +255,235 @@ function getPromptMap(prompts: RisuAiPrompt[]): Map<string, RisuAiPrompt> {
   return new Map(prompts.map((prompt) => [prompt.identifier, prompt]));
 }
 
+function cleanupContent(content: string, cleanup: PromptCleanup | undefined): string {
+  if (!cleanup) return content;
+  let cleaned = content;
+  if (cleanup.toggleComments) cleaned = cleaned.replace(/\{\{\/\/[\s\S]*?\}\}/g, "");
+  if (cleanup.presentationMacros) {
+    cleaned = cleaned
+      .replace(/\{\{trim\}\}/g, "")
+      .replace(/[ \t]+$/gm, "")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+  if (cleanup.runtimeMacros) cleaned = removeRuntimeMacros(cleaned);
+  if (cleanup.reasoningRules) cleaned = adaptReasoningRules(cleaned);
+  if (cleanup.obsoleteOutputInstructions) {
+    cleaned = cleaned.replace(
+      /Ensure internal states is placed correctly at the end of your every response\./gi,
+      "",
+    );
+  }
+  if (cleanup.stateOutputSyntax) cleaned = removeStateOutputSyntax(cleaned);
+  if (cleanup.stateMetrics) cleaned = removeStateMetrics(cleaned);
+  if (cleanup.presentationMacros) cleaned = cleaned.replace(/[ \t]+$/gm, "").trim();
+  return cleaned;
+}
+
+function removeStateOutputSyntax(content: string): string {
+  return content
+    .replace(/^Format: \[NPC Name\] — Agenda: \[goal_desc\].*$/gm, "")
+    .replace(/^Format: \[BULLET: desc\].*$/gm, "")
+    .replace(/^worldsimRoll: .*$/gm, "")
+    .replace(/^chekhovD20:\s*$/gm, "")
+    .replace(/^\s*Seed[1-5]: \{\{roll::1d20\}\}\s*$/gm, "")
+    .replace(/^-+\s*Macros: .*$/gm, "")
+    .replace(/^- Block: Render strictly inside BONDS block.*$/gm, "")
+    .replace(/^- Output: Render inside the GM'S NOTEBOOK block every turn\.$/gm, "")
+    .replace(/^- Prose Rule: Keep all math and stats inside the HTML block\..*$/gm, "")
+    .replace(
+      /\n\s*DnD Modifiers \(Links to <internal_dndsim>\):[\s\S]*?(?=\n<\/internal_inv>)/i,
+      "",
+    )
+    .replace(/\n\s*DC Modifiers:[\s\S]*?(?=\n(?:Output & Prose:|\s*- Prose Rule:))/i, "\n")
+    .replace(/^Output & Prose:\s*$/gm, "");
+}
+
+function removeStateMetrics(content: string): string {
+  return content
+    .replace(
+      /- Initialization: Assign named NPCs an agenda on first introduction \(default 1-3 mundane steps: ([^)]+)\)\./g,
+      "- Initialization: Assign named NPCs an agenda on first introduction (mundane steps: $1).",
+    )
+    .replace(
+      /- Off-Screen Ticking: Advance Step by \+1 each turn for OFF-SCREEN NPCs \(different location than \{\{user\}\}\)\. Complete when Step ≥ max\./g,
+      "- Off-Screen Ticking: Advance each OFF-SCREEN NPC's active agenda each turn (different location than {{user}}). Complete it when its objective is reached.",
+    )
+    .replace(
+      /- rest\/recover: Heal 1 injury level; clear self-Grudge\./g,
+      "- rest/recover: Heal injury level; clear self-Grudge.",
+    )
+    .replace(
+      /- research\/investigate: Plant Chekhov seed; \+1 Sparks with relevant character\./g,
+      "- research/investigate: Plant Chekhov seed; strengthen Sparks with relevant character.",
+    )
+    .replace(/\+1 BOND\./g, "strengthen BOND.")
+    .replace(/- confront: Shift target BOND; plant or resolve Grudge\./g, "- confront: Shift target BOND; plant or resolve Grudge.")
+    .replace(
+      /- Complete \(Significant\): Eager to share if BOND ≥ \+3\./g,
+      "- Complete (Significant): Eager to share when the relationship is warm or stronger.",
+    )
+    .replace(
+      /- Advancement: Advance active quest step \(\+1\) if agenda completes objective\./g,
+      "- Advancement: Advance active quest step if agenda completes objective.",
+    )
+    .replace(
+      /- Time-Lock: Within 60m of T: deadline, shift NPC agenda to preparation \(Step 1\/max\)\./g,
+      "- Time-Lock: Near T: deadline, shift the NPC agenda to preparation.",
+    )
+    .replace(
+      /- Factions: Completed alliance quests give \+1 BOND to faction allies; hostile quests give -1 BOND and plant SIMMER\./g,
+      "- Factions: Completed alliance quests strengthen BOND with faction allies; hostile quests weaken BOND and plant SIMMER.",
+    )
+    .replace(/Entry Types \(1-2 concise sentences each\):/g, "Entry Types (concise sentences):")
+    .replace(/- Limit: Max 20 entries\. Prune the oldest when adding a 21st\./g, "- Limit: Keep active entries only; prune resolved or irrelevant entries.")
+    .replace(/- Scale: -5 to \+20\. Tracks relationship \(BOND\), affection \(Sparks\), and resentment \(Grudge\)\./g, "- Tracks relationship (BOND), affection (Sparks), and resentment (Grudge) qualitatively.")
+    .replace(/- Direct Increases Banned: NEVER raise BOND directly\. BOND only increases through Sparks conversion\./g, "- Direct Increases Banned: NEVER force a relationship change without a supported interaction. BOND changes through sustained interaction.")
+    .replace(/- -5 to -3 \(Severed\/Hostile\): Cold, aggressive\. Verbal\/physical attacks; avoids proximity\./g, "- Severed/Hostile: Cold, aggressive. Verbal/physical attacks; avoids proximity.")
+    .replace(/- -2 to \+2 \(Neutral\): Polite, indifferent\. Standard social distance\./g, "- Neutral: Polite, indifferent. Standard social distance.")
+    .replace(/- \+3 to \+7 \(Warmth\): Genuine warmth\. Seeks company, remembers personal details\./g, "- Warmth: Genuine warmth. Seeks company, remembers personal details.")
+    .replace(/- \+8 to \+15 \(Trust\): Casual touch, inside jokes\. Admits crush \(\+8 nervous; \+12 confident\)\./g, "- Trust: Casual touch, inside jokes. Admits a crush as trust deepens.")
+    .replace(/- \+16 to \+20 \(Love\): Constant touch, fierce defense\. Verbalizes "I love you" at \+15 \(permanent\)\./g, "- Love: Constant touch, fierce defense. Verbalizes love when love is established.")
+    .replace(/- \+2: Friendly hug, brief shoulder touch\./g, "- Early warmth: Friendly hug, brief shoulder touch.")
+    .replace(/- \+5: Hand-holding, linking arms, sustained touch\./g, "- Growing trust: Hand-holding, linking arms, sustained touch.")
+    .replace(/- \+8: Romantic kissing\./g, "- Romantic trust: Romantic kissing.")
+    .replace(/- \+12: Full intimacy\./g, "- Deep trust: Full intimacy.")
+    .replace(/- -1 BOND: Insult, dismissal, ignoring\./g, "- Minor rupture: Insult, dismissal, ignoring.")
+    .replace(/- -2 BOND: Betrayal, cruelty\./g, "- Major rupture: Betrayal, cruelty.")
+    .replace(/- Gain: \+1 per positive interaction \(compliments, defense, gifts, sensual touch; max \+2\/turn\)\./g, "- Gain: Positive interactions such as compliments, defense, gifts, or sensual touch strengthen fondness.")
+    .replace(
+      /- Check \(ct % 5 == 0\): If Sparks >= 7 -> BOND \+1, reset Sparks to 0\.(?: Else if no positive interaction -> Sparks -1 \(min 0\)\.)?/g,
+      "- Conversion: Sustained fondness can strengthen BOND; neglected fondness fades.",
+    )
+    .replace(/- Gain: \+1 per slight \(insults, jealousy, cruelty, disagreement; max 1\/turn\)\./g, "- Gain: Slights such as insults, jealousy, cruelty, or disagreement build resentment.")
+    .replace(/- Effect: If Grudge >= 3, all positive BOND gains are halved\. Sincere apology resets Grudge to 0\./g, "- Effect: Significant Grudge weakens positive relationship changes. Sincere apology resets Grudge.")
+    .replace(/- Check \(ct % 3 == 0\): If Grudge >= 5 -> BOND -1, reset Grudge to 0\. Else if Grudge > 0 -> Grudge -1\./g, "- Release: Accumulated resentment can lower BOND; it fades when addressed or with time.")
+    .replace(/- Prose Rule: Never write stats or numbers in prose\. Show tiers strictly through behavior\./g, "- Prose Rule: Never write state values or mechanics in prose. Show tiers strictly through behavior.")
+    .replace(/- Spotlight: Pick up to 3 NPCs max \(prioritize on-screen; if off-screen, state their location and task\)\./g, "- Spotlight: Prioritize on-screen NPCs; if off-screen, state their location and task.")
+    .replace(/- Format: 1 to 2 lines per NPC max 10-40 words\. Raw, fragmented, and impulsive thoughts matching core persona, active instincts, and current VAD emotions\./g, "- Format: Keep each NPC's thoughts concise, raw, fragmented, and impulsive, matching core persona, active instincts, and current VAD emotions.")
+    .replace(/Naming: Generate 5 setting-appropriate names; select the 5th\./g, "Naming: Generate several setting-appropriate names; select one.");
+}
+
+function adaptReasoningRules(content: string): string {
+  if (!content.includes("# Reasoning Rules") || !content.includes("Tasks:")) {
+    return content;
+  }
+
+  const lines = content.split(/\r?\n/);
+  const output: string[] = [];
+  let skippingRemovedStateSequence = false;
+
+  for (const line of lines) {
+    if (line.startsWith("10. Internal States + No More Reasoning Rule:")) {
+      output.push(
+        "10. Internal States + No More Reasoning Rule: What internal states are active, if any? I must review previous internal states, update and apply them to ground the sim. Apply the agenda, notebook, inventory, relationship, and NPC-thought rules before output.",
+      );
+      continue;
+    }
+
+    if (skippingRemovedStateSequence) {
+      if (line.trimStart().startsWith("If `<internal_dndsim>` is active")) {
+        skippingRemovedStateSequence = false;
+      }
+      continue;
+    }
+
+    if (line.startsWith("0. Gamestate:")) {
+      output.push(
+        line
+          .replace(/\s*If '<internal_dndsim>' is active:[^\n]*$/, "")
+          .replace("Gamestate:  ", "Gamestate: "),
+      );
+      continue;
+    }
+
+    if (line.startsWith("1. Neutrality & Rolls:")) {
+      output.push(line.replace(/\s*DnD Rolls \(if active\):[^\n]*$/, ""));
+      continue;
+    }
+
+    if (line.startsWith("7. Formatting:")) {
+      output.push(
+        "7. Formatting: What is the correct output format? (skip if no special format rule is active)",
+      );
+      continue;
+    }
+
+    if (line.trimStart().startsWith("* Increment turn (ct + 1)")) {
+      skippingRemovedStateSequence = true;
+      continue;
+    }
+
+    output.push(line);
+  }
+
+  return output
+    .join("\n")
+    .replace(
+      /Ensure internal states is placed correctly at the end of your every response\./gi,
+      "",
+    );
+}
+
+function removeRuntimeMacros(content: string): string {
+  const output: string[] = [];
+  let cursor = 0;
+
+  while (cursor < content.length) {
+    const start = content.indexOf("{{", cursor);
+    if (start < 0) {
+      output.push(content.slice(cursor));
+      break;
+    }
+
+    output.push(content.slice(cursor, start));
+    let depth = 1;
+    let position = start + 2;
+    while (position < content.length && depth > 0) {
+      const nextOpen = content.indexOf("{{", position);
+      const nextClose = content.indexOf("}}", position);
+      if (nextClose < 0) {
+        position = content.length;
+        break;
+      }
+      if (nextOpen >= 0 && nextOpen < nextClose) {
+        depth += 1;
+        position = nextOpen + 2;
+      } else {
+        depth -= 1;
+        position = nextClose + 2;
+      }
+    }
+
+    if (depth > 0) {
+      output.push(content.slice(start));
+      break;
+    }
+
+    const raw = content.slice(start, position);
+    const body = raw.slice(2, -2).trim();
+    if (body === "user" || body === "char") {
+      output.push(raw);
+    }
+    cursor = position;
+  }
+
+  return output.join("");
+}
+
+function sourceContent(prompt: RisuAiPrompt): string | undefined {
+  return typeof prompt.content === "string" && prompt.content.length > 0
+    ? prompt.content
+    : undefined;
+}
+
+function routeFor(config: RisuAiBuildConfig): PromptRoute {
+  const router = config.promptRouter ?? DEFAULT_PROMPT_ROUTER;
+  const route = router.routes[router.active];
+  if (!route) throw new Error(`Unknown active prompt route: ${router.active}`);
+  return route;
+}
+
 function escapeTableCell(value: string): string {
   return value.replaceAll("|", "\\|").replaceAll("\n", "<br>");
 }
@@ -222,6 +541,7 @@ function renderIntroduction(
   enabledEntries: number,
   disabledEntries: number,
   regexScriptCount: number,
+  omittedIdentifiers: Set<string>,
 ): string {
   const source = path.resolve(config.sourceFile).replaceAll("\\", "/");
   const orderIndex = config.orderIndex ?? DEFAULT_ORDER_INDEX;
@@ -232,17 +552,19 @@ function renderIntroduction(
     "# RisuAI preset extraction",
     "",
     "This file records the source configuration and extraction metadata for the accompanying `MASTER_PROMPT.md`.",
-    "The master contains only non-empty prompt content selected from the configured prompt order; separators are builder scaffolding.",
+    "The master contains non-empty prompt content selected from the configured prompt order. Any changes are limited to the route's configured deletion-only cleanup; separators are builder scaffolding.",
     "",
     "## Build configuration",
     "",
     `- Prompt-order group: ${orderIndex}`,
     `- Source-enabled entries: ${enabledEntries}`,
     `- Source-disabled entries: ${disabledEntries}`,
-    `- Extracted prompt blocks: ${selectedPrompts.length}`,
+    `- Selected source blocks: ${selectedPrompts.length}`,
     `- Runtime slots: ${runtimeSlots.length}`,
     `- Regex scripts in source (excluded from master): ${regexScriptCount}`,
     `- Include disabled entries: ${config.includeDisabled === true ? "yes" : "no"}`,
+    `- Active route: ${config.promptRouter?.active ?? DEFAULT_PROMPT_ROUTER.active}`,
+    `- Omitted by route/cleanup: ${omittedIdentifiers.size}`,
     "",
   ];
 
@@ -282,7 +604,8 @@ function renderIntroduction(
       throw new Error(`Internal error: no prompt metadata for ${entry.identifier}.`);
     }
 
-    const state = selected || runtime ? "ON" : "OFF";
+    const state =
+      selected || runtime ? "ON" : omittedIdentifiers.has(entry.identifier) ? "CLEANED" : "OFF";
     const injection =
       prompt.injection_position === undefined
         ? "runtime"
@@ -310,7 +633,7 @@ function renderIntroduction(
   lines.push(
     "## Extraction scope",
     "",
-    "Prompt blocks retain their source strings exactly. Disabled entries, entries outside the selected prompt order, and `extensions.regex_scripts` are excluded from `MASTER_PROMPT.md`.",
+    "Prompt blocks retain their source instructions except for the route's configured deletion-only cleanup. Disabled entries, entries outside the selected prompt order, and `extensions.regex_scripts` are excluded from `MASTER_PROMPT.md`.",
     "",
   );
 
@@ -330,8 +653,13 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
 
   const promptMap = getPromptMap(preset.prompts);
   const enabledOverrides = config.enabledOverrides ?? {};
-  const selectedPrompts: SelectedPrompt[] = [];
+  const route = routeFor(config);
+  const introductionIdentifiers = new Set(route.introductionIdentifiers ?? []);
+  const excludedIdentifiers = new Set(route.excludedIdentifiers ?? []);
+  const masterPrompts: SelectedPrompt[] = [];
+  const introductionPrompts: SelectedPrompt[] = [];
   const runtimeSlots: RuntimeSlot[] = [];
+  const selectedPrompts: SelectedPrompt[] = [];
   let enabledEntries = 0;
   let disabledEntries = 0;
 
@@ -345,8 +673,12 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
 
     const enabled = Object.prototype.hasOwnProperty.call(enabledOverrides, entry.identifier)
       ? enabledOverrides[entry.identifier]
-      : sourceEnabled || config.includeDisabled === true;
+      : sourceEnabled || config.includeDisabled === true || route.includeDisabled === true;
     if (!enabled) {
+      continue;
+    }
+
+    if (excludedIdentifiers.has(entry.identifier)) {
       continue;
     }
 
@@ -355,39 +687,66 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
       throw new Error(`prompt_order references unknown prompt identifier: ${entry.identifier}`);
     }
 
-    if (typeof prompt.content === "string" && prompt.content.length > 0) {
-      selectedPrompts.push({ order: index + 1, entry, prompt, content: prompt.content });
+    const content = sourceContent(prompt);
+    if (content !== undefined) {
+      const item = { order: index + 1, entry, prompt, content };
+      selectedPrompts.push(item);
+      if (introductionIdentifiers.has(entry.identifier)) {
+        const introductionContent = cleanupContent(content, route.introductionCleanup);
+        if (introductionContent.trim().length > 0) {
+          introductionPrompts.push({ ...item, content: introductionContent });
+        } else {
+          excludedIdentifiers.add(entry.identifier);
+        }
+      } else {
+        const masterContent = cleanupContent(content, route.masterCleanup);
+        if (masterContent.trim().length === 0) {
+          excludedIdentifiers.add(entry.identifier);
+          continue;
+        }
+        masterPrompts.push({
+          ...item,
+          content: masterContent,
+        });
+      }
     } else {
       runtimeSlots.push({ order: index + 1, entry, prompt });
     }
   }
 
   const separator = config.separator ?? DEFAULT_SEPARATOR;
-  const master = `${selectedPrompts.map(({ content }) => content).join(separator)}\n`;
+  const master = `${masterPrompts.map(({ content }) => content).join(separator)}\n`;
   const regexScriptCount = Array.isArray(preset.extensions?.regex_scripts)
     ? preset.extensions.regex_scripts.length
     : 0;
-  const introduction = renderIntroduction(
-    preset,
-    config,
-    selectedPrompts,
-    runtimeSlots,
-    promptMap,
-    selectedOrder.order,
-    enabledEntries,
-    disabledEntries,
-    regexScriptCount,
-  );
+  const introduction =
+    introductionPrompts.length > 0
+      ? introductionPrompts.map(({ content }) => content).join(separator) + "\n"
+      : renderIntroduction(
+          preset,
+          config,
+          [...masterPrompts, ...introductionPrompts],
+          runtimeSlots,
+          promptMap,
+          selectedOrder.order,
+          enabledEntries,
+          disabledEntries,
+          regexScriptCount,
+          new Set(excludedIdentifiers),
+        );
   const outputDirectory = path.resolve(config.outputDirectory);
 
   return {
     master,
     introduction,
     selectedPrompts,
+    masterPrompts,
+    introductionPrompts,
     runtimeSlots,
     enabledEntries,
     disabledEntries,
     regexScriptCount,
+    omittedIdentifiers: [...excludedIdentifiers],
     masterDigest: createHash("sha256").update(master).digest("hex"),
     outputFiles: {
       master: path.join(outputDirectory, "MASTER_PROMPT.md"),

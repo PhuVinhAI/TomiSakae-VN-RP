@@ -4,7 +4,35 @@ import process from "node:process";
 import { pathToFileURL } from "node:url";
 import { Command } from "commander";
 import { z } from "zod";
-import { buildRisuAiPreset, type RisuAiBuildConfig } from "./risuai-preset-builder.js";
+import {
+  buildRisuAiPreset,
+  DEFAULT_PROMPT_ROUTER,
+  type RisuAiBuildConfig,
+  type PromptRouter,
+} from "./risuai-preset-builder.js";
+
+const PromptCleanupSchema = z.object({
+  toggleComments: z.boolean().optional(),
+  presentationMacros: z.boolean().optional(),
+  runtimeMacros: z.boolean().optional(),
+  reasoningRules: z.boolean().optional(),
+  obsoleteOutputInstructions: z.boolean().optional(),
+  stateOutputSyntax: z.boolean().optional(),
+  stateMetrics: z.boolean().optional(),
+});
+
+const PromptRouteSchema = z.object({
+  introductionIdentifiers: z.array(z.string()).optional(),
+  excludedIdentifiers: z.array(z.string()).optional(),
+  masterCleanup: PromptCleanupSchema.optional(),
+  introductionCleanup: PromptCleanupSchema.optional(),
+  includeDisabled: z.boolean().optional(),
+});
+
+const PromptRouterSchema = z.object({
+  active: z.string().min(1),
+  routes: z.record(z.string(), PromptRouteSchema),
+});
 
 const FileConfigSchema = z
   .object({
@@ -15,6 +43,7 @@ const FileConfigSchema = z
     enabledOverrides: z.record(z.string(), z.boolean()).optional(),
     separator: z.string().optional(),
     includeRootFields: z.boolean().optional(),
+    promptRouter: PromptRouterSchema.optional(),
   })
   .passthrough();
 
@@ -39,6 +68,7 @@ async function readFileConfig(configFile: string): Promise<Partial<RisuAiBuildCo
   if (config.enabledOverrides !== undefined) result.enabledOverrides = config.enabledOverrides;
   if (config.separator !== undefined) result.separator = config.separator;
   if (config.includeRootFields !== undefined) result.includeRootFields = config.includeRootFields;
+  if (config.promptRouter !== undefined) result.promptRouter = config.promptRouter as PromptRouter;
   return result;
 }
 
@@ -94,6 +124,7 @@ export async function run(argv: string[]): Promise<number> {
       false,
     )
     .option("--check", "check whether generated files are current without writing", false)
+    .option("--route <name>", "override the active prompt router route")
     .showHelpAfterError()
     .exitOverride();
 
@@ -108,6 +139,7 @@ export async function run(argv: string[]): Promise<number> {
       setEnabled: string[];
       withoutRootFields: boolean;
       check: boolean;
+      route?: string;
     }>();
     const fileConfig = options.config ? await readFileConfig(options.config) : {};
     const sourceFile = options.source ?? fileConfig.sourceFile;
@@ -122,6 +154,12 @@ export async function run(argv: string[]): Promise<number> {
       ...(fileConfig.enabledOverrides ?? {}),
       ...Object.fromEntries(options.setEnabled.map(parseOverride)),
     };
+    const promptRouter = options.route
+      ? {
+          ...(fileConfig.promptRouter ?? DEFAULT_PROMPT_ROUTER),
+          active: options.route,
+        }
+      : fileConfig.promptRouter;
     const config: RisuAiBuildConfig = {
       sourceFile,
       outputDirectory,
@@ -134,6 +172,7 @@ export async function run(argv: string[]): Promise<number> {
       ...(options.withoutRootFields || fileConfig.includeRootFields === false
         ? { includeRootFields: false }
         : {}),
+      ...(promptRouter === undefined ? {} : { promptRouter }),
     };
     const result = await buildRisuAiPreset(config, !options.check);
 
@@ -149,13 +188,13 @@ export async function run(argv: string[]): Promise<number> {
         return 1;
       }
       process.stdout.write(
-        `RisuAI files are current (${result.selectedPrompts.length} prompt blocks).\n`,
+        `RisuAI files are current (${result.masterPrompts.length + result.introductionPrompts.length} output prompt blocks).\n`,
       );
       return 0;
     }
 
     process.stdout.write(
-      `Extracted ${result.selectedPrompts.length} prompt blocks and ${result.runtimeSlots.length} runtime slots to ${path.resolve(config.outputDirectory)}\nSHA-256: ${result.masterDigest}\n`,
+      `Extracted ${result.masterPrompts.length + result.introductionPrompts.length} output prompt blocks and ${result.runtimeSlots.length} runtime slots to ${path.resolve(config.outputDirectory)}\nSHA-256: ${result.masterDigest}\n`,
     );
     return 0;
   } catch (error) {
