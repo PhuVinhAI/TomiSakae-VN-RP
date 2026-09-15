@@ -45,6 +45,8 @@ export interface PromptCleanup {
 export interface PromptRoute {
   /** Move these selected source prompts from master to introduction. */
   introductionIdentifiers?: string[];
+  /** Enable these prompts for this route even when the source toggle is off. */
+  enabledIdentifiers?: string[];
   /** Omit these selected source prompts entirely. */
   excludedIdentifiers?: string[];
   /** Optional deletion-only cleanup for master blocks. */
@@ -109,11 +111,15 @@ export interface RisuAiBuildResult {
 
 const DEFAULT_SEPARATOR = "\n\n---\n\n";
 const DEFAULT_ORDER_INDEX = 0;
+const INTERNAL_DND_IDENTIFIER = "019f62e8-892f-7021-97a6-42e1b83eaad3";
+const INTERNAL_WORLD_SIM_IDENTIFIER = "019f62e8-892f-7024-a40f-b906fceb58d2";
+const INTERNAL_CHEKHOV_IDENTIFIER = "019f62e8-892f-7025-be65-8859e7730ee0";
 export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
   active: "full-master",
   routes: {
     "all-master": {},
     "full-master": {
+      enabledIdentifiers: [INTERNAL_WORLD_SIM_IDENTIFIER, INTERNAL_CHEKHOV_IDENTIFIER],
       excludedIdentifiers: [
         // Output-format toggles: time/location headers, colored dialogue, HTML/CSS graphics,
         // onomatopoeia, length/format constraints, social-feed widgets, and the hidden renderer.
@@ -126,10 +132,6 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
         "019f62e8-892f-7028-bad6-be1f427c3ae4",
         "019f62e8-892f-7027-93ef-159f3d55c410",
         "019f62e8-892f-7000-9a7f-4d15c1234fb9",
-        // State engines whose core loop requires removed roll/template macros.
-        "019f62e8-892f-7021-97a6-42e1b83eaad3",
-        "019f62e8-892f-7024-a40f-b906fceb58d2",
-        "019f62e8-892f-7025-be65-8859e7730ee0",
       ],
       masterCleanup: {
         toggleComments: true,
@@ -255,8 +257,9 @@ function getPromptMap(prompts: RisuAiPrompt[]): Map<string, RisuAiPrompt> {
   return new Map(prompts.map((prompt) => [prompt.identifier, prompt]));
 }
 
-function cleanupContent(content: string, cleanup: PromptCleanup | undefined): string {
+function cleanupContent(content: string, cleanup: PromptCleanup | undefined, activeIdentifiers: ReadonlySet<string> = new Set()): string {
   if (!cleanup) return content;
+  const internalDndActive = activeIdentifiers.has(INTERNAL_DND_IDENTIFIER);
   let cleaned = content;
   if (cleanup.toggleComments) cleaned = cleaned.replace(/\{\{\/\/[\s\S]*?\}\}/g, "");
   if (cleanup.presentationMacros) {
@@ -267,36 +270,45 @@ function cleanupContent(content: string, cleanup: PromptCleanup | undefined): st
       .trim();
   }
   if (cleanup.runtimeMacros) cleaned = removeRuntimeMacros(cleaned);
-  if (cleanup.reasoningRules) cleaned = adaptReasoningRules(cleaned);
+  if (cleanup.reasoningRules) cleaned = adaptReasoningRules(cleaned, activeIdentifiers);
   if (cleanup.obsoleteOutputInstructions) {
     cleaned = cleaned.replace(
       /Ensure internal states is placed correctly at the end of your every response\./gi,
       "",
     );
   }
-  if (cleanup.stateOutputSyntax) cleaned = removeStateOutputSyntax(cleaned);
+  cleaned = adaptInternalEngines(cleaned);
+  if (cleanup.stateOutputSyntax) cleaned = removeStateOutputSyntax(cleaned, internalDndActive);
   if (cleanup.stateMetrics) cleaned = removeStateMetrics(cleaned);
   if (cleanup.presentationMacros) cleaned = cleaned.replace(/[ \t]+$/gm, "").trim();
   return cleaned;
 }
 
-function removeStateOutputSyntax(content: string): string {
-  return content
+function removeStateOutputSyntax(content: string, internalDndActive: boolean): string {
+  let cleaned = content
     .replace(/^Format: \[NPC Name\] — Agenda: \[goal_desc\].*$/gm, "")
     .replace(/^Format: \[BULLET: desc\].*$/gm, "")
     .replace(/^worldsimRoll: .*$/gm, "")
     .replace(/^chekhovD20:\s*$/gm, "")
-    .replace(/^\s*Seed[1-5]: \{\{roll::1d20\}\}\s*$/gm, "")
+    .replace(/^\s*Seed[1-5]:.*$/gm, "")
     .replace(/^-+\s*Macros: .*$/gm, "")
     .replace(/^- Block: Render strictly inside BONDS block.*$/gm, "")
     .replace(/^- Output: Render inside the GM'S NOTEBOOK block every turn\.$/gm, "")
-    .replace(/^- Prose Rule: Keep all math and stats inside the HTML block\..*$/gm, "")
-    .replace(
-      /\n\s*DnD Modifiers \(Links to <internal_dndsim>\):[\s\S]*?(?=\n<\/internal_inv>)/i,
-      "",
-    )
     .replace(/\n\s*DC Modifiers:[\s\S]*?(?=\n(?:Output & Prose:|\s*- Prose Rule:))/i, "\n")
     .replace(/^Output & Prose:\s*$/gm, "");
+
+  if (internalDndActive) {
+    cleaned = cleaned.replace(
+      /- Prose Rule: Keep all math and stats inside the HTML block\. Never mention modifiers, stats, or numbers in narrative prose\./g,
+      "- Prose Rule: Keep all math and stats in reasoning. Never mention modifiers, stats, or numbers in narrative prose.",
+    );
+  } else {
+    cleaned = cleaned
+      .replace(/\n\s*DnD Modifiers \(Links to <internal_dndsim>\):[\s\S]*?(?=\n<\/internal_inv>)/i, "")
+      .replace(/^- Prose Rule: Keep all math and stats inside the HTML block\..*$/gm, "");
+  }
+
+  return cleaned;
 }
 
 function removeStateMetrics(content: string): string {
@@ -364,10 +376,78 @@ function removeStateMetrics(content: string): string {
     .replace(/Naming: Generate 5 setting-appropriate names; select the 5th\./g, "Naming: Generate several setting-appropriate names; select one.");
 }
 
-function adaptReasoningRules(content: string): string {
+function adaptInternalEngines(content: string): string {
+  let cleaned = content;
+
+  if (cleaned.includes("DND SIM — Dice=law.")) {
+    cleaned = cleaned
+      .replace(/<internal_dndsim>\s*<internal_dndsim>/, "<internal_dndsim>")
+      .replace(
+        "  3. EVAL: Δ = (roll + mods + stats) - DC\n  4. OUTCOME:",
+        "  3. ROLL: Internally sample a uniformly random integer from 1 to 20 for each actor.\n  4. EVAL: Δ = (roll + mods + stats) - DC\n  5. OUTCOME:",
+      );
+  }
+
+  if (cleaned.includes("<internal_worldsim>")) {
+    cleaned = cleaned
+      .replace(
+        "- Roll: World Sim roll is absolute. Skip roll entirely if an intimate NSFW scene is active.",
+        "- Roll: Internally sample a uniformly random integer from 1 to 20. The World Sim roll is absolute. Skip roll entirely if an intimate NSFW scene is active.",
+      )
+      .replace(
+        "(Ignore roll if sexual NSFW scene is present)",
+        "- Prose: Keep the roll and table mechanics in reasoning. Weave only the selected event into narrative.",
+      );
+  }
+
+  if (cleaned.includes("<internal_chekhovguntracker>")) {
+    cleaned = cleaned
+      .replace(
+        "Format: [BULLET: desc] (weight: 1-3, age: 0/12) [depends: prereq] [secret]",
+        "State: Keep each Bullet as [BULLET: desc] (weight: 1-3, age: 0/12) [depends: prereq] [secret] in reasoning only.",
+      )
+      .replace(
+        "Mechanics:",
+        "Mechanics:\n- Memory: Reconstruct unresolved Bullets from chat history. Assign weight from narrative significance; derive age from completed turns since setup and dependencies or locks from established facts. Never reload an active or fired Bullet.\n- Rolls: Internally sample a uniformly random integer from 1 to 20 for each eligible Bullet, up to 5.\n- Prose: Keep Bullet state, rolls, thresholds, and mechanics in reasoning. Weave only fired Bullets into narrative.",
+      )
+      .replace(
+        "- Firing: If Seed roll ≥ effective threshold AND age ≥ 4, fire Bullet and weave naturally into narrative. Jam on Nat 1.",
+        "- Firing: If Seed roll ≥ effective threshold AND age ≥ 4 and a natural opening exists, fire Bullet and weave naturally into narrative; otherwise keep it loaded. Jam on Nat 1.",
+      )
+      .replace(
+        "- Convert future times to `[LOCKED: T:HH:MM]` based on header time. Apply -2 urgency within 2 minutes of deadline.",
+        "- Lock future times against established scene time. Apply -2 urgency within 2 minutes of deadline.",
+      );
+  }
+
+  return cleaned;
+}
+
+function joinRuleNames(names: string[]): string {
+  if (names.length < 2) return names[0] ?? "";
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(", ")}, and ${names.at(-1)}`;
+}
+
+function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<string>): string {
   if (!content.includes("# Reasoning Rules") || !content.includes("Tasks:")) {
     return content;
   }
+
+  const internalDndActive = activeIdentifiers.has(INTERNAL_DND_IDENTIFIER);
+  const internalWorldSimActive = activeIdentifiers.has(INTERNAL_WORLD_SIM_IDENTIFIER);
+  const internalChekhovActive = activeIdentifiers.has(INTERNAL_CHEKHOV_IDENTIFIER);
+  const activeStateRules = joinRuleNames([
+    "agenda",
+    ...(internalChekhovActive ? ["Chekhov"] : []),
+    ...(internalWorldSimActive ? ["World Sim"] : []),
+    "notebook",
+    "inventory",
+    "relationship",
+    "NPC-thought",
+    ...(internalDndActive ? ["DnD"] : []),
+  ]);
+  const hasInternalRolls = internalDndActive || internalWorldSimActive || internalChekhovActive;
 
   const lines = content.split(/\r?\n/);
   const output: string[] = [];
@@ -376,7 +456,7 @@ function adaptReasoningRules(content: string): string {
   for (const line of lines) {
     if (line.startsWith("10. Internal States + No More Reasoning Rule:")) {
       output.push(
-        "10. Internal States + No More Reasoning Rule: What internal states are active, if any? I must review previous internal states, update and apply them to ground the sim. Apply the agenda, notebook, inventory, relationship, and NPC-thought rules before output.",
+        `10. Internal States + No More Reasoning Rule: What internal states are active, if any? I must review previous internal states, update and apply them to ground the sim. Apply the ${activeStateRules} rules before output.${hasInternalRolls ? " Keep their state and rolls in reasoning; weave only their consequences into narrative." : ""}`,
       );
       continue;
     }
@@ -389,16 +469,29 @@ function adaptReasoningRules(content: string): string {
     }
 
     if (line.startsWith("0. Gamestate:")) {
+      const cleanedLine = line.replace(/\{\{getvar::gmNotebookCoTGamestate\}\}\s*/, "");
       output.push(
-        line
-          .replace(/\s*If '<internal_dndsim>' is active:[^\n]*$/, "")
-          .replace("Gamestate:  ", "Gamestate: "),
+        internalDndActive
+          ? cleanedLine.replace(
+              /If '<internal_dndsim>' is active:[^\n]*$/,
+              "If '<internal_dndsim>' is active: What is the locked task DC (Easy: 1-5, Mod: 5-10, Hard: 10-15, Imp: 15-20)? Permanently lock DC now. (Skip if dndsim tag not present or trivial task)",
+            )
+          : cleanedLine
+              .replace(/\s*If '<internal_dndsim>' is active:[^\n]*$/, "")
+              .replace("Gamestate:  ", "Gamestate: "),
       );
       continue;
     }
 
     if (line.startsWith("1. Neutrality & Rolls:")) {
-      output.push(line.replace(/\s*DnD Rolls \(if active\):[^\n]*$/, ""));
+      output.push(
+        internalDndActive
+          ? line.replace(
+              /DnD Rolls \(if active\):[^\n]*$/,
+              "DnD Rolls (if active): Internally sample a uniformly random d20 roll for each actor performing a skilled action. What is the Delta (Roll - DC + mods) and outcome tier? How does this affect the scene?",
+            )
+          : line.replace(/\s*DnD Rolls \(if active\):[^\n]*$/, ""),
+      );
       continue;
     }
 
@@ -655,7 +748,9 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
   const enabledOverrides = config.enabledOverrides ?? {};
   const route = routeFor(config);
   const introductionIdentifiers = new Set(route.introductionIdentifiers ?? []);
+  const routeEnabledIdentifiers = new Set(route.enabledIdentifiers ?? []);
   const excludedIdentifiers = new Set(route.excludedIdentifiers ?? []);
+  const activeIdentifiers = new Set<string>();
   const masterPrompts: SelectedPrompt[] = [];
   const introductionPrompts: SelectedPrompt[] = [];
   const runtimeSlots: RuntimeSlot[] = [];
@@ -673,7 +768,7 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
 
     const enabled = Object.prototype.hasOwnProperty.call(enabledOverrides, entry.identifier)
       ? enabledOverrides[entry.identifier]
-      : sourceEnabled || config.includeDisabled === true || route.includeDisabled === true;
+      : sourceEnabled || routeEnabledIdentifiers.has(entry.identifier) || config.includeDisabled === true || route.includeDisabled === true;
     if (!enabled) {
       continue;
     }
@@ -681,6 +776,8 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
     if (excludedIdentifiers.has(entry.identifier)) {
       continue;
     }
+
+    activeIdentifiers.add(entry.identifier);
 
     const prompt = promptMap.get(entry.identifier);
     if (!prompt) {
@@ -692,14 +789,14 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
       const item = { order: index + 1, entry, prompt, content };
       selectedPrompts.push(item);
       if (introductionIdentifiers.has(entry.identifier)) {
-        const introductionContent = cleanupContent(content, route.introductionCleanup);
+        const introductionContent = cleanupContent(content, route.introductionCleanup, activeIdentifiers);
         if (introductionContent.trim().length > 0) {
           introductionPrompts.push({ ...item, content: introductionContent });
         } else {
           excludedIdentifiers.add(entry.identifier);
         }
       } else {
-        const masterContent = cleanupContent(content, route.masterCleanup);
+        const masterContent = cleanupContent(content, route.masterCleanup, activeIdentifiers);
         if (masterContent.trim().length === 0) {
           excludedIdentifiers.add(entry.identifier);
           continue;

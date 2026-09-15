@@ -14,6 +14,10 @@
     "routes": {
       "all-master": {},
       "full-master": {
+        "enabledIdentifiers": [
+          "019f62e8-892f-7024-a40f-b906fceb58d2",
+          "019f62e8-892f-7025-be65-8859e7730ee0"
+        ],
         "excludedIdentifiers": [
           "019f62e8-892f-7002-8fcf-eea637bd577b",
           "019f62e8-892f-7019-be65-715a4949cba0",
@@ -23,10 +27,7 @@
           "019f62e8-892f-7012-98b4-8de29f11aa1d",
           "019f62e8-892f-7028-bad6-be1f427c3ae4",
           "019f62e8-892f-7027-93ef-159f3d55c410",
-          "019f62e8-892f-7000-9a7f-4d15c1234fb9",
-          "019f62e8-892f-7021-97a6-42e1b83eaad3",
-          "019f62e8-892f-7024-a40f-b906fceb58d2",
-          "019f62e8-892f-7025-be65-8859e7730ee0"
+          "019f62e8-892f-7000-9a7f-4d15c1234fb9"
         ],
         "masterCleanup": {
           "toggleComments": true,

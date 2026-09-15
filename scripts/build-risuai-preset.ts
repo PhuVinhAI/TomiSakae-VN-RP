@@ -23,6 +23,7 @@ const PromptCleanupSchema = z.object({
 
 const PromptRouteSchema = z.object({
   introductionIdentifiers: z.array(z.string()).optional(),
+  enabledIdentifiers: z.array(z.string()).optional(),
   excludedIdentifiers: z.array(z.string()).optional(),
   masterCleanup: PromptCleanupSchema.optional(),
   introductionCleanup: PromptCleanupSchema.optional(),

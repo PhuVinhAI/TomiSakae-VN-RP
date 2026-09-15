@@ -198,7 +198,9 @@ describe("RisuAI preset builder", () => {
       },
     });
 
-    expect(result.master).toContain("<professional_legality>Legal context.</professional_legality>");
+    expect(result.master).toContain(
+      "<professional_legality>Legal context.</professional_legality>",
+    );
     expect(result.master).toContain("Plant Chekhov seed");
     expect(result.master).toContain("Chekhov bullets");
   });
@@ -223,14 +225,85 @@ describe("RisuAI preset builder", () => {
       },
     });
 
-    expect(result.master).toContain("Naming: Generate several setting-appropriate names; select one.");
+    expect(result.master).toContain(
+      "Naming: Generate several setting-appropriate names; select one.",
+    );
     expect(result.master).toContain("Entry Types (concise sentences):");
     expect(result.master).toContain(
       "Advance each OFF-SCREEN NPC's active agenda each turn (different location than {{user}}).",
     );
-    expect(result.master).toContain("Plant Chekhov seed; strengthen Sparks with relevant character.");
-    expect(result.master).toContain("Tracks relationship (BOND), affection (Sparks), and resentment (Grudge) qualitatively.");
-    expect(result.master).toContain("Sustained fondness can strengthen BOND; neglected fondness fades.");
-    expect(result.master).not.toMatch(/Generate 5|select the 5th|1-2|1-3|\+1 Sparks|Scale: -5 to \+20|ct % 5|Sparks >= 7/);
+    expect(result.master).toContain(
+      "Plant Chekhov seed; strengthen Sparks with relevant character.",
+    );
+    expect(result.master).toContain(
+      "Tracks relationship (BOND), affection (Sparks), and resentment (Grudge) qualitatively.",
+    );
+    expect(result.master).toContain(
+      "Sustained fondness can strengthen BOND; neglected fondness fades.",
+    );
+    expect(result.master).not.toMatch(
+      /Generate 5|select the 5th|1-2|1-3|\+1 Sparks|Scale: -5 to \+20|ct % 5|Sparks >= 7/,
+    );
+  });
+
+  it("restores DnD, World Sim, and Chekhov as internal engines without renderer macros", () => {
+    const source = parsePreset({
+      prompts: [
+        {
+          identifier: "019f62e8-892f-7021-97a6-42e1b83eaad3",
+          content:
+            "<internal_dndsim>\n{{setvar::dndTemplate::<details>UI</details>}}\n<internal_dndsim>\n DND SIM — Dice=law. No fudge.\n  3. EVAL: Δ = (roll + mods + stats) - DC\n  4. OUTCOME:\n</internal_dndsim>",
+        },
+        {
+          identifier: "019f62e8-892f-7024-a40f-b906fceb58d2",
+          content:
+            "<internal_worldsim>\n- Roll: World Sim roll is absolute. Skip roll entirely if an intimate NSFW scene is active.\nworldsimRoll: {{roll::1d20}}\n(Ignore roll if sexual NSFW scene is present)\nStandardTable (3+ named NPCs with off-screen characters):\n  1-2, 19-20: CALM\n</internal_worldsim>",
+        },
+        {
+          identifier: "019f62e8-892f-7025-be65-8859e7730ee0",
+          content:
+            "<internal_chekhovguntracker>\nFormat: [BULLET: desc] (weight: 1-3, age: 0/12)\nMechanics:\n- 4-Age Minimum: Bullets CANNOT fire until age ≥ 4, regardless of roll.\n- Firing: If Seed roll ≥ effective threshold AND age ≥ 4, fire Bullet and weave naturally into narrative. Jam on Nat 1.\nchekhovD20:\nSeed1: {{roll::1d20}}\n</internal_chekhovguntracker>",
+        },
+        {
+          identifier: "634ecfec-1862-4ce0-821e-e31057acadfa",
+          content:
+            "# Reasoning Rules\nTasks:\n0. Gamestate: State. If '<internal_dndsim>' is active: {{getvar::dndSimCoTHQ1}} What is the locked task DC?\n1. Neutrality & Rolls: Goals. DnD Rolls (if active): User: {{roll::1d20}} | NPC: {{roll::1d20}}. What is the Delta?\n10. Internal States + No More Reasoning Rule: update states.\n    * Increment turn (ct + 1)\n    {{getvar::worldsimCoT}}\n    If `<internal_dndsim>` is active, populate the dndTemplate.",
+        },
+      ],
+      prompt_order: [
+        {
+          order: [
+            { identifier: "019f62e8-892f-7021-97a6-42e1b83eaad3", enabled: true },
+            { identifier: "019f62e8-892f-7024-a40f-b906fceb58d2", enabled: false },
+            { identifier: "019f62e8-892f-7025-be65-8859e7730ee0", enabled: false },
+            { identifier: "634ecfec-1862-4ce0-821e-e31057acadfa", enabled: true },
+          ],
+        },
+      ],
+    });
+    const result = buildPreset(source, {
+      sourceFile: "preset.json",
+      outputDirectory: "out",
+    });
+
+    expect(result.masterPrompts.map(({ prompt }) => prompt.identifier)).toEqual([
+      "019f62e8-892f-7021-97a6-42e1b83eaad3",
+      "019f62e8-892f-7024-a40f-b906fceb58d2",
+      "019f62e8-892f-7025-be65-8859e7730ee0",
+      "634ecfec-1862-4ce0-821e-e31057acadfa",
+    ]);
+    expect(result.master).toContain(
+      "Internally sample a uniformly random integer from 1 to 20 for each actor.",
+    );
+    expect(result.master).toContain("The World Sim roll is absolute.");
+    expect(result.master).toContain("Keep the roll and table mechanics in reasoning.");
+    expect(result.master).toContain("4-Age Minimum");
+    expect(result.master).toContain("otherwise keep it loaded");
+    expect(result.master).toContain(
+      "Apply the agenda, Chekhov, World Sim, notebook, inventory, relationship, NPC-thought, and DnD rules before output.",
+    );
+    expect(result.master).not.toMatch(
+      /\{\{(?:setvar|getvar|roll)::|dndTemplate|worldsimRoll:|chekhovD20:|Seed1:/,
+    );
   });
 });
