@@ -8,3 +8,4 @@ profile-modules/**/*.md
 bundles/**/*.md
 standalone/*.md
 memory-prompts/**/*.md
+risuai/**/*.md

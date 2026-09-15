@@ -1,0 +1,12 @@
+{
+  "sourceFile": "C:/path/to/preset.json",
+  "outputDirectory": "risuai/my-preset",
+  "orderIndex": 0,
+  "includeDisabled": false,
+  "enabledOverrides": {
+    "some-prompt-identifier": true,
+    "another-prompt-identifier": false
+  },
+  "includeRootFields": true,
+  "separator": "\n\n---\n\n"
+}

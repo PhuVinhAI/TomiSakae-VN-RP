@@ -68,6 +68,8 @@ pnpm check:prompts              # Kiểm tra mọi master có mới hay không
 pnpm check                      # TypeScript và ESLint
 pnpm test                       # Vitest
 pnpm build                      # Biên dịch CLI vào dist/
+pnpm build:risuai -- --source <preset.json> --output-directory <directory>
+                                # Tách prompt đang bật từ preset RisuAI/SillyTavern
 pnpm zip:handoff                # ZIP nguồn cần thiết để gửi cho AI khác
 pnpm ci                         # Chạy toàn bộ kiểm tra
 ```
@@ -81,6 +83,16 @@ pnpm dev --profile nsfw-lite-en --list
 pnpm dev --profile nsfw-lite-gemini3-en --list
 pnpm dev --profile nsfw-lite-mimo25-pro-en --list
 pnpm dev --source prompts --output generated/MASTER_PROMPT.md
+```
+
+Builder preset RisuAI đọc `prompt_order`, giữ nguyên nội dung của các prompt đang bật theo đúng thứ
+tự, ghi các slot runtime vào `INTRODUCTION.md`, và loại `extensions.regex_scripts` khỏi
+`MASTER_PROMPT.md`. Dùng `--set-enabled identifier=on|off` nhiều lần để đổi toggle mà không sửa JSON
+nguồn; dùng `--check` để kiểm tra hai file đã sinh còn mới. Với cấu hình dùng lại nhiều lần, sao
+chép `scripts/risuai-preset.config.example.json`, điền đường dẫn và `enabledOverrides`, rồi chạy:
+
+```bash
+pnpm build:risuai -- --config scripts/my-risuai-preset.config.json
 ```
 
 ## Đóng gói để chuyển cho AI khác
@@ -118,6 +130,8 @@ prompts/                     18 module của NSFW đầy đủ hiện tại
 src/compiler.ts              Compiler thư mục thô tương thích cách dùng cũ
 src/profiles.ts              Nạp manifest và biên dịch profile
 src/cli.ts                   Giao diện dòng lệnh
+scripts/build-risuai-preset.ts CLI dựng hai file từ preset RisuAI/SillyTavern
+scripts/risuai-preset-builder.ts Bộ đọc, kiểm tra, chọn toggle và render dùng lại được
 scripts/export-project.ps1   Đóng gói tệp Git cần thiết thành ZIP
 test/compiler.test.ts        Kiểm thử prompt NSFW đầy đủ và compiler gốc
 test/profiles.test.ts        Kiểm thử ranh giới, kích thước và tương thích sáu profile
@@ -174,9 +188,9 @@ và [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-en
 `nsfw-lite-en` là bản thiết kế lại, không phải bản dịch từng câu của `nsfw-lite`. Bảy lớp system
 prompt lần lượt tách mục tiêu/hierarchy, data boundary và trạng thái, character–trajectory control,
 scene engine, image context/asset control, khóa tiếng Việt và output contract. Profile này có module
-chọn ảnh theo schema nguồn nhưng không có route RisuAI cố định. Mỗi luật có một mã ổn định và một yêu cầu
-kiểm chứng được; output contract cùng silent
-validation nằm gần điểm xuất để giảm lỗi quên luật khi context dài.
+chọn ảnh theo schema nguồn nhưng không có route RisuAI cố định. Mỗi luật có một mã ổn định và một
+yêu cầu kiểm chứng được; output contract cùng silent validation nằm gần điểm xuất để giảm lỗi quên
+luật khi context dài.
 
 Khi dùng Transformers hoặc inference stack có chat template, truyền `MASTER_PROMPT.md` bằng native
 `system` role và để tokenizer tự thêm control token Gemma 4. Không chép thủ công `<|turn>system`
