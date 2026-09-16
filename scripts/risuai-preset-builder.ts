@@ -530,7 +530,7 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
     if (line.startsWith("7. Formatting:")) {
       output.push(
         activeIdentifiers.has(VIETNAMESE_OUTPUT_MODULE_IDENTIFIER)
-          ? "7. Formatting: What is the correct output format? Verify natural Vietnamese throughout and standalone `§...§` only for non-vocal sound effects."
+          ? "7. Formatting: What is the correct output format? How will I keep all reader-facing output in natural Vietnamese and use standalone `§...§` only for non-vocal sound effects?"
           : "7. Formatting: What is the correct output format? (skip if no special format rule is active)",
       );
       continue;

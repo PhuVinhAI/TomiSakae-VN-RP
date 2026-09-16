@@ -196,7 +196,9 @@ describe("RisuAI preset builder", () => {
       },
     });
 
-    expect(result.master).toContain("Verify natural Vietnamese throughout and standalone `§...§`");
+    expect(result.master).toContain(
+      "How will I keep all reader-facing output in natural Vietnamese and use standalone `§...§`",
+    );
     expect(result.master.indexOf(module)).toBeLessThan(result.master.indexOf("# Reasoning Rules"));
     expect(result.externalMasterModules).toEqual([{ file: "module.md", content: module }]);
   });
