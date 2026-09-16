@@ -23,6 +23,7 @@ const PromptCleanupSchema = z.object({
 
 const PromptRouteSchema = z.object({
   masterModuleFiles: z.array(z.string()).optional(),
+  endInjectedPromptFile: z.string().min(1).optional(),
   reasoningIdentifiers: z.array(z.string()).optional(),
   introductionIdentifiers: z.array(z.string()).optional(),
   enabledIdentifiers: z.array(z.string()).optional(),
@@ -47,6 +48,7 @@ const FileConfigSchema = z
     enabledOverrides: z.record(z.string(), z.boolean()).optional(),
     separator: z.string().optional(),
     includeRootFields: z.boolean().optional(),
+    modelMode: z.enum(["default", "gemma-4"]).optional(),
     promptRouter: PromptRouterSchema.optional(),
   })
   .passthrough();
@@ -72,6 +74,7 @@ async function readFileConfig(configFile: string): Promise<Partial<RisuAiBuildCo
   if (config.enabledOverrides !== undefined) result.enabledOverrides = config.enabledOverrides;
   if (config.separator !== undefined) result.separator = config.separator;
   if (config.includeRootFields !== undefined) result.includeRootFields = config.includeRootFields;
+  if (config.modelMode !== undefined) result.modelMode = config.modelMode;
   if (config.promptRouter !== undefined) result.promptRouter = config.promptRouter as PromptRouter;
   return result;
 }
@@ -106,12 +109,12 @@ export async function run(argv: string[]): Promise<number> {
   const program = new Command()
     .name("build-risuai-preset")
     .description(
-      "Extract an ordered RisuAI preset into master, reasoning, and metadata prompt files.",
+      "Extract an ordered RisuAI preset into master, reasoning, end-injected, and metadata prompt files.",
     )
     .option("-s, --source <file>", "source RisuAI preset JSON file (or set sourceFile in --config)")
     .option(
       "-o, --output-directory <directory>",
-      "directory for MASTER_PROMPT.md, REASONING_RULES.md, and INTRODUCTION.md",
+      "directory for MASTER_PROMPT.md, REASONING_RULES.md, END_INJECTED_PROMPT.md, and INTRODUCTION.md",
     )
     .option("-c, --config <file>", "JSON build configuration merged before CLI overrides")
     .option("--order-index <number>", "prompt_order group index", (value) => Number(value))
@@ -129,6 +132,7 @@ export async function run(argv: string[]): Promise<number> {
     )
     .option("--check", "check whether generated files are current without writing", false)
     .option("--route <name>", "override the active prompt router route")
+    .option("--mode <mode>", "model compatibility mode: default or gemma-4")
     .showHelpAfterError()
     .exitOverride();
 
@@ -144,6 +148,7 @@ export async function run(argv: string[]): Promise<number> {
       withoutRootFields: boolean;
       check: boolean;
       route?: string;
+      mode?: string;
     }>();
     const fileConfig = options.config ? await readFileConfig(options.config) : {};
     const sourceFile = options.source ?? fileConfig.sourceFile;
@@ -164,6 +169,10 @@ export async function run(argv: string[]): Promise<number> {
           active: options.route,
         }
       : fileConfig.promptRouter;
+    if (options.mode !== undefined && options.mode !== "default" && options.mode !== "gemma-4") {
+      throw new Error(`Invalid --mode ${options.mode}; expected default or gemma-4.`);
+    }
+    const modelMode = options.mode ?? fileConfig.modelMode;
     const config: RisuAiBuildConfig = {
       sourceFile,
       outputDirectory,
@@ -177,16 +186,24 @@ export async function run(argv: string[]): Promise<number> {
         ? { includeRootFields: false }
         : {}),
       ...(promptRouter === undefined ? {} : { promptRouter }),
+      ...(modelMode === undefined ? {} : { modelMode }),
     };
     const result = await buildRisuAiPreset(config, !options.check);
 
     if (options.check) {
-      const [masterCurrent, reasoningCurrent, introductionCurrent] = await Promise.all([
-        fileMatches(result.outputFiles.master, result.master),
-        fileMatches(result.outputFiles.reasoning, result.reasoning),
-        fileMatches(result.outputFiles.introduction, result.introduction),
-      ]);
-      if (!masterCurrent || !reasoningCurrent || !introductionCurrent) {
+      const [masterCurrent, reasoningCurrent, endInjectedPromptCurrent, introductionCurrent] =
+        await Promise.all([
+          fileMatches(result.outputFiles.master, result.master),
+          fileMatches(result.outputFiles.reasoning, result.reasoning),
+          fileMatches(result.outputFiles.endInjectedPrompt, result.endInjectedPrompt),
+          fileMatches(result.outputFiles.introduction, result.introduction),
+        ]);
+      if (
+        !masterCurrent ||
+        !reasoningCurrent ||
+        !endInjectedPromptCurrent ||
+        !introductionCurrent
+      ) {
         process.stderr.write(
           `Generated RisuAI files are stale in ${path.resolve(config.outputDirectory)}\n`,
         );
@@ -199,7 +216,7 @@ export async function run(argv: string[]): Promise<number> {
     }
 
     process.stdout.write(
-      `Extracted ${result.masterPrompts.length + result.reasoningPrompts.length + result.introductionPrompts.length + result.externalMasterModules.length} output prompt blocks and ${result.runtimeSlots.length} runtime slots to ${path.resolve(config.outputDirectory)}\nMASTER SHA-256: ${result.masterDigest}\nREASONING SHA-256: ${result.reasoningDigest}\n`,
+      `Extracted ${result.masterPrompts.length + result.reasoningPrompts.length + result.introductionPrompts.length + result.externalMasterModules.length} output prompt blocks and ${result.runtimeSlots.length} runtime slots to ${path.resolve(config.outputDirectory)}\nMASTER SHA-256: ${result.masterDigest}\nREASONING SHA-256: ${result.reasoningDigest}\nEND-INJECTED SHA-256: ${result.endInjectedPromptDigest}\n`,
     );
     return 0;
   } catch (error) {

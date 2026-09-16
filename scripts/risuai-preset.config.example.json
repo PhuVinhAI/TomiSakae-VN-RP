@@ -8,6 +8,7 @@
     "another-prompt-identifier": false
   },
   "includeRootFields": true,
+  "modelMode": "gemma-4",
   "separator": "\n\n",
   "promptRouter": {
     "active": "full-master",
@@ -17,6 +18,7 @@
         "masterModuleFiles": [
           "risuai-modules/freaky-frankenstein-5.4/10-vietnamese-output-and-sound.md"
         ],
+        "endInjectedPromptFile": "risuai-modules/freaky-frankenstein-5.4/90-end-injected-prompt.md",
         "reasoningIdentifiers": ["634ecfec-1862-4ce0-821e-e31057acadfa", "jailbreak"],
         "excludedIdentifiers": [
           "019f62e8-892f-7024-a40f-b906fceb58d2",

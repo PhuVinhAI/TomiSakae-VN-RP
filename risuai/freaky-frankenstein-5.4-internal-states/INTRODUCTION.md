@@ -18,6 +18,7 @@ The prompt files contain non-empty content selected from the configured prompt o
 - Regex scripts in source (excluded from master): 25
 - Include disabled entries: no
 - Active route: full-master
+- Model mode: gemma-4
 - Omitted by route/cleanup: 11
 
 ### External master modules

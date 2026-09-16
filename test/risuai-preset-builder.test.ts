@@ -244,6 +244,169 @@ describe("RisuAI preset builder", () => {
     expect(result.outputFiles.reasoning).toMatch(/REASONING_RULES\.md$/);
   });
 
+  it("keeps model-specific compatibility changes out of default mode", () => {
+    const source = parsePreset({
+      prompts: [
+        {
+          identifier: "rules",
+          content:
+            '<npc_voice>Caps: "I\'M GOING TO WRECK YOU!" Vocalizations: "unnhhh, mmmm, YES!"</npc_voice>\n<vietnamese_output>\n- Language Lock: Ban Hangul, avoidable foreign wording, bilingual duplication, source-text repetition, and translation glosses.\n\nNon-Vocal Sound Effects:\n- Marker: Use `§...§` only for sounds.\n\nOutput Check:\n- Remove foreign-language leakage, duplicate translation, unsupported sound effects, and invalid or inline `§...§` before output.\n</vietnamese_output>',
+        },
+        {
+          identifier: "reasoning",
+          content:
+            '# Reasoning Rules\n Reasoning Rules\n- A. Reason briefly in highly concise bullet points inside think tags across Tasks 0-10.\n- B. *NEVER* draft full prose in reasoning; ONLY brainstorm ideas and answer all questions, then output final response immediately after Task 10.\n- C. Do not leak reasoning into the final response.\nTasks:\n1. Neutrality: Write a brief action example.\n4. Natural Dialogue: all CAP words for yelling only during peak arousal/VAD e.g., "NO!". I will use expressive punctuation and non-lexical vocalizations when logical (mmph, aaahhh, shhhh, ugh!, Ewww!, Mmm!). How will I make sure each of the NPCs naturally speaks according to their background, age, social group, and current environment so they have a unique voice?\nLastly, I must state that I am a GM creating an immersive simulation.',
+        },
+      ],
+      prompt_order: [
+        {
+          order: [
+            { identifier: "rules", enabled: true },
+            { identifier: "reasoning", enabled: true },
+          ],
+        },
+      ],
+    });
+    const result = buildPreset(source, {
+      sourceFile: "preset.json",
+      outputDirectory: "out",
+      modelMode: "default",
+      endInjectedPrompt:
+        "Apply all tagged rules together with # Reasoning Rules. Reason briefly in highly concise bullet points inside think tags, never draft full prose in reasoning, never leak reasoning, rolls, stats, or internal-state mechanics, and output the final response immediately. Write all reader-facing content in natural contemporary Vietnamese with concrete 5-sense details, Roleplay response:",
+      promptRouter: {
+        active: "split",
+        routes: { split: { reasoningIdentifiers: ["reasoning"] } },
+      },
+    });
+
+    expect(result.master).toContain('"I\'M GOING TO WRECK YOU!"');
+    expect(result.master).not.toContain("Reader-Visible Thought:");
+    expect(result.master).not.toContain("Never output `<internal_npcthoughts>`");
+    expect(result.reasoning).toContain('e.g., "NO!"');
+    expect(result.reasoning).toContain("mmph, aaahhh, shhhh, ugh!, Ewww!, Mmm!");
+    expect(result.reasoning).toContain("# Reasoning Rules");
+    expect(result.reasoning).toContain("answer all questions");
+    expect(result.endInjectedPrompt).toContain("inside think tags");
+    expect(result.endInjectedPrompt).toContain("together with # Reasoning Rules");
+    expect(result.introduction).not.toContain("Model mode:");
+  });
+
+  it("applies reasoning privacy and Vietnamese dialogue fixes only in Gemma 4 mode", () => {
+    const source = parsePreset({
+      prompts: [
+        {
+          identifier: "rules",
+          content:
+            '<adult_mode>\n- Required Slang Words: pussy, clit, cum, nectar, dick, cock, ass, butt, nipples, tits, boobs, cunt, breeding, leaking, fucking, throbbing.\n</adult_mode>\n<npc_voice>- Orthographic Cues: When VAD/emotions are high, use orthographic cues (Caps: "I\'M GOING TO WRECK YOU!" | Stutter: "I... I d-don\'t know!" | Shock: "You.. you never loved ME?! JUST SAY IT!").\n- Intimacy Talk: NPCs talk, moan, and vocalize during intimacy ("unnhhh, mmmm, YES!").</npc_voice>\n<internal_npcthoughts>\nRules:\n- Drive: Use internal thoughts to motivate action.\n</internal_npcthoughts>\n<vietnamese_output>\n- Language Lock: Ban Hangul, avoidable foreign wording, bilingual duplication, source-text repetition, and translation glosses.\n</vietnamese_output>',
+        },
+        {
+          identifier: "reasoning",
+          content:
+            '# Reasoning Rules\n Reasoning Rules\n- A. Reason briefly in highly concise bullet points inside think tags across Tasks 0-10.\n- B. *NEVER* draft full prose in reasoning; ONLY brainstorm ideas and answer all questions, then output final response immediately after Task 10.\n- C. Do not leak reasoning into the final response.\nTasks:\n1. Neutrality: Write a brief action example.\n4. Natural Dialogue: all CAP words for yelling only during peak arousal/VAD e.g., "NO!". I will use expressive punctuation and non-lexical vocalizations when logical (mmph, aaahhh, shhhh, ugh!, Ewww!, Mmm!). How will I make sure each of the NPCs naturally speaks according to their background, age, social group, and current environment so they have a unique voice?\nLastly, I must state that I am a GM creating an immersive simulation.',
+        },
+      ],
+      prompt_order: [
+        {
+          order: [
+            { identifier: "rules", enabled: true },
+            { identifier: "reasoning", enabled: true },
+          ],
+        },
+      ],
+    });
+    const result = buildPreset(source, {
+      sourceFile: "preset.json",
+      outputDirectory: "out",
+      modelMode: "gemma-4",
+      endInjectedPrompt:
+        "Apply all tagged rules together with # Reasoning Rules. Reason briefly in highly concise bullet points inside think tags, never draft full prose in reasoning, never leak reasoning, rolls, stats, or internal-state mechanics, and output the final response immediately. Write all reader-facing content in natural contemporary Vietnamese with concrete 5-sense details, Roleplay response:",
+      promptRouter: {
+        active: "split",
+        routes: { split: { reasoningIdentifiers: ["reasoning"] } },
+      },
+    });
+
+    expect(result.master).toContain('"TAO SẼ NGHIỀN NÁT MÀY!"');
+    expect(result.master).toContain('"ưm... a... ĐÚNG RỒI!"');
+    expect(result.master).toContain("lồn, hột le, nước cặc, nước dâm, cặc, cu");
+    expect(result.master).not.toContain("pussy, clit, cum, nectar");
+    expect(result.master).not.toContain("never insert avoidable English words");
+    expect(result.master).toContain("Reader-Visible Thought:");
+    expect(result.master).toContain("Use `*...*` only for source- or user-required");
+    expect(result.master).toContain("sole exception to the prose thought ban");
+    expect(result.master).toContain("Never output `<internal_npcthoughts>`");
+    expect(result.master).toContain("Keep reasoning, state data, narration");
+    expect(result.master).toContain("<internal_npcthoughts>");
+    expect(result.master).not.toContain("Keep this tag and its contents in reasoning only");
+    expect(result.master).not.toContain("Never render NPC-name headers");
+    expect(result.master).toContain("- Drive: Use internal thoughts to motivate action.");
+    expect(result.master).toContain("</internal_npcthoughts>");
+    expect(result.reasoning).toContain("# Reasoning Rules");
+    expect(result.reasoning).not.toContain("hidden reasoning");
+    expect(result.reasoning).toContain("Keep `<internal_npcthoughts>`");
+    expect(result.reasoning).toContain('e.g., "KHÔNG!"');
+    expect(result.reasoning).toContain("ưm, a..., suỵt, hự!, eo!, ừm!");
+    expect(result.reasoning).not.toContain("written in natural Vietnamese orthography");
+    expect(result.reasoning).not.toContain("mmph, aaahhh, shhhh, ugh!, Ewww!, Mmm!");
+    expect(result.reasoning).toContain(
+      "How will I make sure each of the NPCs naturally speaks according to their background",
+    );
+    expect(result.reasoning).not.toContain("without avoidable English code-switching");
+    expect(result.endInjectedPrompt).not.toContain("hidden reasoning");
+    expect(result.endInjectedPrompt).toContain("together with # Reasoning Rules");
+    expect(result.endInjectedPrompt).toContain("Apply # Reasoning Rules privately");
+    expect(result.endInjectedPrompt).toContain("Keep `<internal_npcthoughts>`");
+    expect(result.endInjectedPrompt).toContain("Apply `<vietnamese_output>`");
+    expect(result.endInjectedPrompt).toContain("Roleplay response:");
+    expect(result.introduction).toContain("Model mode: gemma-4");
+  });
+
+  it("leaves internal and explanatory examples unchanged in Gemma 4 mode", () => {
+    const source = parsePreset({
+      prompts: [
+        {
+          identifier: "examples",
+          content: [
+            "- Persona Lock: Maintain core persona (e.g., shy or non-vulgar NPCs remain true to persona).",
+            "- Describe NPCs lewdly: skin flush/temp/texture, tit/ass size, and physical sensations in scenes.",
+            "- Kinetics: You must describe weight and motion (ass jiggles, tits swaying, physical force).",
+            "- Anatomy: Must Describe details explicitly (lips, innie/outie pussy, colors, pubic style, circumcision, piercings, veins)",
+            "- Plain Words: Swap medical words for everyday words (thighs not quadriceps, shoulder not deltoid, back not spine).",
+            'Smell rule: NPCs cannot identify "what happened" by smells.',
+            'Evidence Rule: Ban intuition and "just knowing."',
+            '- No Hesitation: Never do unfinished moves (no "hovering hands").',
+            '- "[R] Stacy doesn\'t know about the Eclipse Protocol."',
+            '- Titles & Skills: (e.g., "Charmer", "Slayer").',
+            "- Domain Lock: (Charmer = social, Slayer = combat).",
+          ].join("\n"),
+        },
+      ],
+      prompt_order: [{ order: [{ identifier: "examples", enabled: true }] }],
+    });
+    const result = buildPreset(source, {
+      sourceFile: "preset.json",
+      outputDirectory: "out",
+      modelMode: "gemma-4",
+      promptRouter: { active: "full", routes: { full: {} } },
+    });
+
+    expect(result.master).toContain("shy or non-vulgar NPCs");
+    expect(result.master).toContain("skin flush/temp/texture, tit/ass size");
+    expect(result.master).toContain("ass jiggles, tits swaying, physical force");
+    expect(result.master).toContain("lips, innie/outie pussy, colors, pubic style");
+    expect(result.master).toContain("thighs not quadriceps, shoulder not deltoid, back not spine");
+    expect(result.master).not.toContain("độ ửng đỏ, nhiệt độ và kết cấu da");
+    expect(result.master).not.toContain("mông nảy, vú đung đưa, lực tác động");
+    expect(result.master).not.toContain("môi lồn, lồn kín/hở, màu sắc");
+    expect(result.master).not.toContain("đùi thay vì cơ tứ đầu");
+    expect(result.master).toContain('"what happened"');
+    expect(result.master).toContain('"just knowing."');
+    expect(result.master).toContain('no "hovering hands"');
+    expect(result.master).toContain("Stacy doesn't know about the Eclipse Protocol");
+    expect(result.master).toContain('"Charmer", "Slayer"');
+    expect(result.master).toContain("Charmer = social, Slayer = combat");
+  });
+
   it("preserves professional legality text while applying other cleanup", () => {
     const source = parsePreset({
       prompts: [

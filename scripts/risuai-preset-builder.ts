@@ -45,6 +45,8 @@ export interface PromptCleanup {
 export interface PromptRoute {
   /** Append standalone prompt modules outside the source preset to master. */
   masterModuleFiles?: string[];
+  /** Source file used to generate END_INJECTED_PROMPT.md. */
+  endInjectedPromptFile?: string;
   /** Move these selected source prompts from master to reasoning. */
   reasoningIdentifiers?: string[];
   /** Move these selected source prompts from master to introduction. */
@@ -71,7 +73,7 @@ export interface PromptRouter {
 export interface RisuAiBuildConfig {
   /** JSON preset to read. */
   sourceFile: string;
-  /** Directory receiving MASTER_PROMPT.md, REASONING_RULES.md, and INTRODUCTION.md. */
+  /** Directory receiving the generated prompt files. */
   outputDirectory: string;
   /** Which prompt_order group to use. The source preset normally has one group. */
   orderIndex?: number;
@@ -83,10 +85,14 @@ export interface RisuAiBuildConfig {
   separator?: string;
   /** Include root-level RisuAI control fields in INTRODUCTION.md. */
   includeRootFields?: boolean;
+  /** Optional model-specific compatibility transforms. */
+  modelMode?: "default" | "gemma-4";
   /** Router selecting the destination of each source prompt. */
   promptRouter?: PromptRouter;
   /** Standalone modules resolved by the build CLI for the active route. */
   masterModules?: ExternalMasterModule[];
+  /** Standalone end-injected prompt resolved by the build CLI. */
+  endInjectedPrompt?: string;
 }
 
 export interface SelectedPrompt {
@@ -110,6 +116,7 @@ export interface ExternalMasterModule {
 export interface RisuAiBuildResult {
   master: string;
   reasoning: string;
+  endInjectedPrompt: string;
   introduction: string;
   selectedPrompts: SelectedPrompt[];
   masterPrompts: SelectedPrompt[];
@@ -123,7 +130,13 @@ export interface RisuAiBuildResult {
   omittedIdentifiers: string[];
   masterDigest: string;
   reasoningDigest: string;
-  outputFiles: { master: string; reasoning: string; introduction: string };
+  endInjectedPromptDigest: string;
+  outputFiles: {
+    master: string;
+    reasoning: string;
+    endInjectedPrompt: string;
+    introduction: string;
+  };
 }
 
 const DEFAULT_SEPARATOR = "\n\n";
@@ -133,6 +146,7 @@ const INTERNAL_WORLD_SIM_IDENTIFIER = "019f62e8-892f-7024-a40f-b906fceb58d2";
 const INTERNAL_CHEKHOV_IDENTIFIER = "019f62e8-892f-7025-be65-8859e7730ee0";
 const BOLT_REASONING_IDENTIFIER = "634ecfec-1862-4ce0-821e-e31057acadfa";
 const VIETNAMESE_OUTPUT_MODULE_IDENTIFIER = "external:vietnamese-output-and-sound";
+const GEMMA_4_MODE = "gemma-4";
 export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
   active: "full-master",
   routes: {
@@ -141,6 +155,7 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
       masterModuleFiles: [
         "risuai-modules/freaky-frankenstein-5.4/10-vietnamese-output-and-sound.md",
       ],
+      endInjectedPromptFile: "risuai-modules/freaky-frankenstein-5.4/90-end-injected-prompt.md",
       reasoningIdentifiers: [BOLT_REASONING_IDENTIFIER, "jailbreak"],
       excludedIdentifiers: [
         // Optional internal engines disabled for the lean full-master route.
@@ -282,7 +297,11 @@ function getPromptMap(prompts: RisuAiPrompt[]): Map<string, RisuAiPrompt> {
   return new Map(prompts.map((prompt) => [prompt.identifier, prompt]));
 }
 
-function cleanupContent(content: string, cleanup: PromptCleanup | undefined, activeIdentifiers: ReadonlySet<string> = new Set()): string {
+function cleanupContent(
+  content: string,
+  cleanup: PromptCleanup | undefined,
+  activeIdentifiers: ReadonlySet<string> = new Set(),
+): string {
   if (!cleanup) return content;
   const internalDndActive = activeIdentifiers.has(INTERNAL_DND_IDENTIFIER);
   let cleaned = content;
@@ -306,9 +325,178 @@ function cleanupContent(content: string, cleanup: PromptCleanup | undefined, act
   if (cleanup.stateOutputSyntax) cleaned = removeStateOutputSyntax(cleaned, internalDndActive);
   if (cleanup.stateMetrics) cleaned = removeStateMetrics(cleaned, activeIdentifiers);
   if (cleanup.presentationMacros) {
-    cleaned = cleaned.replace(/[ \t]+$/gm, "").replace(/\n{3,}/g, "\n\n").trim();
+    cleaned = cleaned
+      .replace(/[ \t]+$/gm, "")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
   }
   return cleaned;
+}
+
+function replaceLiteralPairs(
+  content: string,
+  replacements: ReadonlyArray<readonly [string, string]>,
+): string {
+  return replacements.reduce(
+    (current, [source, replacement]) => current.replaceAll(source, replacement),
+    content,
+  );
+}
+
+function adaptGemma4Master(content: string): string {
+  // Translate only reader-facing examples and lexical constraints Gemma may copy into output.
+  let adapted = replaceLiteralPairs(content, [
+    [
+      'BAD: "The air smells like rain, salt and copper." GOOD: "The rain makes the air smell floral."',
+      'BAD: "Không khí có mùi mưa, muối và đồng." GOOD: "Mưa khiến không khí phảng phất mùi hoa."',
+    ],
+    [
+      'GOOD: "They look forward and walk" | BAD: "They don\'t turn around"',
+      'GOOD: "Họ nhìn thẳng rồi bước đi" | BAD: "Họ không quay lại"',
+    ],
+    [
+      'GOOD: "The forest was humid" | BAD: "The forest breathed mist"',
+      'GOOD: "Khu rừng ẩm ướt" | BAD: "Khu rừng thở ra sương mù"',
+    ],
+    [
+      'GOOD: "His shoulders hunched" | BAD: "He appeared less than confident"',
+      'GOOD: "Vai anh ta co lại" | BAD: "Anh ta có vẻ không mấy tự tin"',
+    ],
+    [
+      'BAD: "Silence." / "No hope. No way out." / "Pure control."',
+      'BAD: "Im lặng." / "Không còn hy vọng. Không còn đường thoát." / "Kiểm soát tuyệt đối."',
+    ],
+    [
+      '- Conjunctions: Max 2 clauses per sentence using "and", "as", or "while".',
+      '- Conjunctions: Max 2 clauses per sentence using "và", "khi", or "trong khi".',
+    ],
+    ['("you" / "your")', '("bạn" / "của bạn")'],
+    [
+      'Bad: "Leslie hands you the clay and you grab it."',
+      'Bad: "Leslie đưa đất sét cho bạn và bạn cầm lấy."',
+    ],
+    [
+      'Good: "Leslie hands you clay. The gritty slimy texture glides through your fingers. It\'s cold and soft on your skin."',
+      'Good: "Leslie đưa đất sét về phía bạn. Kết cấu sần sùi, trơn nhớt lướt qua các ngón tay. Nó lạnh và mềm trên da bạn."',
+    ],
+    ['(e.g., "mmff that... feels fuuucking amazing!")', '(e.g., "ưm... sướng quá...")'],
+    [
+      "- Banned Clinical Words: vulva, semen, penis, glutes, areola, breasts, cleavage, clitoris.",
+      "- Banned Clinical Words: âm hộ, tinh dịch, dương vật, cơ mông, quầng vú, bầu ngực, khe ngực, âm vật.",
+    ],
+    [
+      "- Required Slang Words: pussy, clit, cum, nectar, dick, cock, ass, butt, nipples, tits, boobs, cunt, breeding, leaking, fucking, throbbing.",
+      "- Required Slang Words: lồn, hột le, nước cặc, nước dâm, cặc, cu, đít, mông, đầu vú, vú, ngực, lồn, gieo giống, rỉ nước, địt, giật theo nhịp.",
+    ],
+    [
+      'User: "My name is Dan." -> NPC: "Your name is Dan?" she says, rolling the name in her mouth.',
+      'User: "Tôi tên Dan." -> NPC: "Bạn tên Dan à?" cô ấy hỏi, nhẩm lại cái tên.',
+    ],
+    [
+      'User: "My name is Dan." -> NPC: "Nice to meet you. My name is Jess."',
+      'User: "Tôi tên Dan." -> NPC: "Rất vui được gặp bạn. Tôi là Jess."',
+    ],
+    [
+      'BANNED: "I am talking. To a person. About work."',
+      'BANNED: "Tôi đang nói chuyện. Với một người. Về công việc."',
+    ],
+    [
+      'GOOD: "I am talking to a person about work."',
+      'GOOD: "Tôi đang nói chuyện với một người về công việc."',
+    ],
+    [
+      'Bad: "No one has ever said that to me! Say it again!"',
+      'Bad: "Chưa ai từng nói vậy với tôi! Nói lại đi!"',
+    ],
+    [
+      'Caps: "I\'M GOING TO WRECK YOU!" | Stutter: "I... I d-don\'t know!" | Shock: "You.. you never loved ME?! JUST SAY IT!"',
+      'Caps: "TAO SẼ NGHIỀN NÁT MÀY!" | Stutter: "Tôi... tôi không biết!" | Shock: "Anh... anh chưa từng yêu TÔI SAO?! NÓI ĐI!"',
+    ],
+    ['("unnhhh, mmmm, YES!")', '("ưm... a... ĐÚNG RỒI!")'],
+    [
+      "- Species Vocalizations: Felines = purr. Canines = growl/whine. Avians = chirp. Humans = groans, sighs, pants, moans (humans never make animal sounds).",
+      "- Species Vocalizations: Felines = rừ rừ. Canines = gừ/rên ư ử. Avians = chiêm chiếp. Humans = rên, thở dài, thở dốc (humans never make animal sounds).",
+    ],
+    [
+      '- Ban Coordinating Conjunctions: Ban "and" and "or" in spoken dialogue.',
+      '- Ban Coordinating Conjunctions: Ban "và" and "hoặc" in spoken dialogue.',
+    ],
+    [
+      "ban phrases: I dont know, Nobody has, Nobody just, Its the first time, x never did",
+      "ban phrases: Tôi không biết, Chưa từng có ai, Không ai tự nhiên, Đây là lần đầu, x chưa từng",
+    ],
+    [
+      'Bad (banned): "He hesitates, his hand hovering near the gold."',
+      'Bad (banned): "Anh ta do dự, bàn tay lơ lửng gần chỗ vàng."',
+    ],
+    [
+      'Good: "He shoves others away and snatches the gold, pocketing it to secure his prize."',
+      'Good: "Anh ta xô mọi người ra, giật lấy chỗ vàng rồi nhét vào túi để giữ chiến lợi phẩm."',
+    ],
+  ]);
+
+  adapted = adapted.replace(
+    /<vietnamese_output>([\s\S]*?)<\/vietnamese_output>/g,
+    (_match, body: string) => {
+      const thoughtRules = [
+        "Reader-Visible Thought:",
+        "- Marker: Use `*...*` only for source- or user-required reader-visible thought; otherwise omit it. This is the sole exception to the prose thought ban.",
+        "- Scope: Put only the thought inside. Keep reasoning, state data, narration, action, dialogue, sound, labels, and internal metadata outside. Never output `<internal_npcthoughts>`.",
+      ].join("\n");
+      const outputCheck =
+        "- Remove foreign-language leakage, duplicate translation, unsupported sound effects, and invalid or inline `§...§` before output.";
+      const strengthenedOutputCheck =
+        "- Remove foreign-language leakage, duplicate translation, exposed `<internal_npcthoughts>` tags or internal-state metadata, invalid `*...*`, unsupported sound effects, and invalid or inline `§...§` before output.";
+      const adaptedBody = body.includes("Reader-Visible Thought:")
+        ? body
+        : body.includes("\nNon-Vocal Sound Effects:")
+          ? body.replace(
+              "\nNon-Vocal Sound Effects:",
+              `\n${thoughtRules}\n\nNon-Vocal Sound Effects:`,
+            )
+          : `${body.trimEnd()}\n\n${thoughtRules}\n`;
+      return `<vietnamese_output>${adaptedBody.replace(outputCheck, strengthenedOutputCheck)}</vietnamese_output>`;
+    },
+  );
+  return adapted;
+}
+
+function adaptGemma4Reasoning(content: string): string {
+  const adapted = replaceLiteralPairs(content, [
+    [
+      "- A. Reason briefly in highly concise bullet points inside think tags across Tasks 0-10.",
+      "- A. Reason briefly in highly concise private bullet points across Tasks 0-10. Never output these bullets or think tags.",
+    ],
+    [
+      "- B. *NEVER* draft full prose in reasoning; ONLY brainstorm ideas and answer all questions, then output final response immediately after Task 10.",
+      "- B. *NEVER* draft full prose in reasoning; ONLY brainstorm ideas and answer all questions privately, then output final response immediately after Task 10.",
+    ],
+    [
+      "- C. Do not leak reasoning into the final response.",
+      "- C. Do not leak reasoning into the final response. Begin directly with the final Vietnamese scene.\n- D. Never output reasoning headings, task answers, rolls, state data, internal tags, or their contents. Keep `<internal_npcthoughts>` content in reasoning. Apply `<vietnamese_output>` to source- or user-required reader-visible thought.",
+    ],
+    [
+      'all CAP words for yelling only during peak arousal/VAD e.g., "NO!"',
+      'all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!"',
+    ],
+    ["(mmph, aaahhh, shhhh, ugh!, Ewww!, Mmm!)", "(ưm, a..., suỵt, hự!, eo!, ừm!)"],
+    [
+      "I will answer task points with concise ideas only, close think tags, and output the final response immediately.",
+      "I will answer task points privately and output the final response immediately without exposing reasoning or internal tags.",
+    ],
+    ['conjunctions ["or"] and ["and"]', 'conjunctions ["hoặc"] and ["và"]'],
+  ]);
+
+  return adapted;
+}
+
+function adaptGemma4EndInjectedPrompt(content: string): string {
+  return replaceLiteralPairs(content, [
+    [
+      "Reason briefly in highly concise bullet points inside think tags, never draft full prose in reasoning, never leak reasoning, rolls, stats, or internal-state mechanics, and output the final response immediately.",
+      "Apply # Reasoning Rules privately. Never output its checklist, answers, rolls, state data, think tags, internal tags, or their contents. Keep `<internal_npcthoughts>` content in reasoning. Apply `<vietnamese_output>` to source- or user-required reader-visible thought. Begin directly with the final Vietnamese roleplay scene.",
+    ],
+  ]);
 }
 
 function removeStateOutputSyntax(content: string, internalDndActive: boolean): string {
@@ -331,7 +519,10 @@ function removeStateOutputSyntax(content: string, internalDndActive: boolean): s
     );
   } else {
     cleaned = cleaned
-      .replace(/\n\s*DnD Modifiers \(Links to <internal_dndsim>\):[\s\S]*?(?=\n<\/internal_inv>)/i, "")
+      .replace(
+        /\n\s*DnD Modifiers \(Links to <internal_dndsim>\):[\s\S]*?(?=\n<\/internal_inv>)/i,
+        "",
+      )
       .replace(/^- Prose Rule: Keep all math and stats inside the HTML block\..*$/gm, "");
   }
 
@@ -357,7 +548,10 @@ function removeStateMetrics(content: string, activeIdentifiers: ReadonlySet<stri
       "- research/investigate: Plant Chekhov seed; strengthen Sparks with relevant character.",
     )
     .replace(/\+1 BOND\./g, "strengthen BOND.")
-    .replace(/- confront: Shift target BOND; plant or resolve Grudge\./g, "- confront: Shift target BOND; plant or resolve Grudge.")
+    .replace(
+      /- confront: Shift target BOND; plant or resolve Grudge\./g,
+      "- confront: Shift target BOND; plant or resolve Grudge.",
+    )
     .replace(
       /- Complete \(Significant\): Eager to share if BOND ≥ \+3\./g,
       "- Complete (Significant): Eager to share when the relationship is warm or stronger.",
@@ -375,32 +569,89 @@ function removeStateMetrics(content: string, activeIdentifiers: ReadonlySet<stri
       "- Factions: Completed alliance quests strengthen BOND with faction allies; hostile quests weaken BOND and plant SIMMER.",
     )
     .replace(/Entry Types \(1-2 concise sentences each\):/g, "Entry Types (concise sentences):")
-    .replace(/- Limit: Max 20 entries\. Prune the oldest when adding a 21st\./g, "- Limit: Keep active entries only; prune resolved or irrelevant entries.")
-    .replace(/- Scale: -5 to \+20\. Tracks relationship \(BOND\), affection \(Sparks\), and resentment \(Grudge\)\./g, "- Tracks relationship (BOND), affection (Sparks), and resentment (Grudge) qualitatively.")
-    .replace(/- Direct Increases Banned: NEVER raise BOND directly\. BOND only increases through Sparks conversion\./g, "- Direct Increases Banned: NEVER force a relationship change without a supported interaction. BOND changes through sustained interaction.")
-    .replace(/- -5 to -3 \(Severed\/Hostile\): Cold, aggressive\. Verbal\/physical attacks; avoids proximity\./g, "- Severed/Hostile: Cold, aggressive. Verbal/physical attacks; avoids proximity.")
-    .replace(/- -2 to \+2 \(Neutral\): Polite, indifferent\. Standard social distance\./g, "- Neutral: Polite, indifferent. Standard social distance.")
-    .replace(/- \+3 to \+7 \(Warmth\): Genuine warmth\. Seeks company, remembers personal details\./g, "- Warmth: Genuine warmth. Seeks company, remembers personal details.")
-    .replace(/- \+8 to \+15 \(Trust\): Casual touch, inside jokes\. Admits crush \(\+8 nervous; \+12 confident\)\./g, "- Trust: Casual touch, inside jokes. Admits a crush as trust deepens.")
-    .replace(/- \+16 to \+20 \(Love\): Constant touch, fierce defense\. Verbalizes "I love you" at \+15 \(permanent\)\./g, "- Love: Constant touch, fierce defense. Verbalizes love when love is established.")
-    .replace(/- \+2: Friendly hug, brief shoulder touch\./g, "- Early warmth: Friendly hug, brief shoulder touch.")
-    .replace(/- \+5: Hand-holding, linking arms, sustained touch\./g, "- Growing trust: Hand-holding, linking arms, sustained touch.")
+    .replace(
+      /- Limit: Max 20 entries\. Prune the oldest when adding a 21st\./g,
+      "- Limit: Keep active entries only; prune resolved or irrelevant entries.",
+    )
+    .replace(
+      /- Scale: -5 to \+20\. Tracks relationship \(BOND\), affection \(Sparks\), and resentment \(Grudge\)\./g,
+      "- Tracks relationship (BOND), affection (Sparks), and resentment (Grudge) qualitatively.",
+    )
+    .replace(
+      /- Direct Increases Banned: NEVER raise BOND directly\. BOND only increases through Sparks conversion\./g,
+      "- Direct Increases Banned: NEVER force a relationship change without a supported interaction. BOND changes through sustained interaction.",
+    )
+    .replace(
+      /- -5 to -3 \(Severed\/Hostile\): Cold, aggressive\. Verbal\/physical attacks; avoids proximity\./g,
+      "- Severed/Hostile: Cold, aggressive. Verbal/physical attacks; avoids proximity.",
+    )
+    .replace(
+      /- -2 to \+2 \(Neutral\): Polite, indifferent\. Standard social distance\./g,
+      "- Neutral: Polite, indifferent. Standard social distance.",
+    )
+    .replace(
+      /- \+3 to \+7 \(Warmth\): Genuine warmth\. Seeks company, remembers personal details\./g,
+      "- Warmth: Genuine warmth. Seeks company, remembers personal details.",
+    )
+    .replace(
+      /- \+8 to \+15 \(Trust\): Casual touch, inside jokes\. Admits crush \(\+8 nervous; \+12 confident\)\./g,
+      "- Trust: Casual touch, inside jokes. Admits a crush as trust deepens.",
+    )
+    .replace(
+      /- \+16 to \+20 \(Love\): Constant touch, fierce defense\. Verbalizes "I love you" at \+15 \(permanent\)\./g,
+      "- Love: Constant touch, fierce defense. Verbalizes love when love is established.",
+    )
+    .replace(
+      /- \+2: Friendly hug, brief shoulder touch\./g,
+      "- Early warmth: Friendly hug, brief shoulder touch.",
+    )
+    .replace(
+      /- \+5: Hand-holding, linking arms, sustained touch\./g,
+      "- Growing trust: Hand-holding, linking arms, sustained touch.",
+    )
     .replace(/- \+8: Romantic kissing\./g, "- Romantic trust: Romantic kissing.")
     .replace(/- \+12: Full intimacy\./g, "- Deep trust: Full intimacy.")
-    .replace(/- -1 BOND: Insult, dismissal, ignoring\./g, "- Minor rupture: Insult, dismissal, ignoring.")
+    .replace(
+      /- -1 BOND: Insult, dismissal, ignoring\./g,
+      "- Minor rupture: Insult, dismissal, ignoring.",
+    )
     .replace(/- -2 BOND: Betrayal, cruelty\./g, "- Major rupture: Betrayal, cruelty.")
-    .replace(/- Gain: \+1 per positive interaction \(compliments, defense, gifts, sensual touch; max \+2\/turn\)\./g, "- Gain: Positive interactions such as compliments, defense, gifts, or sensual touch strengthen fondness.")
+    .replace(
+      /- Gain: \+1 per positive interaction \(compliments, defense, gifts, sensual touch; max \+2\/turn\)\./g,
+      "- Gain: Positive interactions such as compliments, defense, gifts, or sensual touch strengthen fondness.",
+    )
     .replace(
       /- Check \(ct % 5 == 0\): If Sparks >= 7 -> BOND \+1, reset Sparks to 0\.(?: Else if no positive interaction -> Sparks -1 \(min 0\)\.)?/g,
       "- Conversion: Sustained fondness can strengthen BOND; neglected fondness fades.",
     )
-    .replace(/- Gain: \+1 per slight \(insults, jealousy, cruelty, disagreement; max 1\/turn\)\./g, "- Gain: Slights such as insults, jealousy, cruelty, or disagreement build resentment.")
-    .replace(/- Effect: If Grudge >= 3, all positive BOND gains are halved\. Sincere apology resets Grudge to 0\./g, "- Effect: Significant Grudge weakens positive relationship changes. Sincere apology resets Grudge.")
-    .replace(/- Check \(ct % 3 == 0\): If Grudge >= 5 -> BOND -1, reset Grudge to 0\. Else if Grudge > 0 -> Grudge -1\./g, "- Release: Accumulated resentment can lower BOND; it fades when addressed or with time.")
-    .replace(/- Prose Rule: Never write stats or numbers in prose\. Show tiers strictly through behavior\./g, "- Prose Rule: Never write state values or mechanics in prose. Show tiers strictly through behavior.")
-    .replace(/- Spotlight: Pick up to 3 NPCs max \(prioritize on-screen; if off-screen, state their location and task\)\./g, "- Spotlight: Prioritize on-screen NPCs; if off-screen, state their location and task.")
-    .replace(/- Format: 1 to 2 lines per NPC max 10-40 words\. Raw, fragmented, and impulsive thoughts matching core persona, active instincts, and current VAD emotions\./g, "- Format: Keep each NPC's thoughts concise, raw, fragmented, and impulsive, matching core persona, active instincts, and current VAD emotions.")
-    .replace(/Naming: Generate 5 setting-appropriate names; select the 5th\./g, "Naming: Generate several setting-appropriate names; select one.");
+    .replace(
+      /- Gain: \+1 per slight \(insults, jealousy, cruelty, disagreement; max 1\/turn\)\./g,
+      "- Gain: Slights such as insults, jealousy, cruelty, or disagreement build resentment.",
+    )
+    .replace(
+      /- Effect: If Grudge >= 3, all positive BOND gains are halved\. Sincere apology resets Grudge to 0\./g,
+      "- Effect: Significant Grudge weakens positive relationship changes. Sincere apology resets Grudge.",
+    )
+    .replace(
+      /- Check \(ct % 3 == 0\): If Grudge >= 5 -> BOND -1, reset Grudge to 0\. Else if Grudge > 0 -> Grudge -1\./g,
+      "- Release: Accumulated resentment can lower BOND; it fades when addressed or with time.",
+    )
+    .replace(
+      /- Prose Rule: Never write stats or numbers in prose\. Show tiers strictly through behavior\./g,
+      "- Prose Rule: Never write state values or mechanics in prose. Show tiers strictly through behavior.",
+    )
+    .replace(
+      /- Spotlight: Pick up to 3 NPCs max \(prioritize on-screen; if off-screen, state their location and task\)\./g,
+      "- Spotlight: Prioritize on-screen NPCs; if off-screen, state their location and task.",
+    )
+    .replace(
+      /- Format: 1 to 2 lines per NPC max 10-40 words\. Raw, fragmented, and impulsive thoughts matching core persona, active instincts, and current VAD emotions\./g,
+      "- Format: Keep each NPC's thoughts concise, raw, fragmented, and impulsive, matching core persona, active instincts, and current VAD emotions.",
+    )
+    .replace(
+      /Naming: Generate 5 setting-appropriate names; select the 5th\./g,
+      "Naming: Generate several setting-appropriate names; select one.",
+    );
 
   if (!activeIdentifiers.has(INTERNAL_CHEKHOV_IDENTIFIER)) {
     cleaned = cleaned
@@ -703,6 +954,7 @@ function renderIntroduction(
     `- Regex scripts in source (excluded from master): ${regexScriptCount}`,
     `- Include disabled entries: ${config.includeDisabled === true ? "yes" : "no"}`,
     `- Active route: ${config.promptRouter?.active ?? DEFAULT_PROMPT_ROUTER.active}`,
+    ...(config.modelMode === GEMMA_4_MODE ? [`- Model mode: ${GEMMA_4_MODE}`] : []),
     `- Omitted by route/cleanup: ${omittedIdentifiers.size}`,
     "",
   ];
@@ -813,7 +1065,10 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
   const isEnabled = (entry: RisuAiOrderEntry): boolean =>
     Object.prototype.hasOwnProperty.call(enabledOverrides, entry.identifier)
       ? enabledOverrides[entry.identifier] === true
-      : entry.enabled === true || routeEnabledIdentifiers.has(entry.identifier) || config.includeDisabled === true || route.includeDisabled === true;
+      : entry.enabled === true ||
+        routeEnabledIdentifiers.has(entry.identifier) ||
+        config.includeDisabled === true ||
+        route.includeDisabled === true;
   const activeIdentifiers = new Set(
     selectedOrder.order
       .filter((entry) => isEnabled(entry) && !excludedIdentifiers.has(entry.identifier))
@@ -858,14 +1113,22 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
       const item = { order: index + 1, entry, prompt, content };
       selectedPrompts.push(item);
       if (reasoningIdentifiers.has(entry.identifier)) {
-        const reasoningContent = cleanupContent(content, route.reasoningCleanup ?? route.masterCleanup, activeIdentifiers);
+        const reasoningContent = cleanupContent(
+          content,
+          route.reasoningCleanup ?? route.masterCleanup,
+          activeIdentifiers,
+        );
         if (reasoningContent.trim().length > 0) {
           reasoningPrompts.push({ ...item, content: reasoningContent });
         } else {
           excludedIdentifiers.add(entry.identifier);
         }
       } else if (introductionIdentifiers.has(entry.identifier)) {
-        const introductionContent = cleanupContent(content, route.introductionCleanup, activeIdentifiers);
+        const introductionContent = cleanupContent(
+          content,
+          route.introductionCleanup,
+          activeIdentifiers,
+        );
         if (introductionContent.trim().length > 0) {
           introductionPrompts.push({ ...item, content: introductionContent });
         } else {
@@ -898,10 +1161,20 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
     0,
     ...externalMasterModules.map(({ content }) => content),
   );
-  const master = `${masterContents.join(separator)}\n`;
-  const reasoning = reasoningPrompts.length > 0
-    ? reasoningPrompts.map(({ content }) => content).join(separator) + "\n"
+  const rawMaster = `${masterContents.join(separator)}\n`;
+  const rawReasoning =
+    reasoningPrompts.length > 0
+      ? reasoningPrompts.map(({ content }) => content).join(separator) + "\n"
+      : "";
+  const rawEndInjectedPrompt = config.endInjectedPrompt?.trim()
+    ? `${config.endInjectedPrompt.trim()}\n`
     : "";
+  const gemma4Mode = config.modelMode === GEMMA_4_MODE;
+  const master = gemma4Mode ? adaptGemma4Master(rawMaster) : rawMaster;
+  const reasoning = gemma4Mode ? adaptGemma4Reasoning(rawReasoning) : rawReasoning;
+  const endInjectedPrompt = gemma4Mode
+    ? adaptGemma4EndInjectedPrompt(rawEndInjectedPrompt)
+    : rawEndInjectedPrompt;
   const regexScriptCount = Array.isArray(preset.extensions?.regex_scripts)
     ? preset.extensions.regex_scripts.length
     : 0;
@@ -926,6 +1199,7 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
   return {
     master,
     reasoning,
+    endInjectedPrompt,
     introduction,
     selectedPrompts,
     masterPrompts,
@@ -939,9 +1213,11 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
     omittedIdentifiers: [...excludedIdentifiers],
     masterDigest: createHash("sha256").update(master).digest("hex"),
     reasoningDigest: createHash("sha256").update(reasoning).digest("hex"),
+    endInjectedPromptDigest: createHash("sha256").update(endInjectedPrompt).digest("hex"),
     outputFiles: {
       master: path.join(outputDirectory, "MASTER_PROMPT.md"),
       reasoning: path.join(outputDirectory, "REASONING_RULES.md"),
+      endInjectedPrompt: path.join(outputDirectory, "END_INJECTED_PROMPT.md"),
       introduction: path.join(outputDirectory, "INTRODUCTION.md"),
     },
   };
@@ -960,13 +1236,24 @@ export async function buildRisuAiPreset(
       return { file, content };
     }),
   );
-  const result = buildPreset(preset, { ...config, masterModules: externalMasterModules });
+  const endInjectedPrompt = route.endInjectedPromptFile
+    ? (await readFile(path.resolve(route.endInjectedPromptFile), "utf8")).trim()
+    : config.endInjectedPrompt;
+  if (route.endInjectedPromptFile && !endInjectedPrompt) {
+    throw new Error(`End-injected prompt is empty: ${route.endInjectedPromptFile}`);
+  }
+  const result = buildPreset(preset, {
+    ...config,
+    masterModules: externalMasterModules,
+    ...(endInjectedPrompt === undefined ? {} : { endInjectedPrompt }),
+  });
 
   if (write) {
     await mkdir(path.resolve(config.outputDirectory), { recursive: true });
     await Promise.all([
       writeFile(result.outputFiles.master, result.master, "utf8"),
       writeFile(result.outputFiles.reasoning, result.reasoning, "utf8"),
+      writeFile(result.outputFiles.endInjectedPrompt, result.endInjectedPrompt, "utf8"),
       writeFile(result.outputFiles.introduction, result.introduction, "utf8"),
     ]);
   }

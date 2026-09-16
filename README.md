@@ -68,7 +68,7 @@ pnpm check:prompts              # Kiểm tra mọi master có mới hay không
 pnpm check                      # TypeScript và ESLint
 pnpm test                       # Vitest
 pnpm build                      # Biên dịch CLI vào dist/
-pnpm build:risuai -- --source <preset.json> --output-directory <directory>
+pnpm build:risuai -- --source <preset.json> --output-directory <directory> --mode gemma-4
                                 # Tách prompt đang bật từ preset RisuAI/SillyTavern
 pnpm zip:handoff                # ZIP nguồn cần thiết để gửi cho AI khác
 pnpm ci                         # Chạy toàn bộ kiểm tra
@@ -86,10 +86,12 @@ pnpm dev --source prompts --output generated/MASTER_PROMPT.md
 ```
 
 Builder preset RisuAI đọc `prompt_order`, giữ nguyên nội dung của các prompt đang bật theo đúng thứ
-tự, tách prompt reasoning được cấu hình vào `REASONING_RULES.md`, ghi các slot runtime vào
-`INTRODUCTION.md`, và loại `extensions.regex_scripts` khỏi các prompt đầu ra. Dùng
-`--set-enabled identifier=on|off` nhiều lần để đổi toggle mà không sửa JSON nguồn; dùng `--check` để
-kiểm tra ba file đã sinh còn mới. Với cấu hình dùng lại nhiều lần, sao chép
+tự, tách prompt reasoning được cấu hình vào `REASONING_RULES.md`, sinh `END_INJECTED_PROMPT.md`, ghi
+các slot runtime vào `INTRODUCTION.md`, và loại `extensions.regex_scripts` khỏi các prompt đầu ra.
+Dùng `--set-enabled identifier=on|off` nhiều lần để đổi toggle mà không sửa JSON nguồn; dùng
+`--check` để kiểm tra bốn file đã sinh còn mới. `--mode gemma-4` chỉ bật lớp chống lộ reasoning và
+Việt hóa các prime hội thoại/âm giọng cho Gemma 4; bỏ cờ hoặc dùng `--mode default` sẽ giữ nguyên
+nội dung chuẩn. Với cấu hình dùng lại nhiều lần, sao chép
 `scripts/risuai-preset.config.example.json`, điền đường dẫn và `enabledOverrides`, rồi chạy:
 
 ```bash
@@ -131,7 +133,7 @@ prompts/                     18 module của NSFW đầy đủ hiện tại
 src/compiler.ts              Compiler thư mục thô tương thích cách dùng cũ
 src/profiles.ts              Nạp manifest và biên dịch profile
 src/cli.ts                   Giao diện dòng lệnh
-scripts/build-risuai-preset.ts CLI dựng ba file từ preset RisuAI/SillyTavern
+scripts/build-risuai-preset.ts CLI dựng bốn file từ preset RisuAI/SillyTavern
 scripts/risuai-preset-builder.ts Bộ đọc, kiểm tra, chọn toggle và render dùng lại được
 scripts/export-project.ps1   Đóng gói tệp Git cần thiết thành ZIP
 test/compiler.test.ts        Kiểm thử prompt NSFW đầy đủ và compiler gốc
