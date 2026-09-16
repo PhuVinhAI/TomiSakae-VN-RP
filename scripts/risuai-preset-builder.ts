@@ -348,56 +348,59 @@ function adaptGemma4Master(content: string): string {
   const adapted = replaceLiteralPairs(content, [
     [
       'BAD: "The air smells like rain, salt and copper." GOOD: "The rain makes the air smell floral."',
-      'BAD: "Không khí có mùi mưa, muối và đồng." GOOD: "Mưa khiến không khí phảng phất mùi hoa."',
+      'BAD: "Không khí nồng nặc mùi mưa, mùi muối biển và mùi tanh của kim loại." GOOD: "Cơn mưa rào gột rửa không gian, để lại làn hương hoa thoang thoảng."',
     ],
     [
       'GOOD: "They look forward and walk" | BAD: "They don\'t turn around"',
-      'GOOD: "Họ nhìn thẳng rồi bước đi" | BAD: "Họ không quay lại"',
+      'GOOD: "Họ nhìn thẳng phía trước rồi dứt khoát bước đi." | BAD: "Họ không hề quay đầu nhìn lại."',
     ],
     [
       'GOOD: "The forest was humid" | BAD: "The forest breathed mist"',
-      'GOOD: "Khu rừng ẩm ướt" | BAD: "Khu rừng thở ra sương mù"',
+      'GOOD: "Khu rừng ngột ngạt hơi ẩm." | BAD: "Khu rừng như đang thở ra từng làn sương mù."',
     ],
     [
       'GOOD: "His shoulders hunched" | BAD: "He appeared less than confident"',
-      'GOOD: "Anh ta rụt vai lại" | BAD: "Anh ta có vẻ không mấy tự tin"',
+      'GOOD: "Hắn rụt cổ, khom vai xuống." | BAD: "Trông hắn có vẻ không được tự tin cho lắm."',
     ],
     [
       'BAD: "Silence." / "No hope. No way out." / "Pure control."',
-      'BAD: "Im lặng." / "Không còn hy vọng. Không còn đường thoát." / "Kiểm soát tuyệt đối."',
+      'BAD: "Im bặt." / "Hết hy vọng. Tuyệt đường sống." / "Kiểm soát toàn diện."',
     ],
     [
       '- Conjunctions: Max 2 clauses per sentence using "and", "as", or "while".',
-      '- Conjunctions: Max 2 clauses per sentence using "và", "khi", or "trong khi".',
+      '- Conjunctions: Max 2 clauses per sentence using "và", "khi", "trong khi", or "vừa... vừa...".',
     ],
-    ['("you" / "your")', '("bạn" / "của bạn")'],
+    [
+      '("you" / "your")',
+      '("bạn" / "của bạn" — or the matching second-person roleplay pronoun: "anh", "em", "cậu", "mày", "ngươi", "chàng", "nàng")',
+    ],
     [
       'Bad: "Leslie hands you the clay and you grab it."',
-      'Bad: "Leslie đưa đất sét cho bạn và bạn cầm lấy."',
+      'Bad: "Leslie đưa cục đất sét cho bạn và bạn cầm lấy nó."',
     ],
     [
       'Good: "Leslie hands you clay. The gritty slimy texture glides through your fingers. It\'s cold and soft on your skin."',
-      'Good: "Leslie đưa đất sét cho bạn. Cảm giác sần sùi, trơn nhớt trượt qua các kẽ ngón tay, lạnh và mềm trên da bạn."',
+      'Good: "Leslie chìa cục đất sét về phía bạn. Thứ bùn nhão sền sệt, ram ráp trượt qua các kẽ ngón tay, lạnh ngắt và mềm nhũn trên da."',
     ],
     [
       '(e.g., "mmff that... feels fuuucking amazing!")',
-      '(e.g., "ưm... sướng... sướng chết mất...!")',
+      '(e.g., "ưm... sâu quá... sướng... sướng đéo chịu được...!")',
     ],
     [
       "- Banned Clinical Words: vulva, semen, penis, glutes, areola, breasts, cleavage, clitoris.",
-      "- Banned Clinical Words: âm hộ, tinh dịch, dương vật, cơ mông, quầng vú, bầu ngực, khe ngực, âm vật.",
+      "- Banned Clinical Words: âm hộ, tinh dịch, dương vật, cơ mông, quầng vú, bầu ngực, rãnh ngực, khe ngực, âm vật.",
     ],
     [
       "- Required Slang Words: pussy, clit, cum, nectar, dick, cock, ass, butt, nipples, tits, boobs, cunt, breeding, leaking, fucking, throbbing.",
-      "- Required Slang Words: lồn, hột le, nước tình, nước dâm, cặc, cu, đít, mông, đầu ti, vú, ngực, bướm, bắn giống, rỉ nước, địt, co giật.",
+      "- Required Slang Words: lồn, bướm, hột le, hạt le, tinh khí, sữa đặc, nước dâm, nước tình, cặc, cu, gậy thịt, đít, mông, đầu ti, núm vú, vú, ngực, bắn giống, rót giống, rỉ nước, ướt sũng, đụ, nện, địt, thúc, giật giật, co thắt.",
     ],
     [
       'User: "My name is Dan." -> NPC: "Your name is Dan?" she says, rolling the name in her mouth.',
-      'User: "Tôi tên Dan." -> NPC: "Bạn tên Dan à?" cô ấy hỏi, nhẩm lại cái tên.',
+      'User: "Tôi tên Dan." -> NPC: "Tên anh là Dan sao?" ả lặp lại, đảo cái tên trên đầu môi.',
     ],
     [
       'User: "My name is Dan." -> NPC: "Nice to meet you. My name is Jess."',
-      'User: "Tôi tên Dan." -> NPC: "Rất vui được gặp bạn. Tôi là Jess."',
+      'User: "Tôi tên Dan." -> NPC: "Rất vui được gặp. Tôi là Jess."',
     ],
     [
       'BANNED: "I am talking. To a person. About work."',
@@ -405,36 +408,39 @@ function adaptGemma4Master(content: string): string {
     ],
     [
       'GOOD: "I am talking to a person about work."',
-      'GOOD: "Tôi đang nói chuyện với một người về công việc."',
+      'GOOD: "Tôi đang bàn công việc với một người quen."',
     ],
     [
       'Bad: "No one has ever said that to me! Say it again!"',
-      'Bad: "Chưa ai từng nói vậy với tôi! Nói lại đi!"',
+      'Bad: "Chưa từng có ai nói với tôi như thế! Nói lại lần nữa đi!"',
     ],
     [
       'Caps: "I\'M GOING TO WRECK YOU!" | Stutter: "I... I d-don\'t know!" | Shock: "You.. you never loved ME?! JUST SAY IT!"',
-      'Caps: "TAO SẼ NGHIỀN NÁT MÀY!" | Stutter: "Tôi... t-tôi kh-không biết!" | Shock: "Anh... anh chưa từng yêu TÔI SAO?! NÓI ĐI!"',
+      'Caps: "TAO SẼ XÉ XÁC MÀY RA!" | Stutter: "Tôi... t-tôi kh-không biết thật mà!" | Shock: "Anh... anh chưa từng yêu TÔI SAO?! NÓI RA ĐI!"',
     ],
-    ['("unnhhh, mmmm, YES!")', '("ưm... a... SƯỚNG QUÁ!" / "ưm... a... NỮA ĐI!")'],
+    [
+      '("unnhhh, mmmm, YES!")',
+      '("ư... ứ... a... NỮA ĐI...!" / "a... sướng... ĐÚNG CHỖ ĐÓ RỒI...!")',
+    ],
     [
       "- Species Vocalizations: Felines = purr. Canines = growl/whine. Avians = chirp. Humans = groans, sighs, pants, moans (humans never make animal sounds).",
-      "- Species Vocalizations: Felines = rừ rừ. Canines = gừ/rên ư ử. Avians = chiêm chiếp. Humans = rên, thở dài, thở dốc (humans never make animal sounds).",
+      "- Species Vocalizations: Felines = rừ rừ, gầm gừ. Canines = gừ gừ, ẳng, ư ử. Avians = ríu rít, hót, quang quác. Humans = rên rỉ, thở dài, thở dốc, hổn hển (humans never make animal sounds).",
     ],
     [
       '- Ban Coordinating Conjunctions: Ban "and" and "or" in spoken dialogue.',
-      '- Ban Coordinating Conjunctions: Ban "và" and "hoặc" in spoken dialogue.',
+      '- Ban Coordinating Conjunctions: Ban "và", "hoặc", and "hay là" in spoken dialogue.',
     ],
     [
       "ban phrases: I dont know, Nobody has, Nobody just, Its the first time, x never did",
-      "ban phrases: Tôi không biết, Chưa từng có ai, Không ai tự nhiên, Đây là lần đầu, x chưa từng",
+      "ban phrases: [Tôi/Tao/Em/Ta] không biết, Chưa từng có ai, Chẳng ai tự dưng, Lần đầu tiên, [X] chưa từng...",
     ],
     [
       'Bad (banned): "He hesitates, his hand hovering near the gold."',
-      'Bad (banned): "Anh ta do dự, bàn tay ngập ngừng ngay trên đống vàng."',
+      'Bad (banned): "Hắn do dự, bàn tay ngập ngừng khựng lại ngay trên đống vàng."',
     ],
     [
       'Good: "He shoves others away and snatches the gold, pocketing it to secure his prize."',
-      'Good: "Anh ta xô mọi người ra, giật lấy chỗ vàng rồi nhét vào túi để giữ chiến lợi phẩm."',
+      'Good: "Hắn gạt phăng mọi người ra, chộp lấy đống vàng rồi nhét tọt vào túi."',
     ],
   ]);
 
@@ -457,14 +463,14 @@ function adaptGemma4Reasoning(content: string): string {
     ],
     [
       'all CAP words for yelling only during peak arousal/VAD e.g., "NO!"',
-      'all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!"',
+      'all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!"',
     ],
-    ["(mmph, aaahhh, shhhh, ugh!, Ewww!, Mmm!)", "(ưm, a..., suỵt, hự!, eo!, ừm!)"],
+    ["(mmph, aaahhh, shhhh, ugh!, Ewww!, Mmm!)", "(ưm..., aaaa..., suỵt, hự!, khiếp!, ực!, hừ...)"],
     [
       "I will answer task points with concise ideas only, close think tags, and output the final response immediately.",
       "I will answer task points privately and output the final response immediately without exposing reasoning or internal tags.",
     ],
-    ['conjunctions ["or"] and ["and"]', 'conjunctions ["hoặc"] and ["và"]'],
+    ['conjunctions ["or"] and ["and"]', 'conjunctions ["và"], ["hoặc"], and ["hay là"]'],
   ]);
 
   return adapted;

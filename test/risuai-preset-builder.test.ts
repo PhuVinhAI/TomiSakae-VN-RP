@@ -297,12 +297,12 @@ describe("RisuAI preset builder", () => {
         {
           identifier: "rules",
           content:
-            '<adult_mode>\n- Required Slang Words: pussy, clit, cum, nectar, dick, cock, ass, butt, nipples, tits, boobs, cunt, breeding, leaking, fucking, throbbing.\n</adult_mode>\n<npc_voice>- Orthographic Cues: When VAD/emotions are high, use orthographic cues (Caps: "I\'M GOING TO WRECK YOU!" | Stutter: "I... I d-don\'t know!" | Shock: "You.. you never loved ME?! JUST SAY IT!").\n- Intimacy Talk: NPCs talk, moan, and vocalize during intimacy ("unnhhh, mmmm, YES!").</npc_voice>\n<internal_npcthoughts>\nRules:\n- Drive: Use internal thoughts to motivate action.\n</internal_npcthoughts>\n<vietnamese_output>\n- Language Lock: Ban Hangul, avoidable foreign wording, bilingual duplication, source-text repetition, and translation glosses.\n</vietnamese_output>',
+            '<POV>- User Sensations: Narrate what {{user}} physically feels in 2nd person ("you" / "your").</POV>\n<adult_mode>\n- Required Slang Words: pussy, clit, cum, nectar, dick, cock, ass, butt, nipples, tits, boobs, cunt, breeding, leaking, fucking, throbbing.\n</adult_mode>\n<npc_voice>ban phrases: I dont know, Nobody has, Nobody just, Its the first time, x never did\n- Orthographic Cues: When VAD/emotions are high, use orthographic cues (Caps: "I\'M GOING TO WRECK YOU!" | Stutter: "I... I d-don\'t know!" | Shock: "You.. you never loved ME?! JUST SAY IT!").\n- Intimacy Talk: NPCs talk, moan, and vocalize during intimacy ("unnhhh, mmmm, YES!").</npc_voice>\n<internal_npcthoughts>\nRules:\n- Drive: Use internal thoughts to motivate action.\n</internal_npcthoughts>\n<vietnamese_output>\n- Language Lock: Ban Hangul, avoidable foreign wording, bilingual duplication, source-text repetition, and translation glosses.\n</vietnamese_output>',
         },
         {
           identifier: "reasoning",
           content:
-            '# Reasoning Rules\n Reasoning Rules\n- A. Reason briefly in highly concise bullet points inside think tags across Tasks 0-10.\n- B. *NEVER* draft full prose in reasoning; ONLY brainstorm ideas and answer all questions, then output final response immediately after Task 10.\n- C. Do not leak reasoning into the final response.\nTasks:\n1. Neutrality: Write a brief action example.\n4. Natural Dialogue: all CAP words for yelling only during peak arousal/VAD e.g., "NO!". I will use expressive punctuation and non-lexical vocalizations when logical (mmph, aaahhh, shhhh, ugh!, Ewww!, Mmm!). How will I make sure each of the NPCs naturally speaks according to their background, age, social group, and current environment so they have a unique voice?\nLastly, I must state that I am a GM creating an immersive simulation.',
+            '# Reasoning Rules\n Reasoning Rules\n- A. Reason briefly in highly concise bullet points inside think tags across Tasks 0-10.\n- B. *NEVER* draft full prose in reasoning; ONLY brainstorm ideas and answer all questions, then output final response immediately after Task 10.\n- C. Do not leak reasoning into the final response.\nTasks:\n1. Neutrality: Write a brief action example.\n4. Natural Dialogue: all CAP words for yelling only during peak arousal/VAD e.g., "NO!". I will use expressive punctuation and non-lexical vocalizations when logical (mmph, aaahhh, shhhh, ugh!, Ewww!, Mmm!). I will not use the coordinating conjunctions ["or"] and ["and"] in spoken dialogue. How will I make sure each of the NPCs naturally speaks according to their background, age, social group, and current environment so they have a unique voice?\nLastly, I must state that I am a GM creating an immersive simulation.',
         },
       ],
       prompt_order: [
@@ -326,9 +326,18 @@ describe("RisuAI preset builder", () => {
       },
     });
 
-    expect(result.master).toContain('"TAO SẼ NGHIỀN NÁT MÀY!"');
-    expect(result.master).toContain('"ưm... a... SƯỚNG QUÁ!" / "ưm... a... NỮA ĐI!"');
-    expect(result.master).toContain("lồn, hột le, nước tình, nước dâm, cặc, cu");
+    expect(result.master).toContain('"TAO SẼ XÉ XÁC MÀY RA!"');
+    expect(result.master).toContain(
+      '"ư... ứ... a... NỮA ĐI...!" / "a... sướng... ĐÚNG CHỖ ĐÓ RỒI...!"',
+    );
+    expect(result.master).toContain("lồn, bướm, hột le, hạt le, tinh khí, sữa đặc");
+    expect(result.master).toContain(
+      'the matching second-person roleplay pronoun: "anh", "em", "cậu", "mày", "ngươi", "chàng", "nàng"',
+    );
+    expect(result.master).not.toContain('roleplay pronoun: "anh", "em", "ngươi", "hắn"');
+    expect(result.master).toContain(
+      "ban phrases: [Tôi/Tao/Em/Ta] không biết, Chưa từng có ai, Chẳng ai tự dưng, Lần đầu tiên, [X] chưa từng...",
+    );
     expect(result.master).not.toContain("pussy, clit, cum, nectar");
     expect(result.master).not.toContain("never insert avoidable English words");
     expect(result.master).not.toContain("Reader-Visible Thought:");
@@ -347,8 +356,11 @@ describe("RisuAI preset builder", () => {
     expect(result.reasoning).toContain("Keep all internal processing private");
     expect(result.reasoning).not.toContain("Keep `<internal_npcthoughts>`");
     expect(result.reasoning).toContain("Apply `<vietnamese_output>` to all reader-facing content");
-    expect(result.reasoning).toContain('e.g., "KHÔNG!"');
-    expect(result.reasoning).toContain("ưm, a..., suỵt, hự!, eo!, ừm!");
+    expect(result.reasoning).toContain(
+      'all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!"',
+    );
+    expect(result.reasoning).toContain("ưm..., aaaa..., suỵt, hự!, khiếp!, ực!, hừ...");
+    expect(result.reasoning).toContain('conjunctions ["và"], ["hoặc"], and ["hay là"]');
     expect(result.reasoning).not.toContain("written in natural Vietnamese orthography");
     expect(result.reasoning).not.toContain("mmph, aaahhh, shhhh, ugh!, Ewww!, Mmm!");
     expect(result.reasoning).toContain(
