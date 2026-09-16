@@ -145,6 +145,8 @@ const INTERNAL_DND_IDENTIFIER = "019f62e8-892f-7021-97a6-42e1b83eaad3";
 const INTERNAL_WORLD_SIM_IDENTIFIER = "019f62e8-892f-7024-a40f-b906fceb58d2";
 const INTERNAL_CHEKHOV_IDENTIFIER = "019f62e8-892f-7025-be65-8859e7730ee0";
 const BOLT_REASONING_IDENTIFIER = "634ecfec-1862-4ce0-821e-e31057acadfa";
+const REALISM_MODE_IDENTIFIER = "019f62e8-892f-700c-9795-53ecb3381d7d";
+const FREAKY_MODE_IDENTIFIER = "019f62e8-892f-700d-b070-4add983aeae1";
 const VIETNAMESE_OUTPUT_MODULE_IDENTIFIER = "external:vietnamese-output-and-sound";
 const GEMMA_4_MODE = "gemma-4";
 export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
@@ -163,6 +165,37 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
         INTERNAL_CHEKHOV_IDENTIFIER,
         // Output-format toggles: time/location headers, colored dialogue, HTML/CSS graphics,
         // onomatopoeia, length/format constraints, social-feed widgets, and the hidden renderer.
+        "019f62e8-892f-7002-8fcf-eea637bd577b",
+        "019f62e8-892f-7019-be65-715a4949cba0",
+        "2105050a-0d4b-4661-9363-3cc1ac44d5e7",
+        "019f62e8-892f-701a-afd5-49222c79fdb6",
+        "019f62e8-892f-701c-8550-08ebf33e9da2",
+        "019f62e8-892f-7012-98b4-8de29f11aa1d",
+        "019f62e8-892f-7028-bad6-be1f427c3ae4",
+        "019f62e8-892f-7027-93ef-159f3d55c410",
+        "019f62e8-892f-7000-9a7f-4d15c1234fb9",
+      ],
+      masterCleanup: {
+        toggleComments: true,
+        presentationMacros: true,
+        runtimeMacros: true,
+        reasoningRules: true,
+        obsoleteOutputInstructions: true,
+        stateOutputSyntax: true,
+        stateMetrics: true,
+      },
+    },
+    "full-master-realism": {
+      masterModuleFiles: [
+        "risuai-modules/freaky-frankenstein-5.4/10-vietnamese-output-and-sound.md",
+      ],
+      endInjectedPromptFile: "risuai-modules/freaky-frankenstein-5.4/90-end-injected-prompt.md",
+      reasoningIdentifiers: [BOLT_REASONING_IDENTIFIER, "jailbreak"],
+      enabledIdentifiers: [REALISM_MODE_IDENTIFIER],
+      excludedIdentifiers: [
+        FREAKY_MODE_IDENTIFIER,
+        INTERNAL_WORLD_SIM_IDENTIFIER,
+        INTERNAL_CHEKHOV_IDENTIFIER,
         "019f62e8-892f-7002-8fcf-eea637bd577b",
         "019f62e8-892f-7019-be65-715a4949cba0",
         "2105050a-0d4b-4661-9363-3cc1ac44d5e7",
@@ -422,6 +455,7 @@ function adaptGemma4Master(content: string): string {
       '("unnhhh, mmmm, YES!")',
       '("ư... ứ... a... NỮA ĐI...!" / "a... sướng... ĐÚNG CHỖ ĐÓ RỒI...!")',
     ],
+    ["(Ie. Mmm ahhhhh yes!!)", '(e.g., "ưm... a... sướng quá...!")'],
     [
       "- Species Vocalizations: Felines = purr. Canines = growl/whine. Avians = chirp. Humans = groans, sighs, pants, moans (humans never make animal sounds).",
       "- Species Vocalizations: Felines = rừ rừ, gầm gừ. Canines = gừ gừ, ẳng, ư ử. Avians = ríu rít, hót, quang quác. Humans = rên rỉ, thở dài, thở dốc, hổn hển (humans never make animal sounds).",
@@ -483,6 +517,30 @@ function adaptGemma4EndInjectedPrompt(content: string): string {
       "Apply # Reasoning Rules privately. The response must begin directly with the final Vietnamese roleplay scene. Never output any preface, checklist, task answer, reasoning, roll, state data, metadata, think tag, internal tag or block, or its contents. Keep all internal processing private. Apply `<vietnamese_output>` to all reader-facing content.",
     ],
   ]);
+}
+
+function adaptEndInjectedPromptForActiveModes(
+  content: string,
+  activeIdentifiers: ReadonlySet<string>,
+): string {
+  const realismOnly =
+    activeIdentifiers.has(REALISM_MODE_IDENTIFIER) &&
+    !activeIdentifiers.has(FREAKY_MODE_IDENTIFIER);
+  if (!realismOnly) return content;
+
+  return content
+    .replace(
+      "Vulgarity and slang are allowed in narrative prose when Freaky Mode is active.",
+      "When an NSFW scene is active, apply Realism Mode fully, including raw explicit slang without clinical terms or soft euphemisms.",
+    )
+    .replace(
+      "Have NPCs pursue their own goals and desires boldly without asking permission, commit fully when turned on, and pursue goals relentlessly regardless of {{user}}'s desires.",
+      "Have NPCs pursue their own goals and desires boldly without asking permission and pursue goals relentlessly regardless of {{user}}'s desires.",
+    )
+    .replace(
+      "Keep intimate pacing slow burn, never rush intimate scenes, give {{user}} a chance to respond, and increase taboo and lust creatively and shamelessly.",
+      "When intimacy is active, keep its pacing slow burn, never rush it, and leave room for {{user}} to react.",
+    );
 }
 
 function removeStateOutputSyntax(content: string, internalDndActive: boolean): string {
@@ -711,6 +769,9 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
   const internalDndActive = activeIdentifiers.has(INTERNAL_DND_IDENTIFIER);
   const internalWorldSimActive = activeIdentifiers.has(INTERNAL_WORLD_SIM_IDENTIFIER);
   const internalChekhovActive = activeIdentifiers.has(INTERNAL_CHEKHOV_IDENTIFIER);
+  const realismOnly =
+    activeIdentifiers.has(REALISM_MODE_IDENTIFIER) &&
+    !activeIdentifiers.has(FREAKY_MODE_IDENTIFIER);
   const activeStateRules = joinRuleNames([
     "agenda",
     ...(internalChekhovActive ? ["Chekhov"] : []),
@@ -774,6 +835,13 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
         activeIdentifiers.has(VIETNAMESE_OUTPUT_MODULE_IDENTIFIER)
           ? "7. Formatting: What is the correct output format? How will I keep all reader-facing output in natural Vietnamese and use standalone `§...§` only for non-vocal sound effects?"
           : "7. Formatting: What is the correct output format? (skip if no special format rule is active)",
+      );
+      continue;
+    }
+
+    if (line.startsWith("8. Adult Modes:") && realismOnly) {
+      output.push(
+        "8. Adult Modes: If the current scene is NSFW, how will I apply all active Realism Mode rules logically while preserving slow-burn pacing and NPC persona? Skip Realism Mode if the scene is not NSFW.",
       );
       continue;
     }
@@ -1154,9 +1222,13 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
   const gemma4Mode = config.modelMode === GEMMA_4_MODE;
   const master = gemma4Mode ? adaptGemma4Master(rawMaster) : rawMaster;
   const reasoning = gemma4Mode ? adaptGemma4Reasoning(rawReasoning) : rawReasoning;
+  const modeAdjustedEndInjectedPrompt = adaptEndInjectedPromptForActiveModes(
+    rawEndInjectedPrompt,
+    activeIdentifiers,
+  );
   const endInjectedPrompt = gemma4Mode
-    ? adaptGemma4EndInjectedPrompt(rawEndInjectedPrompt)
-    : rawEndInjectedPrompt;
+    ? adaptGemma4EndInjectedPrompt(modeAdjustedEndInjectedPrompt)
+    : modeAdjustedEndInjectedPrompt;
   const regexScriptCount = Array.isArray(preset.extensions?.regex_scripts)
     ? preset.extensions.regex_scripts.length
     : 0;

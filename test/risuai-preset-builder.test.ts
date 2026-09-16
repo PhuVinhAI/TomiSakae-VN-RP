@@ -391,6 +391,63 @@ describe("RisuAI preset builder", () => {
     expect(result.introduction).toContain("Model mode: gemma-4");
   });
 
+  it("builds the Realism variant without Freaky-only behavior", () => {
+    const source = parsePreset({
+      prompts: [
+        {
+          identifier: "019f62e8-892f-700c-9795-53ecb3381d7d",
+          content:
+            "<adult_mode>\n# Realism Mode\n- Persona Lock: Keep true to NPC persona (e.g., shy characters stay shy in intimacy).\n- Anatomy: physics = bouncing/jiggles\n- Senses & Talk: NPCs talk, moan, and swear during intimacy. (Ie. Mmm ahhhhh yes!!)\n</adult_mode>",
+        },
+        {
+          identifier: "019f62e8-892f-700d-b070-4add983aeae1",
+          content: "<adult_mode>\n# Freaky Mode\n</adult_mode>",
+        },
+        {
+          identifier: "634ecfec-1862-4ce0-821e-e31057acadfa",
+          content:
+            "# Reasoning Rules\nTasks:\n8. Adult Modes: If Realism Mode is active, how will I apply its rules logically? If Freaky Mode is active, how will I describe characters lewdly with slang and kinetics in the scene without repeating details from the last 3 turns?  Vulgarity and slang all allowed in narrative prose if Freaky Mode on. How do I apply Freaky rules to this response?",
+        },
+      ],
+      prompt_order: [
+        {
+          order: [
+            { identifier: "019f62e8-892f-700c-9795-53ecb3381d7d", enabled: false },
+            { identifier: "019f62e8-892f-700d-b070-4add983aeae1", enabled: true },
+            { identifier: "634ecfec-1862-4ce0-821e-e31057acadfa", enabled: true },
+          ],
+        },
+      ],
+    });
+    const result = buildPreset(source, {
+      sourceFile: "preset.json",
+      outputDirectory: "out",
+      modelMode: "gemma-4",
+      endInjectedPrompt:
+        "Reason briefly in highly concise bullet points inside think tags, never draft full prose in reasoning, never leak reasoning, rolls, stats, or internal-state mechanics, and output the final response immediately. Vulgarity and slang are allowed in narrative prose when Freaky Mode is active. Have NPCs pursue their own goals and desires boldly without asking permission, commit fully when turned on, and pursue goals relentlessly regardless of {{user}}'s desires. Keep intimate pacing slow burn, never rush intimate scenes, give {{user}} a chance to respond, and increase taboo and lust creatively and shamelessly.",
+      promptRouter: { ...DEFAULT_PROMPT_ROUTER, active: "full-master-realism" },
+    });
+
+    expect(result.master).toContain("# Realism Mode");
+    expect(result.master).not.toContain("# Freaky Mode");
+    expect(result.master).toContain('(e.g., "ưm... a... sướng quá...!")');
+    expect(result.master).toContain("(e.g., shy characters stay shy in intimacy)");
+    expect(result.master).toContain("physics = bouncing/jiggles");
+    expect(result.reasoning).toContain(
+      "If the current scene is NSFW, how will I apply all active Realism Mode rules logically",
+    );
+    expect(result.reasoning).not.toContain("How do I apply Freaky rules");
+    expect(result.endInjectedPrompt).toContain(
+      "When an NSFW scene is active, apply Realism Mode fully",
+    );
+    expect(result.endInjectedPrompt).toContain(
+      "When intimacy is active, keep its pacing slow burn",
+    );
+    expect(result.endInjectedPrompt).not.toContain("increase taboo and lust");
+    expect(result.endInjectedPrompt).not.toContain("commit fully when turned on");
+    expect(result.endInjectedPrompt).not.toContain("Freaky Mode is active");
+  });
+
   it("leaves internal and explanatory examples unchanged in Gemma 4 mode", () => {
     const source = parsePreset({
       prompts: [
