@@ -211,7 +211,7 @@ describe("RisuAI preset builder", () => {
         {
           identifier: "state-rules",
           content:
-            "Naming: Generate 5 setting-appropriate names; select the 5th.\nEntry Types (1-2 concise sentences each):\n- Initialization: Assign named NPCs an agenda on first introduction (default 1-3 mundane steps: rest, eat).\n- Off-Screen Ticking: Advance Step by +1 each turn for OFF-SCREEN NPCs (different location than {{user}}). Complete when Step ≥ max.\n- research/investigate: Plant Chekhov seed; +1 Sparks with relevant character.\n- Scale: -5 to +20. Tracks relationship (BOND), affection (Sparks), and resentment (Grudge).\n- Check (ct % 5 == 0): If Sparks >= 7 -> BOND +1, reset Sparks to 0.\n- Conversion: Sustained fondness can strengthen BOND; neglected fondness fades.",
+            "Naming: Generate 5 setting-appropriate names; select the 5th.\nEntry Types (1-2 concise sentences each):\n- Initialization: Assign named NPCs an agenda on first introduction (default 1-3 mundane steps: rest, eat).\n- Off-Screen Ticking: Advance Step by +1 each turn for OFF-SCREEN NPCs (different location than {{user}}). Complete when Step ≥ max.\n- research/investigate: Plant Chekhov seed; +1 Sparks with relevant character.\n- Scope: Never log BOND/Sparks/Grudge or Chekhov bullets here.\n- Scale: -5 to +20. Tracks relationship (BOND), affection (Sparks), and resentment (Grudge).\n- Check (ct % 5 == 0): If Sparks >= 7 -> BOND +1, reset Sparks to 0.\n- Conversion: Sustained fondness can strengthen BOND; neglected fondness fades.",
         },
       ],
       prompt_order: [{ order: [{ identifier: "state-rules", enabled: true }] }],
@@ -233,8 +233,10 @@ describe("RisuAI preset builder", () => {
       "Advance each OFF-SCREEN NPC's active agenda each turn (different location than {{user}}).",
     );
     expect(result.master).toContain(
-      "Plant Chekhov seed; strengthen Sparks with relevant character.",
+      "Uncover information; strengthen Sparks with relevant character.",
     );
+    expect(result.master).toContain("Never log BOND/Sparks/Grudge here.");
+    expect(result.master).not.toContain("Chekhov");
     expect(result.master).toContain(
       "Tracks relationship (BOND), affection (Sparks), and resentment (Grudge) qualitatively.",
     );
@@ -246,7 +248,7 @@ describe("RisuAI preset builder", () => {
     );
   });
 
-  it("restores DnD, World Sim, and Chekhov as internal engines without renderer macros", () => {
+  it("keeps DnD while excluding World Sim and Chekhov from full-master", () => {
     const source = parsePreset({
       prompts: [
         {
@@ -288,19 +290,21 @@ describe("RisuAI preset builder", () => {
 
     expect(result.masterPrompts.map(({ prompt }) => prompt.identifier)).toEqual([
       "019f62e8-892f-7021-97a6-42e1b83eaad3",
-      "019f62e8-892f-7024-a40f-b906fceb58d2",
-      "019f62e8-892f-7025-be65-8859e7730ee0",
       "634ecfec-1862-4ce0-821e-e31057acadfa",
     ]);
     expect(result.master).toContain(
       "Internally sample a uniformly random integer from 1 to 20 for each actor.",
     );
-    expect(result.master).toContain("The World Sim roll is absolute.");
-    expect(result.master).toContain("Keep the roll and table mechanics in reasoning.");
-    expect(result.master).toContain("4-Age Minimum");
-    expect(result.master).toContain("otherwise keep it loaded");
     expect(result.master).toContain(
-      "Apply the agenda, Chekhov, World Sim, notebook, inventory, relationship, NPC-thought, and DnD rules before output.",
+      "Apply the agenda, notebook, inventory, relationship, NPC-thought, and DnD rules before output.",
+    );
+    expect(result.master).not.toContain("internal_worldsim");
+    expect(result.master).not.toContain("internal_chekhovguntracker");
+    expect(result.introduction).toContain(
+      "| OFF | 019f62e8-892f-7024-a40f-b906fceb58d2 |",
+    );
+    expect(result.introduction).toContain(
+      "| OFF | 019f62e8-892f-7025-be65-8859e7730ee0 |",
     );
     expect(result.master).not.toMatch(
       /\{\{(?:setvar|getvar|roll)::|dndTemplate|worldsimRoll:|chekhovD20:|Seed1:/,

@@ -119,8 +119,10 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
   routes: {
     "all-master": {},
     "full-master": {
-      enabledIdentifiers: [INTERNAL_WORLD_SIM_IDENTIFIER, INTERNAL_CHEKHOV_IDENTIFIER],
       excludedIdentifiers: [
+        // Optional internal engines disabled for the lean full-master route.
+        INTERNAL_WORLD_SIM_IDENTIFIER,
+        INTERNAL_CHEKHOV_IDENTIFIER,
         // Output-format toggles: time/location headers, colored dialogue, HTML/CSS graphics,
         // onomatopoeia, length/format constraints, social-feed widgets, and the hidden renderer.
         "019f62e8-892f-7002-8fcf-eea637bd577b",
@@ -279,7 +281,7 @@ function cleanupContent(content: string, cleanup: PromptCleanup | undefined, act
   }
   cleaned = adaptInternalEngines(cleaned);
   if (cleanup.stateOutputSyntax) cleaned = removeStateOutputSyntax(cleaned, internalDndActive);
-  if (cleanup.stateMetrics) cleaned = removeStateMetrics(cleaned);
+  if (cleanup.stateMetrics) cleaned = removeStateMetrics(cleaned, activeIdentifiers);
   if (cleanup.presentationMacros) cleaned = cleaned.replace(/[ \t]+$/gm, "").trim();
   return cleaned;
 }
@@ -311,8 +313,8 @@ function removeStateOutputSyntax(content: string, internalDndActive: boolean): s
   return cleaned;
 }
 
-function removeStateMetrics(content: string): string {
-  return content
+function removeStateMetrics(content: string, activeIdentifiers: ReadonlySet<string>): string {
+  let cleaned = content
     .replace(
       /- Initialization: Assign named NPCs an agenda on first introduction \(default 1-3 mundane steps: ([^)]+)\)\./g,
       "- Initialization: Assign named NPCs an agenda on first introduction (mundane steps: $1).",
@@ -374,6 +376,20 @@ function removeStateMetrics(content: string): string {
     .replace(/- Spotlight: Pick up to 3 NPCs max \(prioritize on-screen; if off-screen, state their location and task\)\./g, "- Spotlight: Prioritize on-screen NPCs; if off-screen, state their location and task.")
     .replace(/- Format: 1 to 2 lines per NPC max 10-40 words\. Raw, fragmented, and impulsive thoughts matching core persona, active instincts, and current VAD emotions\./g, "- Format: Keep each NPC's thoughts concise, raw, fragmented, and impulsive, matching core persona, active instincts, and current VAD emotions.")
     .replace(/Naming: Generate 5 setting-appropriate names; select the 5th\./g, "Naming: Generate several setting-appropriate names; select one.");
+
+  if (!activeIdentifiers.has(INTERNAL_CHEKHOV_IDENTIFIER)) {
+    cleaned = cleaned
+      .replace(
+        /- research\/investigate: Plant Chekhov seed; strengthen Sparks with relevant character\./g,
+        "- research/investigate: Uncover information; strengthen Sparks with relevant character.",
+      )
+      .replace(
+        /Never log BOND\/Sparks\/Grudge or Chekhov bullets here\./g,
+        "Never log BOND/Sparks/Grudge here.",
+      );
+  }
+
+  return cleaned;
 }
 
 function adaptInternalEngines(content: string): string {
@@ -698,7 +714,14 @@ function renderIntroduction(
     }
 
     const state =
-      selected || runtime ? "ON" : omittedIdentifiers.has(entry.identifier) ? "CLEANED" : "OFF";
+      selected || runtime
+        ? "ON"
+        : entry.identifier === INTERNAL_WORLD_SIM_IDENTIFIER ||
+            entry.identifier === INTERNAL_CHEKHOV_IDENTIFIER
+          ? "OFF"
+          : omittedIdentifiers.has(entry.identifier)
+            ? "CLEANED"
+            : "OFF";
     const injection =
       prompt.injection_position === undefined
         ? "runtime"
@@ -750,7 +773,15 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
   const introductionIdentifiers = new Set(route.introductionIdentifiers ?? []);
   const routeEnabledIdentifiers = new Set(route.enabledIdentifiers ?? []);
   const excludedIdentifiers = new Set(route.excludedIdentifiers ?? []);
-  const activeIdentifiers = new Set<string>();
+  const isEnabled = (entry: RisuAiOrderEntry): boolean =>
+    Object.prototype.hasOwnProperty.call(enabledOverrides, entry.identifier)
+      ? enabledOverrides[entry.identifier] === true
+      : entry.enabled === true || routeEnabledIdentifiers.has(entry.identifier) || config.includeDisabled === true || route.includeDisabled === true;
+  const activeIdentifiers = new Set(
+    selectedOrder.order
+      .filter((entry) => isEnabled(entry) && !excludedIdentifiers.has(entry.identifier))
+      .map((entry) => entry.identifier),
+  );
   const masterPrompts: SelectedPrompt[] = [];
   const introductionPrompts: SelectedPrompt[] = [];
   const runtimeSlots: RuntimeSlot[] = [];
@@ -766,9 +797,7 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
       disabledEntries += 1;
     }
 
-    const enabled = Object.prototype.hasOwnProperty.call(enabledOverrides, entry.identifier)
-      ? enabledOverrides[entry.identifier]
-      : sourceEnabled || routeEnabledIdentifiers.has(entry.identifier) || config.includeDisabled === true || route.includeDisabled === true;
+    const enabled = isEnabled(entry);
     if (!enabled) {
       continue;
     }
@@ -776,8 +805,6 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
     if (excludedIdentifiers.has(entry.identifier)) {
       continue;
     }
-
-    activeIdentifiers.add(entry.identifier);
 
     const prompt = promptMap.get(entry.identifier);
     if (!prompt) {

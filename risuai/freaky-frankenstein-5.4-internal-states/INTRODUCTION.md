@@ -11,12 +11,12 @@ The master contains non-empty prompt content selected from the configured prompt
 - Prompt-order group: 0
 - Source-enabled entries: 34
 - Source-disabled entries: 22
-- Selected source blocks: 23
+- Selected source blocks: 21
 - Runtime slots: 8
 - Regex scripts in source (excluded from master): 25
 - Include disabled entries: no
 - Active route: full-master
-- Omitted by route/cleanup: 9
+- Omitted by route/cleanup: 11
 
 ## Root prompt fields
 
@@ -125,8 +125,8 @@ Entries below follow the selected prompt_order group. Empty content is a runtime
 | 45 | ON | 019f67ad-c0b1-7000-aca4-0e2480fa02db | 📒 GM's Notebook | user | 1 / 0 | 1332 |
 | 46 | ON | 019f62e8-892f-7022-9eb9-e00c2944ebc6 | 🗡️Inventory, Feats, Titles 💪 | user | 1 / 0 | 1319 |
 | 47 | ON | 019f62e8-892f-7023-825d-9351eca0347f |  🥰 Relationships RPG ❤️ 😡 | user | 1 / 0 | 2672 |
-| 48 | ON | 019f62e8-892f-7024-a40f-b906fceb58d2 | 🌎World Sim 🎲 | user | 1 / 0 | 2586 |
-| 49 | ON | 019f62e8-892f-7025-be65-8859e7730ee0 | 🔫Chekhov's Gun: Secrets / Lies / Plants | user | 1 / 0 | 2996 |
+| 48 | OFF | 019f62e8-892f-7024-a40f-b906fceb58d2 | 🌎World Sim 🎲 | user | 1 / 0 | 2586 |
+| 49 | OFF | 019f62e8-892f-7025-be65-8859e7730ee0 | 🔫Chekhov's Gun: Secrets / Lies / Plants | user | 1 / 0 | 2996 |
 | 50 | ON | 019f62e8-892f-7026-92ea-34ff510c244b | 🧠 Internal Thoughts 💭  | user | 1 / 0 | 690 |
 | 51 | CLEANED | 019f62e8-892f-7027-93ef-159f3d55c410 | 👾Internal States 💾🎮 | user | 1 / 0 | 2467 |
 | 52 | OFF | 019f62e8-892f-7031-a8d8-aa94d06644a2 | 🧠=Pick one CoT Style 👇 ================ | system | 0 / 4 | 343 |

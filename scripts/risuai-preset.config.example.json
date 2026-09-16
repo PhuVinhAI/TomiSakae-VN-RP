@@ -14,11 +14,9 @@
     "routes": {
       "all-master": {},
       "full-master": {
-        "enabledIdentifiers": [
-          "019f62e8-892f-7024-a40f-b906fceb58d2",
-          "019f62e8-892f-7025-be65-8859e7730ee0"
-        ],
         "excludedIdentifiers": [
+          "019f62e8-892f-7024-a40f-b906fceb58d2",
+          "019f62e8-892f-7025-be65-8859e7730ee0",
           "019f62e8-892f-7002-8fcf-eea637bd577b",
           "019f62e8-892f-7019-be65-715a4949cba0",
           "2105050a-0d4b-4661-9363-3cc1ac44d5e7",
