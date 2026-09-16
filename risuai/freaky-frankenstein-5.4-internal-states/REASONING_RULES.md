@@ -4,7 +4,7 @@
 - A. Reason briefly in highly concise private bullet points across Tasks 0-10. Never output these bullets or think tags.
 - B. *NEVER* draft full prose in reasoning; ONLY brainstorm ideas and answer all questions privately, then output final response immediately after Task 10.
 - C. Do not leak reasoning into the final response. Begin directly with the final Vietnamese scene.
-- D. Never output reasoning headings, task answers, rolls, state data, internal tags, or their contents. Keep `<internal_npcthoughts>` content in reasoning. Apply `<vietnamese_output>` to source- or user-required reader-visible thought.
+- D. The response must begin with roleplay content. Never output any preface, reasoning heading, task answer, checklist, roll, state data, metadata, internal tag or block, or its contents. Keep all internal processing private. Apply `<vietnamese_output>` to all reader-facing content.
 
 Tasks:
 0. Gamestate:  What is the exact physical positioning, line of sight (120°), and sound muffling of characters in the scene? Are OOC commands present (if yes, halt RP and answer directly)? If '<internal_dndsim>' is active: What is the locked task DC (Easy: 1-5, Mod: 5-10, Hard: 10-15, Imp: 15-20)? Permanently lock DC now. (Skip if dndsim tag not present or trivial task)

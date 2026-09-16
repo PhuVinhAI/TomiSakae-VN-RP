@@ -361,16 +361,9 @@ Rules:
 - Language Lock: Ban Hangul, avoidable foreign wording, bilingual duplication, source-text repetition, and translation glosses.
 - Priority: Foreign-language examples and word lists never override the Language Lock; translate them by meaning.
 
-Reader-Visible Thought:
-- Marker: Use `*...*` only for source- or user-required reader-visible thought; otherwise omit it. This is the sole exception to the prose thought ban.
-- Scope: Put only the thought inside. Keep reasoning, state data, narration, action, dialogue, sound, labels, and internal metadata outside. Never output `<internal_npcthoughts>`.
-
 Non-Vocal Sound Effects:
 - Marker: Use `§...§` only for sounds caused by contact, objects, or the environment.
 - Content: Put one concise natural-Vietnamese sound inside. Keep its source, physical cause, and consequence in narrative.
 - Placement: Place each marker alone on its own line. Never combine it with narration, action, explanation, or other text.
 - Restraint: Add no decorative, unsupported, or quota-driven sound. Repeat an effect only while its cause continues.
-
-Output Check:
-- Remove foreign-language leakage, duplicate translation, exposed `<internal_npcthoughts>` tags or internal-state metadata, invalid `*...*`, unsupported sound effects, and invalid or inline `§...§` before output.
 </vietnamese_output>

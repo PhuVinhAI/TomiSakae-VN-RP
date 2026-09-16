@@ -345,7 +345,7 @@ function replaceLiteralPairs(
 
 function adaptGemma4Master(content: string): string {
   // Translate only reader-facing examples and lexical constraints Gemma may copy into output.
-  let adapted = replaceLiteralPairs(content, [
+  const adapted = replaceLiteralPairs(content, [
     [
       'BAD: "The air smells like rain, salt and copper." GOOD: "The rain makes the air smell floral."',
       'BAD: "Không khí có mùi mưa, muối và đồng." GOOD: "Mưa khiến không khí phảng phất mùi hoa."',
@@ -435,29 +435,6 @@ function adaptGemma4Master(content: string): string {
     ],
   ]);
 
-  adapted = adapted.replace(
-    /<vietnamese_output>([\s\S]*?)<\/vietnamese_output>/g,
-    (_match, body: string) => {
-      const thoughtRules = [
-        "Reader-Visible Thought:",
-        "- Marker: Use `*...*` only for source- or user-required reader-visible thought; otherwise omit it. This is the sole exception to the prose thought ban.",
-        "- Scope: Put only the thought inside. Keep reasoning, state data, narration, action, dialogue, sound, labels, and internal metadata outside. Never output `<internal_npcthoughts>`.",
-      ].join("\n");
-      const outputCheck =
-        "- Remove foreign-language leakage, duplicate translation, unsupported sound effects, and invalid or inline `§...§` before output.";
-      const strengthenedOutputCheck =
-        "- Remove foreign-language leakage, duplicate translation, exposed `<internal_npcthoughts>` tags or internal-state metadata, invalid `*...*`, unsupported sound effects, and invalid or inline `§...§` before output.";
-      const adaptedBody = body.includes("Reader-Visible Thought:")
-        ? body
-        : body.includes("\nNon-Vocal Sound Effects:")
-          ? body.replace(
-              "\nNon-Vocal Sound Effects:",
-              `\n${thoughtRules}\n\nNon-Vocal Sound Effects:`,
-            )
-          : `${body.trimEnd()}\n\n${thoughtRules}\n`;
-      return `<vietnamese_output>${adaptedBody.replace(outputCheck, strengthenedOutputCheck)}</vietnamese_output>`;
-    },
-  );
   return adapted;
 }
 
@@ -473,7 +450,7 @@ function adaptGemma4Reasoning(content: string): string {
     ],
     [
       "- C. Do not leak reasoning into the final response.",
-      "- C. Do not leak reasoning into the final response. Begin directly with the final Vietnamese scene.\n- D. Never output reasoning headings, task answers, rolls, state data, internal tags, or their contents. Keep `<internal_npcthoughts>` content in reasoning. Apply `<vietnamese_output>` to source- or user-required reader-visible thought.",
+      "- C. Do not leak reasoning into the final response. Begin directly with the final Vietnamese scene.\n- D. The response must begin with roleplay content. Never output any preface, reasoning heading, task answer, checklist, roll, state data, metadata, internal tag or block, or its contents. Keep all internal processing private. Apply `<vietnamese_output>` to all reader-facing content.",
     ],
     [
       'all CAP words for yelling only during peak arousal/VAD e.g., "NO!"',
@@ -494,7 +471,7 @@ function adaptGemma4EndInjectedPrompt(content: string): string {
   return replaceLiteralPairs(content, [
     [
       "Reason briefly in highly concise bullet points inside think tags, never draft full prose in reasoning, never leak reasoning, rolls, stats, or internal-state mechanics, and output the final response immediately.",
-      "Apply # Reasoning Rules privately. Never output its checklist, answers, rolls, state data, think tags, internal tags, or their contents. Keep `<internal_npcthoughts>` content in reasoning. Apply `<vietnamese_output>` to source- or user-required reader-visible thought. Begin directly with the final Vietnamese roleplay scene.",
+      "Apply # Reasoning Rules privately. The response must begin directly with the final Vietnamese roleplay scene. Never output any preface, checklist, task answer, reasoning, roll, state data, metadata, think tag, internal tag or block, or its contents. Keep all internal processing private. Apply `<vietnamese_output>` to all reader-facing content.",
     ],
   ]);
 }

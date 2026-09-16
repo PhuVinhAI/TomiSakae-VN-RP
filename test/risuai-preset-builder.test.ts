@@ -250,7 +250,7 @@ describe("RisuAI preset builder", () => {
         {
           identifier: "rules",
           content:
-            '<npc_voice>Caps: "I\'M GOING TO WRECK YOU!" Vocalizations: "unnhhh, mmmm, YES!"</npc_voice>\n<vietnamese_output>\n- Language Lock: Ban Hangul, avoidable foreign wording, bilingual duplication, source-text repetition, and translation glosses.\n\nNon-Vocal Sound Effects:\n- Marker: Use `§...§` only for sounds.\n\nOutput Check:\n- Remove foreign-language leakage, duplicate translation, unsupported sound effects, and invalid or inline `§...§` before output.\n</vietnamese_output>',
+            '<npc_voice>Caps: "I\'M GOING TO WRECK YOU!" Vocalizations: "unnhhh, mmmm, YES!"</npc_voice>\n<vietnamese_output>\n- Language Lock: Ban Hangul, avoidable foreign wording, bilingual duplication, source-text repetition, and translation glosses.\n\nNon-Vocal Sound Effects:\n- Marker: Use `§...§` only for sounds.\n</vietnamese_output>',
         },
         {
           identifier: "reasoning",
@@ -331,11 +331,12 @@ describe("RisuAI preset builder", () => {
     expect(result.master).toContain("lồn, hột le, nước cặc, nước dâm, cặc, cu");
     expect(result.master).not.toContain("pussy, clit, cum, nectar");
     expect(result.master).not.toContain("never insert avoidable English words");
-    expect(result.master).toContain("Reader-Visible Thought:");
-    expect(result.master).toContain("Use `*...*` only for source- or user-required");
-    expect(result.master).toContain("sole exception to the prose thought ban");
-    expect(result.master).toContain("Never output `<internal_npcthoughts>`");
-    expect(result.master).toContain("Keep reasoning, state data, narration");
+    expect(result.master).not.toContain("Reader-Visible Thought:");
+    expect(result.master).not.toContain("Use `*...*`");
+    expect(result.master).not.toContain("Response Start:");
+    expect(result.master).not.toContain("Output Check:");
+    expect(result.master).not.toContain("internal tag or block and all associated contents");
+    expect(result.master).not.toContain("Never output `<internal_npcthoughts>`");
     expect(result.master).toContain("<internal_npcthoughts>");
     expect(result.master).not.toContain("Keep this tag and its contents in reasoning only");
     expect(result.master).not.toContain("Never render NPC-name headers");
@@ -343,7 +344,9 @@ describe("RisuAI preset builder", () => {
     expect(result.master).toContain("</internal_npcthoughts>");
     expect(result.reasoning).toContain("# Reasoning Rules");
     expect(result.reasoning).not.toContain("hidden reasoning");
-    expect(result.reasoning).toContain("Keep `<internal_npcthoughts>`");
+    expect(result.reasoning).toContain("Keep all internal processing private");
+    expect(result.reasoning).not.toContain("Keep `<internal_npcthoughts>`");
+    expect(result.reasoning).toContain("Apply `<vietnamese_output>` to all reader-facing content");
     expect(result.reasoning).toContain('e.g., "KHÔNG!"');
     expect(result.reasoning).toContain("ưm, a..., suỵt, hự!, eo!, ừm!");
     expect(result.reasoning).not.toContain("written in natural Vietnamese orthography");
@@ -355,8 +358,11 @@ describe("RisuAI preset builder", () => {
     expect(result.endInjectedPrompt).not.toContain("hidden reasoning");
     expect(result.endInjectedPrompt).toContain("together with # Reasoning Rules");
     expect(result.endInjectedPrompt).toContain("Apply # Reasoning Rules privately");
-    expect(result.endInjectedPrompt).toContain("Keep `<internal_npcthoughts>`");
-    expect(result.endInjectedPrompt).toContain("Apply `<vietnamese_output>`");
+    expect(result.endInjectedPrompt).toContain("Keep all internal processing private");
+    expect(result.endInjectedPrompt).not.toContain("Keep `<internal_npcthoughts>`");
+    expect(result.endInjectedPrompt).toContain(
+      "Apply `<vietnamese_output>` to all reader-facing content",
+    );
     expect(result.endInjectedPrompt).toContain("Roleplay response:");
     expect(result.introduction).toContain("Model mode: gemma-4");
   });

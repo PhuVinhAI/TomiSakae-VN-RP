@@ -13,7 +13,4 @@ Non-Vocal Sound Effects:
 - Content: Put one concise natural-Vietnamese sound inside. Keep its source, physical cause, and consequence in narrative.
 - Placement: Place each marker alone on its own line. Never combine it with narration, action, explanation, or other text.
 - Restraint: Add no decorative, unsupported, or quota-driven sound. Repeat an effect only while its cause continues.
-
-Output Check:
-- Remove foreign-language leakage, duplicate translation, unsupported sound effects, and invalid or inline `§...§` before output.
 </vietnamese_output>
