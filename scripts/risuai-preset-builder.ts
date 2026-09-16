@@ -45,6 +45,8 @@ export interface PromptCleanup {
 export interface PromptRoute {
   /** Append standalone prompt modules outside the source preset to master. */
   masterModuleFiles?: string[];
+  /** Move these selected source prompts from master to reasoning. */
+  reasoningIdentifiers?: string[];
   /** Move these selected source prompts from master to introduction. */
   introductionIdentifiers?: string[];
   /** Enable these prompts for this route even when the source toggle is off. */
@@ -55,6 +57,8 @@ export interface PromptRoute {
   masterCleanup?: PromptCleanup;
   /** Optional deletion-only cleanup for introduction blocks. */
   introductionCleanup?: PromptCleanup;
+  /** Optional cleanup for reasoning blocks. Defaults to masterCleanup. */
+  reasoningCleanup?: PromptCleanup;
   /** Allow disabled source entries to participate in this route. */
   includeDisabled?: boolean;
 }
@@ -67,7 +71,7 @@ export interface PromptRouter {
 export interface RisuAiBuildConfig {
   /** JSON preset to read. */
   sourceFile: string;
-  /** Directory receiving MASTER_PROMPT.md and INTRODUCTION.md. */
+  /** Directory receiving MASTER_PROMPT.md, REASONING_RULES.md, and INTRODUCTION.md. */
   outputDirectory: string;
   /** Which prompt_order group to use. The source preset normally has one group. */
   orderIndex?: number;
@@ -105,9 +109,11 @@ export interface ExternalMasterModule {
 
 export interface RisuAiBuildResult {
   master: string;
+  reasoning: string;
   introduction: string;
   selectedPrompts: SelectedPrompt[];
   masterPrompts: SelectedPrompt[];
+  reasoningPrompts: SelectedPrompt[];
   introductionPrompts: SelectedPrompt[];
   runtimeSlots: RuntimeSlot[];
   externalMasterModules: ExternalMasterModule[];
@@ -116,7 +122,8 @@ export interface RisuAiBuildResult {
   regexScriptCount: number;
   omittedIdentifiers: string[];
   masterDigest: string;
-  outputFiles: { master: string; introduction: string };
+  reasoningDigest: string;
+  outputFiles: { master: string; reasoning: string; introduction: string };
 }
 
 const DEFAULT_SEPARATOR = "\n\n";
@@ -124,6 +131,7 @@ const DEFAULT_ORDER_INDEX = 0;
 const INTERNAL_DND_IDENTIFIER = "019f62e8-892f-7021-97a6-42e1b83eaad3";
 const INTERNAL_WORLD_SIM_IDENTIFIER = "019f62e8-892f-7024-a40f-b906fceb58d2";
 const INTERNAL_CHEKHOV_IDENTIFIER = "019f62e8-892f-7025-be65-8859e7730ee0";
+const BOLT_REASONING_IDENTIFIER = "634ecfec-1862-4ce0-821e-e31057acadfa";
 const VIETNAMESE_OUTPUT_MODULE_IDENTIFIER = "external:vietnamese-output-and-sound";
 export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
   active: "full-master",
@@ -133,6 +141,7 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
       masterModuleFiles: [
         "risuai-modules/freaky-frankenstein-5.4/10-vietnamese-output-and-sound.md",
       ],
+      reasoningIdentifiers: [BOLT_REASONING_IDENTIFIER, "jailbreak"],
       excludedIdentifiers: [
         // Optional internal engines disabled for the lean full-master route.
         INTERNAL_WORLD_SIM_IDENTIFIER,
@@ -662,6 +671,7 @@ function renderIntroduction(
   preset: RisuAiPreset,
   config: RisuAiBuildConfig,
   selectedPrompts: SelectedPrompt[],
+  reasoningPrompts: SelectedPrompt[],
   runtimeSlots: RuntimeSlot[],
   promptMap: Map<string, RisuAiPrompt>,
   order: RisuAiOrderEntry[],
@@ -678,8 +688,8 @@ function renderIntroduction(
     "",
     "# RisuAI preset extraction",
     "",
-    "This file records the source configuration and extraction metadata for the accompanying `MASTER_PROMPT.md`.",
-    "The master contains non-empty prompt content selected from the configured prompt order. Any changes are limited to the route's configured deletion-only cleanup; separators are builder scaffolding.",
+    "This file records the source configuration and extraction metadata for the accompanying `MASTER_PROMPT.md` and `REASONING_RULES.md`.",
+    "The prompt files contain non-empty content selected from the configured prompt order. Any changes are limited to the route's configured cleanup; separators are builder scaffolding.",
     "",
     "## Build configuration",
     "",
@@ -687,6 +697,7 @@ function renderIntroduction(
     `- Source-enabled entries: ${enabledEntries}`,
     `- Source-disabled entries: ${disabledEntries}`,
     `- Selected source blocks: ${selectedPrompts.length}`,
+    `- Reasoning source blocks: ${reasoningPrompts.length}`,
     `- External master modules: ${config.masterModules?.length ?? 0}`,
     `- Runtime slots: ${runtimeSlots.length}`,
     `- Regex scripts in source (excluded from master): ${regexScriptCount}`,
@@ -774,7 +785,7 @@ function renderIntroduction(
   lines.push(
     "## Extraction scope",
     "",
-    "Prompt blocks retain their source instructions except for the route's configured deletion-only cleanup. Disabled entries, entries outside the selected prompt order, and `extensions.regex_scripts` are excluded from `MASTER_PROMPT.md`.",
+    "Prompt blocks retain their source instructions except for the route's configured cleanup. Disabled entries, entries outside the selected prompt order, and `extensions.regex_scripts` are excluded from `MASTER_PROMPT.md` and `REASONING_RULES.md`.",
     "",
   );
 
@@ -795,6 +806,7 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
   const promptMap = getPromptMap(preset.prompts);
   const enabledOverrides = config.enabledOverrides ?? {};
   const route = routeFor(config);
+  const reasoningIdentifiers = new Set(route.reasoningIdentifiers ?? []);
   const introductionIdentifiers = new Set(route.introductionIdentifiers ?? []);
   const routeEnabledIdentifiers = new Set(route.enabledIdentifiers ?? []);
   const excludedIdentifiers = new Set(route.excludedIdentifiers ?? []);
@@ -812,6 +824,7 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
   }
 
   const masterPrompts: SelectedPrompt[] = [];
+  const reasoningPrompts: SelectedPrompt[] = [];
   const introductionPrompts: SelectedPrompt[] = [];
   const runtimeSlots: RuntimeSlot[] = [];
   const selectedPrompts: SelectedPrompt[] = [];
@@ -844,7 +857,14 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
     if (content !== undefined) {
       const item = { order: index + 1, entry, prompt, content };
       selectedPrompts.push(item);
-      if (introductionIdentifiers.has(entry.identifier)) {
+      if (reasoningIdentifiers.has(entry.identifier)) {
+        const reasoningContent = cleanupContent(content, route.reasoningCleanup ?? route.masterCleanup, activeIdentifiers);
+        if (reasoningContent.trim().length > 0) {
+          reasoningPrompts.push({ ...item, content: reasoningContent });
+        } else {
+          excludedIdentifiers.add(entry.identifier);
+        }
+      } else if (introductionIdentifiers.has(entry.identifier)) {
         const introductionContent = cleanupContent(content, route.introductionCleanup, activeIdentifiers);
         if (introductionContent.trim().length > 0) {
           introductionPrompts.push({ ...item, content: introductionContent });
@@ -879,6 +899,9 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
     ...externalMasterModules.map(({ content }) => content),
   );
   const master = `${masterContents.join(separator)}\n`;
+  const reasoning = reasoningPrompts.length > 0
+    ? reasoningPrompts.map(({ content }) => content).join(separator) + "\n"
+    : "";
   const regexScriptCount = Array.isArray(preset.extensions?.regex_scripts)
     ? preset.extensions.regex_scripts.length
     : 0;
@@ -888,7 +911,8 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
       : renderIntroduction(
           preset,
           config,
-          [...masterPrompts, ...introductionPrompts],
+          [...masterPrompts, ...reasoningPrompts, ...introductionPrompts],
+          reasoningPrompts,
           runtimeSlots,
           promptMap,
           selectedOrder.order,
@@ -901,9 +925,11 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
 
   return {
     master,
+    reasoning,
     introduction,
     selectedPrompts,
     masterPrompts,
+    reasoningPrompts,
     introductionPrompts,
     runtimeSlots,
     externalMasterModules,
@@ -912,8 +938,10 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
     regexScriptCount,
     omittedIdentifiers: [...excludedIdentifiers],
     masterDigest: createHash("sha256").update(master).digest("hex"),
+    reasoningDigest: createHash("sha256").update(reasoning).digest("hex"),
     outputFiles: {
       master: path.join(outputDirectory, "MASTER_PROMPT.md"),
+      reasoning: path.join(outputDirectory, "REASONING_RULES.md"),
       introduction: path.join(outputDirectory, "INTRODUCTION.md"),
     },
   };
@@ -938,6 +966,7 @@ export async function buildRisuAiPreset(
     await mkdir(path.resolve(config.outputDirectory), { recursive: true });
     await Promise.all([
       writeFile(result.outputFiles.master, result.master, "utf8"),
+      writeFile(result.outputFiles.reasoning, result.reasoning, "utf8"),
       writeFile(result.outputFiles.introduction, result.introduction, "utf8"),
     ]);
   }

@@ -86,10 +86,11 @@ pnpm dev --source prompts --output generated/MASTER_PROMPT.md
 ```
 
 Builder preset RisuAI đọc `prompt_order`, giữ nguyên nội dung của các prompt đang bật theo đúng thứ
-tự, ghi các slot runtime vào `INTRODUCTION.md`, và loại `extensions.regex_scripts` khỏi
-`MASTER_PROMPT.md`. Dùng `--set-enabled identifier=on|off` nhiều lần để đổi toggle mà không sửa JSON
-nguồn; dùng `--check` để kiểm tra hai file đã sinh còn mới. Với cấu hình dùng lại nhiều lần, sao
-chép `scripts/risuai-preset.config.example.json`, điền đường dẫn và `enabledOverrides`, rồi chạy:
+tự, tách prompt reasoning được cấu hình vào `REASONING_RULES.md`, ghi các slot runtime vào
+`INTRODUCTION.md`, và loại `extensions.regex_scripts` khỏi các prompt đầu ra. Dùng
+`--set-enabled identifier=on|off` nhiều lần để đổi toggle mà không sửa JSON nguồn; dùng `--check` để
+kiểm tra ba file đã sinh còn mới. Với cấu hình dùng lại nhiều lần, sao chép
+`scripts/risuai-preset.config.example.json`, điền đường dẫn và `enabledOverrides`, rồi chạy:
 
 ```bash
 pnpm build:risuai -- --config scripts/my-risuai-preset.config.json
@@ -130,7 +131,7 @@ prompts/                     18 module của NSFW đầy đủ hiện tại
 src/compiler.ts              Compiler thư mục thô tương thích cách dùng cũ
 src/profiles.ts              Nạp manifest và biên dịch profile
 src/cli.ts                   Giao diện dòng lệnh
-scripts/build-risuai-preset.ts CLI dựng hai file từ preset RisuAI/SillyTavern
+scripts/build-risuai-preset.ts CLI dựng ba file từ preset RisuAI/SillyTavern
 scripts/risuai-preset-builder.ts Bộ đọc, kiểm tra, chọn toggle và render dùng lại được
 scripts/export-project.ps1   Đóng gói tệp Git cần thiết thành ZIP
 test/compiler.test.ts        Kiểm thử prompt NSFW đầy đủ và compiler gốc

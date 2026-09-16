@@ -3,8 +3,8 @@
 
 # RisuAI preset extraction
 
-This file records the source configuration and extraction metadata for the accompanying `MASTER_PROMPT.md`.
-The master contains non-empty prompt content selected from the configured prompt order. Any changes are limited to the route's configured deletion-only cleanup; separators are builder scaffolding.
+This file records the source configuration and extraction metadata for the accompanying `MASTER_PROMPT.md` and `REASONING_RULES.md`.
+The prompt files contain non-empty content selected from the configured prompt order. Any changes are limited to the route's configured cleanup; separators are builder scaffolding.
 
 ## Build configuration
 
@@ -12,6 +12,7 @@ The master contains non-empty prompt content selected from the configured prompt
 - Source-enabled entries: 34
 - Source-disabled entries: 22
 - Selected source blocks: 21
+- Reasoning source blocks: 2
 - External master modules: 1
 - Runtime slots: 8
 - Regex scripts in source (excluded from master): 25
@@ -155,4 +156,4 @@ These enabled entries have no static `content` in the source and are expected to
 
 ## Extraction scope
 
-Prompt blocks retain their source instructions except for the route's configured deletion-only cleanup. Disabled entries, entries outside the selected prompt order, and `extensions.regex_scripts` are excluded from `MASTER_PROMPT.md`.
+Prompt blocks retain their source instructions except for the route's configured cleanup. Disabled entries, entries outside the selected prompt order, and `extensions.regex_scripts` are excluded from `MASTER_PROMPT.md` and `REASONING_RULES.md`.

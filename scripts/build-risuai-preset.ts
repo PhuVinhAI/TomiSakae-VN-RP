@@ -23,11 +23,13 @@ const PromptCleanupSchema = z.object({
 
 const PromptRouteSchema = z.object({
   masterModuleFiles: z.array(z.string()).optional(),
+  reasoningIdentifiers: z.array(z.string()).optional(),
   introductionIdentifiers: z.array(z.string()).optional(),
   enabledIdentifiers: z.array(z.string()).optional(),
   excludedIdentifiers: z.array(z.string()).optional(),
   masterCleanup: PromptCleanupSchema.optional(),
   introductionCleanup: PromptCleanupSchema.optional(),
+  reasoningCleanup: PromptCleanupSchema.optional(),
   includeDisabled: z.boolean().optional(),
 });
 
@@ -104,12 +106,12 @@ export async function run(argv: string[]): Promise<number> {
   const program = new Command()
     .name("build-risuai-preset")
     .description(
-      "Extract an ordered RisuAI preset into a raw master prompt and metadata introduction.",
+      "Extract an ordered RisuAI preset into master, reasoning, and metadata prompt files.",
     )
     .option("-s, --source <file>", "source RisuAI preset JSON file (or set sourceFile in --config)")
     .option(
       "-o, --output-directory <directory>",
-      "directory for MASTER_PROMPT.md and INTRODUCTION.md",
+      "directory for MASTER_PROMPT.md, REASONING_RULES.md, and INTRODUCTION.md",
     )
     .option("-c, --config <file>", "JSON build configuration merged before CLI overrides")
     .option("--order-index <number>", "prompt_order group index", (value) => Number(value))
@@ -179,24 +181,25 @@ export async function run(argv: string[]): Promise<number> {
     const result = await buildRisuAiPreset(config, !options.check);
 
     if (options.check) {
-      const [masterCurrent, introductionCurrent] = await Promise.all([
+      const [masterCurrent, reasoningCurrent, introductionCurrent] = await Promise.all([
         fileMatches(result.outputFiles.master, result.master),
+        fileMatches(result.outputFiles.reasoning, result.reasoning),
         fileMatches(result.outputFiles.introduction, result.introduction),
       ]);
-      if (!masterCurrent || !introductionCurrent) {
+      if (!masterCurrent || !reasoningCurrent || !introductionCurrent) {
         process.stderr.write(
           `Generated RisuAI files are stale in ${path.resolve(config.outputDirectory)}\n`,
         );
         return 1;
       }
       process.stdout.write(
-        `RisuAI files are current (${result.masterPrompts.length + result.introductionPrompts.length + result.externalMasterModules.length} output prompt blocks).\n`,
+        `RisuAI files are current (${result.masterPrompts.length + result.reasoningPrompts.length + result.introductionPrompts.length + result.externalMasterModules.length} output prompt blocks).\n`,
       );
       return 0;
     }
 
     process.stdout.write(
-      `Extracted ${result.masterPrompts.length + result.introductionPrompts.length + result.externalMasterModules.length} output prompt blocks and ${result.runtimeSlots.length} runtime slots to ${path.resolve(config.outputDirectory)}\nSHA-256: ${result.masterDigest}\n`,
+      `Extracted ${result.masterPrompts.length + result.reasoningPrompts.length + result.introductionPrompts.length + result.externalMasterModules.length} output prompt blocks and ${result.runtimeSlots.length} runtime slots to ${path.resolve(config.outputDirectory)}\nMASTER SHA-256: ${result.masterDigest}\nREASONING SHA-256: ${result.reasoningDigest}\n`,
     );
     return 0;
   } catch (error) {
