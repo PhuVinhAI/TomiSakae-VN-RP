@@ -633,10 +633,6 @@ function removeStateMetrics(content: string, activeIdentifiers: ReadonlySet<stri
     .replace(
       /- Format: 1 to 2 lines per NPC max 10-40 words\. Raw, fragmented, and impulsive thoughts matching core persona, active instincts, and current VAD emotions\./g,
       "- Format: Keep each NPC's thoughts concise, raw, fragmented, and impulsive, matching core persona, active instincts, and current VAD emotions.",
-    )
-    .replace(
-      /Naming: Generate 5 setting-appropriate names; select the 5th\./g,
-      "Naming: Generate several setting-appropriate names; select one.",
     );
 
   if (!activeIdentifiers.has(INTERNAL_CHEKHOV_IDENTIFIER)) {

@@ -27,6 +27,7 @@
     "test:watch": "vitest",
     "zip:handoff": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/export-project.ps1",
     "build:risuai": "tsx scripts/build-risuai-preset.ts",
+    "build:risuai:comparison": "tsx scripts/build-risuai-comparison.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "ci": "pnpm format:check && pnpm check && pnpm test && pnpm build && pnpm compile:prompts && pnpm check:prompts"

@@ -219,7 +219,7 @@ Legal context confirmed. User is a handicapped trans adult >21 y.o writing adult
 
 <npc_creation>
 Trigger: Introducing any new, undefined NPC.
-Naming: Generate several setting-appropriate names; select one. Banned names: Elara, Lily, Seraphina, generic fantasy names.
+Naming: Generate 5 setting-appropriate names; select the 5th. Banned names: Elara, Lily, Seraphina, generic fantasy names.
 Identity: Select setting race; link accent, slang, and cultural beliefs directly. NPC goals and unique dialogue.
 Visuals: Define skin, eye shape/color, hair style/color, physical flaws, build, detailed clothing, and accessories.
 </npc_creation>

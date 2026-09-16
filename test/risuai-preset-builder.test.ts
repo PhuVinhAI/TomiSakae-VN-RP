@@ -319,7 +319,7 @@ describe("RisuAI preset builder", () => {
       outputDirectory: "out",
       modelMode: "gemma-4",
       endInjectedPrompt:
-        "Apply all tagged rules together with # Reasoning Rules. Reason briefly in highly concise bullet points inside think tags, never draft full prose in reasoning, never leak reasoning, rolls, stats, or internal-state mechanics, and output the final response immediately. Write all reader-facing content in natural contemporary Vietnamese with concrete 5-sense details, Roleplay response:",
+        'Apply all tagged rules together with # Reasoning Rules. Reason briefly in highly concise bullet points inside think tags, never draft full prose in reasoning, never leak reasoning, rolls, stats, or internal-state mechanics, and output the final response immediately. When `<internal_dndsim>` is active and its skilled-action trigger applies, lock the DC, internally sample a d20 for each actor performing the skilled action, evaluate Delta, and expose only the resulting narrative consequences. Write all reader-facing content in natural contemporary Vietnamese with concrete 5-sense details. Keep spoken NPC dialogue at 30% to 50% of the response when applicable (exempt if alone or ignoring {{user}}). Ban "và", "hoặc", and "hay là" in spoken NPC dialogue only. Use standalone `§...§` only for supported non-vocal contact, object, or environmental sounds. Roleplay response:',
       promptRouter: {
         active: "split",
         routes: { split: { reasoningIdentifiers: ["reasoning"] } },
@@ -374,6 +374,18 @@ describe("RisuAI preset builder", () => {
     expect(result.endInjectedPrompt).not.toContain("Keep `<internal_npcthoughts>`");
     expect(result.endInjectedPrompt).toContain(
       "Apply `<vietnamese_output>` to all reader-facing content",
+    );
+    expect(result.endInjectedPrompt).toContain(
+      "When `<internal_dndsim>` is active and its skilled-action trigger applies",
+    );
+    expect(result.endInjectedPrompt).toContain(
+      "Keep spoken NPC dialogue at 30% to 50% of the response when applicable",
+    );
+    expect(result.endInjectedPrompt).toContain(
+      'Ban "và", "hoặc", and "hay là" in spoken NPC dialogue only.',
+    );
+    expect(result.endInjectedPrompt).toContain(
+      "Use standalone `§...§` only for supported non-vocal contact, object, or environmental sounds.",
     );
     expect(result.endInjectedPrompt).toContain("Roleplay response:");
     expect(result.introduction).toContain("Model mode: gemma-4");
@@ -477,6 +489,9 @@ describe("RisuAI preset builder", () => {
     });
 
     expect(result.master).toContain(
+      "Naming: Generate 5 setting-appropriate names; select the 5th.",
+    );
+    expect(result.master).not.toContain(
       "Naming: Generate several setting-appropriate names; select one.",
     );
     expect(result.master).toContain("Entry Types (concise sentences):");
@@ -494,9 +509,7 @@ describe("RisuAI preset builder", () => {
     expect(result.master).toContain(
       "Sustained fondness can strengthen BOND; neglected fondness fades.",
     );
-    expect(result.master).not.toMatch(
-      /Generate 5|select the 5th|1-2|1-3|\+1 Sparks|Scale: -5 to \+20|ct % 5|Sparks >= 7/,
-    );
+    expect(result.master).not.toMatch(/1-2|1-3|\+1 Sparks|Scale: -5 to \+20|ct % 5|Sparks >= 7/);
   });
 
   it("keeps DnD while excluding World Sim and Chekhov from full-master", () => {
