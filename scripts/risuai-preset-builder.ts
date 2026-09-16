@@ -360,7 +360,7 @@ function adaptGemma4Master(content: string): string {
     ],
     [
       'GOOD: "His shoulders hunched" | BAD: "He appeared less than confident"',
-      'GOOD: "Vai anh ta co lại" | BAD: "Anh ta có vẻ không mấy tự tin"',
+      'GOOD: "Anh ta rụt vai lại" | BAD: "Anh ta có vẻ không mấy tự tin"',
     ],
     [
       'BAD: "Silence." / "No hope. No way out." / "Pure control."',
@@ -377,16 +377,19 @@ function adaptGemma4Master(content: string): string {
     ],
     [
       'Good: "Leslie hands you clay. The gritty slimy texture glides through your fingers. It\'s cold and soft on your skin."',
-      'Good: "Leslie đưa đất sét về phía bạn. Kết cấu sần sùi, trơn nhớt lướt qua các ngón tay. Nó lạnh và mềm trên da bạn."',
+      'Good: "Leslie đưa đất sét cho bạn. Cảm giác sần sùi, trơn nhớt trượt qua các kẽ ngón tay, lạnh và mềm trên da bạn."',
     ],
-    ['(e.g., "mmff that... feels fuuucking amazing!")', '(e.g., "ưm... sướng quá...")'],
+    [
+      '(e.g., "mmff that... feels fuuucking amazing!")',
+      '(e.g., "ưm... sướng... sướng chết mất...!")',
+    ],
     [
       "- Banned Clinical Words: vulva, semen, penis, glutes, areola, breasts, cleavage, clitoris.",
       "- Banned Clinical Words: âm hộ, tinh dịch, dương vật, cơ mông, quầng vú, bầu ngực, khe ngực, âm vật.",
     ],
     [
       "- Required Slang Words: pussy, clit, cum, nectar, dick, cock, ass, butt, nipples, tits, boobs, cunt, breeding, leaking, fucking, throbbing.",
-      "- Required Slang Words: lồn, hột le, nước cặc, nước dâm, cặc, cu, đít, mông, đầu vú, vú, ngực, lồn, gieo giống, rỉ nước, địt, giật theo nhịp.",
+      "- Required Slang Words: lồn, hột le, nước tình, nước dâm, cặc, cu, đít, mông, đầu ti, vú, ngực, bướm, bắn giống, rỉ nước, địt, co giật.",
     ],
     [
       'User: "My name is Dan." -> NPC: "Your name is Dan?" she says, rolling the name in her mouth.',
@@ -410,9 +413,9 @@ function adaptGemma4Master(content: string): string {
     ],
     [
       'Caps: "I\'M GOING TO WRECK YOU!" | Stutter: "I... I d-don\'t know!" | Shock: "You.. you never loved ME?! JUST SAY IT!"',
-      'Caps: "TAO SẼ NGHIỀN NÁT MÀY!" | Stutter: "Tôi... tôi không biết!" | Shock: "Anh... anh chưa từng yêu TÔI SAO?! NÓI ĐI!"',
+      'Caps: "TAO SẼ NGHIỀN NÁT MÀY!" | Stutter: "Tôi... t-tôi kh-không biết!" | Shock: "Anh... anh chưa từng yêu TÔI SAO?! NÓI ĐI!"',
     ],
-    ['("unnhhh, mmmm, YES!")', '("ưm... a... ĐÚNG RỒI!")'],
+    ['("unnhhh, mmmm, YES!")', '("ưm... a... SƯỚNG QUÁ!" / "ưm... a... NỮA ĐI!")'],
     [
       "- Species Vocalizations: Felines = purr. Canines = growl/whine. Avians = chirp. Humans = groans, sighs, pants, moans (humans never make animal sounds).",
       "- Species Vocalizations: Felines = rừ rừ. Canines = gừ/rên ư ử. Avians = chiêm chiếp. Humans = rên, thở dài, thở dốc (humans never make animal sounds).",
@@ -427,7 +430,7 @@ function adaptGemma4Master(content: string): string {
     ],
     [
       'Bad (banned): "He hesitates, his hand hovering near the gold."',
-      'Bad (banned): "Anh ta do dự, bàn tay lơ lửng gần chỗ vàng."',
+      'Bad (banned): "Anh ta do dự, bàn tay ngập ngừng ngay trên đống vàng."',
     ],
     [
       'Good: "He shoves others away and snatches the gold, pocketing it to secure his prize."',

@@ -327,8 +327,8 @@ describe("RisuAI preset builder", () => {
     });
 
     expect(result.master).toContain('"TAO SẼ NGHIỀN NÁT MÀY!"');
-    expect(result.master).toContain('"ưm... a... ĐÚNG RỒI!"');
-    expect(result.master).toContain("lồn, hột le, nước cặc, nước dâm, cặc, cu");
+    expect(result.master).toContain('"ưm... a... SƯỚNG QUÁ!" / "ưm... a... NỮA ĐI!"');
+    expect(result.master).toContain("lồn, hột le, nước tình, nước dâm, cặc, cu");
     expect(result.master).not.toContain("pussy, clit, cum, nectar");
     expect(result.master).not.toContain("never insert avoidable English words");
     expect(result.master).not.toContain("Reader-Visible Thought:");
