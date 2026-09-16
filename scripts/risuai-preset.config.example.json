@@ -8,12 +8,15 @@
     "another-prompt-identifier": false
   },
   "includeRootFields": true,
-  "separator": "\n\n---\n\n",
+  "separator": "\n\n",
   "promptRouter": {
     "active": "full-master",
     "routes": {
       "all-master": {},
       "full-master": {
+        "masterModuleFiles": [
+          "risuai-modules/freaky-frankenstein-5.4/10-vietnamese-output-and-sound.md"
+        ],
         "excludedIdentifiers": [
           "019f62e8-892f-7024-a40f-b906fceb58d2",
           "019f62e8-892f-7025-be65-8859e7730ee0",

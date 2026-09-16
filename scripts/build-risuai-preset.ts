@@ -22,6 +22,7 @@ const PromptCleanupSchema = z.object({
 });
 
 const PromptRouteSchema = z.object({
+  masterModuleFiles: z.array(z.string()).optional(),
   introductionIdentifiers: z.array(z.string()).optional(),
   enabledIdentifiers: z.array(z.string()).optional(),
   excludedIdentifiers: z.array(z.string()).optional(),
@@ -189,13 +190,13 @@ export async function run(argv: string[]): Promise<number> {
         return 1;
       }
       process.stdout.write(
-        `RisuAI files are current (${result.masterPrompts.length + result.introductionPrompts.length} output prompt blocks).\n`,
+        `RisuAI files are current (${result.masterPrompts.length + result.introductionPrompts.length + result.externalMasterModules.length} output prompt blocks).\n`,
       );
       return 0;
     }
 
     process.stdout.write(
-      `Extracted ${result.masterPrompts.length + result.introductionPrompts.length} output prompt blocks and ${result.runtimeSlots.length} runtime slots to ${path.resolve(config.outputDirectory)}\nSHA-256: ${result.masterDigest}\n`,
+      `Extracted ${result.masterPrompts.length + result.introductionPrompts.length + result.externalMasterModules.length} output prompt blocks and ${result.runtimeSlots.length} runtime slots to ${path.resolve(config.outputDirectory)}\nSHA-256: ${result.masterDigest}\n`,
     );
     return 0;
   } catch (error) {

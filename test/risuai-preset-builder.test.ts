@@ -40,7 +40,7 @@ describe("RisuAI preset builder", () => {
       "second",
     ]);
     expect(result.runtimeSlots.map(({ prompt }) => prompt.identifier)).toEqual(["runtime"]);
-    expect(result.master).toBe("FIRST\n\n---\n\nSECOND\n");
+    expect(result.master).toBe("FIRST\n\nSECOND\n");
     expect(result.introduction).toContain("Regex scripts in source (excluded from master): 1");
     expect(result.master).not.toContain("regex");
   });
@@ -107,7 +107,7 @@ describe("RisuAI preset builder", () => {
       outputDirectory: "out",
       promptRouter: { ...DEFAULT_PROMPT_ROUTER, active: "all-master" },
     });
-    expect(result.master).toBe("FIRST\n\n---\n\nSECOND\n");
+    expect(result.master).toBe("FIRST\n\nSECOND\n");
   });
 
   it("never removes RisuAI identity, state, or roll macros during cleanup", () => {
@@ -172,6 +172,33 @@ describe("RisuAI preset builder", () => {
     expect(result.master).not.toContain("internal_dndsim");
     expect(result.master).not.toContain("getvar::agendaTrackerCoT");
     expect(result.master).not.toContain("DnD DC");
+  });
+
+  it("appends enabled external output modules and adds only their minimal reasoning check", () => {
+    const source = parsePreset({
+      prompts: [
+        {
+          identifier: "bolt",
+          content:
+            "# Reasoning Rules\nTasks:\n7. Formatting: Use the active format.\n10. Internal States + No More Reasoning Rule: update states.",
+        },
+      ],
+      prompt_order: [{ order: [{ identifier: "bolt", enabled: true }] }],
+    });
+    const module = "<vietnamese_output>\n- Language: Vietnamese.\n</vietnamese_output>";
+    const result = buildPreset(source, {
+      sourceFile: "preset.json",
+      outputDirectory: "out",
+      masterModules: [{ file: "module.md", content: module }],
+      promptRouter: {
+        active: "full",
+        routes: { full: { masterCleanup: { reasoningRules: true } } },
+      },
+    });
+
+    expect(result.master).toContain("Verify natural Vietnamese throughout and standalone `§...§`");
+    expect(result.master.indexOf(module)).toBeLessThan(result.master.indexOf("# Reasoning Rules"));
+    expect(result.externalMasterModules).toEqual([{ file: "module.md", content: module }]);
   });
 
   it("preserves professional legality text while applying other cleanup", () => {
