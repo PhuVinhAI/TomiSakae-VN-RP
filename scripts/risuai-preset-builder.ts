@@ -146,12 +146,14 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
         // Optional internal engines disabled for the lean full-master route.
         INTERNAL_WORLD_SIM_IDENTIFIER,
         INTERNAL_CHEKHOV_IDENTIFIER,
-        // Output-format toggles: colored dialogue, HTML/CSS graphics, onomatopoeia,
-        // social-feed widgets, and the hidden renderer.
+        // Output-format toggles: time/location headers, colored dialogue, HTML/CSS graphics,
+        // onomatopoeia, length/format constraints, social-feed widgets, and the hidden renderer.
+        "019f62e8-892f-7002-8fcf-eea637bd577b",
         "019f62e8-892f-7019-be65-715a4949cba0",
         "2105050a-0d4b-4661-9363-3cc1ac44d5e7",
         "019f62e8-892f-701a-afd5-49222c79fdb6",
         "019f62e8-892f-701c-8550-08ebf33e9da2",
+        "019f62e8-892f-7012-98b4-8de29f11aa1d",
         "019f62e8-892f-7028-bad6-be1f427c3ae4",
         "019f62e8-892f-7027-93ef-159f3d55c410",
         "019f62e8-892f-7000-9a7f-4d15c1234fb9",
@@ -537,7 +539,7 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
     if (line.startsWith("7. Formatting:")) {
       output.push(
         activeIdentifiers.has(VIETNAMESE_OUTPUT_MODULE_IDENTIFIER)
-          ? "7. Formatting: What exact header and target response length are required? How will I keep all reader-facing output in natural Vietnamese and use standalone `§...§` only for non-vocal sound effects?"
+          ? "7. Formatting: What is the correct output format? How will I keep all reader-facing output in natural Vietnamese and use standalone `§...§` only for non-vocal sound effects?"
           : "7. Formatting: What is the correct output format? (skip if no special format rule is active)",
       );
       continue;
