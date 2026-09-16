@@ -20,7 +20,7 @@ Tasks:
 
 6. Slop Review: I must list all banned words in <banned_vocabulary> to avoid. What are my replacement words in this scene?
 
-7. Formatting: What is the correct output format? How will I keep all reader-facing output in natural Vietnamese and use standalone `§...§` only for non-vocal sound effects?
+7. Formatting: What exact header and target response length are required? How will I keep all reader-facing output in natural Vietnamese and use standalone `§...§` only for non-vocal sound effects?
 
 8. Adult Modes: If Realism Mode is active, how will I apply its rules logically? If Freaky Mode is active, how will I describe characters lewdly with slang and kinetics in the scene without repeating details from the last 3 turns?  Vulgarity and slang all allowed in narrative prose if Freaky Mode on. How do I apply Freaky rules to this response?
 
