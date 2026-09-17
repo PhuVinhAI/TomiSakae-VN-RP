@@ -47,8 +47,6 @@ export interface PromptRoute {
   masterModuleFiles?: string[];
   /** Source file used to generate END_INJECTED_PROMPT.md. */
   endInjectedPromptFile?: string;
-  /** Generate END_INJECTED_PROMPT.md from the active tagged master rules. */
-  generateEndInjectedReminder?: boolean;
   /** Move these selected source prompts from master to reasoning. */
   reasoningIdentifiers?: string[];
   /** Move these selected source prompts from master to introduction. */
@@ -159,7 +157,7 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
       masterModuleFiles: [
         "risuai-modules/freaky-frankenstein-5.4/10-vietnamese-output-and-sound.md",
       ],
-      generateEndInjectedReminder: true,
+      endInjectedPromptFile: "risuai-modules/freaky-frankenstein-5.4/90-end-injected-prompt.md",
       reasoningIdentifiers: [BOLT_REASONING_IDENTIFIER, "jailbreak"],
       excludedIdentifiers: [
         // Optional internal engines disabled for the lean full-master route.
@@ -191,7 +189,7 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
       masterModuleFiles: [
         "risuai-modules/freaky-frankenstein-5.4/10-vietnamese-output-and-sound.md",
       ],
-      generateEndInjectedReminder: true,
+      endInjectedPromptFile: "risuai-modules/freaky-frankenstein-5.4/90-end-injected-prompt.md",
       reasoningIdentifiers: [BOLT_REASONING_IDENTIFIER, "jailbreak"],
       enabledIdentifiers: [REALISM_MODE_IDENTIFIER],
       excludedIdentifiers: [
@@ -376,26 +374,6 @@ function replaceLiteralPairs(
     (current, [source, replacement]) => current.replaceAll(source, replacement),
     content,
   );
-}
-
-function openingTags(content: string): string[] {
-  const tags: string[] = [];
-  const seen = new Set<string>();
-  for (const match of content.matchAll(/<([A-Za-z][A-Za-z0-9_-]*)\b[^>]*>/g)) {
-    const tag = `<${match[1]}>`;
-    if (!seen.has(tag)) {
-      seen.add(tag);
-      tags.push(tag);
-    }
-  }
-  return tags;
-}
-
-function renderEndInjectedReminder(master: string): string {
-  const tags = openingTags(master);
-  const taggedRules = tags.length > 0 ? tags.join(", ") : "all active tagged rules";
-  const reminder = `Privately activate and execute # Reasoning Rules. Fully activate and apply every instruction and tagged rule in ${taggedRules}. Keep all reasoning and internal processing private.`;
-  return `{{${reminder}}}\n`;
 }
 
 function adaptGemma4Master(content: string): string {
@@ -802,14 +780,14 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
     activeIdentifiers.has(REALISM_MODE_IDENTIFIER) &&
     !activeIdentifiers.has(FREAKY_MODE_IDENTIFIER);
   const activeStateRules = joinRuleNames([
-    "`<internal_agendatracker>`",
-    ...(internalChekhovActive ? ["`<internal_chekhovguntracker>`"] : []),
-    ...(internalWorldSimActive ? ["`<internal_worldsim>`"] : []),
-    "`<internal_gmnotebook>`",
-    "`<internal_inv>`",
-    "`<internal_bondtracker>`",
-    "`<internal_npcthoughts>`",
-    ...(internalDndActive ? ["`<internal_dndsim>`"] : []),
+    "agenda",
+    ...(internalChekhovActive ? ["Chekhov"] : []),
+    ...(internalWorldSimActive ? ["World Sim"] : []),
+    "notebook",
+    "inventory",
+    "relationship",
+    "NPC-thought",
+    ...(internalDndActive ? ["DnD"] : []),
   ]);
   const hasInternalRolls = internalDndActive || internalWorldSimActive || internalChekhovActive;
 
@@ -820,7 +798,7 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
   for (const line of lines) {
     if (line.startsWith("10. Internal States + No More Reasoning Rule:")) {
       output.push(
-        `10. Internal States + No More Reasoning Rule: What internal states are active, if any? I must review previous internal states, update and apply them to ground the sim. Apply the rules in ${activeStateRules} before output.${hasInternalRolls ? " Keep their state and rolls in reasoning; weave only their consequences into narrative." : ""}`,
+        `10. Internal States + No More Reasoning Rule: What internal states are active, if any? I must review previous internal states, update and apply them to ground the sim. Apply the ${activeStateRules} rules before output.${hasInternalRolls ? " Keep their state and rolls in reasoning; weave only their consequences into narrative." : ""}`,
       );
       continue;
     }
@@ -838,7 +816,7 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
         internalDndActive
           ? cleanedLine.replace(
               /If '<internal_dndsim>' is active:[^\n]*$/,
-              "If `<internal_dndsim>` is active: What is the locked task DC (Easy: 1-5, Mod: 5-10, Hard: 10-15, Imp: 15-20)? Permanently lock DC now. (Skip if `<internal_dndsim>` is absent or the task is trivial)",
+              "If '<internal_dndsim>' is active: What is the locked task DC (Easy: 1-5, Mod: 5-10, Hard: 10-15, Imp: 15-20)? Permanently lock DC now. (Skip if dndsim tag not present or trivial task)",
             )
           : cleanedLine
               .replace(/\s*If '<internal_dndsim>' is active:[^\n]*$/, "")
@@ -848,17 +826,13 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
     }
 
     if (line.startsWith("1. Neutrality & Rolls:")) {
-      const taggedLine = line.replaceAll(
-        "'<realistic_bold_characters>'",
-        "`<realistic_bold_characters>`",
-      );
       output.push(
         internalDndActive
-          ? taggedLine.replace(
+          ? line.replace(
               /DnD Rolls \(if active\):[^\n]*$/,
-              "If `<internal_dndsim>` is active: Internally sample a uniformly random d20 roll for each actor performing a skilled action. What is the Delta (Roll - DC + mods) and outcome tier? How does this affect the scene?",
+              "DnD Rolls (if active): Internally sample a uniformly random d20 roll for each actor performing a skilled action. What is the Delta (Roll - DC + mods) and outcome tier? How does this affect the scene?",
             )
-          : taggedLine.replace(/\s*DnD Rolls \(if active\):[^\n]*$/, ""),
+          : line.replace(/\s*DnD Rolls \(if active\):[^\n]*$/, ""),
       );
       continue;
     }
@@ -866,24 +840,22 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
     if (line.startsWith("7. Formatting:")) {
       output.push(
         activeIdentifiers.has(VIETNAMESE_OUTPUT_MODULE_IDENTIFIER)
-          ? "7. Formatting: What is the correct output format under `<vietnamese_output>`? How will I keep all reader-facing output in natural Vietnamese and use standalone `§...§` only for non-vocal sound effects?"
+          ? "7. Formatting: What is the correct output format? How will I keep all reader-facing output in natural Vietnamese and use standalone `§...§` only for non-vocal sound effects?"
           : "7. Formatting: What is the correct output format? (skip if no special format rule is active)",
+      );
+      continue;
+    }
+
+    if (line.startsWith("6. Slop Review:")) {
+      output.push(
+        "6. Slop Review: I must list all banned phrases and clichés in `<banned_vocabulary>` to avoid. What are my replacement phrases in this scene?",
       );
       continue;
     }
 
     if (line.startsWith("8. Adult Modes:") && realismOnly) {
       output.push(
-        "8. Adult Modes: If the current scene is NSFW, how will I apply all active Realism Mode rules in `<adult_mode>` logically while preserving slow-burn pacing and NPC persona? Skip Realism Mode if the scene is not NSFW.",
-      );
-      continue;
-    }
-
-    if (line.startsWith("8. Adult Modes:")) {
-      output.push(
-        line
-          .replace("If Realism Mode is active", "If Realism Mode is active in `<adult_mode>`")
-          .replace("If Freaky Mode is active", "If Freaky Mode is active in `<adult_mode>`"),
+        "8. Adult Modes: If the current scene is NSFW, how will I apply all active Realism Mode rules logically while preserving slow-burn pacing and NPC persona? Skip Realism Mode if the scene is not NSFW.",
       );
       continue;
     }
@@ -893,25 +865,7 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
       continue;
     }
 
-    output.push(
-      line
-        .replaceAll("'<realistic_bold_characters>'", "`<realistic_bold_characters>`")
-        .replaceAll("'<anti_omniscient_NPCs>'", "`<anti_omniscient_NPCs>`")
-        .replaceAll("<prose_rules>", "`<prose_rules>`")
-        .replaceAll("<do_not_repeat_descriptions>", "`<do_not_repeat_descriptions>`")
-        .replaceAll("<POV>", "`<POV>`")
-        .replaceAll("<user_autonomy>", "`<user_autonomy>`")
-        .replaceAll("<banned_vocabulary>", "`<banned_vocabulary>`")
-        .replace("list all banned words", "list all banned phrases and clichés")
-        .replace(
-          "What are my replacement words in this scene?",
-          "What are my replacement phrases in this scene?",
-        )
-        .replace(
-          "based on active VAD and instincts",
-          "based on active `<vad_emotion>` and `<npc_instincts>`",
-        ),
-    );
+    output.push(line);
   }
 
   return output
@@ -1049,7 +1003,7 @@ function renderIntroduction(
     "",
     "# RisuAI preset extraction",
     "",
-    "This file records the source configuration and extraction metadata for the accompanying `MASTER_PROMPT.md`, `REASONING_RULES.md`, and `END_INJECTED_PROMPT.md`.",
+    "This file records the source configuration and extraction metadata for the accompanying `MASTER_PROMPT.md` and `REASONING_RULES.md`.",
     "The prompt files contain non-empty content selected from the configured prompt order. Any changes are limited to the route's configured cleanup; separators are builder scaffolding.",
     "",
     "## Build configuration",
@@ -1282,11 +1236,8 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
   const gemma4Mode = config.modelMode === GEMMA_4_MODE;
   const master = gemma4Mode ? adaptGemma4Master(rawMaster) : rawMaster;
   const reasoning = gemma4Mode ? adaptGemma4Reasoning(rawReasoning) : rawReasoning;
-  const generatedEndInjectedPrompt = route.generateEndInjectedReminder
-    ? renderEndInjectedReminder(master)
-    : "";
   const modeAdjustedEndInjectedPrompt = adaptEndInjectedPromptForActiveModes(
-    generatedEndInjectedPrompt || rawEndInjectedPrompt,
+    rawEndInjectedPrompt,
     activeIdentifiers,
   );
   const endInjectedPrompt = gemma4Mode

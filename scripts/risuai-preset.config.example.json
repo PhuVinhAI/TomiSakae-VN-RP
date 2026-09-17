@@ -18,7 +18,7 @@
         "masterModuleFiles": [
           "risuai-modules/freaky-frankenstein-5.4/10-vietnamese-output-and-sound.md"
         ],
-        "generateEndInjectedReminder": true,
+        "endInjectedPromptFile": "risuai-modules/freaky-frankenstein-5.4/90-end-injected-prompt.md",
         "reasoningIdentifiers": ["634ecfec-1862-4ce0-821e-e31057acadfa", "jailbreak"],
         "excludedIdentifiers": [
           "019f62e8-892f-7024-a40f-b906fceb58d2",

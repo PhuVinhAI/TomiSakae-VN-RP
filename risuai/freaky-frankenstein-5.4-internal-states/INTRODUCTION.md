@@ -3,7 +3,7 @@
 
 # RisuAI preset extraction
 
-This file records the source configuration and extraction metadata for the accompanying `MASTER_PROMPT.md`, `REASONING_RULES.md`, and `END_INJECTED_PROMPT.md`.
+This file records the source configuration and extraction metadata for the accompanying `MASTER_PROMPT.md` and `REASONING_RULES.md`.
 The prompt files contain non-empty content selected from the configured prompt order. Any changes are limited to the route's configured cleanup; separators are builder scaffolding.
 
 ## Build configuration
