@@ -24,6 +24,7 @@ const PromptCleanupSchema = z.object({
 const PromptRouteSchema = z.object({
   masterModuleFiles: z.array(z.string()).optional(),
   endInjectedPromptFile: z.string().min(1).optional(),
+  generateEndInjectedReminder: z.boolean().optional(),
   reasoningIdentifiers: z.array(z.string()).optional(),
   introductionIdentifiers: z.array(z.string()).optional(),
   enabledIdentifiers: z.array(z.string()).optional(),
