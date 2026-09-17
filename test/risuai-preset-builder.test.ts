@@ -297,7 +297,7 @@ describe("RisuAI preset builder", () => {
         {
           identifier: "rules",
           content:
-            '<POV>- User Sensations: Narrate what {{user}} physically feels in 2nd person ("you" / "your").</POV>\n<adult_mode>\n- Required Slang Words: pussy, clit, cum, nectar, dick, cock, ass, butt, nipples, tits, boobs, cunt, breeding, leaking, fucking, throbbing.\n</adult_mode>\n<npc_voice>ban phrases: I dont know, Nobody has, Nobody just, Its the first time, x never did\n- Orthographic Cues: When VAD/emotions are high, use orthographic cues (Caps: "I\'M GOING TO WRECK YOU!" | Stutter: "I... I d-don\'t know!" | Shock: "You.. you never loved ME?! JUST SAY IT!").\n- Intimacy Talk: NPCs talk, moan, and vocalize during intimacy ("unnhhh, mmmm, YES!").</npc_voice>\n<internal_npcthoughts>\nRules:\n- Drive: Use internal thoughts to motivate action.\n</internal_npcthoughts>\n<vietnamese_output>\n- Language Lock: Ban Hangul, avoidable foreign wording, bilingual duplication, source-text repetition, and translation glosses.\n</vietnamese_output>',
+            '<prose_rules>BAD: "The air smells like rain, salt and copper." GOOD: "The rain makes the air smell floral."\nGOOD: "His shoulders hunched" | BAD: "He appeared less than confident"\nBAD: "Silence." / "No hope. No way out." / "Pure control."</prose_rules>\n<POV>- User Sensations: Narrate what {{user}} physically feels in 2nd person ("you" / "your").</POV>\n<adult_mode>\n- Required Slang Words: pussy, clit, cum, nectar, dick, cock, ass, butt, nipples, tits, boobs, cunt, breeding, leaking, fucking, throbbing.\n- Dialogue: Include dirty talk and raw moans (e.g., "mmff that... feels fuuucking amazing!") when persona-appropriate.\n</adult_mode>\n<npc_voice>ban phrases: I dont know, Nobody has, Nobody just, Its the first time, x never did\n- Orthographic Cues: When VAD/emotions are high, use orthographic cues (Caps: "I\'M GOING TO WRECK YOU!" | Stutter: "I... I d-don\'t know!" | Shock: "You.. you never loved ME?! JUST SAY IT!").\n- Intimacy Talk: NPCs talk, moan, and vocalize during intimacy ("unnhhh, mmmm, YES!").</npc_voice>\n<internal_npcthoughts>\nRules:\n- Drive: Use internal thoughts to motivate action.\n</internal_npcthoughts>\n<vietnamese_output>\n- Language Lock: Ban Hangul, avoidable foreign wording, bilingual duplication, source-text repetition, and translation glosses.\n</vietnamese_output>\n<user_autonomy>User: "My name is Dan." -> NPC: "Your name is Dan?" she says, rolling the name in her mouth.</user_autonomy>\n<banned_vocabulary>Rule: ALL listed words and phrases are STRICTLY prohibited in ALL responses. You must select a replacement word:\n\n[fresh meat, spine, breath hitching, breath catching, husky, catching in throat, pupils blown wide, predatory, ozone, meat, asset, shivers down spine, pupils dilated, nails biting, velvet, vise, vice, structural integrity, deep curve, furnace, throaty, calloused, guttural, slick, unadulterated, jaw clenched, jaw working, barely above a whisper, musk, breast, a beat, nobody has, nobody just, ruin you, don\'t you dare]</banned_vocabulary>',
         },
         {
           identifier: "reasoning",
@@ -330,14 +330,54 @@ describe("RisuAI preset builder", () => {
     expect(result.master).toContain(
       '"ư... ứ... a... NỮA ĐI...!" / "a... sướng... ĐÚNG CHỖ ĐÓ RỒI...!"',
     );
-    expect(result.master).toContain("lồn, bướm, hột le, hạt le, tinh khí, sữa đặc");
     expect(result.master).toContain(
-      'the matching second-person roleplay pronoun: "anh", "em", "cậu", "mày", "ngươi", "chàng", "nàng"',
+      "tinh trùng, sữa đặc, dâm dịch, nước nhờn, nước dâm, dịch nhờn",
     );
-    expect(result.master).not.toContain('roleplay pronoun: "anh", "em", "ngươi", "hắn"');
     expect(result.master).toContain(
-      "ban phrases: [Tôi/Tao/Em/Ta] không biết, Chưa từng có ai, Chẳng ai tự dưng, Lần đầu tiên, [X] chưa từng...",
+      "bắn tinh, xuất tinh, bắn ngập vào trong, rót đầy tinh, phun tinh",
     );
+    expect(result.master).toContain('"ưm... sâu quá... sướng... sướng chết mất...!"');
+    expect(result.master).not.toContain("sướng đéo chịu được");
+    expect(result.master).not.toContain("tinh khí");
+    expect(result.master).not.toContain("nước tình");
+    expect(result.master).not.toContain("bắn giống");
+    expect(result.master).not.toContain("rót giống");
+    expect(result.master).toContain(
+      'GOOD: "Cơn mưa rào tạnh hẳn, để lại mùi hoa thơm dịu trong không khí."',
+    );
+    expect(result.master).toContain('GOOD: "Hắn rụt cổ, so vai lại."');
+    expect(result.master).not.toContain("khom vai xuống");
+    expect(result.master).toContain('"Hết hy vọng. Không còn đường lui."');
+    expect(result.master).not.toContain("gột rửa không gian");
+    expect(result.master).not.toContain("Tuyệt đường sống");
+    expect(result.master).toContain(
+      'the matching second-person roleplay pronoun: "anh", "em", "cậu", "mày", "ông", "bà", "cô", "chị", "mình"',
+    );
+    expect(result.master).not.toContain('"ngươi", "chàng", "nàng"');
+    expect(result.master).not.toContain('roleplay pronoun: "hắn"');
+    expect(result.master).not.toContain('roleplay pronoun: "tôi"');
+    expect(result.master).toContain(
+      "ban phrases: [Tôi/Tao/Em/Mình/Anh] không biết, Chưa từng có ai, Chẳng ai tự dưng, Lần đầu tiên, [X] chưa từng...",
+    );
+    expect(result.master).toContain(
+      'NPC: "Tên anh là Dan à?" cô ta hỏi lại, nhắc lại nguyên cái tên.',
+    );
+    expect(result.master).not.toContain("đảo cái tên trên đầu môi");
+    expect(result.master).toContain(
+      "Rule: ALL listed Vietnamese phrases and clichés are STRICTLY prohibited in ALL responses.",
+    );
+    expect(result.master).not.toContain("Quy tắc: Mọi cụm từ");
+    expect(result.master).toContain("đồng tử co rút, đồng tử giãn to, sống lưng lạnh toát");
+    expect(result.master).toContain("hơi thở nghẹn lại, nghẹn ứ nơi cổ họng");
+    expect(result.master).toContain(
+      "giọng trầm khàn đầy mê hoặc, chất giọng khàn đục đầy quyến rũ",
+    );
+    expect(result.master).toContain("hoa huyệt, tiểu huyệt, mật dịch, khe suối róc rách");
+    expect(result.master).toContain(
+      "tìm kiếm sự cứu rỗi, chất chứa ngàn vạn tâm sự, làm em hư mất",
+    );
+    expect(result.master).not.toContain("fresh meat, spine, breath hitching");
+    expect(result.master).not.toContain("don't you dare");
     expect(result.master).not.toContain("pussy, clit, cum, nectar");
     expect(result.master).not.toContain("never insert avoidable English words");
     expect(result.master).not.toContain("Reader-Visible Thought:");
@@ -359,7 +399,8 @@ describe("RisuAI preset builder", () => {
     expect(result.reasoning).toContain(
       'all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!"',
     );
-    expect(result.reasoning).toContain("ưm..., aaaa..., suỵt, hự!, khiếp!, ực!, hừ...");
+    expect(result.reasoning).toContain("ưm..., aaaa..., suỵt, á!, ối!, hức!, ực!, hừ...");
+    expect(result.reasoning).not.toContain("hự!, khiếp!");
     expect(result.reasoning).toContain('conjunctions ["và"], ["hoặc"], and ["hay là"]');
     expect(result.reasoning).not.toContain("written in natural Vietnamese orthography");
     expect(result.reasoning).not.toContain("mmph, aaahhh, shhhh, ugh!, Ewww!, Mmm!");

@@ -381,7 +381,7 @@ function adaptGemma4Master(content: string): string {
   const adapted = replaceLiteralPairs(content, [
     [
       'BAD: "The air smells like rain, salt and copper." GOOD: "The rain makes the air smell floral."',
-      'BAD: "Không khí nồng nặc mùi mưa, mùi muối biển và mùi tanh của kim loại." GOOD: "Cơn mưa rào gột rửa không gian, để lại làn hương hoa thoang thoảng."',
+      'BAD: "Không khí nồng nặc mùi mưa, mùi muối biển và mùi tanh của kim loại." GOOD: "Cơn mưa rào tạnh hẳn, để lại mùi hoa thơm dịu trong không khí."',
     ],
     [
       'GOOD: "They look forward and walk" | BAD: "They don\'t turn around"',
@@ -393,11 +393,11 @@ function adaptGemma4Master(content: string): string {
     ],
     [
       'GOOD: "His shoulders hunched" | BAD: "He appeared less than confident"',
-      'GOOD: "Hắn rụt cổ, khom vai xuống." | BAD: "Trông hắn có vẻ không được tự tin cho lắm."',
+      'GOOD: "Hắn rụt cổ, so vai lại." | BAD: "Trông hắn có vẻ không được tự tin cho lắm."',
     ],
     [
       'BAD: "Silence." / "No hope. No way out." / "Pure control."',
-      'BAD: "Im bặt." / "Hết hy vọng. Tuyệt đường sống." / "Kiểm soát toàn diện."',
+      'BAD: "Im bặt." / "Hết hy vọng. Không còn đường lui." / "Kiểm soát toàn diện."',
     ],
     [
       '- Conjunctions: Max 2 clauses per sentence using "and", "as", or "while".',
@@ -405,7 +405,7 @@ function adaptGemma4Master(content: string): string {
     ],
     [
       '("you" / "your")',
-      '("bạn" / "của bạn" — or the matching second-person roleplay pronoun: "anh", "em", "cậu", "mày", "ngươi", "chàng", "nàng")',
+      '("bạn" / "của bạn" — or the matching second-person roleplay pronoun: "anh", "em", "cậu", "mày", "ông", "bà", "cô", "chị", "mình")',
     ],
     [
       'Bad: "Leslie hands you the clay and you grab it."',
@@ -417,7 +417,7 @@ function adaptGemma4Master(content: string): string {
     ],
     [
       '(e.g., "mmff that... feels fuuucking amazing!")',
-      '(e.g., "ưm... sâu quá... sướng... sướng đéo chịu được...!")',
+      '(e.g., "ưm... sâu quá... sướng... sướng chết mất...!")',
     ],
     [
       "- Banned Clinical Words: vulva, semen, penis, glutes, areola, breasts, cleavage, clitoris.",
@@ -425,11 +425,15 @@ function adaptGemma4Master(content: string): string {
     ],
     [
       "- Required Slang Words: pussy, clit, cum, nectar, dick, cock, ass, butt, nipples, tits, boobs, cunt, breeding, leaking, fucking, throbbing.",
-      "- Required Slang Words: lồn, bướm, hột le, hạt le, tinh khí, sữa đặc, nước dâm, nước tình, cặc, cu, gậy thịt, đít, mông, đầu ti, núm vú, vú, ngực, bắn giống, rót giống, rỉ nước, ướt sũng, đụ, nện, địt, thúc, giật giật, co thắt.",
+      "- Required Slang Words: lồn, bướm, hột le, hạt le, tinh trùng, sữa đặc, dâm dịch, nước nhờn, nước dâm, dịch nhờn, cặc, cu, gậy thịt, đít, mông, đầu ti, núm vú, vú, ngực, bắn tinh, xuất tinh, bắn ngập vào trong, rót đầy tinh, phun tinh, rỉ nước, ướt sũng, đụ, nện, địt, thúc, giật giật, co thắt.",
+    ],
+    [
+      "Rule: ALL listed words and phrases are STRICTLY prohibited in ALL responses. You must select a replacement word:\n\n[fresh meat, spine, breath hitching, breath catching, husky, catching in throat, pupils blown wide, predatory, ozone, meat, asset, shivers down spine, pupils dilated, nails biting, velvet, vise, vice, structural integrity, deep curve, furnace, throaty, calloused, guttural, slick, unadulterated, jaw clenched, jaw working, barely above a whisper, musk, breast, a beat, nobody has, nobody just, ruin you, don't you dare]",
+      "Rule: ALL listed Vietnamese phrases and clichés are STRICTLY prohibited in ALL responses. Never use these formulaic patterns. Write original, grounded, tactile actions instead:\n\n[tim hẫng đi một nhịp, tim đập loạn xạ, hẫng một nhịp, ngưng một nhịp, chững lại một nhịp, đồng tử co rút, đồng tử giãn to, sống lưng lạnh toát, rùng mình dọc sống lưng, hơi thở nghẹn lại, nghẹn ứ nơi cổ họng, nuốt nước bọt cái ực, nheo mắt lại đầy nguy hiểm, ánh mắt như thú săn mồi, ánh mắt lóe lên tia, ánh mắt đầy tính chiếm đoạt, khóe môi khẽ nhếch, nụ cười nửa miệng, nụ cười tà mị, nghiến chặt quai hàm, cơ hàm bạnh ra, chỉ vừa đủ cho hai người nghe, thì thào như hơi thở, giọng trầm khàn đầy mê hoặc, chất giọng khàn đục đầy quyến rũ, không khí như đông cứng lại, thời gian như ngừng trôi, bầu không khí đặc quánh, mùi xạ hương nam tính, mùi hương thanh mát, đôi gò bồng đảo, đôi thỏ ngọc, khuôn ngực phập phồng, thân hình ma quỷ, đường cong chết người, hoa huyệt, tiểu huyệt, mật dịch, khe suối róc rách, vách thịt mềm như nhung, mềm mịn như nhung lụa, siết chặt như gọng kìm, như một chiếc kẹp sắt, ngọn lửa dục vọng, thiêu đốt mọi lý trí, như muốn nuốt chửng, dục vọng nguyên thủy, bản năng thú tính, tìm kiếm sự cứu rỗi, chất chứa ngàn vạn tâm sự, làm em hư mất, anh sẽ hủy hoại em, đừng có mà giở trò, Chưa từng có ai, Chẳng ai tự dưng, Lần đầu tiên có người]",
     ],
     [
       'User: "My name is Dan." -> NPC: "Your name is Dan?" she says, rolling the name in her mouth.',
-      'User: "Tôi tên Dan." -> NPC: "Tên anh là Dan sao?" ả lặp lại, đảo cái tên trên đầu môi.',
+      'User: "Tôi tên Dan." -> NPC: "Tên anh là Dan à?" cô ta hỏi lại, nhắc lại nguyên cái tên.',
     ],
     [
       'User: "My name is Dan." -> NPC: "Nice to meet you. My name is Jess."',
@@ -466,7 +470,7 @@ function adaptGemma4Master(content: string): string {
     ],
     [
       "ban phrases: I dont know, Nobody has, Nobody just, Its the first time, x never did",
-      "ban phrases: [Tôi/Tao/Em/Ta] không biết, Chưa từng có ai, Chẳng ai tự dưng, Lần đầu tiên, [X] chưa từng...",
+      "ban phrases: [Tôi/Tao/Em/Mình/Anh] không biết, Chưa từng có ai, Chẳng ai tự dưng, Lần đầu tiên, [X] chưa từng...",
     ],
     [
       'Bad (banned): "He hesitates, his hand hovering near the gold."',
@@ -499,7 +503,10 @@ function adaptGemma4Reasoning(content: string): string {
       'all CAP words for yelling only during peak arousal/VAD e.g., "NO!"',
       'all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!"',
     ],
-    ["(mmph, aaahhh, shhhh, ugh!, Ewww!, Mmm!)", "(ưm..., aaaa..., suỵt, hự!, khiếp!, ực!, hừ...)"],
+    [
+      "(mmph, aaahhh, shhhh, ugh!, Ewww!, Mmm!)",
+      "(ưm..., aaaa..., suỵt, á!, ối!, hức!, ực!, hừ...)",
+    ],
     [
       "I will answer task points with concise ideas only, close think tags, and output the final response immediately.",
       "I will answer task points privately and output the final response immediately without exposing reasoning or internal tags.",
