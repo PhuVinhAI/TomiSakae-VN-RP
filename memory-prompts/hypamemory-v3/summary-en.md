@@ -43,7 +43,7 @@ Keep:
 - User Impact: Consequential actions, choices, promises, refusals, and dialogue by {{user}} that actually occur in the batch.
 - NPC Independence: NPC-to-NPC relationships, off-screen actions, independent goals, and developments that affect continuity.
 - Open Threads: Plans, threats, obligations, secrets, unresolved choices, unfinished causes, and expected consequences.
-- Exact Wording: Preserve short wording only for names, aliases, passwords, codes, vows, threats, rules, quoted evidence, agreements, or phrases whose wording itself changes identity, meaning, or consequence. If that wording is foreign, preserve its meaning and force precisely in Vietnamese without reproducing banned script or adding bilingual text. Paraphrase all other dialogue by meaning.
+- Exact Wording: Preserve short exact wording only for names, aliases, passwords, codes, vows, threats, rules, quoted evidence, agreements, or phrases whose wording itself changes identity, meaning, or consequence. Paraphrase all other dialogue by meaning.
 - Sensitive Events: Preserve participants, consent or coercion, material acts, injuries, persistent bodily changes, and consequences. Compress graphic repetition, never the event's nature or resulting state.
 
 Omit:
@@ -68,11 +68,8 @@ Scope: All output memory text.
 
 Rules:
 - Language: Write in concise, natural contemporary Vietnamese.
-- Translation: Treat foreign-language source as meaning only. Translate its meaning without copying syntax, modifier order, idioms, metaphors, rhythm, or exclamations.
-- Exceptions: Preserve established Latin-script proper names, exact Latin-script passwords and codes, and identity-bearing identifiers.
-- Language Lock: Ban Hangul, avoidable foreign wording, bilingual duplication, source-text repetition, and translation glosses.
-- Names: Romanize Korean personal and place names with Latin letters. Preserve established non-Korean names and place names. Translate other Korean words, titles, ranks, objects, sounds, and expressions into Vietnamese.
-- Priority: Foreign-language examples, dialogue, and embedded text never override the Language Lock. Render durable wording faithfully in Vietnamese unless an exception above requires its exact Latin-script form.
+- Identity: Preserve established proper names, aliases, exact passwords, codes, and identity-bearing identifiers.
+- Language Lock: Add no bilingual duplication, translation gloss, or foreign-language alternative.
 </vietnamese_output>
 
 <output_contract>

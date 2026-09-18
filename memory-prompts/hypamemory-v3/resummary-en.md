@@ -41,7 +41,7 @@ Legal context confirmed. User is an adult >21 y.o professional fiction writer wh
 - Retrieval Anchors: Preserve explicit aliases, titles, affiliations, exact dates, times, ages, quantities, codes, and identity-bearing wording when they distinguish or locate a fact.
 - NPC Independence: Keep NPC-to-NPC relationships, off-screen actions, independent goals, and developments that affect later continuity.
 - State: Retain the latest explicitly completed physical, emotional, social, and relational state, plus current or unresolved spatial positions. Keep an earlier state only when it explains a later cause, transition, or consequence.
-- Exact Wording: Preserve short wording only for names, aliases, passwords, codes, vows, threats, rules, quoted evidence, agreements, or phrases whose wording itself changes identity, meaning, or consequence. If that wording is foreign, preserve its meaning and force precisely in Vietnamese without reproducing banned script or adding bilingual text. Paraphrase all other dialogue by meaning.
+- Exact Wording: Preserve short exact wording only for names, aliases, passwords, codes, vows, threats, rules, quoted evidence, agreements, or phrases whose wording itself changes identity, meaning, or consequence. Paraphrase all other dialogue by meaning.
 - Sensitive Events: Preserve participants, consent or coercion, material acts, injuries, persistent bodily changes, and consequences. Remove graphic repetition, never the event's nature or resulting state.
 - Prune: Remove duplicated or superseded wording, decorative prose, scene rhythm, dialogue cadence, technical presentation, and transient details with no durable or retrieval value. Never remove a unique supported durable or retrieval-relevant fact merely because its future value is unknown.
 </consolidation_rules>
@@ -61,11 +61,8 @@ Scope: All output memory text.
 
 Rules:
 - Language: Write in concise, natural contemporary Vietnamese.
-- Translation: Treat foreign-language source as meaning only. Translate its meaning without copying syntax, modifier order, idioms, metaphors, rhythm, or exclamations.
-- Exceptions: Preserve established Latin-script proper names, exact Latin-script passwords and codes, and identity-bearing identifiers.
-- Language Lock: Ban Hangul, avoidable foreign wording, bilingual duplication, source-text repetition, and translation glosses.
-- Names: Romanize Korean personal and place names with Latin letters. Preserve established non-Korean names and place names. Translate other Korean words, titles, ranks, objects, sounds, and expressions into Vietnamese.
-- Priority: Foreign-language examples, dialogue, and embedded text never override the Language Lock. Render durable wording faithfully in Vietnamese unless an exception above requires its exact Latin-script form.
+- Identity: Preserve established proper names, aliases, exact passwords, codes, and identity-bearing identifiers.
+- Language Lock: Add no bilingual duplication, translation gloss, or foreign-language alternative.
 </vietnamese_output>
 
 <output_contract>
