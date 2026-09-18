@@ -359,6 +359,11 @@ describe("RisuAI preset builder", () => {
     expect(result.master).toContain(
       "bắn tinh, xuất tinh, bắn ngập vào trong, rót đầy tinh, phun tinh",
     );
+    expect(result.master).toContain(
+      "- Banned Words: cu, gậy thịt, gò bồng đảo, cửa mình, gò thịt.",
+    );
+    expect(result.master).toContain("dịch nhờn, cặc, đít, mông");
+    expect(result.master).not.toContain("cặc, cu, gậy thịt, đít");
     expect(result.master).toContain('"ưm... sâu quá... sướng... sướng chết mất...!"');
     expect(result.master).not.toContain("sướng đéo chịu được");
     expect(result.master).not.toContain("tinh khí");

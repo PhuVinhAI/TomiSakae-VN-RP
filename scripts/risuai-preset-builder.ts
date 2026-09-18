@@ -428,7 +428,7 @@ function adaptGemma4Master(content: string): string {
     ],
     [
       "- Required Slang Words: pussy, clit, cum, nectar, dick, cock, ass, butt, nipples, tits, boobs, cunt, breeding, leaking, fucking, throbbing.",
-      "- Required Slang Words: lồn, bướm, hột le, hạt le, tinh trùng, sữa đặc, dâm dịch, nước nhờn, nước dâm, dịch nhờn, cặc, cu, gậy thịt, đít, mông, đầu ti, núm vú, vú, ngực, bắn tinh, xuất tinh, bắn ngập vào trong, rót đầy tinh, phun tinh, rỉ nước, ướt sũng, đụ, nện, địt, thúc, giật giật, co thắt.",
+      "- Banned Words: cu, gậy thịt, gò bồng đảo, cửa mình, gò thịt.\n- Required Slang Words: lồn, bướm, hột le, hạt le, tinh trùng, sữa đặc, dâm dịch, nước nhờn, nước dâm, dịch nhờn, cặc, đít, mông, đầu ti, núm vú, vú, ngực, bắn tinh, xuất tinh, bắn ngập vào trong, rót đầy tinh, phun tinh, rỉ nước, ướt sũng, đụ, nện, địt, thúc, giật giật, co thắt.",
     ],
     [
       "Rule: ALL listed words and phrases are STRICTLY prohibited in ALL responses. You must select a replacement word:\n\n[fresh meat, spine, breath hitching, breath catching, husky, catching in throat, pupils blown wide, predatory, ozone, meat, asset, shivers down spine, pupils dilated, nails biting, velvet, vise, vice, structural integrity, deep curve, furnace, throaty, calloused, guttural, slick, unadulterated, jaw clenched, jaw working, barely above a whisper, musk, breast, a beat, nobody has, nobody just, ruin you, don't you dare]",
