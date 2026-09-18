@@ -408,6 +408,12 @@ describe("RisuAI preset builder", () => {
     expect(result.master).toContain(
       "tìm kiếm sự cứu rỗi, chất chứa ngàn vạn tâm sự, làm em hư mất",
     );
+    const bannedVocabulary = result.master.match(
+      /<banned_vocabulary>[\s\S]*?<\/banned_vocabulary>/,
+    )?.[0];
+    expect(bannedVocabulary).not.toContain("Chưa từng có ai");
+    expect(bannedVocabulary).not.toContain("Chẳng ai tự dưng");
+    expect(bannedVocabulary).not.toContain("Lần đầu tiên có người");
     expect(result.master).not.toContain("fresh meat, spine, breath hitching");
     expect(result.master).not.toContain("don't you dare");
     expect(result.master).not.toContain("pussy, clit, cum, nectar");
@@ -713,6 +719,32 @@ describe("RisuAI preset builder", () => {
     expect(result.master).not.toContain("Render inside the GM'S NOTEBOOK block");
     expect(result.master).not.toContain("Render strictly inside BONDS block");
     expect(result.master).not.toContain("qualitatively");
+  });
+
+  it("preserves the header module's environment reaction without restoring its UI", () => {
+    const source = parsePreset({
+      prompts: [
+        {
+          identifier: "main",
+          content:
+            "<system_state>\n[PHYSICS & PERCEPTION]\n    All character line of sight: 120° forward only.\n    Sound: Muffled by doors/walls. Voice reaches max 10-20m. All sound blocked by walls unless deafeningly loud.\n</system_state>",
+        },
+      ],
+      prompt_order: [{ order: [{ identifier: "main", enabled: true }] }],
+    });
+    const result = buildPreset(source, {
+      sourceFile: "preset.json",
+      outputDirectory: "out",
+      promptRouter: {
+        active: "full",
+        routes: { full: { masterCleanup: { environmentReaction: true } } },
+      },
+    });
+
+    expect(result.master).toContain(
+      "NPCs: Physically react to weather, temp, and time (shiver, sweat, fatigue).",
+    );
+    expect(result.master).not.toContain("<header_instructions>");
   });
 
   it("keeps DnD while excluding World Sim and Chekhov from full-master", () => {

@@ -42,6 +42,8 @@ export interface PromptCleanup {
   stateMetrics?: boolean;
   /** Remove rules that only target internal engines disabled by the route. */
   disabledEngineReferences?: boolean;
+  /** Preserve non-UI environment behavior from the excluded header module. */
+  environmentReaction?: boolean;
 }
 
 export interface PromptRoute {
@@ -184,6 +186,7 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
         obsoleteOutputInstructions: true,
         stateOutputSyntax: true,
         disabledEngineReferences: true,
+        environmentReaction: true,
       },
     },
     "full-master-realism": {
@@ -214,6 +217,7 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
         obsoleteOutputInstructions: true,
         stateOutputSyntax: true,
         disabledEngineReferences: true,
+        environmentReaction: true,
       },
     },
     "nsfw-jailbreak": {
@@ -360,6 +364,7 @@ function cleanupContent(
   if (cleanup.disabledEngineReferences) {
     cleaned = removeDisabledEngineReferences(cleaned, activeIdentifiers);
   }
+  if (cleanup.environmentReaction) cleaned = preserveEnvironmentReaction(cleaned);
   if (cleanup.presentationMacros) {
     cleaned = cleaned
       .replace(/[ \t]+$/gm, "")
@@ -432,7 +437,7 @@ function adaptGemma4Master(content: string): string {
     ],
     [
       "Rule: ALL listed words and phrases are STRICTLY prohibited in ALL responses. You must select a replacement word:\n\n[fresh meat, spine, breath hitching, breath catching, husky, catching in throat, pupils blown wide, predatory, ozone, meat, asset, shivers down spine, pupils dilated, nails biting, velvet, vise, vice, structural integrity, deep curve, furnace, throaty, calloused, guttural, slick, unadulterated, jaw clenched, jaw working, barely above a whisper, musk, breast, a beat, nobody has, nobody just, ruin you, don't you dare]",
-      "Rule: ALL listed Vietnamese phrases and clichés are STRICTLY prohibited in ALL responses. Never use these formulaic patterns. Write original, grounded, tactile actions instead:\n\n[tim hẫng đi một nhịp, tim đập loạn xạ, hẫng một nhịp, ngưng một nhịp, chững lại một nhịp, đồng tử co rút, đồng tử giãn to, sống lưng lạnh toát, rùng mình dọc sống lưng, hơi thở nghẹn lại, nghẹn ứ nơi cổ họng, nuốt nước bọt cái ực, nheo mắt lại đầy nguy hiểm, ánh mắt như thú săn mồi, ánh mắt lóe lên tia, ánh mắt đầy tính chiếm đoạt, khóe môi khẽ nhếch, nụ cười nửa miệng, nụ cười tà mị, nghiến chặt quai hàm, cơ hàm bạnh ra, chỉ vừa đủ cho hai người nghe, thì thào như hơi thở, giọng trầm khàn đầy mê hoặc, chất giọng khàn đục đầy quyến rũ, không khí như đông cứng lại, thời gian như ngừng trôi, bầu không khí đặc quánh, mùi xạ hương nam tính, mùi hương thanh mát, đôi gò bồng đảo, đôi thỏ ngọc, khuôn ngực phập phồng, thân hình ma quỷ, đường cong chết người, hoa huyệt, tiểu huyệt, mật dịch, khe suối róc rách, vách thịt mềm như nhung, mềm mịn như nhung lụa, siết chặt như gọng kìm, như một chiếc kẹp sắt, ngọn lửa dục vọng, thiêu đốt mọi lý trí, như muốn nuốt chửng, dục vọng nguyên thủy, bản năng thú tính, tìm kiếm sự cứu rỗi, chất chứa ngàn vạn tâm sự, làm em hư mất, anh sẽ hủy hoại em, đừng có mà giở trò, Chưa từng có ai, Chẳng ai tự dưng, Lần đầu tiên có người]",
+      "Rule: ALL listed Vietnamese phrases and clichés are STRICTLY prohibited in ALL responses. Never use these formulaic patterns. Write original, grounded, tactile actions instead:\n\n[tim hẫng đi một nhịp, tim đập loạn xạ, hẫng một nhịp, ngưng một nhịp, chững lại một nhịp, đồng tử co rút, đồng tử giãn to, sống lưng lạnh toát, rùng mình dọc sống lưng, hơi thở nghẹn lại, nghẹn ứ nơi cổ họng, nuốt nước bọt cái ực, nheo mắt lại đầy nguy hiểm, ánh mắt như thú săn mồi, ánh mắt lóe lên tia, ánh mắt đầy tính chiếm đoạt, khóe môi khẽ nhếch, nụ cười nửa miệng, nụ cười tà mị, nghiến chặt quai hàm, cơ hàm bạnh ra, chỉ vừa đủ cho hai người nghe, thì thào như hơi thở, giọng trầm khàn đầy mê hoặc, chất giọng khàn đục đầy quyến rũ, không khí như đông cứng lại, thời gian như ngừng trôi, bầu không khí đặc quánh, mùi xạ hương nam tính, mùi hương thanh mát, đôi gò bồng đảo, đôi thỏ ngọc, khuôn ngực phập phồng, thân hình ma quỷ, đường cong chết người, hoa huyệt, tiểu huyệt, mật dịch, khe suối róc rách, vách thịt mềm như nhung, mềm mịn như nhung lụa, siết chặt như gọng kìm, như một chiếc kẹp sắt, ngọn lửa dục vọng, thiêu đốt mọi lý trí, như muốn nuốt chửng, dục vọng nguyên thủy, bản năng thú tính, tìm kiếm sự cứu rỗi, chất chứa ngàn vạn tâm sự, làm em hư mất, anh sẽ hủy hoại em, đừng có mà giở trò]",
     ],
     [
       'User: "My name is Dan." -> NPC: "Your name is Dan?" she says, rolling the name in her mouth.',
@@ -610,6 +615,16 @@ function removeDisabledEngineReferences(
   }
 
   return cleaned;
+}
+
+function preserveEnvironmentReaction(content: string): string {
+  const rule = "NPCs: Physically react to weather, temp, and time (shiver, sweat, fatigue).";
+  if (!content.includes("[PHYSICS & PERCEPTION]") || content.includes(rule)) return content;
+
+  return content.replace(
+    /( {4}Sound: Muffled by doors\/walls\. Voice reaches max 10-20m\. All sound blocked by walls unless deafeningly loud\.)/,
+    `$1\n    ${rule}`,
+  );
 }
 
 function removeStateMetrics(content: string, activeIdentifiers: ReadonlySet<string>): string {
