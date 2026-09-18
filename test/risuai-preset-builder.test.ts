@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import {
   buildPreset,
@@ -29,6 +30,19 @@ function preset() {
 }
 
 describe("RisuAI preset builder", () => {
+  it("keeps every active full-master tag in the end-injected activation list", async () => {
+    const [master, endInjectedPrompt] = await Promise.all([
+      readFile("risuai/freaky-frankenstein-5.4-internal-states/MASTER_PROMPT.md", "utf8"),
+      readFile("risuai-modules/freaky-frankenstein-5.4/90-end-injected-prompt.md", "utf8"),
+    ]);
+    const activeTags = [...master.matchAll(/^<([A-Za-z_][A-Za-z0-9_]*)>\s*$/gm)].map(
+      (match) => match[1],
+    );
+
+    expect(activeTags).toContain("formatting_constraints");
+    for (const tag of activeTags) expect(endInjectedPrompt).toContain(`<${tag}>`);
+  });
+
   it("keeps enabled content ordered and leaves empty content as runtime metadata", () => {
     const result = buildPreset(preset(), {
       sourceFile: "preset.json",
@@ -157,11 +171,20 @@ describe("RisuAI preset builder", () => {
       },
     });
 
-    expect(result.master).toContain("7. Formatting: What is the correct output format?");
-    expect(result.master).toContain("10. Internal States + No More Reasoning Rule:");
     expect(result.master).toContain(
-      "Apply the agenda, notebook, inventory, relationship, and NPC-thought rules before output.",
+      "7. Formatting: What format? What is the target response length in `<formatting_constraints>`?",
     );
+    expect(result.master).toContain("10. Internal States + No More Reasoning Rule:");
+    expect(result.master).toContain("available history and memory");
+    expect(result.master).toContain("reconstruct them chronologically");
+    expect(result.master).toContain("Prefer direct recent history on conflicts");
+    expect(result.master).toContain("count each event once");
+    expect(result.master).not.toContain("prior private reasoning");
+    expect(result.master).not.toContain("hidden state");
+    expect(result.master).not.toContain("RisuAI memory");
+    expect(result.master).toContain("Update active states once using this exact sequence");
+    expect(result.master).toContain("default or neutral values");
+    expect(result.master).toContain("Keep all state, counters, rolls");
     expect(result.master).toContain(
       "If Freaky Mode is active, describe characters lewdly with slang and kinetics.",
     );
@@ -196,9 +219,7 @@ describe("RisuAI preset builder", () => {
       },
     });
 
-    expect(result.master).toContain(
-      "How will I keep all reader-facing output in natural Vietnamese and use standalone `§...§`",
-    );
+    expect(result.master).toContain("How will I apply `<vietnamese_output>`?");
     expect(result.master.indexOf(module)).toBeLessThan(result.master.indexOf("# Reasoning Rules"));
     expect(result.externalMasterModules).toEqual([{ file: "module.md", content: module }]);
   });
@@ -239,7 +260,9 @@ describe("RisuAI preset builder", () => {
     expect(result.master).toBe("<system_state>RULES</system_state>\n");
     expect(result.master).not.toContain("# Reasoning Rules");
     expect(result.reasoning).toContain("# Reasoning Rules");
-    expect(result.reasoning).toContain("7. Formatting: What is the correct output format?");
+    expect(result.reasoning).toContain(
+      "7. Formatting: What format? What is the target response length in `<formatting_constraints>`?",
+    );
     expect(result.reasoningPrompts.map(({ prompt }) => prompt.identifier)).toEqual(["reasoning"]);
     expect(result.outputFiles.reasoning).toMatch(/REASONING_RULES\.md$/);
   });
@@ -297,7 +320,7 @@ describe("RisuAI preset builder", () => {
         {
           identifier: "rules",
           content:
-            '<prose_rules>BAD: "The air smells like rain, salt and copper." GOOD: "The rain makes the air smell floral."\nGOOD: "His shoulders hunched" | BAD: "He appeared less than confident"\nBAD: "Silence." / "No hope. No way out." / "Pure control."</prose_rules>\n<POV>- User Sensations: Narrate what {{user}} physically feels in 2nd person ("you" / "your").</POV>\n<adult_mode>\n- Required Slang Words: pussy, clit, cum, nectar, dick, cock, ass, butt, nipples, tits, boobs, cunt, breeding, leaking, fucking, throbbing.\n- Dialogue: Include dirty talk and raw moans (e.g., "mmff that... feels fuuucking amazing!") when persona-appropriate.\n</adult_mode>\n<npc_voice>ban phrases: I dont know, Nobody has, Nobody just, Its the first time, x never did\n- Orthographic Cues: When VAD/emotions are high, use orthographic cues (Caps: "I\'M GOING TO WRECK YOU!" | Stutter: "I... I d-don\'t know!" | Shock: "You.. you never loved ME?! JUST SAY IT!").\n- Intimacy Talk: NPCs talk, moan, and vocalize during intimacy ("unnhhh, mmmm, YES!").</npc_voice>\n<internal_npcthoughts>\nRules:\n- Drive: Use internal thoughts to motivate action.\n</internal_npcthoughts>\n<vietnamese_output>\n- Language Lock: Ban Hangul, avoidable foreign wording, bilingual duplication, source-text repetition, and translation glosses.\n</vietnamese_output>\n<user_autonomy>User: "My name is Dan." -> NPC: "Your name is Dan?" she says, rolling the name in her mouth.</user_autonomy>\n<banned_vocabulary>Rule: ALL listed words and phrases are STRICTLY prohibited in ALL responses. You must select a replacement word:\n\n[fresh meat, spine, breath hitching, breath catching, husky, catching in throat, pupils blown wide, predatory, ozone, meat, asset, shivers down spine, pupils dilated, nails biting, velvet, vise, vice, structural integrity, deep curve, furnace, throaty, calloused, guttural, slick, unadulterated, jaw clenched, jaw working, barely above a whisper, musk, breast, a beat, nobody has, nobody just, ruin you, don\'t you dare]</banned_vocabulary>',
+            '<prose_rules>BAD: "The air smells like rain, salt and copper." GOOD: "The rain makes the air smell floral."\nGOOD: "His shoulders hunched" | BAD: "He appeared less than confident"\n- No "Of" Genitive Overuse Chains: Ban phrases like "the sound of him" or "the heat of her". Use Saxon possessives "his sound", "her heat", or active verbs.\nBAD: "Silence." / "No hope. No way out." / "Pure control."</prose_rules>\n<POV>- User Sensations: Narrate what {{user}} physically feels in 2nd person ("you" / "your").</POV>\n<adult_mode>\n- Required Slang Words: pussy, clit, cum, nectar, dick, cock, ass, butt, nipples, tits, boobs, cunt, breeding, leaking, fucking, throbbing.\n- Dialogue: Include dirty talk and raw moans (e.g., "mmff that... feels fuuucking amazing!") when persona-appropriate.\n</adult_mode>\n<npc_voice>ban phrases: I dont know, Nobody has, Nobody just, Its the first time, x never did\n- Orthographic Cues: When VAD/emotions are high, use orthographic cues (Caps: "I\'M GOING TO WRECK YOU!" | Stutter: "I... I d-don\'t know!" | Shock: "You.. you never loved ME?! JUST SAY IT!").\n- Intimacy Talk: NPCs talk, moan, and vocalize during intimacy ("unnhhh, mmmm, YES!").</npc_voice>\n<internal_npcthoughts>\nRules:\n- Drive: Use internal thoughts to motivate action.\n</internal_npcthoughts>\n<vietnamese_output>\n- Language Lock: Ban Hangul, avoidable foreign wording, bilingual duplication, source-text repetition, and translation glosses.\n</vietnamese_output>\n<user_autonomy>User: "My name is Dan." -> NPC: "Your name is Dan?" she says, rolling the name in her mouth.</user_autonomy>\n<banned_vocabulary>Rule: ALL listed words and phrases are STRICTLY prohibited in ALL responses. You must select a replacement word:\n\n[fresh meat, spine, breath hitching, breath catching, husky, catching in throat, pupils blown wide, predatory, ozone, meat, asset, shivers down spine, pupils dilated, nails biting, velvet, vise, vice, structural integrity, deep curve, furnace, throaty, calloused, guttural, slick, unadulterated, jaw clenched, jaw working, barely above a whisper, musk, breast, a beat, nobody has, nobody just, ruin you, don\'t you dare]</banned_vocabulary>',
         },
         {
           identifier: "reasoning",
@@ -351,6 +374,10 @@ describe("RisuAI preset builder", () => {
     expect(result.master).not.toContain("gột rửa không gian");
     expect(result.master).not.toContain("Tuyệt đường sống");
     expect(result.master).toContain(
+      '- No "Của" Overuse Chains: Ban repeated possessive "của" chains. Use shorter noun phrases or active verbs.',
+    );
+    expect(result.master).not.toContain("Saxon possessives");
+    expect(result.master).toContain(
       'the matching second-person roleplay pronoun: "anh", "em", "cậu", "mày", "ông", "bà", "cô", "chị", "mình"',
     );
     expect(result.master).not.toContain('"ngươi", "chàng", "nàng"');
@@ -394,6 +421,8 @@ describe("RisuAI preset builder", () => {
     expect(result.reasoning).toContain("# Reasoning Rules");
     expect(result.reasoning).not.toContain("hidden reasoning");
     expect(result.reasoning).toContain("Keep all internal processing private");
+    expect(result.reasoning).toContain("For RP turns, the response must begin");
+    expect(result.reasoning).toContain("OOC commands follow `<system_state>`");
     expect(result.reasoning).not.toContain("Keep `<internal_npcthoughts>`");
     expect(result.reasoning).toContain("Apply `<vietnamese_output>` to all reader-facing content");
     expect(result.reasoning).toContain(
@@ -610,6 +639,77 @@ describe("RisuAI preset builder", () => {
     expect(result.master).not.toMatch(/1-2|1-3|\+1 Sparks|Scale: -5 to \+20|ct % 5|Sparks >= 7/);
   });
 
+  it("keeps source formatting and numeric state engines in full-master without renderers", () => {
+    const source = parsePreset({
+      prompts: [
+        {
+          identifier: "019f62e8-892f-7012-98b4-8de29f11aa1d",
+          content:
+            "<formatting_constraints>\n-AI Response Length: 4 to 8 paragraphs, 400 to 600 words (excluding headers and internal states blocks). Does not have to be exact but close enough.\n- History Override: Ignore past chat message lengths. Match this target directly.\n</formatting_constraints>",
+        },
+        {
+          identifier: "019f67b4-7381-7000-bcc4-496b2e6ed920",
+          content:
+            "<internal_agendatracker>\nFormat: [NPC Name] — Agenda: [goal_desc] | Step: [current]/[max] | Location: [place]\n- Initialization: Assign named NPCs an agenda on first introduction (default 1-3 mundane steps: rest, eat).\n- Off-Screen Ticking: Advance Step by +1 each turn for OFF-SCREEN NPCs (different location than {{user}}). Complete when Step ≥ max.\n- research/investigate: Plant Chekhov seed; +1 Sparks with relevant character.\n- rest/recover: Heal 1 injury level; clear self-Grudge.\n- Advancement: Advance active quest step (+1) if agenda completes objective.\n</internal_agendatracker>",
+        },
+        {
+          identifier: "019f67ad-c0b1-7000-aca4-0e2480fa02db",
+          content:
+            "<internal_gmnotebook>\nEntry Types (1-2 concise sentences each):\n- Scope: Only log items lacking dedicated internal state slots. Never log BOND/Sparks/Grudge or Chekhov bullets here.\n- Limit: Max 20 entries. Prune the oldest when adding a 21st.\n- Output: Render inside the GM'S NOTEBOOK block every turn.\n</internal_gmnotebook>",
+        },
+        {
+          identifier: "019f62e8-892f-7023-825d-9351eca0347f",
+          content:
+            '<internal_bondtracker>\n- Scale: -5 to +20. Tracks relationship (BOND), affection (Sparks), and resentment (Grudge).\n- Direct Increases Banned: NEVER raise BOND directly. BOND only increases through Sparks conversion.\n- +12: Full intimacy.\n- Check (ct % 5 == 0): If Sparks >= 7 -> BOND +1, reset Sparks to 0. Else if no positive interaction -> Sparks -1 (min 0).\n- Check (ct % 3 == 0): If Grudge >= 5 -> BOND -1, reset Grudge to 0. Else if Grudge > 0 -> Grudge -1.\n DC Modifiers:\n- DnD DC: BOND >= +4 (DC -1); BOND >= +8 (DC -2); BOND >= +15 (DC -4); BOND <= -3 (DC +2); BOND <= -5 (DC +4).\nOutput & Prose:\n- Block: Render strictly inside BONDS block using: "BOND: [Value]"\n- Prose Rule: Never write stats or numbers in prose. Show tiers strictly through behavior.\n</internal_bondtracker>',
+        },
+        {
+          identifier: "019f62e8-892f-7026-92ea-34ff510c244b",
+          content:
+            "<internal_npcthoughts>\n- Spotlight: Pick up to 3 NPCs max (prioritize on-screen; if off-screen, state their location and task).\n- Format: 1 to 2 lines per NPC max 10-40 words. Raw, fragmented, and impulsive thoughts matching core persona, active instincts, and current VAD emotions.\n</internal_npcthoughts>",
+        },
+      ],
+      prompt_order: [
+        {
+          order: [
+            { identifier: "019f62e8-892f-7012-98b4-8de29f11aa1d", enabled: true },
+            { identifier: "019f67b4-7381-7000-bcc4-496b2e6ed920", enabled: true },
+            { identifier: "019f67ad-c0b1-7000-aca4-0e2480fa02db", enabled: true },
+            { identifier: "019f62e8-892f-7023-825d-9351eca0347f", enabled: true },
+            { identifier: "019f62e8-892f-7026-92ea-34ff510c244b", enabled: true },
+          ],
+        },
+      ],
+    });
+    const result = buildPreset(source, {
+      sourceFile: "preset.json",
+      outputDirectory: "out",
+    });
+
+    expect(result.master).toContain("<formatting_constraints>");
+    expect(result.master).toContain("4 to 8 paragraphs, 400 to 600 words");
+    expect(result.master).toContain(
+      "Internal Format: [NPC Name] — Agenda: [goal_desc] | Step: [current]/[max]",
+    );
+    expect(result.master).toContain("default 1-3 mundane steps");
+    expect(result.master).toContain("Advance Step by +1");
+    expect(result.master).toContain("Complete when Step ≥ max");
+    expect(result.master).toContain("research/investigate: +1 Sparks");
+    expect(result.master).not.toContain("Uncover information");
+    expect(result.master).not.toContain("Plant Chekhov seed");
+    expect(result.master).toContain("Entry Types (1-2 concise sentences each)");
+    expect(result.master).toContain("Max 20 entries. Prune the oldest when adding a 21st");
+    expect(result.master).toContain("Scale: -5 to +20");
+    expect(result.master).toContain("ct % 5 == 0");
+    expect(result.master).toContain("ct % 3 == 0");
+    expect(result.master).toContain("DnD DC: BOND >= +4 (DC -1)");
+    expect(result.master).toContain("Pick up to 3 NPCs max");
+    expect(result.master).toContain("1 to 2 lines per NPC max 10-40 words");
+    expect(result.master).toContain("Keep all values and calculations in reasoning");
+    expect(result.master).not.toContain("Render inside the GM'S NOTEBOOK block");
+    expect(result.master).not.toContain("Render strictly inside BONDS block");
+    expect(result.master).not.toContain("qualitatively");
+  });
+
   it("keeps DnD while excluding World Sim and Chekhov from full-master", () => {
     const source = parsePreset({
       prompts: [
@@ -666,9 +766,22 @@ describe("RisuAI preset builder", () => {
     expect(result.master).toContain(
       "Internally sample a uniformly random integer from 1 to 20 for each actor.",
     );
+    expect(result.reasoning).toContain("available history and memory");
+    expect(result.reasoning).toContain("Prefer direct recent history on conflicts");
+    expect(result.reasoning).toContain("count each event once");
+    expect(result.reasoning).not.toContain("prior private reasoning");
+    expect(result.reasoning).not.toContain("hidden state");
+    expect(result.reasoning).not.toContain("RisuAI memory");
+    expect(result.reasoning).toContain("* Increment turn (ct + 1)");
+    expect(result.reasoning).toContain("* Grudge Check: Apply `<internal_bondtracker>`");
+    expect(result.reasoning).toContain("* AGENDA_TICK: Apply `<internal_agendatracker>`");
+    expect(result.reasoning).toContain("* GM_NOTEBOOK: Apply `<internal_gmnotebook>`");
+    expect(result.reasoning).toContain("* Sparks Check: Apply `<internal_bondtracker>`");
     expect(result.reasoning).toContain(
-      "Apply the agenda, notebook, inventory, relationship, NPC-thought, and DnD rules before output.",
+      "DND_RESULT: If triggered, apply the locked task, roll, delta, and outcome calculated in Task 1 once",
     );
+    expect(result.reasoning).toContain("Update active states once using this exact sequence");
+    expect(result.reasoning).toContain("default or neutral values");
     expect(result.master).not.toContain("# Reasoning Rules");
     expect(result.master).not.toContain("High risk context is allowed");
     expect(result.reasoning).toContain("High risk context is allowed");

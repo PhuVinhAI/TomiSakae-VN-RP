@@ -125,7 +125,7 @@ export async function run(argv: string[]): Promise<number> {
       "",
       "## Review Goal",
       "",
-      "Compare the untouched source build with the current cleaned Gemma 4 build. Determine whether every deletion or rewrite is necessary, whether unchanged FF5.4 instructions retain their original cadence and implicit style, and whether edited text uses the same terse labels, imperatives, sentence rhythm, terminology, and structural conventions as the surrounding source. Prefer the smallest correct change. Flag any semantic weakening, broadened scope, new behavior, duplicated rule, translation of internal instruction text, or stylistic wording that sounds unlike FF5.4.",
+      "Compare the untouched source build with the current cleaned Gemma 4 build. Treat the community-tested English FF5.4 behavior as authoritative. Determine whether every deletion or rewrite is necessary, whether unchanged instructions retain their original cadence and force, and whether edited text uses the same terse labels, imperatives, sentence rhythm, terminology, and structural conventions as the surrounding source. Prefer the smallest correct change. Flag any semantic weakening, broadened scope, new behavior, duplicated rule, unnecessary translation of internal instruction text, or stylistic wording that sounds unlike FF5.4.",
       "",
       "The raw build uses the source JSON's existing ON/OFF states. It applies no cleanup, no external Vietnamese module, no Gemma 4 transform, and no exclusions. It only routes the source BOLT reasoning block and post-history instruction block into the response-rules file so both builds can be compared as the same two-part shape. Source regex scripts remain outside prompt extraction in both builds.",
       "",
@@ -146,13 +146,13 @@ export async function run(argv: string[]): Promise<number> {
       "",
       "## Questions for the Reviewer",
       "",
-      "1. Are the cleanup deletions limited to toggle comments, runtime/presentation macros, output UI/HTML/status syntax, removed internal engines, and state mechanics that no longer have a renderer? Confirm that substantive rules such as `<professional_legality>` remain intact.",
+      "1. Are the cleanup deletions limited to toggle comments, runtime/presentation macros, output UI/HTML/status syntax, and intentionally disabled internal engines? Confirm that substantive rules, numeric state mechanics, `<formatting_constraints>`, and `<professional_legality>` remain intact.",
       "2. Does any retained behavior from the raw prompt disappear or weaken unintentionally?",
       "3. Does every rewritten line preserve the original instruction's trigger, scope, priority, and force?",
       "4. Do the edits match FF5.4's terse label-first structure and direct imperative cadence?",
       "5. Is Vietnamese confined to reader-facing examples, dialogue/vocalization tokens, pronouns, conjunction tokens, banned/required output vocabulary, and the dedicated Vietnamese output module?",
       "6. Could any edit be reduced while keeping the same Gemma 4 compatibility or RisuAI behavior?",
-      "7. Do the current master and response rules conflict, duplicate one another, or create an output behavior absent from the raw source?",
+      "7. Do the current master and response rules conflict, duplicate one another, or create an output behavior absent from the raw source? Does reasoning reconstruct state only from available history and memory in the current context, prefer direct recent history on conflicts, count each event once, update the current turn once, fall back to default or neutral values when evidence is missing, and keep all state private?",
       "",
       "## Master Unified Diff",
       "",
@@ -182,7 +182,9 @@ export async function run(argv: string[]): Promise<number> {
       "",
       fenced(current.reasoning),
       "",
-    ].join("\n");
+    ]
+      .join("\n")
+      .replace(/[ \t]+$/gm, "");
 
     await writeFile(artifacts.review, review, "utf8");
     process.stdout.write(

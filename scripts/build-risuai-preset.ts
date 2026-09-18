@@ -19,6 +19,7 @@ const PromptCleanupSchema = z.object({
   obsoleteOutputInstructions: z.boolean().optional(),
   stateOutputSyntax: z.boolean().optional(),
   stateMetrics: z.boolean().optional(),
+  disabledEngineReferences: z.boolean().optional(),
 });
 
 const PromptRouteSchema = z.object({

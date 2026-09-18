@@ -40,6 +40,8 @@ export interface PromptCleanup {
   stateOutputSyntax?: boolean;
   /** Replace UI-backed numeric state mechanics with qualitative behavior rules. */
   stateMetrics?: boolean;
+  /** Remove rules that only target internal engines disabled by the route. */
+  disabledEngineReferences?: boolean;
 }
 
 export interface PromptRoute {
@@ -164,13 +166,12 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
         INTERNAL_WORLD_SIM_IDENTIFIER,
         INTERNAL_CHEKHOV_IDENTIFIER,
         // Output-format toggles: time/location headers, colored dialogue, HTML/CSS graphics,
-        // onomatopoeia, length/format constraints, social-feed widgets, and the hidden renderer.
+        // onomatopoeia, social-feed widgets, and the hidden renderer.
         "019f62e8-892f-7002-8fcf-eea637bd577b",
         "019f62e8-892f-7019-be65-715a4949cba0",
         "2105050a-0d4b-4661-9363-3cc1ac44d5e7",
         "019f62e8-892f-701a-afd5-49222c79fdb6",
         "019f62e8-892f-701c-8550-08ebf33e9da2",
-        "019f62e8-892f-7012-98b4-8de29f11aa1d",
         "019f62e8-892f-7028-bad6-be1f427c3ae4",
         "019f62e8-892f-7027-93ef-159f3d55c410",
         "019f62e8-892f-7000-9a7f-4d15c1234fb9",
@@ -182,7 +183,7 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
         reasoningRules: true,
         obsoleteOutputInstructions: true,
         stateOutputSyntax: true,
-        stateMetrics: true,
+        disabledEngineReferences: true,
       },
     },
     "full-master-realism": {
@@ -201,7 +202,6 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
         "2105050a-0d4b-4661-9363-3cc1ac44d5e7",
         "019f62e8-892f-701a-afd5-49222c79fdb6",
         "019f62e8-892f-701c-8550-08ebf33e9da2",
-        "019f62e8-892f-7012-98b4-8de29f11aa1d",
         "019f62e8-892f-7028-bad6-be1f427c3ae4",
         "019f62e8-892f-7027-93ef-159f3d55c410",
         "019f62e8-892f-7000-9a7f-4d15c1234fb9",
@@ -213,7 +213,7 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
         reasoningRules: true,
         obsoleteOutputInstructions: true,
         stateOutputSyntax: true,
-        stateMetrics: true,
+        disabledEngineReferences: true,
       },
     },
     "nsfw-jailbreak": {
@@ -357,6 +357,9 @@ function cleanupContent(
   cleaned = adaptInternalEngines(cleaned);
   if (cleanup.stateOutputSyntax) cleaned = removeStateOutputSyntax(cleaned, internalDndActive);
   if (cleanup.stateMetrics) cleaned = removeStateMetrics(cleaned, activeIdentifiers);
+  if (cleanup.disabledEngineReferences) {
+    cleaned = removeDisabledEngineReferences(cleaned, activeIdentifiers);
+  }
   if (cleanup.presentationMacros) {
     cleaned = cleaned
       .replace(/[ \t]+$/gm, "")
@@ -469,6 +472,10 @@ function adaptGemma4Master(content: string): string {
       '- Ban Coordinating Conjunctions: Ban "và", "hoặc", and "hay là" in spoken dialogue.',
     ],
     [
+      '- No "Of" Genitive Overuse Chains: Ban phrases like "the sound of him" or "the heat of her". Use Saxon possessives "his sound", "her heat", or active verbs.',
+      '- No "Của" Overuse Chains: Ban repeated possessive "của" chains. Use shorter noun phrases or active verbs.',
+    ],
+    [
       "ban phrases: I dont know, Nobody has, Nobody just, Its the first time, x never did",
       "ban phrases: [Tôi/Tao/Em/Mình/Anh] không biết, Chưa từng có ai, Chẳng ai tự dưng, Lần đầu tiên, [X] chưa từng...",
     ],
@@ -497,7 +504,7 @@ function adaptGemma4Reasoning(content: string): string {
     ],
     [
       "- C. Do not leak reasoning into the final response.",
-      "- C. Do not leak reasoning into the final response. Begin directly with the final Vietnamese scene.\n- D. The response must begin with roleplay content. Never output any preface, reasoning heading, task answer, checklist, roll, state data, metadata, internal tag or block, or its contents. Keep all internal processing private. Apply `<vietnamese_output>` to all reader-facing content.",
+      "- C. Do not leak reasoning into the final response.\n- D. For RP turns, the response must begin with roleplay content. Never output any preface, reasoning heading, task answer, checklist, roll, state data, metadata, internal tag or block, or its contents. Keep all internal processing private. Apply `<vietnamese_output>` to all reader-facing content. OOC commands follow `<system_state>`.",
     ],
     [
       'all CAP words for yelling only during peak arousal/VAD e.g., "NO!"',
@@ -552,7 +559,8 @@ function adaptEndInjectedPromptForActiveModes(
 
 function removeStateOutputSyntax(content: string, internalDndActive: boolean): string {
   let cleaned = content
-    .replace(/^Format: \[NPC Name\] — Agenda: \[goal_desc\].*$/gm, "")
+    .replace(/ \(excluding headers and internal states blocks\)/g, "")
+    .replace(/^Format: (\[NPC Name\] — Agenda: \[goal_desc\].*)$/gm, "Internal Format: $1")
     .replace(/^Format: \[BULLET: desc\].*$/gm, "")
     .replace(/^worldsimRoll: .*$/gm, "")
     .replace(/^chekhovD20:\s*$/gm, "")
@@ -560,8 +568,11 @@ function removeStateOutputSyntax(content: string, internalDndActive: boolean): s
     .replace(/^-+\s*Macros: .*$/gm, "")
     .replace(/^- Block: Render strictly inside BONDS block.*$/gm, "")
     .replace(/^- Output: Render inside the GM'S NOTEBOOK block every turn\.$/gm, "")
-    .replace(/\n\s*DC Modifiers:[\s\S]*?(?=\n(?:Output & Prose:|\s*- Prose Rule:))/i, "\n")
-    .replace(/^Output & Prose:\s*$/gm, "");
+    .replace(/^Output & Prose:\s*$/gm, "")
+    .replace(
+      /- Prose Rule: Never write stats or numbers in prose\. Show tiers strictly through behavior\./g,
+      "- Prose Rule: Keep all values and calculations in reasoning. Show tiers strictly through behavior.",
+    );
 
   if (internalDndActive) {
     cleaned = cleaned.replace(
@@ -575,6 +586,27 @@ function removeStateOutputSyntax(content: string, internalDndActive: boolean): s
         "",
       )
       .replace(/^- Prose Rule: Keep all math and stats inside the HTML block\..*$/gm, "");
+  }
+
+  return cleaned;
+}
+
+function removeDisabledEngineReferences(
+  content: string,
+  activeIdentifiers: ReadonlySet<string>,
+): string {
+  let cleaned = content;
+
+  if (!activeIdentifiers.has(INTERNAL_CHEKHOV_IDENTIFIER)) {
+    cleaned = cleaned
+      .replace(
+        /- research\/investigate: Plant Chekhov seed; \+1 Sparks with relevant character\./g,
+        "- research/investigate: +1 Sparks with relevant character.",
+      )
+      .replace(
+        /Never log BOND\/Sparks\/Grudge or Chekhov bullets here\./g,
+        "Never log BOND/Sparks/Grudge here.",
+      );
   }
 
   return cleaned;
@@ -762,12 +794,6 @@ function adaptInternalEngines(content: string): string {
   return cleaned;
 }
 
-function joinRuleNames(names: string[]): string {
-  if (names.length < 2) return names[0] ?? "";
-  if (names.length === 2) return `${names[0]} and ${names[1]}`;
-  return `${names.slice(0, -1).join(", ")}, and ${names.at(-1)}`;
-}
-
 function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<string>): string {
   if (!content.includes("# Reasoning Rules") || !content.includes("Tasks:")) {
     return content;
@@ -779,26 +805,30 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
   const realismOnly =
     activeIdentifiers.has(REALISM_MODE_IDENTIFIER) &&
     !activeIdentifiers.has(FREAKY_MODE_IDENTIFIER);
-  const activeStateRules = joinRuleNames([
-    "agenda",
-    ...(internalChekhovActive ? ["Chekhov"] : []),
-    ...(internalWorldSimActive ? ["World Sim"] : []),
-    "notebook",
-    "inventory",
-    "relationship",
-    "NPC-thought",
-    ...(internalDndActive ? ["DnD"] : []),
-  ]);
-  const hasInternalRolls = internalDndActive || internalWorldSimActive || internalChekhovActive;
-
   const lines = content.split(/\r?\n/);
   const output: string[] = [];
   let skippingRemovedStateSequence = false;
 
   for (const line of lines) {
     if (line.startsWith("10. Internal States + No More Reasoning Rule:")) {
+      const currentTurnSequence = [
+        "    * Increment turn (ct + 1)",
+        "    * Grudge Check: Apply `<internal_bondtracker>`.",
+        "    * AGENDA_TICK: Apply `<internal_agendatracker>`.",
+        ...(internalChekhovActive
+          ? ["    * CHEKHOV_CHECK: Apply `<internal_chekhovguntracker>`."]
+          : []),
+        ...(internalWorldSimActive ? ["    * WORLD_SIM: Apply `<internal_worldsim>`."] : []),
+        "    * GM_NOTEBOOK: Apply `<internal_gmnotebook>`.",
+        "    * Sparks Check: Apply `<internal_bondtracker>`.",
+        ...(internalDndActive
+          ? [
+              "    * DND_RESULT: If triggered, apply the locked task, roll, delta, and outcome calculated in Task 1 once.",
+            ]
+          : []),
+      ].join("\n");
       output.push(
-        `10. Internal States + No More Reasoning Rule: What internal states are active, if any? I must review previous internal states, update and apply them to ground the sim. Apply the ${activeStateRules} rules before output.${hasInternalRolls ? " Keep their state and rolls in reasoning; weave only their consequences into narrative." : ""}`,
+        `10. Internal States + No More Reasoning Rule: What internal states are active, if any? I must reconstruct them chronologically from available history and memory, update and apply them to ground the sim. Prefer direct recent history on conflicts, count each event once, and use default or neutral values when evidence is missing; never invent past values. Update active states once using this exact sequence:\n${currentTurnSequence}\nKeep all state, counters, rolls, and calculations private. Weave only their consequences into narrative.`,
       );
       continue;
     }
@@ -811,16 +841,10 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
     }
 
     if (line.startsWith("0. Gamestate:")) {
-      const cleanedLine = line.replace(/\{\{getvar::gmNotebookCoTGamestate\}\}\s*/, "");
       output.push(
         internalDndActive
-          ? cleanedLine.replace(
-              /If '<internal_dndsim>' is active:[^\n]*$/,
-              "If '<internal_dndsim>' is active: What is the locked task DC (Easy: 1-5, Mod: 5-10, Hard: 10-15, Imp: 15-20)? Permanently lock DC now. (Skip if dndsim tag not present or trivial task)",
-            )
-          : cleanedLine
-              .replace(/\s*If '<internal_dndsim>' is active:[^\n]*$/, "")
-              .replace("Gamestate:  ", "Gamestate: "),
+          ? "0. Gamestate: From available history and memory, what is the current game state? What is the exact physical positioning, line of sight (120°), and sound muffling of characters in the scene? Are OOC commands present (if yes, halt RP and answer directly)? If '<internal_dndsim>' is active: What is the locked task DC (Easy: 1-5, Mod: 5-10, Hard: 10-15, Imp: 15-20)? Permanently lock DC now. (Skip if dndsim tag not present or trivial task)"
+          : "0. Gamestate: From available history and memory, what is the current game state? What is the exact physical positioning, line of sight (120°), and sound muffling of characters in the scene? Are OOC commands present (if yes, halt RP and answer directly)?",
       );
       continue;
     }
@@ -840,8 +864,8 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
     if (line.startsWith("7. Formatting:")) {
       output.push(
         activeIdentifiers.has(VIETNAMESE_OUTPUT_MODULE_IDENTIFIER)
-          ? "7. Formatting: What is the correct output format? How will I keep all reader-facing output in natural Vietnamese and use standalone `§...§` only for non-vocal sound effects?"
-          : "7. Formatting: What is the correct output format? (skip if no special format rule is active)",
+          ? "7. Formatting: What format? What is the target response length in `<formatting_constraints>`? How will I apply `<vietnamese_output>`? (skip if tags not present)"
+          : "7. Formatting: What format? What is the target response length in `<formatting_constraints>`? (skip if tags not present)",
       );
       continue;
     }

@@ -11,7 +11,7 @@ The prompt files contain non-empty content selected from the configured prompt o
 - Prompt-order group: 0
 - Source-enabled entries: 34
 - Source-disabled entries: 22
-- Selected source blocks: 21
+- Selected source blocks: 22
 - Reasoning source blocks: 2
 - External master modules: 1
 - Runtime slots: 8
@@ -19,7 +19,7 @@ The prompt files contain non-empty content selected from the configured prompt o
 - Include disabled entries: no
 - Active route: full-master
 - Model mode: gemma-4
-- Omitted by route/cleanup: 11
+- Omitted by route/cleanup: 10
 
 ### External master modules
 
@@ -103,7 +103,7 @@ Entries below follow the selected prompt_order group. Empty content is a runtime
 | 16 | OFF | 019f62e8-892f-7010-bf59-e7b17fd4476f | 🧂Embellish Mode- Experimental 🧙‍♂️ | system | 0 / 4 | 955 |
 | 17 | OFF | 019f62e8-892f-7011-980c-f01846f6c97f | =✍🏻Edit custom toggles 👇============== | system | 0 / 4 | 30 |
 | 18 | OFF | 079ce45e-d344-4e75-a5a5-be6ae3037c91 | Kimi K3 | assistant | 0 / 2 | 914 |
-| 19 | CLEANED | 019f62e8-892f-7012-98b4-8de29f11aa1d | 📝Total Output Length🚦 | system | 0 / 4 | 599 |
+| 19 | ON | 019f62e8-892f-7012-98b4-8de29f11aa1d | 📝Total Output Length🚦 | system | 0 / 4 | 599 |
 | 20 | ON | 019f62e8-892f-7017-ae2e-44fbc7d29de7 | 🎤NPC Voice + Dialogue 2.0 Output🗣️ | system | 0 / 4 | 3442 |
 | 21 | ON | 019f62e8-892f-7015-9be8-a0015ebd2c1d | 🧘Anti-Omniscient NPCs and Thoughts 💥🧠 | system | 0 / 4 | 1123 |
 | 22 | ON | 019f62e8-892f-7016-a021-aa24f58271d6 | 🎭NPC Instincts + VAD Emotions🎥🎬 | system | 0 / 4 | 2011 |
