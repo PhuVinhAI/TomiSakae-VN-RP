@@ -17,7 +17,7 @@ The raw build uses the source JSON's existing ON/OFF states. It applies no clean
 - Current master blocks: 20 + 1 external module
 - Current response-rule blocks: 2
 - Raw master SHA-256: `48ae4a0a67cc8bbc8b900f9bf79b82b78d48e8719d974af617241e4b92163923`
-- Current master SHA-256: `5e1a61b49a576e008ed3b1968fbc836a77aeaef48b2d2d0310d10a5b38857991`
+- Current master SHA-256: `f33c9a74488b097c056f69ca0ebe87c53ce80ba738d0c46fa522355358d52fc8`
 - Raw response rules SHA-256: `445bc573408519f724814f0ca8660e9bfbc42eb189b7250040f8c8a34021b666`
 - Current response rules SHA-256: `6d6509e5ccf6c0574a4df064883529efc11ff646bf538a895bac4bf88d4fa9ac`
 
@@ -35,7 +35,7 @@ The raw build uses the source JSON's existing ON/OFF states. It applies no clean
 
 ```diff
 diff --git raw/raw.md current/current.md
-index e20037c..bf1add8 100644
+index e20037c..5eb4cb8 100644
 --- raw/raw.md
 +++ current/current.md
 @@ -1,5 +1,3 @@
@@ -137,7 +137,7 @@ index e20037c..bf1add8 100644
 -- Banned Clinical Words: vulva, semen, penis, glutes, areola, breasts, cleavage, clitoris.
 -- Required Slang Words: pussy, clit, cum, nectar, dick, cock, ass, butt, nipples, tits, boobs, cunt, breeding, leaking, fucking, throbbing.
 +- Banned Clinical Words: âm hộ, tinh dịch, dương vật, cơ mông, quầng vú, bầu ngực, rãnh ngực, khe ngực, âm vật.
-+- Banned Words: cu, gậy thịt, gò bồng đảo, cửa mình, gò thịt, dương cụ, phân thân.
++- Banned Words: cu, gậy thịt, chiếc cặc, gò bồng đảo, cửa mình, gò thịt, dương cụ, phân thân.
 +- Required Slang Words: lồn, bướm, hột le, hạt le, tinh trùng, sữa đặc, dâm dịch, nước nhờn, nước dâm, dịch nhờn, cặc, đít, mông, đầu ti, núm vú, vú, ngực, bắn tinh, xuất tinh, bắn ngập vào trong, rót đầy tinh, phun tinh, rỉ nước, ướt sũng, đụ, nện, địt, thúc, giật giật, co thắt.
 
  Body, Kinetics & Senses:
@@ -1269,7 +1269,7 @@ NPC Rules:
 
 Word Rules:
 - Banned Clinical Words: âm hộ, tinh dịch, dương vật, cơ mông, quầng vú, bầu ngực, rãnh ngực, khe ngực, âm vật.
-- Banned Words: cu, gậy thịt, gò bồng đảo, cửa mình, gò thịt, dương cụ, phân thân.
+- Banned Words: cu, gậy thịt, chiếc cặc, gò bồng đảo, cửa mình, gò thịt, dương cụ, phân thân.
 - Required Slang Words: lồn, bướm, hột le, hạt le, tinh trùng, sữa đặc, dâm dịch, nước nhờn, nước dâm, dịch nhờn, cặc, đít, mông, đầu ti, núm vú, vú, ngực, bắn tinh, xuất tinh, bắn ngập vào trong, rót đầy tinh, phun tinh, rỉ nước, ướt sũng, đụ, nện, địt, thúc, giật giật, co thắt.
 
 Body, Kinetics & Senses:
