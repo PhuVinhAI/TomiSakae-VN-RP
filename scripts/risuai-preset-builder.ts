@@ -820,6 +820,9 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
   const realismOnly =
     activeIdentifiers.has(REALISM_MODE_IDENTIFIER) &&
     !activeIdentifiers.has(FREAKY_MODE_IDENTIFIER);
+  const freakyOnly =
+    activeIdentifiers.has(FREAKY_MODE_IDENTIFIER) &&
+    !activeIdentifiers.has(REALISM_MODE_IDENTIFIER);
   const lines = content.split(/\r?\n/);
   const output: string[] = [];
   let skippingRemovedStateSequence = false;
@@ -895,6 +898,13 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
     if (line.startsWith("8. Adult Modes:") && realismOnly) {
       output.push(
         "8. Adult Modes: If the current scene is NSFW, how will I apply all active Realism Mode rules logically while preserving slow-burn pacing and NPC persona? Skip Realism Mode if the scene is not NSFW.",
+      );
+      continue;
+    }
+
+    if (line.startsWith("8. Adult Modes:") && freakyOnly) {
+      output.push(
+        "8. Adult Modes: If Freaky Mode is active, how will I describe characters lewdly with slang and kinetics in the scene without repeating details from the last 3 turns?  Vulgarity and slang all allowed in narrative prose if Freaky Mode on. How do I apply Freaky rules to this response?",
       );
       continue;
     }

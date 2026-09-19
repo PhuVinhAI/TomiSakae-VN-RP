@@ -518,6 +518,7 @@ describe("RisuAI preset builder", () => {
       "If the current scene is NSFW, how will I apply all active Realism Mode rules logically",
     );
     expect(result.reasoning).not.toContain("How do I apply Freaky rules");
+    expect(result.reasoning).not.toContain("If Freaky Mode is active, how will I describe");
     expect(result.endInjectedPrompt).toContain(
       "When an NSFW scene is active, apply Realism Mode fully",
     );

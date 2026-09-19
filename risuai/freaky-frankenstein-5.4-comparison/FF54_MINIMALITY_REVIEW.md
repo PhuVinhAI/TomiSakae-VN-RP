@@ -19,7 +19,7 @@ The raw build uses the source JSON's existing ON/OFF states. It applies no clean
 - Raw master SHA-256: `48ae4a0a67cc8bbc8b900f9bf79b82b78d48e8719d974af617241e4b92163923`
 - Current master SHA-256: `f33c9a74488b097c056f69ca0ebe87c53ce80ba738d0c46fa522355358d52fc8`
 - Raw response rules SHA-256: `445bc573408519f724814f0ca8660e9bfbc42eb189b7250040f8c8a34021b666`
-- Current response rules SHA-256: `6d6509e5ccf6c0574a4df064883529efc11ff646bf538a895bac4bf88d4fa9ac`
+- Current response rules SHA-256: `93cbf4027b74d3c52540bbfb1f00bce4049ba716c485b1332a6beafddba940d6`
 
 ## Questions for the Reviewer
 
@@ -560,7 +560,7 @@ index e20037c..5eb4cb8 100644
 
 ```diff
 diff --git raw/raw.md current/current.md
-index d809095..afcde46 100644
+index d809095..90dcc8f 100644
 --- raw/raw.md
 +++ current/current.md
 @@ -1,46 +1,40 @@
@@ -599,7 +599,8 @@ index d809095..afcde46 100644
 -7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? What format? What is the target response length in <formatting_constraints>? (skip if tags not present)
 +7. Formatting: What format? What is the target response length in `<formatting_constraints>`? How will I apply `<vietnamese_output>`? (skip if tags not present)
 
- 8. Adult Modes: If Realism Mode is active, how will I apply its rules logically? If Freaky Mode is active, how will I describe characters lewdly with slang and kinetics in the scene without repeating details from the last 3 turns?  Vulgarity and slang all allowed in narrative prose if Freaky Mode on. How do I apply Freaky rules to this response?
+-8. Adult Modes: If Realism Mode is active, how will I apply its rules logically? If Freaky Mode is active, how will I describe characters lewdly with slang and kinetics in the scene without repeating details from the last 3 turns?  Vulgarity and slang all allowed in narrative prose if Freaky Mode on. How do I apply Freaky rules to this response?
++8. Adult Modes: If Freaky Mode is active, how will I describe characters lewdly with slang and kinetics in the scene without repeating details from the last 3 turns?  Vulgarity and slang all allowed in narrative prose if Freaky Mode on. How do I apply Freaky rules to this response?
 
  9. Plot Momentum: Brainstorm 3 very distinct, compelling ways NPCs can react in the scene based on active VAD and instincts to drive the scene. Then select the best path or a blend and concisely describe why it's best.
 
@@ -1650,7 +1651,7 @@ Tasks:
 
 7. Formatting: What format? What is the target response length in `<formatting_constraints>`? How will I apply `<vietnamese_output>`? (skip if tags not present)
 
-8. Adult Modes: If Realism Mode is active, how will I apply its rules logically? If Freaky Mode is active, how will I describe characters lewdly with slang and kinetics in the scene without repeating details from the last 3 turns?  Vulgarity and slang all allowed in narrative prose if Freaky Mode on. How do I apply Freaky rules to this response?
+8. Adult Modes: If Freaky Mode is active, how will I describe characters lewdly with slang and kinetics in the scene without repeating details from the last 3 turns?  Vulgarity and slang all allowed in narrative prose if Freaky Mode on. How do I apply Freaky rules to this response?
 
 9. Plot Momentum: Brainstorm 3 very distinct, compelling ways NPCs can react in the scene based on active VAD and instincts to drive the scene. Then select the best path or a blend and concisely describe why it's best.
 
