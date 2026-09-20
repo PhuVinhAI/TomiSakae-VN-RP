@@ -612,6 +612,101 @@ describe("RisuAI preset builder", () => {
     expect(result.endInjectedPrompt).not.toContain("private");
   });
 
+  it("routes Realism behavior rules without internal-state blocks", async () => {
+    const source = parsePreset({
+      prompts: [
+        { identifier: "system-state", content: "<system_state>Rules</system_state>" },
+        {
+          identifier: "019f62e8-892f-700c-9795-53ecb3381d7d",
+          content: "<adult_mode># Realism Mode</adult_mode>",
+        },
+        {
+          identifier: "019f62e8-892f-700d-b070-4add983aeae1",
+          content: "<adult_mode># Freaky Mode</adult_mode>",
+        },
+        {
+          identifier: "019f62e8-892f-7021-97a6-42e1b83eaad3",
+          content: "<internal_dndsim>legacy</internal_dndsim>",
+        },
+        {
+          identifier: "019f67b4-7381-7000-bcc4-496b2e6ed920",
+          content: "<internal_agendatracker>legacy</internal_agendatracker>",
+        },
+        {
+          identifier: "634ecfec-1862-4ce0-821e-e31057acadfa",
+          content: [
+            "# Reasoning Rules",
+            "Tasks:",
+            "0. Gamestate: legacy DnD setup.",
+            "1. Neutrality & Rolls: Preserve this core instruction. DnD Rolls (if active): legacy roll instruction.",
+            "2. Scope & Knowledge: Preserve this task exactly.",
+            "3. Prose Style: Preserve this task exactly.",
+            "4. Natural Dialogue: Preserve this task exactly.",
+            "5. User Boundaries: Preserve this task exactly.",
+            "6. Slop Review: legacy.",
+            "7. Formatting: legacy.",
+            "8. Adult Modes: legacy.",
+            "9. Plot Momentum: Preserve this task exactly.",
+            "10. Internal States + No More Reasoning Rule: update states.",
+          ].join("\n"),
+        },
+      ],
+      prompt_order: [
+        {
+          order: [
+            { identifier: "system-state", enabled: true },
+            { identifier: "019f62e8-892f-700c-9795-53ecb3381d7d", enabled: true },
+            { identifier: "019f62e8-892f-700d-b070-4add983aeae1", enabled: true },
+            { identifier: "019f62e8-892f-7021-97a6-42e1b83eaad3", enabled: true },
+            { identifier: "019f67b4-7381-7000-bcc4-496b2e6ed920", enabled: true },
+            { identifier: "634ecfec-1862-4ce0-821e-e31057acadfa", enabled: true },
+          ],
+        },
+      ],
+    });
+    const behaviorRules = await readFile(
+      "risuai-modules/freaky-frankenstein-5.4/20-realism-behavior-rules.md",
+      "utf8",
+    );
+    const result = buildPreset(source, {
+      sourceFile: "preset.json",
+      outputDirectory: "out",
+      modelMode: "gemma-4",
+      masterModules: [{ file: "behavior-rules.md", content: behaviorRules.trim() }],
+      promptRouter: {
+        ...DEFAULT_PROMPT_ROUTER,
+        active: "full-master-realism-behavior",
+      },
+    });
+
+    expect(result.master).toContain("<action_resolution>");
+    expect(result.master).toContain("<npc_agendas>");
+    expect(result.master).toContain("<continuity_rules>");
+    expect(result.master).toContain("<established_resources>");
+    expect(result.master).toContain("<relationship_progression>");
+    expect(result.master).toContain("<npc_motivation>");
+    expect(result.master).not.toContain("<internal_");
+    expect(result.master).not.toContain("setvar::");
+    expect(result.master).not.toContain("GFX_START");
+    expect(result.master).not.toContain("notebook, state list");
+    expect(result.reasoning).not.toContain("Internal States");
+    expect(result.reasoning).toContain(
+      "1. Neutrality: Preserve this core instruction. When a skilled action has a meaningful failure condition, apply `<action_resolution>`",
+    );
+    expect(result.reasoning).toContain("2. Scope & Knowledge: Preserve this task exactly.");
+    expect(result.reasoning).toContain("3. Prose Style: Preserve this task exactly.");
+    expect(result.reasoning).toContain("4. Natural Dialogue: Preserve this task exactly.");
+    expect(result.reasoning).toContain("5. User Boundaries: Preserve this task exactly.");
+    expect(result.reasoning).toContain("9. Plot Momentum: Preserve this task exactly.");
+    expect(result.reasoning).toContain("* ACTION_RESOLUTION: For each skilled action");
+    expect(result.reasoning).toContain("* NPC_AGENDAS: Apply `<npc_agendas>`");
+    expect(result.reasoning).toContain("* CONTINUITY: Apply `<continuity_rules>`");
+    expect(result.reasoning).toContain("* RESOURCES: Apply `<established_resources>`");
+    expect(result.reasoning).toContain("* RELATIONSHIP: Apply `<relationship_progression>`");
+    expect(result.reasoning).toContain("* MOTIVATION: Apply `<npc_motivation>`");
+    expect(result.reasoning).not.toContain("legacy roll instruction");
+  });
+
   it("leaves internal and explanatory examples unchanged in Gemma 4 mode", () => {
     const source = parsePreset({
       prompts: [

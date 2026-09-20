@@ -69,6 +69,8 @@ export interface PromptRoute {
   includeDisabled?: boolean;
   /** Remove all internal-state engines and their reasoning/output guards. */
   noInternalStates?: boolean;
+  /** Replace removed internal engines with ordinary behavior rules. */
+  behaviorRules?: boolean;
 }
 
 export interface PromptRouter {
@@ -164,6 +166,7 @@ const REALISM_MODE_IDENTIFIER = "019f62e8-892f-700c-9795-53ecb3381d7d";
 const FREAKY_MODE_IDENTIFIER = "019f62e8-892f-700d-b070-4add983aeae1";
 const VIETNAMESE_OUTPUT_MODULE_IDENTIFIER = "external:vietnamese-output-and-sound";
 const NO_INTERNAL_STATES_ROUTE_IDENTIFIER = "route:no-internal-states";
+const BEHAVIOR_RULES_ROUTE_IDENTIFIER = "route:realism-behavior";
 const GEMMA_4_MODE = "gemma-4";
 export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
   active: "full-master",
@@ -272,6 +275,51 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
         environmentReaction: true,
       },
       noInternalStates: true,
+    },
+    "full-master-realism-behavior": {
+      masterModuleFiles: [
+        "risuai-modules/freaky-frankenstein-5.4/10-vietnamese-output-and-sound.md",
+        "risuai-modules/freaky-frankenstein-5.4/20-realism-behavior-rules.md",
+      ],
+      endInjectedPromptFile:
+        "risuai-modules/freaky-frankenstein-5.4/90-end-injected-prompt-realism-behavior.md",
+      reasoningIdentifiers: [BOLT_REASONING_IDENTIFIER, "jailbreak"],
+      enabledIdentifiers: [REALISM_MODE_IDENTIFIER],
+      excludedIdentifiers: [
+        FREAKY_MODE_IDENTIFIER,
+        INTERNAL_DND_IDENTIFIER,
+        INTERNAL_AGENDA_IDENTIFIER,
+        INTERNAL_GM_NOTEBOOK_IDENTIFIER,
+        INTERNAL_INVENTORY_IDENTIFIER,
+        INTERNAL_BOND_IDENTIFIER,
+        INTERNAL_WORLD_SIM_IDENTIFIER,
+        INTERNAL_CHEKHOV_IDENTIFIER,
+        INTERNAL_NPC_THOUGHTS_IDENTIFIER,
+        INTERNAL_STATES_MODULE_IDENTIFIER,
+        INTERNAL_MAX_COT_IDENTIFIER,
+        INTERNAL_MICRO_COT_IDENTIFIER,
+        INTERNAL_DEBUG_IDENTIFIER,
+        "019f62e8-892f-7002-8fcf-eea637bd577b",
+        "019f62e8-892f-7019-be65-715a4949cba0",
+        "2105050a-0d4b-4661-9363-3cc1ac44d5e7",
+        "019f62e8-892f-701a-afd5-49222c79fdb6",
+        "019f62e8-892f-701c-8550-08ebf33e9da2",
+        "019f62e8-892f-7028-bad6-be1f427c3ae4",
+        "019f62e8-892f-7027-93ef-159f3d55c410",
+        "019f62e8-892f-7000-9a7f-4d15c1234fb9",
+      ],
+      masterCleanup: {
+        toggleComments: true,
+        presentationMacros: true,
+        runtimeMacros: true,
+        reasoningRules: true,
+        obsoleteOutputInstructions: true,
+        stateOutputSyntax: true,
+        disabledEngineReferences: true,
+        environmentReaction: true,
+      },
+      noInternalStates: true,
+      behaviorRules: true,
     },
     "nsfw-jailbreak": {
       introductionIdentifiers: [
@@ -917,6 +965,7 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
   const internalWorldSimActive = activeIdentifiers.has(INTERNAL_WORLD_SIM_IDENTIFIER);
   const internalChekhovActive = activeIdentifiers.has(INTERNAL_CHEKHOV_IDENTIFIER);
   const noInternalStates = activeIdentifiers.has(NO_INTERNAL_STATES_ROUTE_IDENTIFIER);
+  const behaviorRules = activeIdentifiers.has(BEHAVIOR_RULES_ROUTE_IDENTIFIER);
   const realismOnly =
     activeIdentifiers.has(REALISM_MODE_IDENTIFIER) &&
     !activeIdentifiers.has(FREAKY_MODE_IDENTIFIER);
@@ -929,6 +978,12 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
 
   for (const line of lines) {
     if (line.startsWith("10. Internal States + No More Reasoning Rule:")) {
+      if (behaviorRules) {
+        output.push(
+          "10. Final Review + No More Reasoning Rule: Apply the active behavior rules once to ground the simulation in the current scene, chat history, and memory. Prefer direct recent evidence when facts conflict, count each established event once, use a neutral interpretation when evidence is missing, and never invent past values, items, goals, relationship changes, motives, or outcomes. Apply this exact sequence:\n    * ACTION_RESOLUTION: For each skilled action with a meaningful failure condition, apply `<action_resolution>`.\n    * NPC_AGENDAS: Apply `<npc_agendas>` to each named NPC's current goal and feasible next step.\n    * CONTINUITY: Apply `<continuity_rules>` to reminders, threads, promises, secrets, and unresolved consequences.\n    * RESOURCES: Apply `<established_resources>` to supported items, skills, titles, injuries, and conditions.\n    * RELATIONSHIP: Apply `<relationship_progression>` to supported changes in trust, affection, resentment, fear, attraction, or distance.\n    * MOTIVATION: Apply `<npc_motivation>` to turn each supported motive into a complete action, choice, or dialogue line.\nResolve conflicts using the active rules, then weave only supported consequences into the narrative and stop reasoning.",
+        );
+        continue;
+      }
       if (noInternalStates) {
         output.push(
           "10. Final Review + No More Reasoning Rule: I must review Tasks 0-9, resolve any conflicts using the active rules and current scene context, then stop reasoning.",
@@ -981,7 +1036,14 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
               "DnD Rolls (if active): Internally sample a uniformly random d20 roll for each actor performing a skilled action. What is the Delta (Roll - DC + mods) and outcome tier? How does this affect the scene?",
             )
           : line.replace(/\s*DnD Rolls \(if active\):[^\n]*$/, "");
-      output.push(noInternalStates ? adaptedLine.replace(" & Rolls:", ":") : adaptedLine);
+      const noRollsLine = adaptedLine.replace(" & Rolls:", ":");
+      output.push(
+        behaviorRules
+          ? `${noRollsLine} When a skilled action has a meaningful failure condition, apply \`<action_resolution>\` using facts supported by the current scene, chat history, or memory. How does the result affect the scene?`
+          : noInternalStates
+            ? noRollsLine
+            : adaptedLine,
+      );
       continue;
     }
 
@@ -1299,6 +1361,9 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
   if (route.noInternalStates) {
     activeIdentifiers.add(NO_INTERNAL_STATES_ROUTE_IDENTIFIER);
   }
+  if (route.behaviorRules) {
+    activeIdentifiers.add(BEHAVIOR_RULES_ROUTE_IDENTIFIER);
+  }
 
   const masterPrompts: SelectedPrompt[] = [];
   const reasoningPrompts: SelectedPrompt[] = [];
@@ -1397,9 +1462,10 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
     ? removeInternalStateMasterReferences(gemmaAdjustedMaster)
     : gemmaAdjustedMaster;
   const modeAdjustedReasoning = gemma4Mode ? adaptGemma4Reasoning(rawReasoning) : rawReasoning;
-  const reasoning = route.noInternalStates
+  const noInternalReasoning = route.noInternalStates
     ? removeInternalStateReasoningGuards(modeAdjustedReasoning)
     : modeAdjustedReasoning;
+  const reasoning = noInternalReasoning;
   const modeAdjustedEndInjectedPrompt = adaptEndInjectedPromptForActiveModes(
     rawEndInjectedPrompt,
     activeIdentifiers,

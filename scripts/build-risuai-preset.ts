@@ -35,6 +35,7 @@ const PromptRouteSchema = z.object({
   reasoningCleanup: PromptCleanupSchema.optional(),
   includeDisabled: z.boolean().optional(),
   noInternalStates: z.boolean().optional(),
+  behaviorRules: z.boolean().optional(),
 });
 
 const PromptRouterSchema = z.object({
