@@ -530,6 +530,85 @@ describe("RisuAI preset builder", () => {
     expect(result.endInjectedPrompt).not.toContain("Freaky Mode is active");
   });
 
+  it("builds the Realism variant without internal-state engines or leak guards", () => {
+    const source = parsePreset({
+      prompts: [
+        {
+          identifier: "system-state",
+          content:
+            "<system_state>\n AI role: unbiased cinematographer, unhinged DM, GM, controls all NPCs. Reasoning: Never draft prose in think tags. Bullet points only. Output immediately.\n</system_state>",
+        },
+        {
+          identifier: "019f62e8-892f-700c-9795-53ecb3381d7d",
+          content: "<adult_mode>\n# Realism Mode\n</adult_mode>",
+        },
+        {
+          identifier: "019f62e8-892f-700d-b070-4add983aeae1",
+          content: "<adult_mode>\n# Freaky Mode\n</adult_mode>",
+        },
+        {
+          identifier: "019f62e8-892f-7021-97a6-42e1b83eaad3",
+          content: "<internal_dndsim>DnD state</internal_dndsim>",
+        },
+        {
+          identifier: "019f67b4-7381-7000-bcc4-496b2e6ed920",
+          content: "<internal_agendatracker>Agenda state</internal_agendatracker>",
+        },
+        {
+          identifier: "634ecfec-1862-4ce0-821e-e31057acadfa",
+          content:
+            "# Reasoning Rules\n\n Reasoning Rules\n- A. Reason briefly in highly concise bullet points inside think tags across Tasks 0-10.\n- B. *NEVER* draft full prose in reasoning; ONLY brainstorm ideas and answer all questions, then output final response immediately after Task 10.\n- C. Do not leak reasoning into the final response.\n\nTasks:\n0. Gamestate: Check the scene. If '<internal_dndsim>' is active: lock DC.\n1. Neutrality & Rolls: Check goals. DnD Rolls (if active): roll.\n8. Adult Modes: Apply active mode.\n9. Plot Momentum: Choose a path.\n10. Internal States + No More Reasoning Rule: Update states.\n    * Increment turn (ct + 1)\n    If `<internal_dndsim>` is active, populate state.\nLastly, I must state that I am a GM creating an immersive simulation, I am not a helpful AI assistant. Creative risk-taking is embraced and perfection is unnecessary. Bold choices matter more than perfection. I will never draft full prose or write out pre-planned scenes in reasoning. I will answer task points with concise ideas only, close think tags, and output the final response immediately.",
+        },
+      ],
+      prompt_order: [
+        {
+          order: [
+            { identifier: "system-state", enabled: true },
+            { identifier: "019f62e8-892f-700c-9795-53ecb3381d7d", enabled: false },
+            { identifier: "019f62e8-892f-700d-b070-4add983aeae1", enabled: true },
+            { identifier: "019f62e8-892f-7021-97a6-42e1b83eaad3", enabled: true },
+            { identifier: "019f67b4-7381-7000-bcc4-496b2e6ed920", enabled: true },
+            { identifier: "634ecfec-1862-4ce0-821e-e31057acadfa", enabled: true },
+          ],
+        },
+      ],
+    });
+    const result = buildPreset(source, {
+      sourceFile: "preset.json",
+      outputDirectory: "out",
+      modelMode: "gemma-4",
+      endInjectedPrompt:
+        "{{Privately activate and execute # Reasoning Rules. Fully apply every instruction in <system_state>, <adult_mode>, <internal_dndsim>, <internal_agendatracker>, <vietnamese_output>. Keep all reasoning and internal processing private.}}",
+      promptRouter: {
+        ...DEFAULT_PROMPT_ROUTER,
+        active: "full-master-realism-no-internal",
+      },
+    });
+
+    expect(result.master).toContain("# Realism Mode");
+    expect(result.master).not.toContain("# Freaky Mode");
+    expect(result.master).not.toContain("<internal_");
+    expect(result.master).not.toContain("Output immediately");
+    expect(result.master).toContain("Reasoning: Never draft prose in think tags. Bullet points only.");
+    expect(result.reasoning).toContain("1. Neutrality:");
+    expect(result.reasoning).not.toContain("Neutrality & Rolls");
+    expect(result.reasoning).toContain(
+      "10. Final Review + No More Reasoning Rule: I must review Tasks 0-9",
+    );
+    expect(result.reasoning).not.toContain("<internal_");
+    expect(result.reasoning).not.toContain("Internal States");
+    expect(result.reasoning).not.toContain("Do not leak");
+    expect(result.reasoning).not.toContain("Never output");
+    expect(result.reasoning).not.toContain("privately");
+    expect(result.reasoning).toContain(
+      "I will never draft full prose or write out pre-planned scenes in reasoning.",
+    );
+    expect(result.endInjectedPrompt).toContain("{{Activate and execute # Reasoning Rules.");
+    expect(result.endInjectedPrompt).not.toContain("<internal_");
+    expect(result.endInjectedPrompt).not.toContain("Privately");
+    expect(result.endInjectedPrompt).not.toContain("private");
+  });
+
   it("leaves internal and explanatory examples unchanged in Gemma 4 mode", () => {
     const source = parsePreset({
       prompts: [

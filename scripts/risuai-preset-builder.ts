@@ -67,6 +67,8 @@ export interface PromptRoute {
   reasoningCleanup?: PromptCleanup;
   /** Allow disabled source entries to participate in this route. */
   includeDisabled?: boolean;
+  /** Remove all internal-state engines and their reasoning/output guards. */
+  noInternalStates?: boolean;
 }
 
 export interface PromptRouter {
@@ -146,12 +148,22 @@ export interface RisuAiBuildResult {
 const DEFAULT_SEPARATOR = "\n\n";
 const DEFAULT_ORDER_INDEX = 0;
 const INTERNAL_DND_IDENTIFIER = "019f62e8-892f-7021-97a6-42e1b83eaad3";
+const INTERNAL_AGENDA_IDENTIFIER = "019f67b4-7381-7000-bcc4-496b2e6ed920";
+const INTERNAL_GM_NOTEBOOK_IDENTIFIER = "019f67ad-c0b1-7000-aca4-0e2480fa02db";
+const INTERNAL_INVENTORY_IDENTIFIER = "019f62e8-892f-7022-9eb9-e00c2944ebc6";
+const INTERNAL_BOND_IDENTIFIER = "019f62e8-892f-7023-825d-9351eca0347f";
 const INTERNAL_WORLD_SIM_IDENTIFIER = "019f62e8-892f-7024-a40f-b906fceb58d2";
 const INTERNAL_CHEKHOV_IDENTIFIER = "019f62e8-892f-7025-be65-8859e7730ee0";
+const INTERNAL_NPC_THOUGHTS_IDENTIFIER = "019f62e8-892f-7026-92ea-34ff510c244b";
+const INTERNAL_STATES_MODULE_IDENTIFIER = "019f62e8-892f-7027-93ef-159f3d55c410";
+const INTERNAL_MAX_COT_IDENTIFIER = "019f62e8-892f-7032-b004-1869f8bc0782";
+const INTERNAL_MICRO_COT_IDENTIFIER = "b5db9430-857a-408c-817c-32e975a71430";
+const INTERNAL_DEBUG_IDENTIFIER = "019f62e8-892f-7000-9a7f-4d15c1234fb9";
 const BOLT_REASONING_IDENTIFIER = "634ecfec-1862-4ce0-821e-e31057acadfa";
 const REALISM_MODE_IDENTIFIER = "019f62e8-892f-700c-9795-53ecb3381d7d";
 const FREAKY_MODE_IDENTIFIER = "019f62e8-892f-700d-b070-4add983aeae1";
 const VIETNAMESE_OUTPUT_MODULE_IDENTIFIER = "external:vietnamese-output-and-sound";
+const NO_INTERNAL_STATES_ROUTE_IDENTIFIER = "route:no-internal-states";
 const GEMMA_4_MODE = "gemma-4";
 export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
   active: "full-master",
@@ -206,6 +218,45 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
         "019f62e8-892f-701a-afd5-49222c79fdb6",
         "019f62e8-892f-701c-8550-08ebf33e9da2",
         "019f62e8-892f-7028-bad6-be1f427c3ae4",
+      ],
+      masterCleanup: {
+        toggleComments: true,
+        presentationMacros: true,
+        runtimeMacros: true,
+        reasoningRules: true,
+        obsoleteOutputInstructions: true,
+        stateOutputSyntax: true,
+        disabledEngineReferences: true,
+        environmentReaction: true,
+      },
+    },
+    "full-master-realism-no-internal": {
+      masterModuleFiles: [
+        "risuai-modules/freaky-frankenstein-5.4/10-vietnamese-output-and-sound.md",
+      ],
+      endInjectedPromptFile: "risuai-modules/freaky-frankenstein-5.4/90-end-injected-prompt.md",
+      reasoningIdentifiers: [BOLT_REASONING_IDENTIFIER, "jailbreak"],
+      enabledIdentifiers: [REALISM_MODE_IDENTIFIER],
+      excludedIdentifiers: [
+        FREAKY_MODE_IDENTIFIER,
+        INTERNAL_DND_IDENTIFIER,
+        INTERNAL_AGENDA_IDENTIFIER,
+        INTERNAL_GM_NOTEBOOK_IDENTIFIER,
+        INTERNAL_INVENTORY_IDENTIFIER,
+        INTERNAL_BOND_IDENTIFIER,
+        INTERNAL_WORLD_SIM_IDENTIFIER,
+        INTERNAL_CHEKHOV_IDENTIFIER,
+        INTERNAL_NPC_THOUGHTS_IDENTIFIER,
+        INTERNAL_STATES_MODULE_IDENTIFIER,
+        INTERNAL_MAX_COT_IDENTIFIER,
+        INTERNAL_MICRO_COT_IDENTIFIER,
+        INTERNAL_DEBUG_IDENTIFIER,
+        "019f62e8-892f-7002-8fcf-eea637bd577b",
+        "019f62e8-892f-7019-be65-715a4949cba0",
+        "2105050a-0d4b-4661-9363-3cc1ac44d5e7",
+        "019f62e8-892f-701a-afd5-49222c79fdb6",
+        "019f62e8-892f-701c-8550-08ebf33e9da2",
+        "019f62e8-892f-7028-bad6-be1f427c3ae4",
         "019f62e8-892f-7027-93ef-159f3d55c410",
         "019f62e8-892f-7000-9a7f-4d15c1234fb9",
       ],
@@ -219,6 +270,7 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
         disabledEngineReferences: true,
         environmentReaction: true,
       },
+      noInternalStates: true,
     },
     "nsfw-jailbreak": {
       introductionIdentifiers: [
@@ -538,6 +590,52 @@ function adaptGemma4EndInjectedPrompt(content: string): string {
   ]);
 }
 
+function removeInternalStateReasoningGuards(content: string): string {
+  return content
+    .replace(
+      "- A. Reason briefly in highly concise private bullet points across Tasks 0-10. Never output these bullets or think tags.",
+      "- A. Reason briefly in highly concise bullet points across Tasks 0-10.",
+    )
+    .replace(
+      "- A. Reason briefly in highly concise bullet points inside think tags across Tasks 0-10.",
+      "- A. Reason briefly in highly concise bullet points across Tasks 0-10.",
+    )
+    .replace(
+      "- B. *NEVER* draft full prose in reasoning; ONLY brainstorm ideas and answer all questions privately, then output final response immediately after Task 10.",
+      "- B. *NEVER* draft full prose in reasoning; ONLY brainstorm ideas and answer all questions.",
+    )
+    .replace(
+      "- B. *NEVER* draft full prose in reasoning; ONLY brainstorm ideas and answer all questions, then output final response immediately after Task 10.",
+      "- B. *NEVER* draft full prose in reasoning; ONLY brainstorm ideas and answer all questions.",
+    )
+    .replace(/^- C\. Do not leak reasoning into the final response\.\s*$/gm, "")
+    .replace(/^\s*- D\. For RP turns,[^\n]*\s*$/gm, "")
+    .replace(
+      /^Lastly, I must state that I am a GM creating an immersive simulation, I am not a helpful AI assistant\. Creative risk-taking is embraced and perfection is unnecessary\. Bold choices matter more than perfection\.[^\n]*$/gm,
+      "Lastly, I must state that I am a GM creating an immersive simulation, I am not a helpful AI assistant. Creative risk-taking is embraced and perfection is unnecessary. Bold choices matter more than perfection. I will never draft full prose or write out pre-planned scenes in reasoning.",
+    )
+    .replace(/\n{3,}/g, "\n\n");
+}
+
+function removeInternalStateEndInjectedGuards(content: string): string {
+  return content
+    .replace("Privately activate and execute", "Activate and execute")
+    .replace(/, <internal_[A-Za-z0-9_]+>/g, "")
+    .replace(/ Keep all reasoning and internal processing private\./g, "");
+}
+
+function removeInternalStateMasterReferences(content: string): string {
+  return content
+    .replace(
+      " AI role: unbiased cinematographer, unhinged DM, GM, controls all NPCs. Reasoning: Never draft prose in think tags. Bullet points only. Output immediately.",
+      " AI role: unbiased cinematographer, unhinged DM, GM, controls all NPCs. Reasoning: Never draft prose in think tags. Bullet points only.",
+    )
+    .replace(
+      "; weave into narrative and track via internal states.",
+      "; weave into narrative.",
+    );
+}
+
 function adaptEndInjectedPromptForActiveModes(
   content: string,
   activeIdentifiers: ReadonlySet<string>,
@@ -817,6 +915,7 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
   const internalDndActive = activeIdentifiers.has(INTERNAL_DND_IDENTIFIER);
   const internalWorldSimActive = activeIdentifiers.has(INTERNAL_WORLD_SIM_IDENTIFIER);
   const internalChekhovActive = activeIdentifiers.has(INTERNAL_CHEKHOV_IDENTIFIER);
+  const noInternalStates = activeIdentifiers.has(NO_INTERNAL_STATES_ROUTE_IDENTIFIER);
   const realismOnly =
     activeIdentifiers.has(REALISM_MODE_IDENTIFIER) &&
     !activeIdentifiers.has(FREAKY_MODE_IDENTIFIER);
@@ -829,6 +928,12 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
 
   for (const line of lines) {
     if (line.startsWith("10. Internal States + No More Reasoning Rule:")) {
+      if (noInternalStates) {
+        output.push(
+          "10. Final Review + No More Reasoning Rule: I must review Tasks 0-9, resolve any conflicts using the active rules and current scene context, then stop reasoning.",
+        );
+        continue;
+      }
       const currentTurnSequence = [
         "    * Increment turn (ct + 1)",
         "    * Grudge Check: Apply `<internal_bondtracker>`.",
@@ -868,14 +973,14 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
     }
 
     if (line.startsWith("1. Neutrality & Rolls:")) {
-      output.push(
+      const adaptedLine =
         internalDndActive
           ? line.replace(
               /DnD Rolls \(if active\):[^\n]*$/,
               "DnD Rolls (if active): Internally sample a uniformly random d20 roll for each actor performing a skilled action. What is the Delta (Roll - DC + mods) and outcome tier? How does this affect the scene?",
             )
-          : line.replace(/\s*DnD Rolls \(if active\):[^\n]*$/, ""),
-      );
+          : line.replace(/\s*DnD Rolls \(if active\):[^\n]*$/, "");
+      output.push(noInternalStates ? adaptedLine.replace(" & Rolls:", ":") : adaptedLine);
       continue;
     }
 
@@ -1190,6 +1295,9 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
   if (config.masterModules?.some(({ content }) => content.includes("<vietnamese_output>"))) {
     activeIdentifiers.add(VIETNAMESE_OUTPUT_MODULE_IDENTIFIER);
   }
+  if (route.noInternalStates) {
+    activeIdentifiers.add(NO_INTERNAL_STATES_ROUTE_IDENTIFIER);
+  }
 
   const masterPrompts: SelectedPrompt[] = [];
   const reasoningPrompts: SelectedPrompt[] = [];
@@ -1283,15 +1391,24 @@ export function buildPreset(preset: RisuAiPreset, config: RisuAiBuildConfig): Ri
     ? `${config.endInjectedPrompt.trim()}\n`
     : "";
   const gemma4Mode = config.modelMode === GEMMA_4_MODE;
-  const master = gemma4Mode ? adaptGemma4Master(rawMaster) : rawMaster;
-  const reasoning = gemma4Mode ? adaptGemma4Reasoning(rawReasoning) : rawReasoning;
+  const gemmaAdjustedMaster = gemma4Mode ? adaptGemma4Master(rawMaster) : rawMaster;
+  const master = route.noInternalStates
+    ? removeInternalStateMasterReferences(gemmaAdjustedMaster)
+    : gemmaAdjustedMaster;
+  const modeAdjustedReasoning = gemma4Mode ? adaptGemma4Reasoning(rawReasoning) : rawReasoning;
+  const reasoning = route.noInternalStates
+    ? removeInternalStateReasoningGuards(modeAdjustedReasoning)
+    : modeAdjustedReasoning;
   const modeAdjustedEndInjectedPrompt = adaptEndInjectedPromptForActiveModes(
     rawEndInjectedPrompt,
     activeIdentifiers,
   );
-  const endInjectedPrompt = gemma4Mode
+  const gemmaAdjustedEndInjectedPrompt = gemma4Mode
     ? adaptGemma4EndInjectedPrompt(modeAdjustedEndInjectedPrompt)
     : modeAdjustedEndInjectedPrompt;
+  const endInjectedPrompt = route.noInternalStates
+    ? removeInternalStateEndInjectedGuards(gemmaAdjustedEndInjectedPrompt)
+    : gemmaAdjustedEndInjectedPrompt;
   const regexScriptCount = Array.isArray(preset.extensions?.regex_scripts)
     ? preset.extensions.regex_scripts.length
     : 0;
