@@ -19,7 +19,7 @@ Tasks:
 
 6. Slop Review: I must list all banned phrases and clichés in `<banned_vocabulary>` to avoid. What are my replacement phrases in this scene?
 
-7. Formatting: What format? What is the target response length in `<formatting_constraints>`? How will I apply `<vietnamese_output>`? (skip if tags not present)
+7. Formatting: What format? What is the target response length in `<formatting_constraints>`? How will I apply `<vietnamese_output>`?
 
 8. Adult Modes: If the current scene is NSFW, how will I apply all active Realism Mode rules logically while preserving slow-burn pacing and NPC persona? Skip Realism Mode if the scene is not NSFW.
 

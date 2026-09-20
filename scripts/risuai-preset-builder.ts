@@ -218,6 +218,7 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
         "019f62e8-892f-701a-afd5-49222c79fdb6",
         "019f62e8-892f-701c-8550-08ebf33e9da2",
         "019f62e8-892f-7028-bad6-be1f427c3ae4",
+        INTERNAL_STATES_MODULE_IDENTIFIER,
       ],
       masterCleanup: {
         toggleComments: true,
@@ -987,8 +988,8 @@ function adaptReasoningRules(content: string, activeIdentifiers: ReadonlySet<str
     if (line.startsWith("7. Formatting:")) {
       output.push(
         activeIdentifiers.has(VIETNAMESE_OUTPUT_MODULE_IDENTIFIER)
-          ? "7. Formatting: What format? What is the target response length in `<formatting_constraints>`? How will I apply `<vietnamese_output>`? (skip if tags not present)"
-          : "7. Formatting: What format? What is the target response length in `<formatting_constraints>`? (skip if tags not present)",
+          ? "7. Formatting: What format? What is the target response length in `<formatting_constraints>`? How will I apply `<vietnamese_output>`?"
+          : "7. Formatting: What format? What is the target response length in `<formatting_constraints>`?",
       );
       continue;
     }

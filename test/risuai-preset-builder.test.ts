@@ -174,6 +174,7 @@ describe("RisuAI preset builder", () => {
     expect(result.master).toContain(
       "7. Formatting: What format? What is the target response length in `<formatting_constraints>`?",
     );
+    expect(result.master).not.toContain("skip if tags not present");
     expect(result.master).toContain("10. Internal States + No More Reasoning Rule:");
     expect(result.master).toContain("available history and memory");
     expect(result.master).toContain("reconstruct them chronologically");
@@ -220,6 +221,7 @@ describe("RisuAI preset builder", () => {
     });
 
     expect(result.master).toContain("How will I apply `<vietnamese_output>`?");
+    expect(result.master).not.toContain("skip if tags not present");
     expect(result.master.indexOf(module)).toBeLessThan(result.master.indexOf("# Reasoning Rules"));
     expect(result.externalMasterModules).toEqual([{ file: "module.md", content: module }]);
   });
@@ -263,6 +265,7 @@ describe("RisuAI preset builder", () => {
     expect(result.reasoning).toContain(
       "7. Formatting: What format? What is the target response length in `<formatting_constraints>`?",
     );
+    expect(result.reasoning).not.toContain("skip if tags not present");
     expect(result.reasoningPrompts.map(({ prompt }) => prompt.identifier)).toEqual(["reasoning"]);
     expect(result.outputFiles.reasoning).toMatch(/REASONING_RULES\.md$/);
   });

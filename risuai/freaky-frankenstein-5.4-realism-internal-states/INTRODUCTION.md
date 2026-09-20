@@ -19,7 +19,7 @@ The prompt files contain non-empty content selected from the configured prompt o
 - Include disabled entries: no
 - Active route: full-master-realism
 - Model mode: gemma-4
-- Omitted by route/cleanup: 11
+- Omitted by route/cleanup: 10
 
 ### External master modules
 
