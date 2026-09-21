@@ -106,7 +106,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(built[latestIndex + 1]!.memo).toContain("ff54:absolute:0");
   });
 
-  it("adds the Vietnamese module once before card context and adapts only enabled prompts", async () => {
+  it("adds the Vietnamese module once after card context and adapts only enabled prompts", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);
     const disabledPrompt = data.prompt_order[0]!.order.find((entry) => entry.enabled === false);
@@ -119,8 +119,24 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     const vietnamese = built.filter((entry) => entry.memo === "ff54:vietnamese-output");
     expect(vietnamese).toHaveLength(1);
     expect(vietnamese[0]!.content).toBe(VIETNAMESE_OUTPUT_PROMPT);
-    expect(built.indexOf(vietnamese[0]!)).toBeLessThan(
+    expect(built.indexOf(vietnamese[0]!)).toBeGreaterThan(
       built.findIndex((entry) => entry.content === "card context"),
+    );
+    expect(built.indexOf(vietnamese[0]!)).toBeGreaterThan(
+      Math.max(
+        ...built
+          .map((entry, index) => (entry.memo?.startsWith("ff54:absolute:") ? index : -1))
+          .filter((index) => index >= 0),
+      ),
+    );
+    expect(built.indexOf(vietnamese[0]!)).toBeLessThan(
+      built.findIndex((entry) => entry.memo === "ff54:jailbreak"),
+    );
+    expect(vietnamese[0]!.content).toContain(
+      "internal-state blocks, GFX, HUDs, status panels, and separate structured displays required by a character card",
+    );
+    expect(vietnamese[0]!.content).toContain(
+      "preserve its exact schema but write the variable values in Vietnamese",
     );
     expect(built.some((entry) => entry.memo === `ff54:${disabledPrompt!.identifier}`)).toBe(false);
 
@@ -144,7 +160,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue>",
     );
     expect(allContent).toContain(
-      "What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content? (skip if tags not present)",
+      "What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers, internal states, and card-required HUDs? (skip if tags not present)",
     );
   });
 
@@ -205,6 +221,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       const adapted = adaptPromptForVietnamese(sourceContent);
       expect(sourceContent).not.toContain("How will I apply `<vietnamese_output>`");
       expect(adapted.match(/How will I apply `<vietnamese_output>`/g)).toHaveLength(1);
+      expect(adapted).toContain("including headers, internal states, and card-required HUDs");
     }
   });
 
@@ -361,7 +378,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "utf8",
     );
     expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
-    expect(artifact).toContain("//@version 1.2.0");
+    expect(artifact).toContain("//@version 1.2.1");
   });
 
   it("context-saver regex strips old internal state but keeps the newest", async () => {

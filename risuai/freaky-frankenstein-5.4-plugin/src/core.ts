@@ -564,6 +564,7 @@ export async function buildRequestMessages(
   const composed = await composePresetPrompts(preset, settings, parseHostMacros, macroContext);
   return [
     ...composed.leading,
+    ...injectAbsoluteAtDepth(regexed, composed.absolute),
     ...(settings.vietnameseOutputEnabled
       ? [
           {
@@ -573,7 +574,6 @@ export async function buildRequestMessages(
           },
         ]
       : []),
-    ...injectAbsoluteAtDepth(regexed, composed.absolute),
     ...composed.trailing,
   ];
 }
