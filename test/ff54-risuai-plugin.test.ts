@@ -19,6 +19,13 @@ import {
   VIETNAMESE_REASONING_REPLACEMENTS,
 } from "../risuai/freaky-frankenstein-5.4-plugin/src/vietnamese.js";
 import { buildVietnameseComparison } from "../scripts/build-ff54-vietnamese-comparison.js";
+import {
+  EXCLUSIVE_PROMPT_GROUPS,
+  HOST_MARKER_IDS,
+  normalizeExclusivePromptGroups,
+  PROMPT_SECTIONS,
+  SOURCE_SEPARATOR_IDS,
+} from "../risuai/freaky-frankenstein-5.4-plugin/src/ui-vi.js";
 
 const source = "C:/Users/tomis/Downloads/Freaky Frankenstein 5.4 Internal States (2).json";
 
@@ -186,6 +193,66 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(adapted).not.toMatch(/begin directly|Keep all internal processing private/i);
   });
 
+  it("applies the Vietnamese output tag in MAX, BOLT, and Micro reasoning", async () => {
+    const data = await preset();
+    for (const identifier of [
+      "019f62e8-892f-7032-b004-1869f8bc0782",
+      "634ecfec-1862-4ce0-821e-e31057acadfa",
+      "b5db9430-857a-408c-817c-32e975a71430",
+    ]) {
+      const prompt = data.prompts.find((candidate) => candidate.identifier === identifier);
+      const sourceContent = String(prompt?.content ?? "");
+      const adapted = adaptPromptForVietnamese(sourceContent);
+      expect(sourceContent).not.toContain("How will I apply `<vietnamese_output>`");
+      expect(adapted.match(/How will I apply `<vietnamese_output>`/g)).toHaveLength(1);
+    }
+  });
+
+  it("uses exclusive UI groups and hides source separators and host markers", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    for (const group of EXCLUSIVE_PROMPT_GROUPS) {
+      expect(
+        group.memberIds.filter((identifier) => settings.promptEnabled[identifier]),
+      ).toHaveLength(1);
+    }
+
+    const reasoning = EXCLUSIVE_PROMPT_GROUPS.find((group) => group.id === "reasoning")!;
+    for (const identifier of reasoning.memberIds) settings.promptEnabled[identifier] = true;
+    normalizeExclusivePromptGroups(settings, data.prompt_order[0]!.order);
+    expect(reasoning.memberIds.filter((identifier) => settings.promptEnabled[identifier])).toEqual([
+      "634ecfec-1862-4ce0-821e-e31057acadfa",
+    ]);
+
+    const visibleIds = new Set([
+      ...EXCLUSIVE_PROMPT_GROUPS.flatMap((group) => [...group.memberIds]),
+      ...PROMPT_SECTIONS.flatMap((section) => [...section.promptIds]),
+    ]);
+    for (const identifier of SOURCE_SEPARATOR_IDS) expect(visibleIds.has(identifier)).toBe(false);
+    for (const identifier of HOST_MARKER_IDS) expect(visibleIds.has(identifier)).toBe(false);
+    expect(SOURCE_SEPARATOR_IDS.size).toBe(8);
+    expect(HOST_MARKER_IDS.size).toBe(8);
+  });
+
+  it("renders a Vietnamese responsive settings UI", async () => {
+    const pluginSource = await readFile(
+      "risuai/freaky-frankenstein-5.4-plugin/src/plugin.ts",
+      "utf8",
+    );
+    expect(pluginSource).toContain("Cấu hình FF5.4");
+    expect(pluginSource).toContain("Lưu toàn cục");
+    expect(pluginSource).toContain("Khôi phục mặc định");
+    expect(pluginSource).toContain("Nhóm chọn một");
+    expect(pluginSource).toContain('select[data-kind="choice"]');
+    expect(pluginSource).toContain("@media(max-width:640px)");
+    expect(pluginSource).toContain("grid-template-columns:1fr");
+    expect(pluginSource).not.toContain("Global configuration");
+    expect(pluginSource).not.toContain("Reset source defaults");
+    expect(pluginSource).not.toContain("Save globally");
+    expect(pluginSource).not.toContain("Prompt modules");
+    expect(pluginSource).not.toContain("Regex scripts");
+  });
+
   it("matches every Vietnamese replacement against the source preset", async () => {
     const data = await preset();
     const sourceContent = data.prompts
@@ -294,7 +361,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "utf8",
     );
     expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
-    expect(artifact).toContain("//@version 1.1.0");
+    expect(artifact).toContain("//@version 1.2.0");
   });
 
   it("context-saver regex strips old internal state but keeps the newest", async () => {

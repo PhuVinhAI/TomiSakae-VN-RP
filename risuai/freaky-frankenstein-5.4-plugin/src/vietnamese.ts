@@ -268,6 +268,14 @@ export const VIETNAMESE_REASONING_REPLACEMENTS: ReadonlyArray<readonly [string, 
     "7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? What format? What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content? (skip if tags not present)",
   ],
   [
+    "E. Does the final response fit the length stated in `<formatting_constraints>`? If the tag is not present, skip to GATE 10.",
+    "E. Does the final response fit the length stated in `<formatting_constraints>`? How will I apply `<vietnamese_output>` to all reader-facing content? If the tag is not present, skip to GATE 10.",
+  ],
+  [
+    "What is the response length in `<formatting_constraints>`? How can I pivot so NPCs stay true to their wants/needs?",
+    "What is the response length in `<formatting_constraints>`? How will I apply `<vietnamese_output>` to all reader-facing content? How can I pivot so NPCs stay true to their wants/needs?",
+  ],
+  [
     'Enforce the ban on coordinate conjunctions ["or"] and ["and"] in spoken dialogue',
     'Enforce the ban on coordinate conjunctions ["và"], ["hoặc"], and ["hay là"] in spoken dialogue',
   ],
