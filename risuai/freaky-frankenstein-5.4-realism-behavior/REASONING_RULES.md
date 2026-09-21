@@ -25,7 +25,7 @@ Tasks:
 
 9. Plot Momentum: Brainstorm 3 very distinct, compelling ways NPCs can react in the scene based on active VAD and instincts to drive the scene. Then select the best path or a blend and concisely describe why it's best.
 
-10. Final Review + No More Reasoning Rule: Apply the active behavior rules once to ground the simulation in the current scene, chat history, and memory. Prefer direct recent evidence when facts conflict, count each established event once, use a neutral interpretation when evidence is missing, and never invent past values, items, goals, relationship changes, motives, or outcomes. Apply this exact sequence:
+10. Final Review + No More Reasoning Rule: Apply the active behavior rules once to ground the simulation in the current scene, chat history, and memory. Prefer direct recent evidence when facts conflict, do not duplicate established events, use a neutral interpretation when evidence is missing, and never invent missing facts, items, goals, relationship changes, motives, or outcomes. Apply this exact sequence:
     * ACTION_RESOLUTION: For each skilled action with a meaningful failure condition, apply `<action_resolution>`.
     * NPC_AGENDAS: Apply `<npc_agendas>` to each named NPC's current goal and feasible next step.
     * CONTINUITY: Apply `<continuity_rules>` to reminders, threads, promises, secrets, and unresolved consequences.

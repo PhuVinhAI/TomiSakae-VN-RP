@@ -689,6 +689,11 @@ describe("RisuAI preset builder", () => {
     expect(result.master).not.toContain("setvar::");
     expect(result.master).not.toContain("GFX_START");
     expect(result.master).not.toContain("notebook, state list");
+    expect(result.master).not.toContain("+1 to +2 modifier");
+    expect(result.master).not.toContain("-1 to -2 modifier");
+    expect(result.master).toContain("Calculate Delta as roll - DC");
+    expect(result.master).toContain("History and memory provide qualitative evidence only");
+    expect(result.reasoning).not.toContain("count each established event once");
     expect(result.reasoning).not.toContain("Internal States");
     expect(result.reasoning).toContain(
       "1. Neutrality: Preserve this core instruction. When a skilled action has a meaningful failure condition, apply `<action_resolution>`",
