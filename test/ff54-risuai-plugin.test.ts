@@ -8,8 +8,17 @@ import {
   createDefaultSettings,
   expandSourceMacros,
   expandHostMacros,
+  injectAbsoluteAtDepth,
+  normalizeSettings,
   type FfPreset,
 } from "../risuai/freaky-frankenstein-5.4-plugin/src/core.js";
+import {
+  adaptPromptForVietnamese,
+  VIETNAMESE_OUTPUT_PROMPT,
+  VIETNAMESE_OUTPUT_REPLACEMENTS,
+  VIETNAMESE_REASONING_REPLACEMENTS,
+} from "../risuai/freaky-frankenstein-5.4-plugin/src/vietnamese.js";
+import { buildVietnameseComparison } from "../scripts/build-ff54-vietnamese-comparison.js";
 
 const source = "C:/Users/tomis/Downloads/Freaky Frankenstein 5.4 Internal States (2).json";
 
@@ -26,6 +35,21 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     for (const entry of data.prompt_order[0]!.order) {
       expect(settings.promptEnabled[entry.identifier]).toBe(entry.enabled !== false);
     }
+    expect(settings.vietnameseOutputEnabled).toBe(true);
+  });
+
+  it("defaults old global settings to Vietnamese output while preserving an explicit choice", async () => {
+    const data = await preset();
+    const oldSettings = {
+      enabled: false,
+      promptEnabled: {},
+      regexEnabled: {},
+    };
+    expect(normalizeSettings(data, oldSettings).vietnameseOutputEnabled).toBe(true);
+    expect(
+      normalizeSettings(data, { ...oldSettings, vietnameseOutputEnabled: false })
+        .vietnameseOutputEnabled,
+    ).toBe(false);
   });
 
   it("composes setvar/getvar fragments dynamically from enabled modules", () => {
@@ -75,6 +99,171 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(built[latestIndex + 1]!.memo).toContain("ff54:absolute:0");
   });
 
+  it("adds the Vietnamese module once before card context and adapts only enabled prompts", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    const disabledPrompt = data.prompt_order[0]!.order.find((entry) => entry.enabled === false);
+    expect(disabledPrompt).toBeDefined();
+    const messages = [
+      { role: "system" as const, content: "card context" },
+      { role: "user" as const, content: "latest" },
+    ];
+    const built = await buildRequestMessages(messages, data, settings, async (value) => value);
+    const vietnamese = built.filter((entry) => entry.memo === "ff54:vietnamese-output");
+    expect(vietnamese).toHaveLength(1);
+    expect(vietnamese[0]!.content).toBe(VIETNAMESE_OUTPUT_PROMPT);
+    expect(built.indexOf(vietnamese[0]!)).toBeLessThan(
+      built.findIndex((entry) => entry.content === "card context"),
+    );
+    expect(built.some((entry) => entry.memo === `ff54:${disabledPrompt!.identifier}`)).toBe(false);
+
+    const allContent = built.map((entry) => entry.content).join("\n");
+    expect(allContent).toContain('conjunctions ["và"], ["hoặc"], and ["hay là"]');
+    expect(allContent).toContain('e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!"');
+    expect(allContent).toContain("(ưm..., aaaa..., suỵt, á!, ối!, hức!, ực!, hừ...)");
+    expect(allContent).toContain(
+      "6. Slop Review: I must list all banned phrases and clichés in `<banned_vocabulary>`",
+    );
+    const bannedVocabulary = built.find(
+      (entry) => entry.memo === "ff54:019f62e8-892f-7013-9e9b-13eae330f5a0",
+    );
+    expect(bannedVocabulary?.content).toContain("<banned_vocabulary>");
+    expect(bannedVocabulary?.content).toContain(
+      "ALL listed Vietnamese phrases and clichés are STRICTLY prohibited",
+    );
+    expect(bannedVocabulary?.content).toContain("tim hẫng đi một nhịp");
+    expect(bannedVocabulary?.content).not.toContain("fresh meat");
+    expect(allContent).toContain(
+      "Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue>",
+    );
+    expect(allContent).toContain(
+      "What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content? (skip if tags not present)",
+    );
+  });
+
+  it("keeps FF5.4 byte-identical when the Vietnamese module is disabled", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    settings.vietnameseOutputEnabled = false;
+    const messages = [
+      { role: "system" as const, content: "host" },
+      { role: "user" as const, content: "latest" },
+    ];
+    const parse = async (value: string) => value;
+    const macroContext = { randomInt: () => 13 };
+    const built = await buildRequestMessages(messages, data, settings, parse, macroContext);
+    const composed = await composePresetPrompts(data, settings, parse, macroContext);
+    expect(built).toEqual([
+      ...composed.leading,
+      ...injectAbsoluteAtDepth(messages, composed.absolute),
+      ...composed.trailing,
+    ]);
+    expect(built.some((entry) => entry.memo === "ff54:vietnamese-output")).toBe(false);
+  });
+
+  it("changes only Vietnamese-facing BOLT checks", async () => {
+    const data = await preset();
+    const bolt = data.prompts.find((prompt) => prompt.name === "⚡️BOLT Chain of Thought 🧠");
+    expect(bolt?.content).toEqual(expect.any(String));
+    const source = String(bolt!.content);
+    const adapted = adaptPromptForVietnamese(source);
+    for (const unchanged of [
+      "- A. Reason briefly in highly concise bullet points inside think tags across Tasks 0-10.",
+      "- B. *NEVER* draft full prose in reasoning; ONLY brainstorm ideas and answer all questions, then output final response immediately after Task 10.",
+      "- C. Do not leak reasoning into the final response.",
+      "0. Gamestate:",
+      "3. Prose Style:",
+      "5. User Boundaries:",
+      "8. Adult Modes:",
+      "9. Plot Momentum:",
+      "10. Internal States + No More Reasoning Rule:",
+      "I will answer task points with concise ideas only, close think tags, and output the final response immediately.",
+    ]) {
+      expect(source).toContain(unchanged);
+      expect(adapted).toContain(unchanged);
+    }
+    expect(adapted).not.toContain("- D.");
+    expect(adapted).not.toMatch(/begin directly|Keep all internal processing private/i);
+  });
+
+  it("matches every Vietnamese replacement against the source preset", async () => {
+    const data = await preset();
+    const sourceContent = data.prompts
+      .map((prompt) => (typeof prompt.content === "string" ? prompt.content : ""))
+      .join("\n\n");
+    for (const [sourceText, replacement] of [
+      ...VIETNAMESE_OUTPUT_REPLACEMENTS,
+      ...VIETNAMESE_REASONING_REPLACEMENTS,
+    ]) {
+      expect(sourceContent, `missing source replacement: ${sourceText}`).toContain(sourceText);
+      expect(adaptPromptForVietnamese(sourceText)).toBe(replacement);
+    }
+  });
+
+  it("adapts Vietnamese-facing examples in optional modules when enabled", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    const optionalIdentifiers = [
+      "019f62e8-892f-7008-bbb9-b6ebf9cdc0f5",
+      "0b0afd85-71ea-45ee-99cf-cb72faf19fac",
+      "2105050a-0d4b-4661-9363-3cc1ac44d5e7",
+      "019f62e8-892f-701c-8550-08ebf33e9da2",
+      "019f62e8-892f-7028-bad6-be1f427c3ae4",
+    ];
+    for (const identifier of optionalIdentifiers) settings.promptEnabled[identifier] = true;
+    const composed = await composePresetPrompts(data, settings, async (value) => value, {
+      randomInt: () => 13,
+    });
+    const content = [...composed.leading, ...composed.absolute, ...composed.trailing]
+      .map((entry) => entry.content)
+      .join("\n");
+    expect(content).toContain('Good: "Bạn nhận thấy cánh tay cô ấy đang run."');
+    expect(content).toContain('Exact Format: <font color="#HEX">"Lời thoại"</font>');
+    expect(content).toContain("*Bẹp!*, *Đoàng!*");
+    expect(content).toContain('("Khoan, sao họ lại nói thế?")');
+    expect(content).not.toContain('"You notice her arms are shaking."');
+    expect(content).not.toContain('"You\'re barking up the wrong tree."');
+    const orphanedLargeVoice = data.prompts.find(
+      (prompt) => prompt.identifier === "019f62e8-892f-7018-a6ba-bfb2077ccfa7",
+    );
+    const adaptedLargeVoice = adaptPromptForVietnamese(String(orphanedLargeVoice?.content));
+    expect(adaptedLargeVoice).toContain('pleasure: "ưm... a... sướng quá...!"');
+  });
+
+  it("builds original and Vietnamese comparison files from every source module", async () => {
+    const data = await preset();
+    const outputDirectory = "risuai/freaky-frankenstein-5.4-plugin/comparison";
+    const result = await buildVietnameseComparison({
+      sourceFile: source,
+      outputDirectory,
+    });
+    const [original, vietnamese, review] = await Promise.all([
+      readFile(result.originalFile, "utf8"),
+      readFile(result.vietnameseFile, "utf8"),
+      readFile(result.reviewFile, "utf8"),
+    ]);
+    expect(original.match(/^## \d{2}\. (?:ON|OFF) — /gm)).toHaveLength(data.prompts.length);
+    expect(vietnamese.match(/^## \d{2}\. (?:ON|OFF) — /gm)).toHaveLength(data.prompts.length);
+    expect(original).toContain("FF5.4 Original — All Prompt Modules");
+    expect(original).toContain("fresh meat, spine, breath hitching");
+    expect(original).not.toContain(VIETNAMESE_OUTPUT_PROMPT);
+    expect(vietnamese).toContain("FF5.4 Vietnamese Adapter — All Prompt Modules");
+    expect(vietnamese).toContain(VIETNAMESE_OUTPUT_PROMPT);
+    expect(vietnamese).toContain("tim hẫng đi một nhịp");
+    expect(vietnamese).toContain("Source toggle: **OFF**");
+    expect(vietnamese).toContain("# Prompts outside `prompt_order`");
+    expect(vietnamese).toContain('pleasure: "ưm... a... sướng quá...!"');
+    expect(review.match(/^## \d{2}\. (?:ON|OFF) — /gm)).toHaveLength(data.prompts.length);
+    expect(review).toContain("# FF5.4 English/Vietnamese Adapter Review");
+    expect(review).toContain("## Mandatory review checklist");
+    expect(review).toContain("### English source");
+    expect(review).toContain("### Vietnamese-adapted");
+    expect(review).toContain("quoted GOOD/BAD prose");
+    expect(review).toContain(
+      'NPCs talk, moan, and swear during intimacy. (e.g., "ưm... a... sướng quá...!")',
+    );
+  });
+
   it("uses one global settings object rather than card or chat settings", async () => {
     const pluginSource = await readFile(
       "risuai/freaky-frankenstein-5.4-plugin/src/plugin.ts",
@@ -95,7 +284,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "utf8",
     );
     expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
-    expect(artifact).toContain("//@version 1.0.2");
+    expect(artifact).toContain("//@version 1.1.0");
   });
 
   it("context-saver regex strips old internal state but keeps the newest", async () => {

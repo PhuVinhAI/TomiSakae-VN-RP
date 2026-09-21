@@ -1,3 +1,5 @@
+import { adaptPromptForVietnamese, VIETNAMESE_OUTPUT_PROMPT } from "./vietnamese.js";
+
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
 export interface ChatMessage {
@@ -54,6 +56,7 @@ export interface FfGlobalSettings {
   enabled: boolean;
   promptEnabled: Record<string, boolean>;
   regexEnabled: Record<string, boolean>;
+  vietnameseOutputEnabled: boolean;
 }
 
 export interface MacroContext {
@@ -94,6 +97,7 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
     regexEnabled: Object.fromEntries(
       regexScripts.map((script) => [script.id, script.disabled !== true]),
     ),
+    vietnameseOutputEnabled: true,
   };
 }
 
@@ -121,6 +125,9 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
     }
   }
   if (typeof record.enabled === "boolean") defaults.enabled = record.enabled;
+  if (typeof record.vietnameseOutputEnabled === "boolean") {
+    defaults.vietnameseOutputEnabled = record.vietnameseOutputEnabled;
+  }
   return defaults;
 }
 
@@ -336,7 +343,10 @@ export function composePresetPrompts(
         continue;
       const prompt = map.get(entry.identifier);
       if (!prompt || prompt.marker || typeof prompt.content !== "string") continue;
-      let content = expandSourceMacros(prompt.content, variables, macroContext);
+      const sourceContent = settings.vietnameseOutputEnabled
+        ? adaptPromptForVietnamese(prompt.content)
+        : prompt.content;
+      let content = expandSourceMacros(sourceContent, variables, macroContext);
       content = await parseHostMacros(content, promptRole(prompt));
       if (!content.trim()) continue;
       const message: ChatMessage = {
@@ -554,6 +564,15 @@ export async function buildRequestMessages(
   const composed = await composePresetPrompts(preset, settings, parseHostMacros, macroContext);
   return [
     ...composed.leading,
+    ...(settings.vietnameseOutputEnabled
+      ? [
+          {
+            role: "system" as const,
+            content: VIETNAMESE_OUTPUT_PROMPT,
+            memo: "ff54:vietnamese-output",
+          },
+        ]
+      : []),
     ...injectAbsoluteAtDepth(regexed, composed.absolute),
     ...composed.trailing,
   ];

@@ -29,6 +29,7 @@
     "build:risuai": "tsx scripts/build-risuai-preset.ts",
     "build:risuai:comparison": "tsx scripts/build-risuai-comparison.ts",
     "build:risuai:ff54-plugin": "tsx scripts/build-ff54-risuai-plugin.ts",
+    "build:risuai:ff54-vietnamese-comparison": "tsx scripts/build-ff54-vietnamese-comparison.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "ci": "pnpm format:check && pnpm check && pnpm test && pnpm build && pnpm compile:prompts && pnpm check:prompts"

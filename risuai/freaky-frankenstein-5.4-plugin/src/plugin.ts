@@ -104,7 +104,7 @@ async function saveSettings(): Promise<void> {
 }
 
 function checkbox(
-  kind: "prompt" | "regex",
+  kind: "plugin" | "prompt" | "regex",
   id: string,
   checked: boolean,
   label: string,
@@ -159,6 +159,13 @@ async function showSettings(): Promise<void> {
       <div class="bar"><button id="close">Close</button><button id="reset">Reset source defaults</button><button class="primary" id="save">Save globally</button></div><div class="status" id="status"></div>
     </header>
     <label class="master"><input id="master" type="checkbox" ${settings.enabled ? "checked" : ""}><span><strong>Enable FF5.4 globally</strong><br><span class="note">One shared setting for every card and chat. Only the currently active generation is transformed.</span></span></label>
+    <details open><summary>Plugin modules (1)</summary><div class="list">${checkbox(
+      "plugin",
+      "vietnamese-output",
+      settings.vietnameseOutputEnabled,
+      "🇻🇳 Vietnamese Output",
+      "Natural Vietnamese output, Vietnamese-facing examples, lexical constraints, and the related BOLT checks · default ON",
+    )}</div></details>
     <details open><summary>Prompt modules (${orderEntries().length})</summary><div class="list">${promptRows}</div></details>
     <details><summary>Regex scripts (${preset.extensions?.regex_scripts?.length ?? 0})</summary><div class="list">${regexRows}</div></details>
   </main>`;
@@ -169,7 +176,8 @@ async function showSettings(): Promise<void> {
     for (const node of document.querySelectorAll<HTMLInputElement>("input[data-kind]")) {
       const id = node.dataset.id!;
       if (node.dataset.kind === "prompt") settings.promptEnabled[id] = node.checked;
-      else settings.regexEnabled[id] = node.checked;
+      else if (node.dataset.kind === "regex") settings.regexEnabled[id] = node.checked;
+      else if (id === "vietnamese-output") settings.vietnameseOutputEnabled = node.checked;
     }
   };
   document.getElementById("close")!.addEventListener("click", () => void Risuai.hideContainer());

@@ -5,6 +5,7 @@ This directory builds the original **Freaky Frankenstein 5.4 Internal States** S
 - The source JSON is embedded verbatim at build time.
 - The chat-menu item **FF5.4** opens the configuration screen.
 - The master switch, prompt toggles, and regex toggles use one save-wide configuration. They are stored once in `pluginStorage` and apply to every card and chat in that save.
+- The plugin module **🇻🇳 Vietnamese Output** is enabled by default. It adds the approved `<vietnamese_output>` rules and adapts only reader-facing language examples, lexical constraints, and the related BOLT checks in enabled source prompts.
 - The plugin does not write toggle configuration into characters or chats.
 - The source prompt order, roles, default enabled flags, macro fragments, and regex definitions are retained.
 - `{{user}}` and `{{char}}` resolve from the active RisuAI persona and character using API v3 methods available in RisuAI 2026.8.250.
