@@ -420,6 +420,36 @@ function parseRegexLiteral(value: string): RegExp | null {
   }
 }
 
+function adaptRegexForVietnamese(
+  findRegex: string,
+  replaceString: string,
+): { findRegex: string; replaceString: string } {
+  return {
+    findRegex: findRegex
+      .replaceAll("\\bTime\\b", "(?:\\bTime\\b|Thời\\s{1,8}gian)")
+      .replaceAll("(INTERNAL STATES)", "(INTERNAL STATES|TRẠNG THÁI NỘI BỘ)")
+      .replaceAll(
+        "(QUESTS|CHEKHOV'S GUN|CHEKHOV SEEDS|INTERNAL THOUGHTS|INV & SKILLS|INVENTORY & STATUS|GM NOTEBOOK|GM'S NOTEBOOK)",
+        "(QUESTS|CHEKHOV'S GUN|CHEKHOV SEEDS|INTERNAL THOUGHTS|INV & SKILLS|INVENTORY & STATUS|GM NOTEBOOK|GM'S NOTEBOOK|NHIỆM VỤ|SÚNG CỦA CHEKHOV|SUY NGHĨ NỘI TÂM|HÀNH TRANG & KỸ NĂNG|SỔ TAY GM)",
+      )
+      .replaceAll(
+        "(NPC AGENDAS|NPC LOCATIONS|FACTIONS|BONDS|BOND TRACKER)",
+        "(NPC AGENDAS|NPC LOCATIONS|FACTIONS|BONDS|BOND TRACKER|LỊCH TRÌNH NPC|VỊ TRÍ NPC|PHE PHÁI|MỐI QUAN HỆ)",
+      )
+      .replaceAll(
+        "(PLOT MOMENTUM|DND TASK SIM|WORLD SIM|PHYSICS, ENGINE & WORLD)",
+        "(PLOT MOMENTUM|DND TASK SIM|WORLD SIM|PHYSICS, ENGINE & WORLD|MÔ PHỎNG NHIỆM VỤ DND|MÔ PHỎNG THẾ GIỚI|VẬT LÝ, CƠ CHẾ & THẾ GIỚI)",
+      )
+      .replaceAll("BOND:", "(?:BOND|GẮN KẾT):")
+      .replaceAll("SPARKS?:", "(?:SPARKS?|THIỆN CẢM):")
+      .replaceAll("GRUDGE:", "(?:GRUDGE|BẤT MÃN):"),
+    replaceString: replaceString
+      .replaceAll("BOND: $3$4", "GẮN KẾT: $3$4")
+      .replaceAll("SPARKS: $5", "THIỆN CẢM: $5")
+      .replaceAll("GRUDGE: $6", "BẤT MÃN: $6"),
+  };
+}
+
 function depthAllowed(script: FfRegexScript, depth: number | undefined): boolean {
   if (depth === undefined) return true;
   if (typeof script.minDepth === "number" && script.minDepth >= -1 && depth < script.minDepth)
@@ -477,12 +507,15 @@ export function applyRegexScripts(
     if (!eligibleMode || !script.placement?.includes(options.placement)) continue;
     if (options.edit && !script.runOnEdit) continue;
     if (!depthAllowed(script, options.depth)) continue;
-    const regex = parseRegexLiteral(script.findRegex);
+    const localized = settings.vietnameseOutputEnabled
+      ? adaptRegexForVietnamese(script.findRegex, String(script.replaceString ?? ""))
+      : { findRegex: script.findRegex, replaceString: String(script.replaceString ?? "") };
+    const regex = parseRegexLiteral(localized.findRegex);
     if (!regex) continue;
     output = replaceWithSourceGroups(
       output,
       regex,
-      String(script.replaceString ?? "").replace(/\\n/g, "\n"),
+      localized.replaceString.replace(/\\n/g, "\n"),
       script.trimStrings ?? [],
     );
   }

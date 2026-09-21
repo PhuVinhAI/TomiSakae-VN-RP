@@ -10,9 +10,8 @@ Rules:
 - Priority: Foreign-language examples and word lists never override the Language Lock; translate them by meaning.
 
 Structured Displays:
-- Coverage: Apply the Language Lock to every model-generated free-text value in FF5.4 headers, internal-state blocks, GFX, HUDs, status panels, and separate structured displays required by a character card.
+- Coverage: Apply the Language Lock to every model-generated free-text value in FF5.4 headers, internal-state blocks, and GFX.
 - Values: Write filled-in descriptions, locations, weather, weekdays, months, eras written in words, goals, actions, conditions, thoughts, notes, summaries, events, and empty-state text in natural Vietnamese.
-- Card Priority: If a character card or source template requests its variable information in another language, preserve its exact schema but write the variable values in Vietnamese. This tag governs all reader-visible free-text values.
 - Schema Lock: Fixed labels and syntax remain exact only where the schema or regex requires them; they do not permit foreign-language values.
 
 Non-Vocal Sound Effects:
@@ -23,6 +22,92 @@ Non-Vocal Sound Effects:
 </vietnamese_output>`;
 
 export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
+  [
+    "[ 🕰️ Time HH:MM AM/PM | 🗓️ Day # - 🗓️ DayOfWeek, Month DD, YYYY Era | 📍 Location - Specific Area | [WeatherEmoji] Weather, Temp °F ]",
+    "[ 🕰️ Thời gian HH:MM SA/CH | 🗓️ Ngày # - Thứ trong tuần, ngày DD tháng MM năm YYYY Kỷ nguyên | 📍 Địa điểm - Khu vực cụ thể | [Biểu tượng thời tiết] Thời tiết, Nhiệt độ °F ]",
+  ],
+  [
+    "- Era: Use AD/BC or setting-appropriate fantasy era.",
+    "- Era: Use SCN/TCN or setting-appropriate fantasy era.",
+  ],
+  [
+    "- NPCs: Physically react to weather, temp, and time (shiver, sweat, fatigue).",
+    "- NPCs: Physically react to weather, temp, and time (shiver, sweat, fatigue).\n- Vietnamese Output: Keep the exact header structure and write every displayed label and filled-in value in natural Vietnamese.",
+  ],
+  [
+    "{{setvar::dndTemplate::<details><summary>🎲 DND TASK SIM</summary>- <b>Task:</b> [Actor] attempts [Action]<br>- <b>Locked DC:</b> [Value]<br>- <b>Roll:</b> <b>User Roll:</b> <b>NPC Roll:</b>   | <b>Delta:</b> [Roll minus DC established \n- do this for each. ]<br>- <b>Outcome:</b> [Degree & consequence]</details>}}",
+    "{{setvar::dndTemplate::<details><summary>🎲 MÔ PHỎNG NHIỆM VỤ DND</summary>- <b>Nhiệm vụ:</b> [Nhân vật] thực hiện [Hành động]<br>- <b>DC cố định:</b> [Giá trị]<br>- <b>Kết quả gieo:</b> <b>Người dùng:</b> <b>NPC:</b>   | <b>Chênh lệch:</b> [Kết quả gieo trừ DC đã lập \n- thực hiện cho từng nhân vật.]<br>- <b>Kết quả:</b> [Mức độ và hệ quả]</details>}}",
+  ],
+  [
+    "{{setvar::gmNotebookTemplate::<details><summary>📓 GM'S NOTEBOOK</summary>\n- [R] No active notes.\n</details>}}",
+    "{{setvar::gmNotebookTemplate::<details><summary>📓 SỔ TAY GM</summary>\n- [R] Không có ghi chú đang hoạt động.\n</details>}}",
+  ],
+  [
+    "{{setvar::invTemplate::<details><summary>🎒 INV & SKILLS</summary>- <b>Inv:</b> [items]<br>- <b>Titles/Skills:</b> [traits]<br>- <b>Status:</b> [conditions]<br>- <b>Mods:</b> [+/- applied to roll/DC]</details>}}",
+    "{{setvar::invTemplate::<details><summary>🎒 HÀNH TRANG & KỸ NĂNG</summary>- <b>Hành trang:</b> [vật phẩm]<br>- <b>Danh hiệu/Kỹ năng:</b> [đặc điểm]<br>- <b>Trạng thái:</b> [tình trạng]<br>- <b>Điều chỉnh:</b> [+/- áp dụng cho kết quả gieo/DC]</details>}}",
+  ],
+  [
+    "{{setvar::bondsTemplate::<details><summary>💚 BONDS</summary><br>- <b>[NPC]</b> ↔ <b>{{user}}</b> | BOND: [Value] | Sparks: [Value] | Grudge: [Value]<br></details>}}",
+    "{{setvar::bondsTemplate::<details><summary>💚 MỐI QUAN HỆ</summary><br>- <b>[NPC]</b> ↔ <b>{{user}}</b> | GẮN KẾT: [Giá trị] | THIỆN CẢM: [Giá trị] | BẤT MÃN: [Giá trị]<br></details>}}",
+  ],
+  [
+    '- Block: Render strictly inside BONDS block using: "- <b>[NPC]</b> ↔ <b>{{user}}</b> | BOND: [Value] | Sparks: [Value] | Grudge: [Value]"',
+    '- Block: Render strictly inside MỐI QUAN HỆ block using: "- <b>[NPC]</b> ↔ <b>{{user}}</b> | GẮN KẾT: [Giá trị] | THIỆN CẢM: [Giá trị] | BẤT MÃN: [Giá trị]"',
+  ],
+  [
+    "{{setvar::worldsimTemplate::<details><summary>🌎 WORLD SIM</summary>- <b>Active Table:</b> [Standard or Duo Table selected]<br>- <b>World Sim Current Roll:</b> [Roll]<br>- <b>Event:</b> [Selected Event - Brief description of off-screen shift]</details>}}",
+    "{{setvar::worldsimTemplate::<details><summary>🌎 MÔ PHỎNG THẾ GIỚI</summary>- <b>Bảng đang dùng:</b> [Bảng Standard hoặc Duo đã chọn]<br>- <b>Kết quả hiện tại:</b> [Kết quả gieo]<br>- <b>Sự kiện:</b> [Sự kiện đã chọn - Mô tả ngắn thay đổi ngoài cảnh]</details>}}",
+  ],
+  [
+    "{{setvar::chekhovTemplate::<details><summary>🔫 CHEKHOV'S GUN</summary>- <b>Active:</b> {{getvar::chekhovActive::None}}<br>- <b>Locked:</b> {{getvar::chekhovLocked::None}}<br>- <b>Fired:</b> [fired]</details>}}",
+    "{{setvar::chekhovTemplate::<details><summary>🔫 SÚNG CỦA CHEKHOV</summary>- <b>Đang hoạt động:</b> {{getvar::chekhovActive::Không có}}<br>- <b>Đã khóa:</b> {{getvar::chekhovLocked::Không có}}<br>- <b>Đã kích hoạt:</b> [đã kích hoạt]</details>}}",
+  ],
+  [
+    "{{setvar::thoughtsTemplate::<details><summary>🧠 INTERNAL THOUGHTS</summary><br>- <b>[NPC Name]</b> | Internal Thoughts: <br></details>}}",
+    "{{setvar::thoughtsTemplate::<details><summary>🧠 SUY NGHĨ NỘI TÂM</summary><br>- <b>[Tên NPC]</b> | Suy nghĩ nội tâm: <br></details>}}",
+  ],
+  [
+    '- No Truncation: Generate every section shown in the template verbatim; if empty or unchanged, output "None".',
+    '- No Truncation: Generate every section shown in the template verbatim; if empty or unchanged, output "Không có".',
+  ],
+  [
+    "- Formatting: Exactly one blank line between nested <details> blocks. Ban markdown code blocks inside HTML. Use only a telegraphic, dense style.",
+    "- Formatting: Exactly one blank line between nested <details> blocks. Ban markdown code blocks inside HTML. Use only a telegraphic, dense style.\n- Vietnamese Output: Keep the exact HTML, tags, delimiters, identifiers, and numeric values; write every displayed label, placeholder replacement, and generated free-text value in natural Vietnamese.",
+  ],
+  ["🎬 INTERNAL STATES (Turn: [ct])", "🎬 TRẠNG THÁI NỘI BỘ (Lượt: [ct])"],
+  ["👤 NPC AGENDAS", "👤 LỊCH TRÌNH NPC"],
+  [
+    "- <b>[NPC Name]</b> | Agenda: [task] | (Step [current]/[max]) | Aware: [secrets] | Fibs: [lies_told] | Circle: [allies] | Body: [state/condition]",
+    "- <b>[Tên NPC]</b> | Lịch trình: [mục tiêu] | (Bước [hiện tại]/[tối đa]) | Biết: [bí mật] | Điều bịa: [lời nói dối] | Phe: [đồng minh] | Thể trạng: [trạng thái/tình trạng]",
+  ],
+  ["👤 NPC LOCATIONS", "👤 VỊ TRÍ NPC"],
+  [
+    "- <b>[NPC Name]</b> | Location: [coords/scene, current activity]",
+    "- <b>[Tên NPC]</b> | Vị trí: [tọa độ/cảnh, hoạt động hiện tại]",
+  ],
+  ["🏳️ FACTIONS", "🏳️ PHE PHÁI"],
+  [
+    "- <b>[Faction Name]</b> | Goal: [target] | Intel: [lore] | Fibs: [lies] | State: [morale] | Conflict: [internal] | Relations: [rivalries]",
+    "- <b>[Tên phe]</b> | Mục tiêu: [đích đến] | Tin tức: [tri thức] | Điều bịa: [lời nói dối] | Trạng thái: [tinh thần] | Xung đột: [nội bộ] | Quan hệ: [đối địch]",
+  ],
+  ["📜 QUESTS", "📜 NHIỆM VỤ"],
+  [
+    "- <b>Main:</b> [Active/Completed] — [Objective] | <b>Progress:</b> [Current/Target] | <b>Reward:</b> [Reward]<br>",
+    "- <b>Chính:</b> [Đang hoạt động/Hoàn thành] — [Mục tiêu] | <b>Tiến độ:</b> [Hiện tại/Đích] | <b>Phần thưởng:</b> [Phần thưởng]<br>",
+  ],
+  [
+    "- <b>Side:</b> [Active/None] — [Objective] | <b>Reward:</b> [Reward New Titles or Items]",
+    "- <b>Phụ:</b> [Đang hoạt động/Không có] — [Mục tiêu] | <b>Phần thưởng:</b> [Danh hiệu hoặc vật phẩm mới]",
+  ],
+  ["🌌 PHYSICS, ENGINE & WORLD", "🌌 VẬT LÝ, CƠ CHẾ & THẾ GIỚI"],
+  [
+    "- <b>Env:</b> [hazards/magic/weather]<br>",
+    "- <b>Môi trường:</b> [hiểm họa/phép thuật/thời tiết]<br>",
+  ],
+  [
+    "- <b>Physics:</b> [spatial positioning, distances, line-of-sight]",
+    "- <b>Vật lý:</b> [vị trí không gian, khoảng cách, đường nhìn]",
+  ],
   [
     'BAD: "The air smells like rain, salt and copper." GOOD: "The rain makes the air smell floral."',
     'BAD: "Không khí nồng nặc mùi mưa, mùi muối biển và mùi tanh của kim loại." GOOD: "Cơn mưa rào tạnh hẳn, để lại mùi hoa thơm dịu trong không khí."',
@@ -271,15 +356,15 @@ export const VIETNAMESE_REASONING_REPLACEMENTS: ReadonlyArray<readonly [string, 
   ],
   [
     "7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? What format? What is the target response length in <formatting_constraints>? (skip if tags not present)",
-    "7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? What format? What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers, internal states, and card-required HUDs? (skip if tags not present)",
+    "7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? What format? What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? (skip if tags not present)",
   ],
   [
     "E. Does the final response fit the length stated in `<formatting_constraints>`? If the tag is not present, skip to GATE 10.",
-    "E. Does the final response fit the length stated in `<formatting_constraints>`? How will I apply `<vietnamese_output>` to all reader-facing content, including headers, internal states, and card-required HUDs? If the tag is not present, skip to GATE 10.",
+    "E. Does the final response fit the length stated in `<formatting_constraints>`? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? If the tag is not present, skip to GATE 10.",
   ],
   [
     "What is the response length in `<formatting_constraints>`? How can I pivot so NPCs stay true to their wants/needs?",
-    "What is the response length in `<formatting_constraints>`? How will I apply `<vietnamese_output>` to all reader-facing content, including headers, internal states, and card-required HUDs? How can I pivot so NPCs stay true to their wants/needs?",
+    "What is the response length in `<formatting_constraints>`? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? How can I pivot so NPCs stay true to their wants/needs?",
   ],
   [
     'Enforce the ban on coordinate conjunctions ["or"] and ["and"] in spoken dialogue',

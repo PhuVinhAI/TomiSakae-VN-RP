@@ -53,7 +53,12 @@ function digest(value: string): string {
 }
 
 function fenced(value: string): string {
-  return `~~~~text\n${value.trimEnd()}\n~~~~`;
+  const normalized = value
+    .split(/\r?\n/)
+    .map((line) => line.trimEnd())
+    .join("\n")
+    .trimEnd();
+  return `~~~~text\n${normalized}\n~~~~`;
 }
 
 function renderPrompt(
@@ -250,8 +255,8 @@ function renderCombinedReview(
     "- [ ] Translate quoted sample dialogue, narration, vocalizations, interjections, and other literal response text while preserving the surrounding English instruction.",
     "- [ ] Translate output pronoun and conjunction tokens only where they directly constrain Vietnamese narration or spoken dialogue.",
     "- [ ] Translate banned, required, allowed, and discouraged output vocabulary so those lists govern Vietnamese generation rather than irrelevant English wording.",
-    "- [ ] Keep internal-state examples, GM Notebook data, World Sim event descriptions, debug text, UI text, fixed headers, and schema values unchanged unless they are genuinely shown as reader-visible RP prose.",
-    "- [ ] Preserve tags, HTML/CSS, comments, macros, placeholders, event codes, commands, identifiers, regex-sensitive syntax, and fixed machine labels exactly.",
+    "- [ ] Translate reader-visible FF5.4 headers, internal-state labels, placeholders, and generated values while preserving their structure and updating dependent regex compatibility.",
+    "- [ ] Preserve tags, HTML/CSS, comments, macros, event codes, commands, identifiers, and machine syntax exactly.",
     "- [ ] Reject broad rewrites of English instructions made only for style, simplification, or explanation.",
     "- [ ] Check that every replacement preserves the original rule's force, scope, polarity, and FF5.4 rhythm.",
     "- [ ] Check that Vietnamese samples are natural contemporary Vietnamese and do not introduce translationese, unintended setting, gender, relationship, or intensity changes.",

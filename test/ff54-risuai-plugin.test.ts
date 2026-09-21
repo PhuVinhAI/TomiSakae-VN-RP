@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import {
   adaptDisplayMarkupForRisuAI,
+  applyRegexScripts,
   applyPromptRegexToMessages,
   buildRequestMessages,
   composePresetPrompts,
@@ -132,12 +133,8 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(built.indexOf(vietnamese[0]!)).toBeLessThan(
       built.findIndex((entry) => entry.memo === "ff54:jailbreak"),
     );
-    expect(vietnamese[0]!.content).toContain(
-      "internal-state blocks, GFX, HUDs, status panels, and separate structured displays required by a character card",
-    );
-    expect(vietnamese[0]!.content).toContain(
-      "preserve its exact schema but write the variable values in Vietnamese",
-    );
+    expect(vietnamese[0]!.content).toContain("FF5.4 headers, internal-state blocks, and GFX");
+    expect(vietnamese[0]!.content).not.toContain("character card");
     expect(built.some((entry) => entry.memo === `ff54:${disabledPrompt!.identifier}`)).toBe(false);
 
     const allContent = built.map((entry) => entry.content).join("\n");
@@ -160,7 +157,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue>",
     );
     expect(allContent).toContain(
-      "What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers, internal states, and card-required HUDs? (skip if tags not present)",
+      "What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? (skip if tags not present)",
     );
   });
 
@@ -221,7 +218,8 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       const adapted = adaptPromptForVietnamese(sourceContent);
       expect(sourceContent).not.toContain("How will I apply `<vietnamese_output>`");
       expect(adapted.match(/How will I apply `<vietnamese_output>`/g)).toHaveLength(1);
-      expect(adapted).toContain("including headers, internal states, and card-required HUDs");
+      expect(adapted).toContain("including headers and internal states");
+      expect(adapted).not.toContain("card-required HUDs");
     }
   });
 
@@ -324,6 +322,65 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(adaptedLargeVoice).toContain('pleasure: "ưm... a... sướng quá...!"');
   });
 
+  it("localizes the FF5.4 header and internal-state output schemas", async () => {
+    const data = await preset();
+    const byId = new Map(data.prompts.map((prompt) => [prompt.identifier, prompt]));
+    const header = adaptPromptForVietnamese(
+      String(byId.get("019f62e8-892f-7002-8fcf-eea637bd577b")?.content),
+    );
+    const internalStates = adaptPromptForVietnamese(
+      String(byId.get("019f62e8-892f-7027-93ef-159f3d55c410")?.content),
+    );
+    const dnd = adaptPromptForVietnamese(
+      String(byId.get("019f62e8-892f-7021-97a6-42e1b83eaad3")?.content),
+    );
+
+    expect(header).toContain("🕰️ Thời gian HH:MM SA/CH");
+    expect(header).toContain("📍 Địa điểm - Khu vực cụ thể");
+    expect(header).not.toContain("🕰️ Time HH:MM AM/PM");
+    expect(internalStates).toContain("🎬 TRẠNG THÁI NỘI BỘ (Lượt: [ct])");
+    expect(internalStates).toContain("👤 LỊCH TRÌNH NPC");
+    expect(internalStates).toContain("🌌 VẬT LÝ, CƠ CHẾ & THẾ GIỚI");
+    expect(internalStates).toContain(
+      "write every displayed label, placeholder replacement, and generated free-text value in natural Vietnamese",
+    );
+    expect(dnd).toContain("🎲 MÔ PHỎNG NHIỆM VỤ DND");
+    expect(dnd).toContain("<b>Kết quả:</b> [Mức độ và hệ quả]");
+  });
+
+  it("keeps FF5.4 display regex compatible with Vietnamese internal-state labels", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    const input =
+      "<details><summary>💚 MỐI QUAN HỆ</summary><br>- <b>Eunjin</b> ↔ <b>TomiSakae</b> | GẮN KẾT: +2 | THIỆN CẢM: 1 | BẤT MÃN: 0<br></details>";
+    const output = applyRegexScripts(input, data, settings, {
+      placement: 2,
+      markdown: true,
+      depth: 0,
+    });
+
+    expect(output).toContain("GẮN KẾT: +2");
+    expect(output).toContain("THIỆN CẢM: 1");
+    expect(output).toContain("BẤT MÃN: 0");
+    expect(output).toContain("background:rgba");
+  });
+
+  it("keeps the untagged-thought filter compatible with the Vietnamese header", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    const input =
+      "Reasoning leaked here\n\n[ 🕰️ Thời gian 02:25 CH | 🗓️ Ngày 1 - Thứ Bảy, ngày 04 tháng 04 năm 2026 SCN ]\nNội dung nhập vai";
+    const output = applyRegexScripts(input, data, settings, {
+      placement: 2,
+      prompt: true,
+      depth: 0,
+    });
+
+    expect(output).not.toContain("Reasoning leaked here");
+    expect(output).toContain("[ 🕰️ Thời gian 02:25 CH");
+    expect(output).toContain("Nội dung nhập vai");
+  });
+
   it("builds original and Vietnamese comparison files from every source module", async () => {
     const data = await preset();
     const outputDirectory = "risuai/freaky-frankenstein-5.4-plugin/comparison";
@@ -378,7 +435,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "utf8",
     );
     expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
-    expect(artifact).toContain("//@version 1.2.1");
+    expect(artifact).toContain("//@version 1.2.2");
   });
 
   it("context-saver regex strips old internal state but keeps the newest", async () => {
