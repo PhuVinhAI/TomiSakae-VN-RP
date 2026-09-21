@@ -209,6 +209,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "2105050a-0d4b-4661-9363-3cc1ac44d5e7",
       "019f62e8-892f-701c-8550-08ebf33e9da2",
       "019f62e8-892f-7028-bad6-be1f427c3ae4",
+      "019f62e8-892f-7024-a40f-b906fceb58d2",
     ];
     for (const identifier of optionalIdentifiers) settings.promptEnabled[identifier] = true;
     const composed = await composePresetPrompts(data, settings, async (value) => value, {
@@ -218,9 +219,18 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       .map((entry) => entry.content)
       .join("\n");
     expect(content).toContain('Good: "Bạn nhận thấy cánh tay cô ấy đang run."');
-    expect(content).toContain('Exact Format: <font color="#HEX">"Lời thoại"</font>');
+    expect(content).toContain('Exact Format: <font color="#HEX">"Dialogue"</font>');
+    expect(content).not.toContain('Exact Format: <font color="#HEX">"Lời thoại"</font>');
     expect(content).toContain("*Bẹp!*, *Đoàng!*");
     expect(content).toContain('("Khoan, sao họ lại nói thế?")');
+    expect(content).toContain('They can\'t identify "what happened" by smells.');
+    expect(content).toContain('Ban intuition, dramatic irony, and "just knowing."');
+    expect(content).toContain(
+      "1-2, 19-20: CALM — Quiet moment; plant 1 passive environment Chekhov seed (W1).",
+    );
+    expect(content).not.toContain(
+      "1-2, 19-20: CALM — Khoảnh khắc yên ắng; gieo 1 Chekhov seed môi trường thụ động (W1).",
+    );
     expect(content).not.toContain('"You notice her arms are shaking."');
     expect(content).not.toContain('"You\'re barking up the wrong tree."');
     const orphanedLargeVoice = data.prompts.find(

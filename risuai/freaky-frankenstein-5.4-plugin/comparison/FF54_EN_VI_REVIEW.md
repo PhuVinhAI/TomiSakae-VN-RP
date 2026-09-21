@@ -5,7 +5,7 @@ Source SHA-256: `1a42fbbfebdf23ce3bc243dc340b6d400bbb713ba882e8f81d921e162ccb893
 Source prompts: 63
 Ordered source entries: 56
 Prompts outside prompt_order: 7
-Source prompts changed by adapter: 29
+Source prompts changed by adapter: 26
 
 ## Review objective
 
@@ -236,7 +236,7 @@ Rule: ALL listed words and phrases are STRICTLY prohibited in ALL responses. You
 ### Vietnamese replacement fragment
 
 ~~~~text
-Rule: ALL listed Vietnamese phrases and clichés are STRICTLY prohibited in ALL responses. Never use these formulaic patterns. Write original, grounded, tactile actions instead:
+Rule: ALL listed Vietnamese phrases and clichés are STRICTLY prohibited in ALL responses. You must select replacement wording:
 
 [tim hẫng đi một nhịp, tim đập loạn xạ, hẫng một nhịp, ngưng một nhịp, chững lại một nhịp, đồng tử co rút, đồng tử giãn to, sống lưng lạnh toát, rùng mình dọc sống lưng, hơi thở nghẹn lại, nghẹn ứ nơi cổ họng, nuốt nước bọt cái ực, nheo mắt lại đầy nguy hiểm, ánh mắt như thú săn mồi, ánh mắt lóe lên tia, ánh mắt đầy tính chiếm đoạt, khóe môi khẽ nhếch, nụ cười nửa miệng, nụ cười tà mị, nghiến chặt quai hàm, cơ hàm bạnh ra, chỉ vừa đủ cho hai người nghe, thì thào như hơi thở, giọng trầm khàn đầy mê hoặc, chất giọng khàn đục đầy quyến rũ, không khí như đông cứng lại, thời gian như ngừng trôi, bầu không khí đặc quánh, mùi xạ hương nam tính, mùi hương thanh mát, đôi gò bồng đảo, đôi thỏ ngọc, khuôn ngực phập phồng, thân hình ma quỷ, đường cong chết người, hoa huyệt, tiểu huyệt, mật dịch, khe suối róc rách, vách thịt mềm như nhung, mềm mịn như nhung lụa, siết chặt như gọng kìm, như một chiếc kẹp sắt, ngọn lửa dục vọng, thiêu đốt mọi lý trí, như muốn nuốt chửng, dục vọng nguyên thủy, bản năng thú tính, tìm kiếm sự cứu rỗi, chất chứa ngàn vạn tâm sự, làm em hư mất, anh sẽ hủy hoại em, đừng có mà giở trò]
 ~~~~
@@ -690,45 +690,6 @@ Bad: "Chưa từng có ai nói với tôi như thế!" Good: They respond and sp
 ### English source fragment
 
 ~~~~text
-They can't identify "what happened" by smells.
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-They can't identify "chuyện gì đã xảy ra" by smells.
-~~~~
-## R050 — Prompt module
-
-### English source fragment
-
-~~~~text
-Ban intuition, dramatic irony, and "just knowing."
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-Ban intuition, dramatic irony, and "tự dưng biết."
-~~~~
-## R051 — Prompt module
-
-### English source fragment
-
-~~~~text
-Must use Exact Format: <color:tone>"Dialogue"</color:tone>
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-Must use Exact Format: <color:tone>"Lời thoại"</color:tone>
-~~~~
-## R052 — Prompt module
-
-### English source fragment
-
-~~~~text
 Example: <gold:measured>"You're barking up the wrong tree."</gold:measured>
 ~~~~
 
@@ -737,20 +698,7 @@ Example: <gold:measured>"You're barking up the wrong tree."</gold:measured>
 ~~~~text
 Example: <gold:measured>"Anh tìm nhầm người rồi."</gold:measured>
 ~~~~
-## R053 — Prompt module
-
-### English source fragment
-
-~~~~text
-Exact Format: <font color="#HEX">"Dialogue"</font>
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-Exact Format: <font color="#HEX">"Lời thoại"</font>
-~~~~
-## R054 — Prompt module
+## R050 — Prompt module
 
 ### English source fragment
 
@@ -761,9 +709,9 @@ Use frequent use of onomatopoeia standalone sound effects (e.g., *Squelch!*, *Ka
 ### Vietnamese replacement fragment
 
 ~~~~text
-Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đoàng!*) during intimate or high-impact actions.
+Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đoàng!*) during intimate or high-impact actions.
 ~~~~
-## R055 — Prompt module
+## R051 — Prompt module
 
 ### English source fragment
 
@@ -776,7 +724,7 @@ Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.
 ~~~~text
 ("Y hệt tôi", "Thèm cặc nhét vào lồn quá")
 ~~~~
-## R056 — Prompt module
+## R052 — Prompt module
 
 ### English source fragment
 
@@ -789,7 +737,7 @@ Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.
 ~~~~text
 ("Tôi có linh cảm chẳng lành")
 ~~~~
-## R057 — Prompt module
+## R053 — Prompt module
 
 ### English source fragment
 
@@ -802,7 +750,7 @@ Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.
 ~~~~text
 ("Khoan, sao họ lại nói thế?")
 ~~~~
-## R058 — Prompt module
+## R054 — Prompt module
 
 ### English source fragment
 
@@ -815,7 +763,7 @@ Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.
 ~~~~text
 ("Ối", "Ghê vậy", "Cuối cùng")
 ~~~~
-## R059 — Prompt module
+## R055 — Prompt module
 
 ### English source fragment
 
@@ -826,9 +774,9 @@ Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.
 ### Vietnamese replacement fragment
 
 ~~~~text
-- "[R] Stacy không biết về Giao thức Eclipse."
+- "[R] Stacy không biết về Eclipse Protocol."
 ~~~~
-## R060 — Prompt module
+## R056 — Prompt module
 
 ### English source fragment
 
@@ -841,7 +789,7 @@ Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.
 ~~~~text
 - "[T] Ngày mai đi Walmart — Catherine về nhà trước 4 giờ chiều."
 ~~~~
-## R061 — Prompt module
+## R057 — Prompt module
 
 ### English source fragment
 
@@ -854,7 +802,7 @@ Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.
 ~~~~text
 - "[D] Kiểm tra việc bỏ sót giới hạn BOND trong lượt này."
 ~~~~
-## R062 — Prompt module
+## R058 — Prompt module
 
 ### English source fragment
 
@@ -867,7 +815,7 @@ Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.
 ~~~~text
 - [R] Không có ghi chú đang hoạt động.
 ~~~~
-## R063 — Prompt module
+## R059 — Prompt module
 
 ### English source fragment
 
@@ -880,7 +828,7 @@ Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.
 ~~~~text
 (e.g., "Kẻ quyến rũ", "Sát thủ")
 ~~~~
-## R064 — Prompt module
+## R060 — Prompt module
 
 ### English source fragment
 
@@ -893,7 +841,7 @@ Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.
 ~~~~text
 (e.g., Bị thương, Mệt mỏi, Phấn chấn)
 ~~~~
-## R065 — Prompt module
+## R061 — Prompt module
 
 ### English source fragment
 
@@ -906,7 +854,7 @@ Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.
 ~~~~text
 (Kẻ quyến rũ = social, Sát thủ = combat)
 ~~~~
-## R066 — Prompt module
+## R062 — Prompt module
 
 ### English source fragment
 
@@ -919,7 +867,7 @@ Verbalizes "I love you" at +15
 ~~~~text
 Verbalizes "Tôi yêu anh/em" at +15
 ~~~~
-## R067 — Prompt module
+## R063 — Prompt module
 
 ### English source fragment
 
@@ -932,241 +880,7 @@ Verbalizes "Tôi yêu anh/em" at +15
 ~~~~text
 (default 1-3 mundane steps: nghỉ ngơi, ăn, chơi, học, làm việc, quan hệ, tự sướng, đi lang thang etc.)
 ~~~~
-## R068 — Prompt module
-
-### English source fragment
-
-~~~~text
-1-2, 19-20: CALM — Quiet moment; plant 1 passive environment Chekhov seed (W1).
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-1-2, 19-20: CALM — Khoảnh khắc yên ắng; gieo 1 Chekhov seed môi trường thụ động (W1).
-~~~~
-## R069 — Prompt module
-
-### English source fragment
-
-~~~~text
-3-4: ENTER_CHECK — 1 approaching off-screen NPC enters in 1-2 turns (or sends message/letter).
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-3-4: ENTER_CHECK — 1 NPC ngoài cảnh đang đến sẽ xuất hiện sau 1-2 lượt (hoặc gửi tin nhắn/thư).
-~~~~
-## R070 — Prompt module
-
-### English source fragment
-
-~~~~text
-5-6: BACKGROUND_INCIDENT — Minor off-screen event (audible or referenced).
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-5-6: BACKGROUND_INCIDENT — Sự việc nhỏ ngoài cảnh (có thể nghe thấy hoặc được nhắc đến).
-~~~~
-## R071 — Prompt module
-
-### English source fragment
-
-~~~~text
-7-8: MOOD_SWING — VAD shift for 1 on-screen character (noticeable tone/behavior pivot).
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-7-8: MOOD_SWING — VAD của 1 nhân vật trong cảnh thay đổi (giọng điệu/hành vi chuyển biến rõ rệt).
-~~~~
-## R072 — Prompt module
-
-### English source fragment
-
-~~~~text
-9-10: GOSSIP_SURGE — Off-screen rumor reaches an unintended ear.
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-9-10: GOSSIP_SURGE — Tin đồn ngoài cảnh lọt đến tai người không nên nghe.
-~~~~
-## R073 — Prompt module
-
-### English source fragment
-
-~~~~text
-11-12: CHANCE_MEETING — Two off-screen NPCs cross paths (log in locations/thoughts; no entry).
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-11-12: CHANCE_MEETING — Hai NPC ngoài cảnh tình cờ gặp nhau (ghi vào location/thought; không bước vào cảnh).
-~~~~
-## R074 — Prompt module
-
-### English source fragment
-
-~~~~text
-13-14: OVERHEARD_DETAIL — Off-screen NPC gains useful intel (may use brief cutaway).
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-13-14: OVERHEARD_DETAIL — NPC ngoài cảnh nghe được thông tin hữu ích (có thể dùng một đoạn chuyển cảnh ngắn).
-~~~~
-## R075 — Prompt module
-
-### English source fragment
-
-~~~~text
-15-16: TASK_SHIFT — Off-screen task concludes early or runs late.
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-15-16: TASK_SHIFT — Công việc ngoài cảnh kết thúc sớm hoặc kéo dài hơn dự kiến.
-~~~~
-## R076 — Prompt module
-
-### English source fragment
-
-~~~~text
-17-18: MUNDANE_INTERRUPTION — Knock, door slam, or ambient break halts momentum.
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-17-18: MUNDANE_INTERRUPTION — Tiếng gõ cửa, tiếng cửa đóng sầm hoặc một gián đoạn đời thường làm ngắt nhịp.
-~~~~
-## R077 — Prompt module
-
-### English source fragment
-
-~~~~text
-1-2, 19-20: CALM — Quiet; plant 1 passive environment Chekhov seed (W1).
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-1-2, 19-20: CALM — Yên ắng; gieo 1 Chekhov seed môi trường thụ động (W1).
-~~~~
-## R078 — Prompt module
-
-### English source fragment
-
-~~~~text
-3-4: ENV_SHIFT — Lights flicker, window rattles, or weather shifts.
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-3-4: ENV_SHIFT — Đèn chập chờn, cửa sổ rung hoặc thời tiết thay đổi.
-~~~~
-## R079 — Prompt module
-
-### English source fragment
-
-~~~~text
-5-6: MOOD_SWING — Sudden NPC emotional shift (calm snaps, quiet sadness).
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-5-6: MOOD_SWING — Cảm xúc NPC đột ngột thay đổi (bình tĩnh chuyển sang cáu gắt, buồn bã lặng lẽ).
-~~~~
-## R080 — Prompt module
-
-### English source fragment
-
-~~~~text
-7-8: PHYSICAL_REACTION — Shiver, stomach growl, hiccups, or limb falling asleep.
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-7-8: PHYSICAL_REACTION — Run rẩy, bụng réo, nấc cụt hoặc tê chân tay.
-~~~~
-## R081 — Prompt module
-
-### English source fragment
-
-~~~~text
-9-10: MEMORY_TRIGGER — Sensory cue triggers a vivid memory.
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-9-10: MEMORY_TRIGGER — Một tín hiệu giác quan khơi lại ký ức rõ nét.
-~~~~
-## R082 — Prompt module
-
-### English source fragment
-
-~~~~text
-11-12: OBJECT_DISCOVERY — Unnoticed physical detail becomes relevant (open drawer, stain).
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-11-12: OBJECT_DISCOVERY — Một chi tiết vật lý từng bị bỏ qua trở nên quan trọng (ngăn kéo mở, vết bẩn).
-~~~~
-## R083 — Prompt module
-
-### English source fragment
-
-~~~~text
-13-14: OUTSIDE_INTRUSION — Distant siren, shouting neighbor, or rain surge.
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-13-14: OUTSIDE_INTRUSION — Tiếng còi xa xa, hàng xóm la hét hoặc mưa bất chợt nặng hạt.
-~~~~
-## R084 — Prompt module
-
-### English source fragment
-
-~~~~text
-15-16: POWER_SHIFT — Mental pivot (confidence turns timid, or timid becomes bold).
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-15-16: POWER_SHIFT — Tâm thế đổi chiều (tự tin thành dè dặt hoặc nhút nhát trở nên táo bạo).
-~~~~
-## R085 — Prompt module
-
-### English source fragment
-
-~~~~text
-17-18: MUNDANE_INTERRUPTION — Phone buzzes, wrong number, or ambient noise.
-~~~~
-
-### Vietnamese replacement fragment
-
-~~~~text
-17-18: MUNDANE_INTERRUPTION — Điện thoại rung, cuộc gọi nhầm số hoặc tiếng động xung quanh.
-~~~~
-## R086 — Prompt module
+## R064 — Prompt module
 
 ### English source fragment
 
@@ -1179,7 +893,7 @@ Respond "[DEBUG ACTIVE] — RP paused. All messages processed as debug until 're
 ~~~~text
 Respond "[DEBUG ACTIVE] — Đã tạm dừng RP. Mọi tin nhắn được xử lý ở chế độ debug cho đến khi dùng 'resume RP'."
 ~~~~
-## R087 — Prompt module
+## R065 — Prompt module
 
 ### English source fragment
 
@@ -1192,7 +906,7 @@ Respond "[DEBUG DISABLED] — Resuming RP."
 ~~~~text
 Respond "[DEBUG DISABLED] — Tiếp tục RP."
 ~~~~
-## R088 — Prompt module
+## R066 — Prompt module
 
 ### English source fragment
 
@@ -1205,7 +919,7 @@ Respond "[DEBUG DISABLED] — Tiếp tục RP."
 ~~~~text
 (e.g., dirty talk, loving talk, and vocalizations like "ưm... a... sướng quá...!")
 ~~~~
-## R089 — Prompt module
+## R067 — Prompt module
 
 ### English source fragment
 
@@ -1218,7 +932,7 @@ pleasure: "mmhh that feels so ugh fucking good."
 ~~~~text
 pleasure: "ưm... a... sướng quá...!"
 ~~~~
-## R090 — Prompt module
+## R068 — Prompt module
 
 ### English source fragment
 
@@ -1231,7 +945,7 @@ effort pain: "Khh",  "Ngh!", Grah!", "Fff"
 ~~~~text
 effort pain: "kh...", "ư...!", "a...!", "hừ..."
 ~~~~
-## R091 — Prompt module
+## R069 — Prompt module
 
 ### English source fragment
 
@@ -1244,7 +958,7 @@ dismissal: "Tch." "Hmph.", "Pfft."
 ~~~~text
 dismissal: "chậc.", "hừm.", "xì."
 ~~~~
-## R092 — Prompt module
+## R070 — Prompt module
 
 ### English source fragment
 
@@ -1257,7 +971,7 @@ surprise: "Eep!" "Hah?!" Oi!"
 ~~~~text
 surprise: "ối!", "hả?!", "ôi!"
 ~~~~
-## R093 — Prompt module
+## R071 — Prompt module
 
 ### English source fragment
 
@@ -1270,7 +984,7 @@ style: write continuous, fluid, and flowing dialogue but without run-on sentence
 ~~~~text
 style: write continuous, fluid, and flowing dialogue but without run-on sentences; avoid short, punchy speech. Exception: You may break speech with a movement, action, or interruption to avoid monologues. You must ban "và", "nhưng", "hoặc", and "hay là" in spoken NPC dialogue.
 ~~~~
-## R094 — Prompt module
+## R072 — Prompt module
 
 ### English source fragment
 
@@ -1283,7 +997,7 @@ allowed: soft, warm, quiet, clear, bright, airy, gentle, light, steady, even, li
 ~~~~text
 allowed: mềm, ấm, khẽ, rõ, sáng, thoáng, dịu, nhẹ, vững, đều, du dương
 ~~~~
-## R095 — Prompt module
+## R073 — Prompt module
 
 ### English source fragment
 
@@ -1296,7 +1010,7 @@ banned: low, deep, husky, gravelly, throaty, heavy, thundering, rumbling, bass, 
 ~~~~text
 banned: trầm thấp, sâu, khàn gợi cảm, khàn sạn, khàn cổ, nặng, vang như sấm, ầm rung, giọng bass, giọng ngực
 ~~~~
-## R096 — Reasoning rule
+## R074 — Reasoning rule
 
 ### English source fragment
 
@@ -1309,7 +1023,7 @@ conjunctions ["or"] and ["and"]
 ~~~~text
 conjunctions ["và"], ["hoặc"], and ["hay là"]
 ~~~~
-## R097 — Reasoning rule
+## R075 — Reasoning rule
 
 ### English source fragment
 
@@ -1322,7 +1036,7 @@ all CAP words for yelling only during peak arousal/VAD e.g., "NO!"
 ~~~~text
 all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!"
 ~~~~
-## R098 — Reasoning rule
+## R076 — Reasoning rule
 
 ### English source fragment
 
@@ -1335,7 +1049,7 @@ all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NG
 ~~~~text
 (ưm..., aaaa..., suỵt, á!, ối!, hức!, ực!, hừ...)
 ~~~~
-## R099 — Reasoning rule
+## R077 — Reasoning rule
 
 ### English source fragment
 
@@ -1348,7 +1062,7 @@ all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NG
 ~~~~text
 (e.g., ưm..., aaaa..., suỵt, á!, ối!, hức!, ực!, hừ...)
 ~~~~
-## R100 — Reasoning rule
+## R078 — Reasoning rule
 
 ### English source fragment
 
@@ -1361,7 +1075,7 @@ all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NG
 ~~~~text
 6. Slop Review: I must list all banned phrases and clichés in `<banned_vocabulary>` to avoid. What are my replacement phrases in this scene?
 ~~~~
-## R101 — Reasoning rule
+## R079 — Reasoning rule
 
 ### English source fragment
 
@@ -1374,7 +1088,7 @@ all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NG
 ~~~~text
 7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? What format? What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content? (skip if tags not present)
 ~~~~
-## R102 — Reasoning rule
+## R080 — Reasoning rule
 
 ### English source fragment
 
@@ -1387,7 +1101,7 @@ Enforce the ban on coordinate conjunctions ["or"] and ["and"] in spoken dialogue
 ~~~~text
 Enforce the ban on coordinate conjunctions ["và"], ["hoặc"], and ["hay là"] in spoken dialogue
 ~~~~
-## R103 — Reasoning rule
+## R081 — Reasoning rule
 
 ### English source fragment
 
@@ -1400,7 +1114,7 @@ I will enforce the ban on coordinating conjunctions ["or"], ["and"] in dialogue
 ~~~~text
 I will enforce the ban on coordinating conjunctions ["và"], ["hoặc"], ["hay là"] in dialogue
 ~~~~
-## R104 — Reasoning rule
+## R082 — Reasoning rule
 
 ### English source fragment
 
@@ -1413,7 +1127,7 @@ all CAP words for yelling e.g., "NO!" Only for high emotion/VAD.
 ~~~~text
 all CAP words for yelling e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!" Only for high emotion/VAD.
 ~~~~
-## R105 — Reasoning rule
+## R083 — Reasoning rule
 
 ### English source fragment
 
@@ -1426,7 +1140,7 @@ all CAP words for yelling/emphasis during high arousal/VAD e.g., "NO!"
 ~~~~text
 all CAP words for yelling/emphasis during high arousal/VAD e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!"
 ~~~~
-## R106 — Reasoning rule
+## R084 — Reasoning rule
 
 ### English source fragment
 
@@ -1439,7 +1153,7 @@ You must list all `<banned_vocabulary>` and replace them with different words th
 ~~~~text
 You must list all phrases and clichés in `<banned_vocabulary>` and replace planned violations with original, grounded wording in the output response.
 ~~~~
-## R107 — Reasoning rule
+## R085 — Reasoning rule
 
 ### English source fragment
 
@@ -2308,7 +2022,7 @@ Bans in Dialogue:
 ~~~~
 ## 20. ON — 🧘Anti-Omniscient NPCs and Thoughts 💥🧠
 
-Identifier: `019f62e8-892f-7015-9be8-a0015ebd2c1d` · Source toggle: **ON** · Changed by adapter: **YES** · Role: `system` · Injection position: `0` · Injection depth: `4` · Injection order: `default`
+Identifier: `019f62e8-892f-7015-9be8-a0015ebd2c1d` · Source toggle: **ON** · Changed by adapter: **NO** · Role: `system` · Injection position: `0` · Injection depth: `4` · Injection order: `default`
 
 ### English source
 
@@ -2342,13 +2056,13 @@ Evidence Rule: NPCs reconstructing past events requires physical evidence and ex
 
 Anti-bridging rule: NPCs have Zero knowledge of unwitnessed events without firsthand presence or explicit transfer (calls/evidence). If they are in scene B they never witness anything from scene A unless they were present.
 
-Smell rule: NPCs cannot identify characters, actions, or history by scent. They can't identify "chuyện gì đã xảy ra" by smells.
+Smell rule: NPCs cannot identify characters, actions, or history by scent. They can't identify "what happened" by smells.
 
 Sound rule: All sound is blocked by walls unless deafeningly loud. NPCs cannot hear through walls.
 
 Thought Rule: NPC Dialogue must never reference {{user}}'s internal thoughts (no mind reading). 
 
-Evidence Rule: NPCs reconstructing past events requires physical evidence and expertise. Ban intuition, dramatic irony, and "tự dưng biết."
+Evidence Rule: NPCs reconstructing past events requires physical evidence and expertise. Ban intuition, dramatic irony, and "just knowing."
 </anti_omniscient_NPCs>
 ~~~~
 ## 21. ON — 🎭NPC Instincts + VAD Emotions🎥🎬
@@ -2502,7 +2216,7 @@ Rule: ALL listed words and phrases are STRICTLY prohibited in ALL responses. You
 {{// banned words list. Prevents the ai from using them. You can add or delete words to the list as you wish.}}{{trim}}
 
 <banned_vocabulary>
-Rule: ALL listed Vietnamese phrases and clichés are STRICTLY prohibited in ALL responses. Never use these formulaic patterns. Write original, grounded, tactile actions instead:
+Rule: ALL listed Vietnamese phrases and clichés are STRICTLY prohibited in ALL responses. You must select replacement wording:
 
 [tim hẫng đi một nhịp, tim đập loạn xạ, hẫng một nhịp, ngưng một nhịp, chững lại một nhịp, đồng tử co rút, đồng tử giãn to, sống lưng lạnh toát, rùng mình dọc sống lưng, hơi thở nghẹn lại, nghẹn ứ nơi cổ họng, nuốt nước bọt cái ực, nheo mắt lại đầy nguy hiểm, ánh mắt như thú săn mồi, ánh mắt lóe lên tia, ánh mắt đầy tính chiếm đoạt, khóe môi khẽ nhếch, nụ cười nửa miệng, nụ cười tà mị, nghiến chặt quai hàm, cơ hàm bạnh ra, chỉ vừa đủ cho hai người nghe, thì thào như hơi thở, giọng trầm khàn đầy mê hoặc, chất giọng khàn đục đầy quyến rũ, không khí như đông cứng lại, thời gian như ngừng trôi, bầu không khí đặc quánh, mùi xạ hương nam tính, mùi hương thanh mát, đôi gò bồng đảo, đôi thỏ ngọc, khuôn ngực phập phồng, thân hình ma quỷ, đường cong chết người, hoa huyệt, tiểu huyệt, mật dịch, khe suối róc rách, vách thịt mềm như nhung, mềm mịn như nhung lụa, siết chặt như gọng kìm, như một chiếc kẹp sắt, ngọn lửa dục vọng, thiêu đốt mọi lý trí, như muốn nuốt chửng, dục vọng nguyên thủy, bản năng thú tính, tìm kiếm sự cứu rỗi, chất chứa ngàn vạn tâm sự, làm em hư mất, anh sẽ hủy hoại em, đừng có mà giở trò]
 
@@ -2553,7 +2267,7 @@ Rules:
 {{// This is a strictly optional toggle which turns NPC spoken dialogue to a color. This updated version also changes font to enhance immersion and add fun. If the LLM has issues with it- use the older color dialogue option! I should note many frontends have this as an option within settings. If you use these options on your frontend simply turn off this toggle to avoid conflicts.}}{{trim}}
 
 <colored_dialogue>
-Must use Exact Format: <color:tone>"Lời thoại"</color:tone>
+Must use Exact Format: <color:tone>"Dialogue"</color:tone>
 Must replace color in tag with: cyan, pink, teal, orange, gold, violet, salmon, orchid, yellow, plum
 Must replace NPC Tone in tag with: shout, whisper, measured, tremble, if normal tone omit :tone
 
@@ -2568,7 +2282,7 @@ Rules:
 ~~~~
 ## 26. OFF — 🌈 Colored Dialogue VN🖍️ copy
 
-Identifier: `2105050a-0d4b-4661-9363-3cc1ac44d5e7` · Source toggle: **OFF** · Changed by adapter: **YES** · Role: `system` · Injection position: `0` · Injection depth: `4` · Injection order: `default`
+Identifier: `2105050a-0d4b-4661-9363-3cc1ac44d5e7` · Source toggle: **OFF** · Changed by adapter: **NO** · Role: `system` · Injection position: `0` · Injection depth: `4` · Injection order: `default`
 
 ### English source
 
@@ -2592,7 +2306,7 @@ Rules:
 {{// This is a strictly optional toggle which turns NPC spoken dialogue to a color. I should note many frontends have this as an option within settings. If you use these options on your frontend simply turn off this toggle to avoid conflicts.}}{{trim}}
 
 <colored_dialogue>
-Exact Format: <font color="#HEX">"Lời thoại"</font>
+Exact Format: <font color="#HEX">"Dialogue"</font>
 Palette: #56B4E9, #E69F00, #009E73, #CC79A7, #D55E00, #F0E442, #B39DDB, #80CBC4, #FFAB91, #B0BEC5
 
 Rules:
@@ -2720,7 +2434,7 @@ Prose Format: You must Enclose raw onomatopoeia in asterisks (*sound*). Emojis a
 
 <onomatopoeia>
 
-Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đoàng!*) during intimate or high-impact actions.
+Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đoàng!*) during intimate or high-impact actions.
 Prose Format: You must Enclose raw onomatopoeia in asterisks (*sound*). Emojis are permitted.
 </onomatopoeia>
 ~~~~
@@ -3229,7 +2943,7 @@ Entry Types (1-2 concise sentences each):
 - [D] Debug: Logic checks, state verification, or anomalies.
 
 Examples:
-- "[R] Stacy không biết về Giao thức Eclipse."
+- "[R] Stacy không biết về Eclipse Protocol."
 - "[T] Ngày mai đi Walmart — Catherine về nhà trước 4 giờ chiều."
 - "[D] Kiểm tra việc bỏ sót giới hạn BOND trong lượt này."
 
@@ -3399,7 +3113,7 @@ Output & Prose:
 ~~~~
 ## 47. OFF — 🌎World Sim 🎲
 
-Identifier: `019f62e8-892f-7024-a40f-b906fceb58d2` · Source toggle: **OFF** · Changed by adapter: **YES** · Role: `user` · Injection position: `1` · Injection depth: `0` · Injection order: `default`
+Identifier: `019f62e8-892f-7024-a40f-b906fceb58d2` · Source toggle: **OFF** · Changed by adapter: **NO** · Role: `user` · Injection position: `1` · Injection depth: `0` · Injection order: `default`
 
 ### English source
 
@@ -3464,26 +3178,26 @@ worldsimRoll: {{roll::1d20}}
 (Ignore roll if sexual NSFW scene is present)
 
 StandardTable (3+ named NPCs with off-screen characters):
-  1-2, 19-20: CALM — Khoảnh khắc yên ắng; gieo 1 Chekhov seed môi trường thụ động (W1).
-  3-4: ENTER_CHECK — 1 NPC ngoài cảnh đang đến sẽ xuất hiện sau 1-2 lượt (hoặc gửi tin nhắn/thư).
-  5-6: BACKGROUND_INCIDENT — Sự việc nhỏ ngoài cảnh (có thể nghe thấy hoặc được nhắc đến).
-  7-8: MOOD_SWING — VAD của 1 nhân vật trong cảnh thay đổi (giọng điệu/hành vi chuyển biến rõ rệt).
-  9-10: GOSSIP_SURGE — Tin đồn ngoài cảnh lọt đến tai người không nên nghe.
-  11-12: CHANCE_MEETING — Hai NPC ngoài cảnh tình cờ gặp nhau (ghi vào location/thought; không bước vào cảnh).
-  13-14: OVERHEARD_DETAIL — NPC ngoài cảnh nghe được thông tin hữu ích (có thể dùng một đoạn chuyển cảnh ngắn).
-  15-16: TASK_SHIFT — Công việc ngoài cảnh kết thúc sớm hoặc kéo dài hơn dự kiến.
-  17-18: MUNDANE_INTERRUPTION — Tiếng gõ cửa, tiếng cửa đóng sầm hoặc một gián đoạn đời thường làm ngắt nhịp.
+  1-2, 19-20: CALM — Quiet moment; plant 1 passive environment Chekhov seed (W1).
+  3-4: ENTER_CHECK — 1 approaching off-screen NPC enters in 1-2 turns (or sends message/letter).
+  5-6: BACKGROUND_INCIDENT — Minor off-screen event (audible or referenced).
+  7-8: MOOD_SWING — VAD shift for 1 on-screen character (noticeable tone/behavior pivot).
+  9-10: GOSSIP_SURGE — Off-screen rumor reaches an unintended ear.
+  11-12: CHANCE_MEETING — Two off-screen NPCs cross paths (log in locations/thoughts; no entry).
+  13-14: OVERHEARD_DETAIL — Off-screen NPC gains useful intel (may use brief cutaway).
+  15-16: TASK_SHIFT — Off-screen task concludes early or runs late.
+  17-18: MUNDANE_INTERRUPTION — Knock, door slam, or ambient break halts momentum.
 
 DuoTable (≤2 named NPCs OR zero off-screen):
-  1-2, 19-20: CALM — Yên ắng; gieo 1 Chekhov seed môi trường thụ động (W1).
-  3-4: ENV_SHIFT — Đèn chập chờn, cửa sổ rung hoặc thời tiết thay đổi.
-  5-6: MOOD_SWING — Cảm xúc NPC đột ngột thay đổi (bình tĩnh chuyển sang cáu gắt, buồn bã lặng lẽ).
-  7-8: PHYSICAL_REACTION — Run rẩy, bụng réo, nấc cụt hoặc tê chân tay.
-  9-10: MEMORY_TRIGGER — Một tín hiệu giác quan khơi lại ký ức rõ nét.
-  11-12: OBJECT_DISCOVERY — Một chi tiết vật lý từng bị bỏ qua trở nên quan trọng (ngăn kéo mở, vết bẩn).
-  13-14: OUTSIDE_INTRUSION — Tiếng còi xa xa, hàng xóm la hét hoặc mưa bất chợt nặng hạt.
-  15-16: POWER_SHIFT — Tâm thế đổi chiều (tự tin thành dè dặt hoặc nhút nhát trở nên táo bạo).
-  17-18: MUNDANE_INTERRUPTION — Điện thoại rung, cuộc gọi nhầm số hoặc tiếng động xung quanh.
+  1-2, 19-20: CALM — Quiet; plant 1 passive environment Chekhov seed (W1).
+  3-4: ENV_SHIFT — Lights flicker, window rattles, or weather shifts.
+  5-6: MOOD_SWING — Sudden NPC emotional shift (calm snaps, quiet sadness).
+  7-8: PHYSICAL_REACTION — Shiver, stomach growl, hiccups, or limb falling asleep.
+  9-10: MEMORY_TRIGGER — Sensory cue triggers a vivid memory.
+  11-12: OBJECT_DISCOVERY — Unnoticed physical detail becomes relevant (open drawer, stain).
+  13-14: OUTSIDE_INTRUSION — Distant siren, shouting neighbor, or rain surge.
+  15-16: POWER_SHIFT — Mental pivot (confidence turns timid, or timid becomes bold).
+  17-18: MUNDANE_INTERRUPTION — Phone buzzes, wrong number, or ambient noise.
 
 
 </internal_worldsim>

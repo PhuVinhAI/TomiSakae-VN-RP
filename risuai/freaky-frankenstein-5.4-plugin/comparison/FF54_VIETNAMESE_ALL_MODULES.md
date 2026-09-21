@@ -460,13 +460,13 @@ Identifier: `019f62e8-892f-7015-9be8-a0015ebd2c1d` · Source toggle: **ON** · R
 
 Anti-bridging rule: NPCs have Zero knowledge of unwitnessed events without firsthand presence or explicit transfer (calls/evidence). If they are in scene B they never witness anything from scene A unless they were present.
 
-Smell rule: NPCs cannot identify characters, actions, or history by scent. They can't identify "chuyện gì đã xảy ra" by smells.
+Smell rule: NPCs cannot identify characters, actions, or history by scent. They can't identify "what happened" by smells.
 
 Sound rule: All sound is blocked by walls unless deafeningly loud. NPCs cannot hear through walls.
 
 Thought Rule: NPC Dialogue must never reference {{user}}'s internal thoughts (no mind reading). 
 
-Evidence Rule: NPCs reconstructing past events requires physical evidence and expertise. Ban intuition, dramatic irony, and "tự dưng biết."
+Evidence Rule: NPCs reconstructing past events requires physical evidence and expertise. Ban intuition, dramatic irony, and "just knowing."
 </anti_omniscient_NPCs>
 ~~~~
 ## 21. ON — 🎭NPC Instincts + VAD Emotions🎥🎬
@@ -540,7 +540,7 @@ Identifier: `019f62e8-892f-7013-9e9b-13eae330f5a0` · Source toggle: **ON** · R
 {{// banned words list. Prevents the ai from using them. You can add or delete words to the list as you wish.}}{{trim}}
 
 <banned_vocabulary>
-Rule: ALL listed Vietnamese phrases and clichés are STRICTLY prohibited in ALL responses. Never use these formulaic patterns. Write original, grounded, tactile actions instead:
+Rule: ALL listed Vietnamese phrases and clichés are STRICTLY prohibited in ALL responses. You must select replacement wording:
 
 [tim hẫng đi một nhịp, tim đập loạn xạ, hẫng một nhịp, ngưng một nhịp, chững lại một nhịp, đồng tử co rút, đồng tử giãn to, sống lưng lạnh toát, rùng mình dọc sống lưng, hơi thở nghẹn lại, nghẹn ứ nơi cổ họng, nuốt nước bọt cái ực, nheo mắt lại đầy nguy hiểm, ánh mắt như thú săn mồi, ánh mắt lóe lên tia, ánh mắt đầy tính chiếm đoạt, khóe môi khẽ nhếch, nụ cười nửa miệng, nụ cười tà mị, nghiến chặt quai hàm, cơ hàm bạnh ra, chỉ vừa đủ cho hai người nghe, thì thào như hơi thở, giọng trầm khàn đầy mê hoặc, chất giọng khàn đục đầy quyến rũ, không khí như đông cứng lại, thời gian như ngừng trôi, bầu không khí đặc quánh, mùi xạ hương nam tính, mùi hương thanh mát, đôi gò bồng đảo, đôi thỏ ngọc, khuôn ngực phập phồng, thân hình ma quỷ, đường cong chết người, hoa huyệt, tiểu huyệt, mật dịch, khe suối róc rách, vách thịt mềm như nhung, mềm mịn như nhung lụa, siết chặt như gọng kìm, như một chiếc kẹp sắt, ngọn lửa dục vọng, thiêu đốt mọi lý trí, như muốn nuốt chửng, dục vọng nguyên thủy, bản năng thú tính, tìm kiếm sự cứu rỗi, chất chứa ngàn vạn tâm sự, làm em hư mất, anh sẽ hủy hoại em, đừng có mà giở trò]
 
@@ -561,7 +561,7 @@ Identifier: `019f62e8-892f-7019-be65-715a4949cba0` · Source toggle: **ON** · R
 {{// This is a strictly optional toggle which turns NPC spoken dialogue to a color. This updated version also changes font to enhance immersion and add fun. If the LLM has issues with it- use the older color dialogue option! I should note many frontends have this as an option within settings. If you use these options on your frontend simply turn off this toggle to avoid conflicts.}}{{trim}}
 
 <colored_dialogue>
-Must use Exact Format: <color:tone>"Lời thoại"</color:tone>
+Must use Exact Format: <color:tone>"Dialogue"</color:tone>
 Must replace color in tag with: cyan, pink, teal, orange, gold, violet, salmon, orchid, yellow, plum
 Must replace NPC Tone in tag with: shout, whisper, measured, tremble, if normal tone omit :tone
 
@@ -582,7 +582,7 @@ Identifier: `2105050a-0d4b-4661-9363-3cc1ac44d5e7` · Source toggle: **OFF** · 
 {{// This is a strictly optional toggle which turns NPC spoken dialogue to a color. I should note many frontends have this as an option within settings. If you use these options on your frontend simply turn off this toggle to avoid conflicts.}}{{trim}}
 
 <colored_dialogue>
-Exact Format: <font color="#HEX">"Lời thoại"</font>
+Exact Format: <font color="#HEX">"Dialogue"</font>
 Palette: #56B4E9, #E69F00, #009E73, #CC79A7, #D55E00, #F0E442, #B39DDB, #80CBC4, #FFAB91, #B0BEC5
 
 Rules:
@@ -647,7 +647,7 @@ Identifier: `019f62e8-892f-701c-8550-08ebf33e9da2` · Source toggle: **OFF** · 
 
 <onomatopoeia>
 
-Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đoàng!*) during intimate or high-impact actions.
+Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đoàng!*) during intimate or high-impact actions.
 Prose Format: You must Enclose raw onomatopoeia in asterisks (*sound*). Emojis are permitted.
 </onomatopoeia>
 ~~~~
@@ -889,7 +889,7 @@ Entry Types (1-2 concise sentences each):
 - [D] Debug: Logic checks, state verification, or anomalies.
 
 Examples:
-- "[R] Stacy không biết về Giao thức Eclipse."
+- "[R] Stacy không biết về Eclipse Protocol."
 - "[T] Ngày mai đi Walmart — Catherine về nhà trước 4 giờ chiều."
 - "[D] Kiểm tra việc bỏ sót giới hạn BOND trong lượt này."
 
@@ -1000,26 +1000,26 @@ worldsimRoll: {{roll::1d20}}
 (Ignore roll if sexual NSFW scene is present)
 
 StandardTable (3+ named NPCs with off-screen characters):
-  1-2, 19-20: CALM — Khoảnh khắc yên ắng; gieo 1 Chekhov seed môi trường thụ động (W1).
-  3-4: ENTER_CHECK — 1 NPC ngoài cảnh đang đến sẽ xuất hiện sau 1-2 lượt (hoặc gửi tin nhắn/thư).
-  5-6: BACKGROUND_INCIDENT — Sự việc nhỏ ngoài cảnh (có thể nghe thấy hoặc được nhắc đến).
-  7-8: MOOD_SWING — VAD của 1 nhân vật trong cảnh thay đổi (giọng điệu/hành vi chuyển biến rõ rệt).
-  9-10: GOSSIP_SURGE — Tin đồn ngoài cảnh lọt đến tai người không nên nghe.
-  11-12: CHANCE_MEETING — Hai NPC ngoài cảnh tình cờ gặp nhau (ghi vào location/thought; không bước vào cảnh).
-  13-14: OVERHEARD_DETAIL — NPC ngoài cảnh nghe được thông tin hữu ích (có thể dùng một đoạn chuyển cảnh ngắn).
-  15-16: TASK_SHIFT — Công việc ngoài cảnh kết thúc sớm hoặc kéo dài hơn dự kiến.
-  17-18: MUNDANE_INTERRUPTION — Tiếng gõ cửa, tiếng cửa đóng sầm hoặc một gián đoạn đời thường làm ngắt nhịp.
+  1-2, 19-20: CALM — Quiet moment; plant 1 passive environment Chekhov seed (W1).
+  3-4: ENTER_CHECK — 1 approaching off-screen NPC enters in 1-2 turns (or sends message/letter).
+  5-6: BACKGROUND_INCIDENT — Minor off-screen event (audible or referenced).
+  7-8: MOOD_SWING — VAD shift for 1 on-screen character (noticeable tone/behavior pivot).
+  9-10: GOSSIP_SURGE — Off-screen rumor reaches an unintended ear.
+  11-12: CHANCE_MEETING — Two off-screen NPCs cross paths (log in locations/thoughts; no entry).
+  13-14: OVERHEARD_DETAIL — Off-screen NPC gains useful intel (may use brief cutaway).
+  15-16: TASK_SHIFT — Off-screen task concludes early or runs late.
+  17-18: MUNDANE_INTERRUPTION — Knock, door slam, or ambient break halts momentum.
 
 DuoTable (≤2 named NPCs OR zero off-screen):
-  1-2, 19-20: CALM — Yên ắng; gieo 1 Chekhov seed môi trường thụ động (W1).
-  3-4: ENV_SHIFT — Đèn chập chờn, cửa sổ rung hoặc thời tiết thay đổi.
-  5-6: MOOD_SWING — Cảm xúc NPC đột ngột thay đổi (bình tĩnh chuyển sang cáu gắt, buồn bã lặng lẽ).
-  7-8: PHYSICAL_REACTION — Run rẩy, bụng réo, nấc cụt hoặc tê chân tay.
-  9-10: MEMORY_TRIGGER — Một tín hiệu giác quan khơi lại ký ức rõ nét.
-  11-12: OBJECT_DISCOVERY — Một chi tiết vật lý từng bị bỏ qua trở nên quan trọng (ngăn kéo mở, vết bẩn).
-  13-14: OUTSIDE_INTRUSION — Tiếng còi xa xa, hàng xóm la hét hoặc mưa bất chợt nặng hạt.
-  15-16: POWER_SHIFT — Tâm thế đổi chiều (tự tin thành dè dặt hoặc nhút nhát trở nên táo bạo).
-  17-18: MUNDANE_INTERRUPTION — Điện thoại rung, cuộc gọi nhầm số hoặc tiếng động xung quanh.
+  1-2, 19-20: CALM — Quiet; plant 1 passive environment Chekhov seed (W1).
+  3-4: ENV_SHIFT — Lights flicker, window rattles, or weather shifts.
+  5-6: MOOD_SWING — Sudden NPC emotional shift (calm snaps, quiet sadness).
+  7-8: PHYSICAL_REACTION — Shiver, stomach growl, hiccups, or limb falling asleep.
+  9-10: MEMORY_TRIGGER — Sensory cue triggers a vivid memory.
+  11-12: OBJECT_DISCOVERY — Unnoticed physical detail becomes relevant (open drawer, stain).
+  13-14: OUTSIDE_INTRUSION — Distant siren, shouting neighbor, or rain surge.
+  15-16: POWER_SHIFT — Mental pivot (confidence turns timid, or timid becomes bold).
+  17-18: MUNDANE_INTERRUPTION — Phone buzzes, wrong number, or ambient noise.
 
 
 </internal_worldsim>

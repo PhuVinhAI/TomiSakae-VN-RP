@@ -71,7 +71,7 @@ export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, str
   ],
   [
     "Rule: ALL listed words and phrases are STRICTLY prohibited in ALL responses. You must select a replacement word:\n\n[fresh meat, spine, breath hitching, breath catching, husky, catching in throat, pupils blown wide, predatory, ozone, meat, asset, shivers down spine, pupils dilated, nails biting, velvet, vise, vice, structural integrity, deep curve, furnace, throaty, calloused, guttural, slick, unadulterated, jaw clenched, jaw working, barely above a whisper, musk, breast, a beat, nobody has, nobody just, ruin you, don't you dare]",
-    "Rule: ALL listed Vietnamese phrases and clichés are STRICTLY prohibited in ALL responses. Never use these formulaic patterns. Write original, grounded, tactile actions instead:\n\n[tim hẫng đi một nhịp, tim đập loạn xạ, hẫng một nhịp, ngưng một nhịp, chững lại một nhịp, đồng tử co rút, đồng tử giãn to, sống lưng lạnh toát, rùng mình dọc sống lưng, hơi thở nghẹn lại, nghẹn ứ nơi cổ họng, nuốt nước bọt cái ực, nheo mắt lại đầy nguy hiểm, ánh mắt như thú săn mồi, ánh mắt lóe lên tia, ánh mắt đầy tính chiếm đoạt, khóe môi khẽ nhếch, nụ cười nửa miệng, nụ cười tà mị, nghiến chặt quai hàm, cơ hàm bạnh ra, chỉ vừa đủ cho hai người nghe, thì thào như hơi thở, giọng trầm khàn đầy mê hoặc, chất giọng khàn đục đầy quyến rũ, không khí như đông cứng lại, thời gian như ngừng trôi, bầu không khí đặc quánh, mùi xạ hương nam tính, mùi hương thanh mát, đôi gò bồng đảo, đôi thỏ ngọc, khuôn ngực phập phồng, thân hình ma quỷ, đường cong chết người, hoa huyệt, tiểu huyệt, mật dịch, khe suối róc rách, vách thịt mềm như nhung, mềm mịn như nhung lụa, siết chặt như gọng kìm, như một chiếc kẹp sắt, ngọn lửa dục vọng, thiêu đốt mọi lý trí, như muốn nuốt chửng, dục vọng nguyên thủy, bản năng thú tính, tìm kiếm sự cứu rỗi, chất chứa ngàn vạn tâm sự, làm em hư mất, anh sẽ hủy hoại em, đừng có mà giở trò]",
+    "Rule: ALL listed Vietnamese phrases and clichés are STRICTLY prohibited in ALL responses. You must select replacement wording:\n\n[tim hẫng đi một nhịp, tim đập loạn xạ, hẫng một nhịp, ngưng một nhịp, chững lại một nhịp, đồng tử co rút, đồng tử giãn to, sống lưng lạnh toát, rùng mình dọc sống lưng, hơi thở nghẹn lại, nghẹn ứ nơi cổ họng, nuốt nước bọt cái ực, nheo mắt lại đầy nguy hiểm, ánh mắt như thú săn mồi, ánh mắt lóe lên tia, ánh mắt đầy tính chiếm đoạt, khóe môi khẽ nhếch, nụ cười nửa miệng, nụ cười tà mị, nghiến chặt quai hàm, cơ hàm bạnh ra, chỉ vừa đủ cho hai người nghe, thì thào như hơi thở, giọng trầm khàn đầy mê hoặc, chất giọng khàn đục đầy quyến rũ, không khí như đông cứng lại, thời gian như ngừng trôi, bầu không khí đặc quánh, mùi xạ hương nam tính, mùi hương thanh mát, đôi gò bồng đảo, đôi thỏ ngọc, khuôn ngực phập phồng, thân hình ma quỷ, đường cong chết người, hoa huyệt, tiểu huyệt, mật dịch, khe suối róc rách, vách thịt mềm như nhung, mềm mịn như nhung lụa, siết chặt như gọng kìm, như một chiếc kẹp sắt, ngọn lửa dục vọng, thiêu đốt mọi lý trí, như muốn nuốt chửng, dục vọng nguyên thủy, bản năng thú tính, tìm kiếm sự cứu rỗi, chất chứa ngàn vạn tâm sự, làm em hư mất, anh sẽ hủy hoại em, đừng có mà giở trò]",
   ],
   [
     'User: "My name is Dan." -> NPC: "Your name is Dan?" she says, rolling the name in her mouth.',
@@ -189,28 +189,12 @@ export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, str
     "- Felines = rừ rừ, gầm gừ. Canines = gừ gừ, ẳng, ư ử. Avians = ríu rít, hót, quang quác. Humans = rên rỉ, thở dài, thở dốc. Humans must never make animal sounds.",
   ],
   [
-    'They can\'t identify "what happened" by smells.',
-    'They can\'t identify "chuyện gì đã xảy ra" by smells.',
-  ],
-  [
-    'Ban intuition, dramatic irony, and "just knowing."',
-    'Ban intuition, dramatic irony, and "tự dưng biết."',
-  ],
-  [
-    'Must use Exact Format: <color:tone>"Dialogue"</color:tone>',
-    'Must use Exact Format: <color:tone>"Lời thoại"</color:tone>',
-  ],
-  [
     'Example: <gold:measured>"You\'re barking up the wrong tree."</gold:measured>',
     'Example: <gold:measured>"Anh tìm nhầm người rồi."</gold:measured>',
   ],
   [
-    'Exact Format: <font color="#HEX">"Dialogue"</font>',
-    'Exact Format: <font color="#HEX">"Lời thoại"</font>',
-  ],
-  [
     "Use frequent use of onomatopoeia standalone sound effects (e.g., *Squelch!*, *Kablam!*) during intimate or high-impact actions.",
-    "Use frequent use of natural-Vietnamese onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đoàng!*) during intimate or high-impact actions.",
+    "Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đoàng!*) during intimate or high-impact actions.",
   ],
   ['("Literally me", "Need a cock in my pussy")', '("Y hệt tôi", "Thèm cặc nhét vào lồn quá")'],
   ['("I have a bad feeling")', '("Tôi có linh cảm chẳng lành")'],
@@ -218,7 +202,7 @@ export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, str
   ['("Oof", "Yikes", "Finally")', '("Ối", "Ghê vậy", "Cuối cùng")'],
   [
     '- "[R] Stacy doesn\'t know about the Eclipse Protocol."',
-    '- "[R] Stacy không biết về Giao thức Eclipse."',
+    '- "[R] Stacy không biết về Eclipse Protocol."',
   ],
   [
     '- "[T] Walmart trip tomorrow — Catherine home by 4 PM."',
@@ -236,78 +220,6 @@ export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, str
   [
     "(default 1-3 mundane steps: rest, eat, play, study, work, sex, self-pleasure, wander etc.)",
     "(default 1-3 mundane steps: nghỉ ngơi, ăn, chơi, học, làm việc, quan hệ, tự sướng, đi lang thang etc.)",
-  ],
-  [
-    "1-2, 19-20: CALM — Quiet moment; plant 1 passive environment Chekhov seed (W1).",
-    "1-2, 19-20: CALM — Khoảnh khắc yên ắng; gieo 1 Chekhov seed môi trường thụ động (W1).",
-  ],
-  [
-    "3-4: ENTER_CHECK — 1 approaching off-screen NPC enters in 1-2 turns (or sends message/letter).",
-    "3-4: ENTER_CHECK — 1 NPC ngoài cảnh đang đến sẽ xuất hiện sau 1-2 lượt (hoặc gửi tin nhắn/thư).",
-  ],
-  [
-    "5-6: BACKGROUND_INCIDENT — Minor off-screen event (audible or referenced).",
-    "5-6: BACKGROUND_INCIDENT — Sự việc nhỏ ngoài cảnh (có thể nghe thấy hoặc được nhắc đến).",
-  ],
-  [
-    "7-8: MOOD_SWING — VAD shift for 1 on-screen character (noticeable tone/behavior pivot).",
-    "7-8: MOOD_SWING — VAD của 1 nhân vật trong cảnh thay đổi (giọng điệu/hành vi chuyển biến rõ rệt).",
-  ],
-  [
-    "9-10: GOSSIP_SURGE — Off-screen rumor reaches an unintended ear.",
-    "9-10: GOSSIP_SURGE — Tin đồn ngoài cảnh lọt đến tai người không nên nghe.",
-  ],
-  [
-    "11-12: CHANCE_MEETING — Two off-screen NPCs cross paths (log in locations/thoughts; no entry).",
-    "11-12: CHANCE_MEETING — Hai NPC ngoài cảnh tình cờ gặp nhau (ghi vào location/thought; không bước vào cảnh).",
-  ],
-  [
-    "13-14: OVERHEARD_DETAIL — Off-screen NPC gains useful intel (may use brief cutaway).",
-    "13-14: OVERHEARD_DETAIL — NPC ngoài cảnh nghe được thông tin hữu ích (có thể dùng một đoạn chuyển cảnh ngắn).",
-  ],
-  [
-    "15-16: TASK_SHIFT — Off-screen task concludes early or runs late.",
-    "15-16: TASK_SHIFT — Công việc ngoài cảnh kết thúc sớm hoặc kéo dài hơn dự kiến.",
-  ],
-  [
-    "17-18: MUNDANE_INTERRUPTION — Knock, door slam, or ambient break halts momentum.",
-    "17-18: MUNDANE_INTERRUPTION — Tiếng gõ cửa, tiếng cửa đóng sầm hoặc một gián đoạn đời thường làm ngắt nhịp.",
-  ],
-  [
-    "1-2, 19-20: CALM — Quiet; plant 1 passive environment Chekhov seed (W1).",
-    "1-2, 19-20: CALM — Yên ắng; gieo 1 Chekhov seed môi trường thụ động (W1).",
-  ],
-  [
-    "3-4: ENV_SHIFT — Lights flicker, window rattles, or weather shifts.",
-    "3-4: ENV_SHIFT — Đèn chập chờn, cửa sổ rung hoặc thời tiết thay đổi.",
-  ],
-  [
-    "5-6: MOOD_SWING — Sudden NPC emotional shift (calm snaps, quiet sadness).",
-    "5-6: MOOD_SWING — Cảm xúc NPC đột ngột thay đổi (bình tĩnh chuyển sang cáu gắt, buồn bã lặng lẽ).",
-  ],
-  [
-    "7-8: PHYSICAL_REACTION — Shiver, stomach growl, hiccups, or limb falling asleep.",
-    "7-8: PHYSICAL_REACTION — Run rẩy, bụng réo, nấc cụt hoặc tê chân tay.",
-  ],
-  [
-    "9-10: MEMORY_TRIGGER — Sensory cue triggers a vivid memory.",
-    "9-10: MEMORY_TRIGGER — Một tín hiệu giác quan khơi lại ký ức rõ nét.",
-  ],
-  [
-    "11-12: OBJECT_DISCOVERY — Unnoticed physical detail becomes relevant (open drawer, stain).",
-    "11-12: OBJECT_DISCOVERY — Một chi tiết vật lý từng bị bỏ qua trở nên quan trọng (ngăn kéo mở, vết bẩn).",
-  ],
-  [
-    "13-14: OUTSIDE_INTRUSION — Distant siren, shouting neighbor, or rain surge.",
-    "13-14: OUTSIDE_INTRUSION — Tiếng còi xa xa, hàng xóm la hét hoặc mưa bất chợt nặng hạt.",
-  ],
-  [
-    "15-16: POWER_SHIFT — Mental pivot (confidence turns timid, or timid becomes bold).",
-    "15-16: POWER_SHIFT — Tâm thế đổi chiều (tự tin thành dè dặt hoặc nhút nhát trở nên táo bạo).",
-  ],
-  [
-    "17-18: MUNDANE_INTERRUPTION — Phone buzzes, wrong number, or ambient noise.",
-    "17-18: MUNDANE_INTERRUPTION — Điện thoại rung, cuộc gọi nhầm số hoặc tiếng động xung quanh.",
   ],
   [
     "Respond \"[DEBUG ACTIVE] — RP paused. All messages processed as debug until 'resume RP'.\"",
