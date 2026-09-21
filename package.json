@@ -28,6 +28,7 @@
     "zip:handoff": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/export-project.ps1",
     "build:risuai": "tsx scripts/build-risuai-preset.ts",
     "build:risuai:comparison": "tsx scripts/build-risuai-comparison.ts",
+    "build:risuai:ff54-plugin": "tsx scripts/build-ff54-risuai-plugin.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "ci": "pnpm format:check && pnpm check && pnpm test && pnpm build && pnpm compile:prompts && pnpm check:prompts"
@@ -39,6 +40,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
+    "esbuild": "^0.27.7",
     "eslint": "^9.39.1",
     "prettier": "^3.7.4",
     "tsup": "^8.5.1",
