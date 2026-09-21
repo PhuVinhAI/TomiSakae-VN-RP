@@ -528,6 +528,37 @@ export function adaptDisplayMarkupForRisuAI(input: string): string {
     .replace(/<\s*\/\s*internal_states\s*>/gi, "</div>");
 }
 
+function escapeDisplayHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+export function adaptVietnameseHeaderForRisuAI(input: string): string {
+  if (input.includes('data-ff54="scene-header"')) return input;
+  const match = input.match(
+    /^(\s*)\[\s*🕰️\s*Thời gian\s+([^|\]\r\n]+?\s(?:SA|CH))\s*\|\s*🗓️\s*Ngày\s+([^|\]\r\n]+?\s(?:SCN|TCN))\s*\|\s*📍\s*([^|\]\r\n]+?)\s*\|\s*([^|\]\r\n]+?,\s*-?\d+(?:[.,]\d+)?\s*°C)\s*\]/u,
+  );
+  if (!match) return input;
+
+  const cards = [
+    ["🕰️ Thời gian", match[2]],
+    ["🗓️ Ngày", match[3]],
+    ["📍 Địa điểm", match[4]],
+    ["🌤️ Thời tiết", match[5]],
+  ]
+    .map(
+      ([label, value]) =>
+        `<div style="min-width:0;padding:10px 12px;border:1px solid rgba(148,163,184,.24);border-radius:10px;background:rgba(15,23,42,.3)"><div style="margin-bottom:4px;color:#a5b4fc;font-size:.76em;font-weight:700">${label}</div><div style="overflow-wrap:anywhere;line-height:1.4">${escapeDisplayHtml(value!)}</div></div>`,
+    )
+    .join("");
+  const header = `<div data-ff54="scene-header" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:8px;margin:0 0 12px;padding:10px;border:1px solid rgba(148,163,184,.28);border-radius:12px;background:rgba(15,23,42,.22)">${cards}</div>`;
+  return `${match[1]}${header}${input.slice(match[0].length)}`;
+}
+
 export function applyPromptRegexToMessages(
   messages: ChatMessage[],
   preset: FfPreset,

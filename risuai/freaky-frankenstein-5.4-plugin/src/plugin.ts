@@ -1,5 +1,6 @@
 import {
   adaptDisplayMarkupForRisuAI,
+  adaptVietnameseHeaderForRisuAI,
   applyRegexScripts,
   buildRequestMessages,
   createDefaultSettings,
@@ -399,12 +400,14 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
 
 const displayOutput = async (content: string): Promise<string> => {
   if (!settings.enabled) return content;
-  return adaptDisplayMarkupForRisuAI(
-    applyRegexScripts(content, preset, settings, {
-      placement: PLACEMENT_AI_OUTPUT,
-      markdown: true,
-      depth: 0,
-    }),
+  return adaptVietnameseHeaderForRisuAI(
+    adaptDisplayMarkupForRisuAI(
+      applyRegexScripts(content, preset, settings, {
+        placement: PLACEMENT_AI_OUTPUT,
+        markdown: true,
+        depth: 0,
+      }),
+    ),
   );
 };
 

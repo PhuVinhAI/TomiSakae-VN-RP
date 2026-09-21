@@ -24,7 +24,7 @@ Non-Vocal Sound Effects:
 export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
   [
     "[ 🕰️ Time HH:MM AM/PM | 🗓️ Day # - 🗓️ DayOfWeek, Month DD, YYYY Era | 📍 Location - Specific Area | [WeatherEmoji] Weather, Temp °F ]",
-    "[ 🕰️ Thời gian HH:MM SA/CH | 🗓️ Ngày # - Thứ trong tuần, ngày DD tháng MM năm YYYY Kỷ nguyên | 📍 Địa điểm - Khu vực cụ thể | [Biểu tượng thời tiết] Thời tiết, Nhiệt độ °F ]",
+    "[ 🕰️ Thời gian HH:MM SA/CH | 🗓️ Ngày # - Thứ trong tuần, ngày DD tháng MM năm YYYY SCN/TCN | 📍 Địa điểm - Khu vực cụ thể | [Biểu tượng thời tiết] Thời tiết, Nhiệt độ °C ]",
   ],
   [
     "- Era: Use AD/BC or setting-appropriate fantasy era.",
@@ -32,7 +32,7 @@ export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, str
   ],
   [
     "- NPCs: Physically react to weather, temp, and time (shiver, sweat, fatigue).",
-    "- NPCs: Physically react to weather, temp, and time (shiver, sweat, fatigue).\n- Vietnamese Output: Keep the exact header structure and write every displayed label and filled-in value in natural Vietnamese.",
+    "- NPCs: Physically react to weather, temp, and time (shiver, sweat, fatigue).\n- Temperature: Display temperature in degrees Celsius.\n- Vietnamese Output: Keep the exact header structure and write every displayed label and filled-in value in natural Vietnamese.",
   ],
   [
     "{{setvar::dndTemplate::<details><summary>🎲 DND TASK SIM</summary>- <b>Task:</b> [Actor] attempts [Action]<br>- <b>Locked DC:</b> [Value]<br>- <b>Roll:</b> <b>User Roll:</b> <b>NPC Roll:</b>   | <b>Delta:</b> [Roll minus DC established \n- do this for each. ]<br>- <b>Outcome:</b> [Degree & consequence]</details>}}",

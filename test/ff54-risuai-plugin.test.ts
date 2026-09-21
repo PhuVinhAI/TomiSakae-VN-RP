@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import {
   adaptDisplayMarkupForRisuAI,
+  adaptVietnameseHeaderForRisuAI,
   applyRegexScripts,
   applyPromptRegexToMessages,
   buildRequestMessages,
@@ -337,6 +338,9 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
 
     expect(header).toContain("🕰️ Thời gian HH:MM SA/CH");
     expect(header).toContain("📍 Địa điểm - Khu vực cụ thể");
+    expect(header).toContain("năm YYYY SCN/TCN");
+    expect(header).toContain("Nhiệt độ °C");
+    expect(header).toContain("Display temperature in degrees Celsius");
     expect(header).not.toContain("🕰️ Time HH:MM AM/PM");
     expect(internalStates).toContain("🎬 TRẠNG THÁI NỘI BỘ (Lượt: [ct])");
     expect(internalStates).toContain("👤 LỊCH TRÌNH NPC");
@@ -435,7 +439,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "utf8",
     );
     expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
-    expect(artifact).toContain("//@version 1.2.2");
+    expect(artifact).toContain("//@version 1.2.3");
   });
 
   it("context-saver regex strips old internal state but keeps the newest", async () => {
@@ -460,6 +464,28 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       '<!-- GFX_START -->\n<div data-ff54="internal-states">\n<details><summary>State</summary>Body</details>\n</div>\n<!-- GFX_END -->',
     );
     expect(output).not.toMatch(/<\/?internal_states>/i);
+  });
+
+  it("renders only the current Vietnamese scene header as responsive UI", () => {
+    const input =
+      "[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 - Thứ Bảy, ngày 04 tháng 04 năm 2026 SCN | 📍 Đại học - Đường hoa anh đào | ☀️ Nắng ráo, 20 °C ]\n\nNội dung nhập vai";
+    const output = adaptVietnameseHeaderForRisuAI(input);
+
+    expect(output).toContain('data-ff54="scene-header"');
+    expect(output).toContain("grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr))");
+    expect(output).toContain("14:25 CH");
+    expect(output).toContain("1 - Thứ Bảy, ngày 04 tháng 04 năm 2026 SCN");
+    expect(output).toContain("Đại học - Đường hoa anh đào");
+    expect(output).toContain("☀️ Nắng ráo, 20 °C");
+    expect(output).toContain("Nội dung nhập vai");
+    expect(adaptVietnameseHeaderForRisuAI(output)).toBe(output);
+  });
+
+  it("leaves legacy scene headers unchanged", () => {
+    const input =
+      "[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 - Thứ Bảy, ngày 04 tháng 04 năm 2026 Kỷ nguyên | 📍 Đại học - Đường hoa anh đào | ☀️ Nắng ráo, 68°F ]";
+
+    expect(adaptVietnameseHeaderForRisuAI(input)).toBe(input);
   });
 
   it("master disable returns the host request without mutation", async () => {

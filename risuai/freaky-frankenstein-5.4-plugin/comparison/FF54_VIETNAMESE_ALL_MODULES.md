@@ -80,13 +80,14 @@ Identifier: `019f62e8-892f-7002-8fcf-eea637bd577b` · Source toggle: **ON** · R
 
 <header_instructions>
 Start every response with:
-[ 🕰️ Thời gian HH:MM SA/CH | 🗓️ Ngày # - Thứ trong tuần, ngày DD tháng MM năm YYYY Kỷ nguyên | 📍 Địa điểm - Khu vực cụ thể | [Biểu tượng thời tiết] Thời tiết, Nhiệt độ °F ]
+[ 🕰️ Thời gian HH:MM SA/CH | 🗓️ Ngày # - Thứ trong tuần, ngày DD tháng MM năm YYYY SCN/TCN | 📍 Địa điểm - Khu vực cụ thể | [Biểu tượng thời tiết] Thời tiết, Nhiệt độ °C ]
 
 Rules:
 - Time: Advance logically; execute skips for sleep, work, or travel.
 - Era: Use SCN/TCN or setting-appropriate fantasy era.
 - Location: General - Specific area. Update on movement.
 - NPCs: Physically react to weather, temp, and time (shiver, sweat, fatigue).
+- Temperature: Display temperature in degrees Celsius.
 - Vietnamese Output: Keep the exact header structure and write every displayed label and filled-in value in natural Vietnamese.
 </header_instructions>
 ~~~~
