@@ -60,6 +60,13 @@ export interface MacroContext {
   randomInt?: (minimum: number, maximum: number) => number;
 }
 
+export interface HostMacroContext {
+  characterName: string;
+  maxContext?: number;
+  maxResponse?: number;
+  userName: string;
+}
+
 export const PLACEMENT_USER_INPUT = 1;
 export const PLACEMENT_AI_OUTPUT = 2;
 
@@ -251,6 +258,23 @@ export function expandSourceMacros(
   }
   result = result.replace(/(?:\r?\n)*\{\{trim\}\}(?:\r?\n)*/gi, "");
   return result;
+}
+
+/**
+ * Resolves the host-name macros used by FF5.4 without relying on newer
+ * RisuAI chat-parser APIs. Other macros stay intact for source fidelity.
+ */
+export function expandHostMacros(content: string, context: HostMacroContext): string {
+  let output = content
+    .replace(/\{\{user\}\}/gi, context.userName)
+    .replace(/\{\{char\}\}/gi, context.characterName);
+  if (context.maxContext !== undefined) {
+    output = output.replace(/\{\{maxContext(?:Tokens)?\}\}/gi, String(context.maxContext));
+  }
+  if (context.maxResponse !== undefined) {
+    output = output.replace(/\{\{maxResponse(?:Tokens)?\}\}/gi, String(context.maxResponse));
+  }
+  return output;
 }
 
 function promptMap(preset: FfPreset): Map<string, FfPrompt> {

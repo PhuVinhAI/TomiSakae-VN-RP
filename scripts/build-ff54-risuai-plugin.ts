@@ -77,7 +77,7 @@ export async function buildPlugin(options: Options): Promise<{ output: string; d
         "//@name ff54_risuai",
         "//@display-name Freaky Frankenstein 5.4",
         "//@api 3.0",
-        "//@version 1.0.0",
+        "//@version 1.0.1",
         "",
       ].join("\n"),
     },

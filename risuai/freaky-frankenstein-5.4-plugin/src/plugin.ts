@@ -2,10 +2,10 @@ import {
   applyRegexScripts,
   buildRequestMessages,
   createDefaultSettings,
+  expandHostMacros,
   normalizeSettings,
   PLACEMENT_AI_OUTPUT,
   type ChatMessage,
-  type ChatRole,
   type FfGlobalSettings,
   type FfPreset,
 } from "./core.js";
@@ -24,10 +24,8 @@ declare const Risuai: {
   unregisterUIPart(id: string): Promise<void>;
   showContainer(mode: "fullscreen"): Promise<void>;
   hideContainer(): Promise<void>;
-  parseRisuChat(
-    text: string,
-    options?: { role?: string; runVar?: boolean; rmVar?: boolean },
-  ): Promise<string>;
+  getCharacter(): Promise<HostCharacter | null>;
+  getDatabase(includeOnly?: string[] | "all"): Promise<HostDatabase | null>;
   addRisuReplacer(
     type: "beforeRequest",
     callback: (messages: ChatMessage[], type: string) => Promise<ChatMessage[]>,
@@ -50,6 +48,29 @@ declare const Risuai: {
     setItem<T>(key: string, value: T): Promise<void>;
   };
 };
+
+interface HostChat {
+  bindedPersona?: string;
+}
+
+interface HostCharacter {
+  name?: string;
+  nickname?: string;
+  chatPage?: number;
+  chats?: HostChat[];
+}
+
+interface HostPersona {
+  id?: string;
+  name?: string;
+}
+
+interface HostDatabase {
+  maxContext?: number;
+  maxResponse?: number;
+  personas?: HostPersona[];
+  selectedPersona?: number;
+}
 
 declare const __FF54_PRESET__: FfPreset;
 declare const __FF54_SOURCE_NAME__: string;
@@ -169,10 +190,36 @@ function mainGeneration(type: string): boolean {
   return type === "model";
 }
 
+async function getHostMacroContext(): Promise<{
+  characterName: string;
+  maxContext?: number;
+  maxResponse?: number;
+  userName: string;
+}> {
+  const [character, database] = await Promise.all([
+    Risuai.getCharacter(),
+    Risuai.getDatabase(["personas", "selectedPersona", "maxContext", "maxResponse"]),
+  ]);
+  const characterName = character?.nickname || character?.name || "Character";
+  const activeChat = character?.chats?.[character.chatPage ?? 0];
+  const boundPersona = activeChat?.bindedPersona
+    ? database?.personas?.find((persona) => persona.id === activeChat.bindedPersona)
+    : undefined;
+  const selectedPersona = database?.personas?.[database.selectedPersona ?? 0];
+  const userName = boundPersona?.name || selectedPersona?.name || "User";
+  return {
+    characterName,
+    maxContext: database?.maxContext,
+    maxResponse: database?.maxResponse,
+    userName,
+  };
+}
+
 const beforeRequest = async (messages: ChatMessage[], type: string): Promise<ChatMessage[]> => {
   if (!settings.enabled || !mainGeneration(type)) return messages;
-  return buildRequestMessages(messages, preset, settings, async (content, role: ChatRole) =>
-    Risuai.parseRisuChat(content, { role, runVar: false, rmVar: false }),
+  const macroContext = await getHostMacroContext();
+  return buildRequestMessages(messages, preset, settings, async (content) =>
+    expandHostMacros(content, macroContext),
   );
 };
 

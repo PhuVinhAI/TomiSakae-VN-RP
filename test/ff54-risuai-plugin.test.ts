@@ -6,6 +6,7 @@ import {
   composePresetPrompts,
   createDefaultSettings,
   expandSourceMacros,
+  expandHostMacros,
   type FfPreset,
 } from "../risuai/freaky-frankenstein-5.4-plugin/src/core.js";
 
@@ -36,6 +37,25 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(expandSourceMacros("{{roll::1d20}}", variables, { randomInt: () => 13 })).toBe("13");
   });
 
+  it("resolves FF5.4 host-name macros without the unavailable chat-parser API", () => {
+    expect(
+      expandHostMacros("{{user}} meets {{CHAR}}. {{scenario}} stays intact.", {
+        userName: "Tomi",
+        characterName: "Miyabi",
+        maxContext: 32768,
+        maxResponse: 1024,
+      }),
+    ).toBe("Tomi meets Miyabi. {{scenario}} stays intact.");
+    expect(
+      expandHostMacros("{{maxContext}}/{{maxResponseTokens}}", {
+        userName: "Tomi",
+        characterName: "Miyabi",
+        maxContext: 32768,
+        maxResponse: 1024,
+      }),
+    ).toBe("32768/1024");
+  });
+
   it("keeps source prompt text and adds depth-zero internal prompts after the latest message", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);
@@ -64,6 +84,17 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(pluginSource).not.toMatch(/getCurrent(Character|Chat)Index|characterIndex|chatIndex/);
     expect(pluginSource.match(/pluginStorage\.getItem\(STORAGE_KEY\)/g)).toHaveLength(1);
     expect(pluginSource.match(/pluginStorage\.setItem\(STORAGE_KEY, settings\)/g)).toHaveLength(1);
+    const unavailableParserApi = ["parse", "Risu", "Chat"].join("");
+    expect(pluginSource).not.toContain(unavailableParserApi);
+  });
+
+  it("does not bundle the unavailable chat-parser API", async () => {
+    const artifact = await readFile(
+      "risuai/freaky-frankenstein-5.4-plugin/dist/ff54-risuai-plugin.js",
+      "utf8",
+    );
+    expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
+    expect(artifact).toContain("//@version 1.0.1");
   });
 
   it("context-saver regex strips old internal state but keeps the newest", async () => {
