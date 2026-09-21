@@ -172,6 +172,11 @@ export const DEFAULT_PROMPT_ROUTER: PromptRouter = {
   active: "full-master",
   routes: {
     "all-master": {},
+    "verbatim-realism": {
+      reasoningIdentifiers: [BOLT_REASONING_IDENTIFIER, "jailbreak"],
+      enabledIdentifiers: [REALISM_MODE_IDENTIFIER],
+      excludedIdentifiers: [FREAKY_MODE_IDENTIFIER],
+    },
     "full-master": {
       masterModuleFiles: [
         "risuai-modules/freaky-frankenstein-5.4/10-vietnamese-output-and-sound.md",

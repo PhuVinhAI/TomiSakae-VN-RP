@@ -124,6 +124,45 @@ describe("RisuAI preset builder", () => {
     expect(result.master).toBe("FIRST\n\nSECOND\n");
   });
 
+  it("builds the verbatim Realism route by changing only the NSFW mode toggle", () => {
+    const source = parsePreset({
+      prompts: [
+        { identifier: "always-on", content: "{{// keep }}{{trim}}\n<always>RAW</always>" },
+        { identifier: "019f62e8-892f-700c-9795-53ecb3381d7d", content: "REALISM RAW" },
+        { identifier: "019f62e8-892f-700d-b070-4add983aeae1", content: "FREAKY RAW" },
+        { identifier: "634ecfec-1862-4ce0-821e-e31057acadfa", content: "BOLT RAW" },
+        { identifier: "jailbreak", content: "POST-HISTORY RAW" },
+        { identifier: "source-off", content: "SOURCE OFF" },
+      ],
+      prompt_order: [
+        {
+          order: [
+            { identifier: "always-on", enabled: true },
+            { identifier: "019f62e8-892f-700c-9795-53ecb3381d7d", enabled: false },
+            { identifier: "019f62e8-892f-700d-b070-4add983aeae1", enabled: true },
+            { identifier: "634ecfec-1862-4ce0-821e-e31057acadfa", enabled: true },
+            { identifier: "jailbreak", enabled: true },
+            { identifier: "source-off", enabled: false },
+          ],
+        },
+      ],
+    });
+    const result = buildPreset(source, {
+      sourceFile: "preset.json",
+      outputDirectory: "out",
+      modelMode: "default",
+      promptRouter: { ...DEFAULT_PROMPT_ROUTER, active: "verbatim-realism" },
+    });
+
+    expect(result.master).toBe(
+      "{{// keep }}{{trim}}\n<always>RAW</always>\n\nREALISM RAW\n",
+    );
+    expect(result.reasoning).toBe("BOLT RAW\n\nPOST-HISTORY RAW\n");
+    expect(result.endInjectedPrompt).toBe("");
+    expect(result.master).not.toContain("FREAKY RAW");
+    expect(result.master).not.toContain("SOURCE OFF");
+  });
+
   it("never removes RisuAI identity, state, or roll macros during cleanup", () => {
     const macros = "{{user}} {{char}} {{setvar::x::value}} {{getvar::x}} {{roll::1d20}}";
     const source = parsePreset({
