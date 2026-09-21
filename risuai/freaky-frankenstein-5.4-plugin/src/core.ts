@@ -479,6 +479,12 @@ export function applyRegexScripts(
   return output;
 }
 
+export function adaptDisplayMarkupForRisuAI(input: string): string {
+  return input
+    .replace(/<\s*internal_states\s*>/gi, '<div data-ff54="internal-states">')
+    .replace(/<\s*\/\s*internal_states\s*>/gi, "</div>");
+}
+
 export function applyPromptRegexToMessages(
   messages: ChatMessage[],
   preset: FfPreset,

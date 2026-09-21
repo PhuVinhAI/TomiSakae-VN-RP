@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import {
+  adaptDisplayMarkupForRisuAI,
   applyPromptRegexToMessages,
   buildRequestMessages,
   composePresetPrompts,
@@ -94,7 +95,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "utf8",
     );
     expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
-    expect(artifact).toContain("//@version 1.0.1");
+    expect(artifact).toContain("//@version 1.0.2");
   });
 
   it("context-saver regex strips old internal state but keeps the newest", async () => {
@@ -109,6 +110,16 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     const output = applyPromptRegexToMessages(messages, data, settings);
     expect(output[0]!.content).toBe("old");
     expect(output[2]!.content).toContain("<internal_states>NEW</internal_states>");
+  });
+
+  it("uses a RisuAI-safe display wrapper without exposing internal-state tags", () => {
+    const input =
+      "<!-- GFX_START -->\n<internal_states>\n<details><summary>State</summary>Body</details>\n</internal_states>\n<!-- GFX_END -->";
+    const output = adaptDisplayMarkupForRisuAI(input);
+    expect(output).toBe(
+      '<!-- GFX_START -->\n<div data-ff54="internal-states">\n<details><summary>State</summary>Body</details>\n</div>\n<!-- GFX_END -->',
+    );
+    expect(output).not.toMatch(/<\/?internal_states>/i);
   });
 
   it("master disable returns the host request without mutation", async () => {
