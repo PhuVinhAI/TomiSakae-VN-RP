@@ -105,11 +105,10 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     );
     expect(built).toContainEqual(composed.leading.find((entry) => entry.memo === "ff54:main"));
     const latestIndex = built.findIndex((entry) => entry.content === "latest");
-    expect(built[latestIndex + 1]!.memo).toBe("ff54:vietnamese-output");
-    expect(built[latestIndex + 2]!.memo).toContain("ff54:absolute:0");
+    expect(built[latestIndex + 1]!.memo).toContain("ff54:absolute:0");
   });
 
-  it("adds the Vietnamese module once before reasoning and adapts only enabled prompts", async () => {
+  it("adds the Vietnamese module once before card context and adapts only enabled prompts", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);
     const disabledPrompt = data.prompt_order[0]!.order.find((entry) => entry.enabled === false);
@@ -119,10 +118,16 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       { role: "user" as const, content: "latest" },
     ];
     const built = await buildRequestMessages(messages, data, settings, async (value) => value);
+    const composed = await composePresetPrompts(data, settings, async (value) => value);
     const vietnamese = built.filter((entry) => entry.memo === "ff54:vietnamese-output");
     expect(vietnamese).toHaveLength(1);
     expect(vietnamese[0]!.content).toBe(VIETNAMESE_OUTPUT_PROMPT);
-    expect(built.indexOf(vietnamese[0]!)).toBeGreaterThan(
+    expect(built.slice(0, composed.leading.length)).toEqual(composed.leading);
+    expect(built.indexOf(vietnamese[0]!)).toBe(composed.leading.length);
+    const npcCreationIndex = built.findIndex((entry) => entry.content.includes("<npc_creation>"));
+    expect(npcCreationIndex).toBeGreaterThanOrEqual(0);
+    expect(built.indexOf(vietnamese[0]!)).toBe(npcCreationIndex + 1);
+    expect(built.indexOf(vietnamese[0]!)).toBeLessThan(
       built.findIndex((entry) => entry.content === "card context"),
     );
     expect(built.indexOf(vietnamese[0]!)).toBeLessThan(
@@ -440,7 +445,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "utf8",
     );
     expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
-    expect(artifact).toContain("//@version 1.2.4");
+    expect(artifact).toContain("//@version 1.2.5");
   });
 
   it("context-saver regex strips old internal state but keeps the newest", async () => {
