@@ -5,7 +5,6 @@ import {
   buildRequestMessages,
   createDefaultSettings,
   expandHostMacros,
-  isActiveStreamingOutput,
   normalizeSettings,
   PLACEMENT_AI_OUTPUT,
   type ChatMessage,
@@ -66,8 +65,6 @@ declare const Risuai: {
 
 interface HostChat {
   bindedPersona?: string;
-  isStreaming?: boolean;
-  message?: Array<{ role?: string; data?: string }>;
 }
 
 interface HostCharacter {
@@ -403,8 +400,6 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
 
 const displayOutput = async (content: string): Promise<string> => {
   if (!settings.enabled) return content;
-  const character = await Risuai.getCharacter();
-  if (isActiveStreamingOutput(character, content)) return content;
   return adaptVietnameseHeaderForRisuAI(
     adaptDisplayMarkupForRisuAI(
       applyRegexScripts(content, preset, settings, {

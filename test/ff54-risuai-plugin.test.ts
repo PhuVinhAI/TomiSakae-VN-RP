@@ -10,7 +10,6 @@ import {
   createDefaultSettings,
   expandSourceMacros,
   expandHostMacros,
-  isActiveStreamingOutput,
   injectAbsoluteAtDepth,
   normalizeSettings,
   type FfPreset,
@@ -500,31 +499,6 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       '<!-- GFX_START -->\n<div data-ff54="internal-states">\n<details><summary>State</summary>Body</details>\n</div>\n<!-- GFX_END -->',
     );
     expect(output).not.toMatch(/<\/?internal_states>/i);
-  });
-
-  it("defers display transforms only for the active streaming AI message", () => {
-    const character = {
-      chatPage: 0,
-      chats: [
-        {
-          isStreaming: true,
-          message: [
-            { role: "assistant", data: "old response" },
-            { role: "char", data: "current response" },
-          ],
-        },
-      ],
-    };
-    expect(isActiveStreamingOutput(character, "current response")).toBe(true);
-    expect(isActiveStreamingOutput(character, "current")).toBe(false);
-    expect(isActiveStreamingOutput(character, "old response")).toBe(false);
-    expect(isActiveStreamingOutput(character, "current response")).toBe(true);
-    expect(
-      isActiveStreamingOutput(
-        { ...character, chats: [{ ...character.chats[0], isStreaming: false }] },
-        "current response",
-      ),
-    ).toBe(false);
   });
 
   it("renders only the current Vietnamese scene header as responsive UI", () => {

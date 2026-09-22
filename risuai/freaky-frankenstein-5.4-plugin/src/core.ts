@@ -59,45 +59,6 @@ export interface FfGlobalSettings {
   vietnameseOutputEnabled: boolean;
 }
 
-export interface StreamingChatMessage {
-  role?: string;
-  data?: string;
-}
-
-export interface StreamingChatState {
-  isStreaming?: boolean;
-  message?: StreamingChatMessage[];
-}
-
-export interface StreamingCharacterState {
-  chatPage?: number;
-  chats?: StreamingChatState[];
-}
-
-/**
- * The host calls display handlers for every visible message while a response
- * streams. Defer only the active character message so old messages keep their
- * normal display transforms until the final render.
- */
-export function isActiveStreamingOutput(
-  character: StreamingCharacterState | null | undefined,
-  content: string,
-): boolean {
-  const activeChat = character?.chats?.[character.chatPage ?? 0];
-  if (!activeChat?.isStreaming) return false;
-  const activeMessage = activeChat.message?.at(-1);
-  if (!activeMessage || activeMessage.role !== "char" || typeof activeMessage.data !== "string") {
-    return false;
-  }
-  if (!content) return false;
-  const normalizedContent = content.replaceAll("\r\n", "\n");
-  const normalizedActive = activeMessage.data.replaceAll("\r\n", "\n");
-  return (
-    normalizedContent === normalizedActive ||
-    (normalizedActive.length > 0 && normalizedContent.endsWith(normalizedActive))
-  );
-}
-
 export interface MacroContext {
   randomInt?: (minimum: number, maximum: number) => number;
 }
