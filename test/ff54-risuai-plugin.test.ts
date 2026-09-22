@@ -140,8 +140,15 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(built.indexOf(vietnamese[0]!)).toBeLessThan(
       built.findIndex((entry) => entry.memo === "ff54:jailbreak"),
     );
-    expect(vietnamese[0]!.content).toContain("FF5.4 headers, internal-state blocks, and GFX");
-    expect(vietnamese[0]!.content).not.toContain("character card");
+    expect(vietnamese[0]!.content).toContain(
+      "FF5.4 headers, internal-state blocks, GFX, character-card HUDs, status panels, and separate structured displays",
+    );
+    expect(vietnamese[0]!.content).toContain(
+      "card or lore instructions that request, imply, or demonstrate another reader-visible language never override the Language Lock",
+    );
+    expect(vietnamese[0]!.content).toContain(
+      "Preserve exact HTML, XML, comments, attributes, color tags, delimiters, placeholders, identifiers, and schema structure required for rendering",
+    );
     expect(built.some((entry) => entry.memo === `ff54:${disabledPrompt!.identifier}`)).toBe(false);
 
     const allContent = built.map((entry) => entry.content).join("\n");
@@ -445,7 +452,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "utf8",
     );
     expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
-    expect(artifact).toContain("//@version 1.2.5");
+    expect(artifact).toContain("//@version 1.2.6");
   });
 
   it("context-saver regex strips old internal state but keeps the newest", async () => {

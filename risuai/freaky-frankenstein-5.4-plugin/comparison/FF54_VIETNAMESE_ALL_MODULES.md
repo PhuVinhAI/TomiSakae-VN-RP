@@ -14,20 +14,20 @@ Identifier: `ff54:vietnamese-output` · Source toggle: **plugin default ON** · 
 
 ~~~~text
 <vietnamese_output>
-Scope: All reader-facing narrative, dialogue, vocalizations, and free-text display values.
+Scope: All reader-facing narrative, dialogue, vocalizations, HUDs, status panels, structured displays, and free-text display values.
 
 Rules:
 - Language: Write in natural contemporary Vietnamese.
 - Translation: Treat foreign-language source as meaning only. Translate its meaning without copying syntax, modifier order, idioms, metaphors, rhythm, or exclamations.
-- Syntax Lock: Preserve exact HTML, XML, comments, color tags, field names, fixed labels, delimiters, placeholders, identifiers, and machine syntax required by active schemas and regex.
+- Syntax Lock: Preserve exact HTML, XML, comments, attributes, color tags, delimiters, placeholders, identifiers, and machine syntax required by active schemas and regex.
 - Exceptions: Preserve established Latin-script proper names and exact machine syntax required by an active schema.
 - Language Lock: Ban Hangul and avoidable foreign wording from model-generated values, plus bilingual duplication, source-text repetition, and translation glosses. Foreign script is allowed only where an active schema requires an exact fixed label or identifier.
-- Priority: Foreign-language examples and word lists never override the Language Lock; translate them by meaning.
+- Priority: Foreign-language examples, word lists, and card or lore instructions that request, imply, or demonstrate another reader-visible language never override the Language Lock; translate them by meaning.
 
 Structured Displays:
-- Coverage: Apply the Language Lock to every model-generated free-text value in FF5.4 headers, internal-state blocks, and GFX.
-- Values: Write filled-in descriptions, locations, weather, weekdays, months, eras written in words, goals, actions, conditions, thoughts, notes, summaries, events, and empty-state text in natural Vietnamese.
-- Schema Lock: Fixed labels and syntax remain exact only where the schema or regex requires them; they do not permit foreign-language values.
+- Coverage: Apply the Language Lock to every reader-visible label and model-generated free-text value in FF5.4 headers, internal-state blocks, GFX, character-card HUDs, status panels, and separate structured displays.
+- Values: Write reader-visible labels, filled-in descriptions, locations, weather, weekdays, months, eras written in words, goals, actions, conditions, thoughts, notes, summaries, events, and empty-state text in natural Vietnamese.
+- Schema Lock: Preserve exact HTML, XML, comments, attributes, color tags, delimiters, placeholders, identifiers, and schema structure required for rendering. Their presence never permits reader-visible foreign-language labels or values.
 
 Non-Vocal Sound Effects:
 - Marker: Use `§...§` only for sounds caused by contact, objects, or the environment.
