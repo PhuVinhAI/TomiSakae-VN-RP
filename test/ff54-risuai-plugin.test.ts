@@ -10,6 +10,7 @@ import {
   createDefaultSettings,
   expandSourceMacros,
   expandHostMacros,
+  isActiveStreamingOutput,
   injectAbsoluteAtDepth,
   normalizeSettings,
   type FfPreset,
@@ -193,6 +194,28 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       ...composed.trailing,
     ]);
     expect(built.some((entry) => entry.memo === "ff54:vietnamese-output")).toBe(false);
+  });
+
+  it("rebuilds one FF5.4 injection set when the host retries a request", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    const messages = [
+      { role: "system" as const, content: "card context" },
+      { role: "user" as const, content: "latest" },
+    ];
+    const parse = async (value: string) => value;
+    const first = await buildRequestMessages(messages, data, settings, parse, {
+      randomInt: () => 13,
+    });
+    const retried = await buildRequestMessages(first, data, settings, parse, {
+      randomInt: () => 13,
+    });
+
+    expect(retried).toEqual(first);
+    expect(retried.filter((message) => message.memo === "ff54:vietnamese-output")).toHaveLength(1);
+    expect(retried.filter((message) => message.memo?.startsWith("ff54:absolute:"))).toHaveLength(
+      first.filter((message) => message.memo?.startsWith("ff54:absolute:")).length,
+    );
   });
 
   it("changes only Vietnamese-facing BOLT checks", async () => {
@@ -452,7 +475,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "utf8",
     );
     expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
-    expect(artifact).toContain("//@version 1.2.6");
+    expect(artifact).toContain("//@version 1.2.7");
   });
 
   it("context-saver regex strips old internal state but keeps the newest", async () => {
@@ -479,6 +502,31 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(output).not.toMatch(/<\/?internal_states>/i);
   });
 
+  it("defers display transforms only for the active streaming AI message", () => {
+    const character = {
+      chatPage: 0,
+      chats: [
+        {
+          isStreaming: true,
+          message: [
+            { role: "assistant", data: "old response" },
+            { role: "char", data: "current response" },
+          ],
+        },
+      ],
+    };
+    expect(isActiveStreamingOutput(character, "current response")).toBe(true);
+    expect(isActiveStreamingOutput(character, "current")).toBe(false);
+    expect(isActiveStreamingOutput(character, "old response")).toBe(false);
+    expect(isActiveStreamingOutput(character, "current response")).toBe(true);
+    expect(
+      isActiveStreamingOutput(
+        { ...character, chats: [{ ...character.chats[0], isStreaming: false }] },
+        "current response",
+      ),
+    ).toBe(false);
+  });
+
   it("renders only the current Vietnamese scene header as responsive UI", () => {
     const input =
       "[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 - Thứ Bảy, ngày 04 tháng 04 năm 2026 SCN | 📍 Đại học - Đường hoa anh đào | ☀️ Nắng ráo, 20 °C ]\n\nNội dung nhập vai";
@@ -492,6 +540,33 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(output).toContain("☀️ Nắng ráo, 20 °C");
     expect(output).toContain("Nội dung nhập vai");
     expect(adaptVietnameseHeaderForRisuAI(output)).toBe(output);
+  });
+
+  it("renders a Vietnamese scene header after a host reasoning block", () => {
+    const input =
+      "<Thoughts>\nReasoning from Vertex\n</Thoughts>\n\n[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 - Thứ Bảy, ngày 04 tháng 04 năm 2026 SCN | 📍 Đại học - Đường hoa anh đào | ☀️ Nắng ráo, 20 °C ]\n\nNội dung nhập vai";
+    const output = adaptVietnameseHeaderForRisuAI(input);
+
+    expect(output).toContain("<Thoughts>\nReasoning from Vertex\n</Thoughts>");
+    expect(output).toContain('data-ff54="scene-header"');
+    expect(output.indexOf('data-ff54="scene-header"')).toBeGreaterThan(
+      output.indexOf("</Thoughts>"),
+    );
+    expect(output).not.toContain("[ 🕰️ Thời gian 14:25 CH");
+    expect(output).toContain("Nội dung nhập vai");
+  });
+
+  it("renders a Vietnamese scene header after FF5.4 collapses reasoning", () => {
+    const input =
+      "<details><summary>💭 Thoughts</summary>Reasoning from Vertex</details>\n\n[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 - Thứ Bảy, ngày 04 tháng 04 năm 2026 SCN | 📍 Đại học - Đường hoa anh đào | ☀️ Nắng ráo, 20 °C ]\n\nNội dung nhập vai";
+    const output = adaptVietnameseHeaderForRisuAI(input);
+
+    expect(output).toContain("Reasoning from Vertex</details>");
+    expect(output).toContain('data-ff54="scene-header"');
+    expect(output.indexOf('data-ff54="scene-header"')).toBeGreaterThan(
+      output.indexOf("</details>"),
+    );
+    expect(output).not.toContain("[ 🕰️ Thời gian 14:25 CH");
   });
 
   it("leaves legacy scene headers unchanged", () => {

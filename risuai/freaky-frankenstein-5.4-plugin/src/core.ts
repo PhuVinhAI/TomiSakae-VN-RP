@@ -59,6 +59,45 @@ export interface FfGlobalSettings {
   vietnameseOutputEnabled: boolean;
 }
 
+export interface StreamingChatMessage {
+  role?: string;
+  data?: string;
+}
+
+export interface StreamingChatState {
+  isStreaming?: boolean;
+  message?: StreamingChatMessage[];
+}
+
+export interface StreamingCharacterState {
+  chatPage?: number;
+  chats?: StreamingChatState[];
+}
+
+/**
+ * The host calls display handlers for every visible message while a response
+ * streams. Defer only the active character message so old messages keep their
+ * normal display transforms until the final render.
+ */
+export function isActiveStreamingOutput(
+  character: StreamingCharacterState | null | undefined,
+  content: string,
+): boolean {
+  const activeChat = character?.chats?.[character.chatPage ?? 0];
+  if (!activeChat?.isStreaming) return false;
+  const activeMessage = activeChat.message?.at(-1);
+  if (!activeMessage || activeMessage.role !== "char" || typeof activeMessage.data !== "string") {
+    return false;
+  }
+  if (!content) return false;
+  const normalizedContent = content.replaceAll("\r\n", "\n");
+  const normalizedActive = activeMessage.data.replaceAll("\r\n", "\n");
+  return (
+    normalizedContent === normalizedActive ||
+    (normalizedActive.length > 0 && normalizedContent.endsWith(normalizedActive))
+  );
+}
+
 export interface MacroContext {
   randomInt?: (minimum: number, maximum: number) => number;
 }
@@ -540,15 +579,15 @@ function escapeDisplayHtml(value: string): string {
 export function adaptVietnameseHeaderForRisuAI(input: string): string {
   if (input.includes('data-ff54="scene-header"')) return input;
   const match = input.match(
-    /^(\s*)\[\s*🕰️\s*Thời gian\s+([^|\]\r\n]+?\s(?:SA|CH))\s*\|\s*🗓️\s*Ngày\s+([^|\]\r\n]+?\s(?:SCN|TCN))\s*\|\s*📍\s*([^|\]\r\n]+?)\s*\|\s*([^|\]\r\n]+?,\s*-?\d+(?:[.,]\d+)?\s*°C)\s*\]/u,
+    /(^|<\/(?:details|Thoughts|think)>)(\s*)\[\s*🕰️\s*Thời gian\s+([^|\]\r\n]+?\s(?:SA|CH))\s*\|\s*🗓️\s*Ngày\s+([^|\]\r\n]+?\s(?:SCN|TCN))\s*\|\s*📍\s*([^|\]\r\n]+?)\s*\|\s*([^|\]\r\n]+?,\s*-?\d+(?:[.,]\d+)?\s*°C)\s*\]/iu,
   );
   if (!match) return input;
 
   const cards = [
-    ["🕰️ Thời gian", match[2]],
-    ["🗓️ Ngày", match[3]],
-    ["📍 Địa điểm", match[4]],
-    ["🌤️ Thời tiết", match[5]],
+    ["🕰️ Thời gian", match[3]],
+    ["🗓️ Ngày", match[4]],
+    ["📍 Địa điểm", match[5]],
+    ["🌤️ Thời tiết", match[6]],
   ]
     .map(
       ([label, value]) =>
@@ -556,7 +595,7 @@ export function adaptVietnameseHeaderForRisuAI(input: string): string {
     )
     .join("");
   const header = `<div data-ff54="scene-header" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:8px;margin:0 0 12px;padding:10px;border:1px solid rgba(148,163,184,.28);border-radius:12px;background:rgba(15,23,42,.22)">${cards}</div>`;
-  return `${match[1]}${header}${input.slice(match[0].length)}`;
+  return `${input.slice(0, match.index)}${match[1]}${match[2]}${header}${input.slice((match.index ?? 0) + match[0].length)}`;
 }
 
 export function applyPromptRegexToMessages(
@@ -624,7 +663,10 @@ export async function buildRequestMessages(
   macroContext: MacroContext = {},
 ): Promise<ChatMessage[]> {
   if (!settings.enabled) return messages;
-  const regexed = applyPromptRegexToMessages(messages, preset, settings);
+  const hostMessages = messages.filter(
+    (message) => !String(message.memo ?? "").startsWith("ff54:"),
+  );
+  const regexed = applyPromptRegexToMessages(hostMessages, preset, settings);
   const composed = await composePresetPrompts(preset, settings, parseHostMacros, macroContext);
   return [
     ...composed.leading,
