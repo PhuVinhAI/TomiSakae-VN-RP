@@ -626,18 +626,18 @@ export async function buildRequestMessages(
   if (!settings.enabled) return messages;
   const regexed = applyPromptRegexToMessages(messages, preset, settings);
   const composed = await composePresetPrompts(preset, settings, parseHostMacros, macroContext);
+  const vietnameseOutput: ChatMessage[] = settings.vietnameseOutputEnabled
+    ? [
+        {
+          role: "system",
+          content: VIETNAMESE_OUTPUT_PROMPT,
+          memo: "ff54:vietnamese-output",
+        },
+      ]
+    : [];
   return [
     ...composed.leading,
-    ...injectAbsoluteAtDepth(regexed, composed.absolute),
-    ...(settings.vietnameseOutputEnabled
-      ? [
-          {
-            role: "system" as const,
-            content: VIETNAMESE_OUTPUT_PROMPT,
-            memo: "ff54:vietnamese-output",
-          },
-        ]
-      : []),
+    ...injectAbsoluteAtDepth(regexed, [...vietnameseOutput, ...composed.absolute]),
     ...composed.trailing,
   ];
 }

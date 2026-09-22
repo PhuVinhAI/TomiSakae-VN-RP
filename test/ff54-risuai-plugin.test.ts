@@ -105,10 +105,11 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     );
     expect(built).toContainEqual(composed.leading.find((entry) => entry.memo === "ff54:main"));
     const latestIndex = built.findIndex((entry) => entry.content === "latest");
-    expect(built[latestIndex + 1]!.memo).toContain("ff54:absolute:0");
+    expect(built[latestIndex + 1]!.memo).toBe("ff54:vietnamese-output");
+    expect(built[latestIndex + 2]!.memo).toContain("ff54:absolute:0");
   });
 
-  it("adds the Vietnamese module once after card context and adapts only enabled prompts", async () => {
+  it("adds the Vietnamese module once before reasoning and adapts only enabled prompts", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);
     const disabledPrompt = data.prompt_order[0]!.order.find((entry) => entry.enabled === false);
@@ -124,11 +125,11 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(built.indexOf(vietnamese[0]!)).toBeGreaterThan(
       built.findIndex((entry) => entry.content === "card context"),
     );
-    expect(built.indexOf(vietnamese[0]!)).toBeGreaterThan(
-      Math.max(
+    expect(built.indexOf(vietnamese[0]!)).toBeLessThan(
+      Math.min(
         ...built
-          .map((entry, index) => (entry.memo?.startsWith("ff54:absolute:") ? index : -1))
-          .filter((index) => index >= 0),
+          .map((entry, index) => (entry.memo?.startsWith("ff54:absolute:") ? index : Infinity))
+          .filter((index) => Number.isFinite(index)),
       ),
     );
     expect(built.indexOf(vietnamese[0]!)).toBeLessThan(
@@ -439,7 +440,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "utf8",
     );
     expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
-    expect(artifact).toContain("//@version 1.2.3");
+    expect(artifact).toContain("//@version 1.2.4");
   });
 
   it("context-saver regex strips old internal state but keeps the newest", async () => {
