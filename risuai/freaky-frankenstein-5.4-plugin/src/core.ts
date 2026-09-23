@@ -560,9 +560,47 @@ export function adaptVietnameseHeaderForRisuAI(input: string): string {
   );
 }
 
-/** Remove only scene headers from the request copy; saved chat history keeps them. */
+/** Remove scene headers from the request copy; saved history remains unchanged. */
 export function removeSceneHeadersForRequest(input: string): string {
   return input.replace(SCENE_HEADER_RE, "");
+}
+
+function messageDepths(messages: ChatMessage[]): Map<ChatMessage, number> {
+  const history = messages.filter(
+    (message) =>
+      (message.role === "user" || message.role === "assistant") &&
+      !String(message.memo ?? "").startsWith("ff54:"),
+  );
+  const depths = new Map<ChatMessage, number>();
+  [...history].reverse().forEach((message, depth) => depths.set(message, depth));
+  return depths;
+}
+
+export function applyRequestFiltersToMessages(
+  messages: ChatMessage[],
+  preset: FfPreset,
+  settings: FfGlobalSettings,
+): ChatMessage[] {
+  const regexed = applyPromptRegexToMessages(messages, preset, settings);
+  const depths = messageDepths(regexed);
+  return regexed.map((message) => {
+    const depth = depths.get(message);
+    const contextSaver = (preset.extensions?.regex_scripts ?? []).find(
+      (script) => script.scriptName === "FF5 - Context Saver (Universal)",
+    );
+    const removeHeader =
+      message.role === "assistant" &&
+      depth !== undefined &&
+      contextSaver !== undefined &&
+      settings.regexEnabled[contextSaver.id] === true &&
+      !contextSaver.disabled &&
+      contextSaver.placement?.includes(PLACEMENT_AI_OUTPUT) === true &&
+      depthAllowed(contextSaver, depth);
+    return {
+      ...message,
+      content: removeHeader ? removeSceneHeadersForRequest(message.content) : message.content,
+    };
+  });
 }
 
 
@@ -571,13 +609,7 @@ export function applyPromptRegexToMessages(
   preset: FfPreset,
   settings: FfGlobalSettings,
 ): ChatMessage[] {
-  const history = messages.filter(
-    (message) =>
-      (message.role === "user" || message.role === "assistant") &&
-      !String(message.memo ?? "").startsWith("ff54:"),
-  );
-  const depths = new Map<ChatMessage, number>();
-  [...history].reverse().forEach((message, depth) => depths.set(message, depth));
+  const depths = messageDepths(messages);
   return messages.map((message) => {
     const placement =
       message.role === "user"
@@ -634,11 +666,7 @@ export async function buildRequestMessages(
   const hostMessages = messages.filter(
     (message) => !String(message.memo ?? "").startsWith("ff54:"),
   );
-  const regexed = applyPromptRegexToMessages(hostMessages, preset, settings);
-  const requestHistory = regexed.map((message) => ({
-    ...message,
-    content: removeSceneHeadersForRequest(message.content),
-  }));
+  const requestHistory = applyRequestFiltersToMessages(hostMessages, preset, settings);
   const composed = await composePresetPrompts(preset, settings, parseHostMacros, macroContext);
   return [
     ...composed.leading,

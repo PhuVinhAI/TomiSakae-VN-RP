@@ -6,6 +6,7 @@ import {
   removeSceneHeadersForRequest,
   applyRegexScripts,
   applyPromptRegexToMessages,
+  applyRequestFiltersToMessages,
   buildRequestMessages,
   composePresetPrompts,
   createDefaultSettings,
@@ -492,6 +493,54 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     const output = applyPromptRegexToMessages(messages, data, settings);
     expect(output[0]!.content).toBe("old");
     expect(output[2]!.content).toContain("<internal_states>NEW</internal_states>");
+  });
+
+  it("uses context-saver minDepth for old request content while preserving recent history", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    const header = "[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 | 📍 Đại học | ☀️ Nắng, 20 °C ]";
+    const messages = [
+      {
+        role: "assistant" as const,
+        content: `${header}\nold<internal_states>OLD</internal_states>`,
+      },
+      { role: "user" as const, content: "middle" },
+      {
+        role: "assistant" as const,
+        content: `${header}\nrecent<internal_states>RECENT</internal_states>`,
+      },
+      { role: "user" as const, content: "latest" },
+    ];
+
+    const filtered = applyRequestFiltersToMessages(messages, data, settings);
+    expect(filtered[0]!.content).toBe("\nold");
+    expect(filtered[0]!.content).not.toContain(header);
+    expect(filtered[0]!.content).not.toContain("<internal_states>");
+    expect(filtered[2]!.content).toContain(header);
+    expect(filtered[2]!.content).toContain("<internal_states>RECENT</internal_states>");
+
+    settings.regexEnabled["3fbb6c80-ab8f-4a21-8221-62c9f8546306"] = false;
+    const preserved = applyRequestFiltersToMessages(messages, data, settings);
+    expect(preserved[0]!.content).toContain(header);
+    expect(preserved[0]!.content).toContain("<internal_states>OLD</internal_states>");
+  });
+
+  it("keeps scene headers in the saved history during context-saver cleanup", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    const header = "[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 | 📍 Đại học | ☀️ Nắng, 20 °C ]";
+    const messages = [
+      { role: "assistant" as const, content: `${header}\nold<internal_states>OLD</internal_states>` },
+      { role: "user" as const, content: "middle" },
+      { role: "assistant" as const, content: `${header}\nrecent<internal_states>NEW</internal_states>` },
+      { role: "user" as const, content: "latest" },
+    ];
+
+    const cleanedHistory = applyPromptRegexToMessages(messages, data, settings);
+    expect(cleanedHistory[0]!.content).toContain(header);
+    expect(cleanedHistory[0]!.content).not.toContain("<internal_states>");
+    expect(cleanedHistory[2]!.content).toContain(header);
+    expect(cleanedHistory[2]!.content).toContain("<internal_states>NEW</internal_states>");
   });
 
   it("keeps scene headers in history but removes them from the request copy", () => {
