@@ -481,18 +481,21 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(artifact).toContain("//@version 1.2.7");
   });
 
-  it("context-saver regex strips old internal state but keeps the newest", async () => {
+  it("context-saver regex keeps the two newest AI responses", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);
     const messages = [
       { role: "assistant" as const, content: "old<internal_states>OLD</internal_states>" },
-      { role: "user" as const, content: "middle" },
-      { role: "assistant" as const, content: "new<internal_states>NEW</internal_states>" },
+      { role: "user" as const, content: "first user" },
+      { role: "assistant" as const, content: "recent<internal_states>RECENT</internal_states>" },
+      { role: "user" as const, content: "second user" },
+      { role: "assistant" as const, content: "newest<internal_states>NEWEST</internal_states>" },
       { role: "user" as const, content: "latest" },
     ];
     const output = applyPromptRegexToMessages(messages, data, settings);
     expect(output[0]!.content).toBe("old");
-    expect(output[2]!.content).toContain("<internal_states>NEW</internal_states>");
+    expect(output[2]!.content).toContain("<internal_states>RECENT</internal_states>");
+    expect(output[4]!.content).toContain("<internal_states>NEWEST</internal_states>");
   });
 
   it("uses context-saver minDepth for old request content while preserving recent history", async () => {
@@ -504,10 +507,15 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
         role: "assistant" as const,
         content: `${header}\nold<internal_states>OLD</internal_states>`,
       },
-      { role: "user" as const, content: "middle" },
+      { role: "user" as const, content: "first user" },
       {
         role: "assistant" as const,
         content: `${header}\nrecent<internal_states>RECENT</internal_states>`,
+      },
+      { role: "user" as const, content: "second user" },
+      {
+        role: "assistant" as const,
+        content: `${header}\nnewest<internal_states>NEWEST</internal_states>`,
       },
       { role: "user" as const, content: "latest" },
     ];
@@ -518,6 +526,8 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(filtered[0]!.content).not.toContain("<internal_states>");
     expect(filtered[2]!.content).toContain(header);
     expect(filtered[2]!.content).toContain("<internal_states>RECENT</internal_states>");
+    expect(filtered[4]!.content).toContain(header);
+    expect(filtered[4]!.content).toContain("<internal_states>NEWEST</internal_states>");
 
     settings.regexEnabled["3fbb6c80-ab8f-4a21-8221-62c9f8546306"] = false;
     const preserved = applyRequestFiltersToMessages(messages, data, settings);
@@ -531,7 +541,9 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     const header = "[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 | 📍 Đại học | ☀️ Nắng, 20 °C ]";
     const messages = [
       { role: "assistant" as const, content: `${header}\nold<internal_states>OLD</internal_states>` },
-      { role: "user" as const, content: "middle" },
+      { role: "user" as const, content: "first user" },
+      { role: "assistant" as const, content: `${header}\nrecent<internal_states>RECENT</internal_states>` },
+      { role: "user" as const, content: "second user" },
       { role: "assistant" as const, content: `${header}\nrecent<internal_states>NEW</internal_states>` },
       { role: "user" as const, content: "latest" },
     ];
@@ -540,7 +552,9 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(cleanedHistory[0]!.content).toContain(header);
     expect(cleanedHistory[0]!.content).not.toContain("<internal_states>");
     expect(cleanedHistory[2]!.content).toContain(header);
-    expect(cleanedHistory[2]!.content).toContain("<internal_states>NEW</internal_states>");
+    expect(cleanedHistory[2]!.content).toContain("<internal_states>RECENT</internal_states>");
+    expect(cleanedHistory[4]!.content).toContain(header);
+    expect(cleanedHistory[4]!.content).toContain("<internal_states>NEW</internal_states>");
   });
 
   it("keeps scene headers in history but removes them from the request copy", () => {

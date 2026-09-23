@@ -7,7 +7,7 @@ import {
   expandHostMacros,
   normalizeSettings,
   PLACEMENT_AI_OUTPUT,
-  applyRequestFiltersToMessages,
+  applyPromptRegexToMessages,
   type ChatMessage,
   type FfGlobalSettings,
   type FfPreset,
@@ -418,7 +418,7 @@ async function cleanSavedHistory(): Promise<void> {
     role: message.role === "char" ? "assistant" : "user",
     content: String(message.data ?? ""),
   }));
-  const cleanedMessages = applyRequestFiltersToMessages(sourceMessages, preset, settings);
+  const cleanedMessages = applyPromptRegexToMessages(sourceMessages, preset, settings);
   let changed = false;
   const message = chat.message.map((entry, index) => {
     const content = cleanedMessages[index]?.content ?? String(entry.data ?? "");

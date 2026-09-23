@@ -497,6 +497,7 @@ export function applyRegexScripts(
     markdown?: boolean;
     edit?: boolean;
     depth?: number;
+    depthForScript?: (script: FfRegexScript) => number | undefined;
   },
 ): string {
   let output = input;
@@ -509,7 +510,8 @@ export function applyRegexScripts(
       (!script.markdownOnly && !script.promptOnly && !options.markdown && !options.prompt);
     if (!eligibleMode || !script.placement?.includes(options.placement)) continue;
     if (options.edit && !script.runOnEdit) continue;
-    if (!depthAllowed(script, options.depth)) continue;
+    const scriptDepth = options.depthForScript?.(script) ?? options.depth;
+    if (!depthAllowed(script, scriptDepth)) continue;
     const localized = settings.vietnameseOutputEnabled
       ? adaptRegexForVietnamese(script.findRegex, String(script.replaceString ?? ""))
       : { findRegex: script.findRegex, replaceString: String(script.replaceString ?? "") };
@@ -576,13 +578,25 @@ function messageDepths(messages: ChatMessage[]): Map<ChatMessage, number> {
   return depths;
 }
 
+function assistantResponseDepths(messages: ChatMessage[]): Map<ChatMessage, number> {
+  const depths = new Map<ChatMessage, number>();
+  let assistantDepth = 0;
+  for (const message of [...messages].reverse()) {
+    if (String(message.memo ?? "").startsWith("ff54:")) continue;
+    if (message.role !== "user" && message.role !== "assistant") continue;
+    depths.set(message, assistantDepth);
+    if (message.role === "assistant") assistantDepth += 1;
+  }
+  return depths;
+}
+
 export function applyRequestFiltersToMessages(
   messages: ChatMessage[],
   preset: FfPreset,
   settings: FfGlobalSettings,
 ): ChatMessage[] {
   const regexed = applyPromptRegexToMessages(messages, preset, settings);
-  const depths = messageDepths(regexed);
+  const depths = assistantResponseDepths(regexed);
   return regexed.map((message) => {
     const depth = depths.get(message);
     const contextSaver = (preset.extensions?.regex_scripts ?? []).find(
@@ -610,6 +624,10 @@ export function applyPromptRegexToMessages(
   settings: FfGlobalSettings,
 ): ChatMessage[] {
   const depths = messageDepths(messages);
+  const contextSaver = (preset.extensions?.regex_scripts ?? []).find(
+    (script) => script.scriptName === "FF5 - Context Saver (Universal)",
+  );
+  const contextSaverDepths = assistantResponseDepths(messages);
   return messages.map((message) => {
     const placement =
       message.role === "user"
@@ -624,6 +642,10 @@ export function applyPromptRegexToMessages(
         placement,
         prompt: true,
         ...(depths.has(message) ? { depth: depths.get(message)! } : {}),
+        ...(contextSaver !== undefined && placement === PLACEMENT_AI_OUTPUT
+          ? { depthForScript: (script: FfRegexScript) =>
+              script.id === contextSaver.id ? contextSaverDepths.get(message) : undefined }
+          : {}),
       }),
     };
   });
