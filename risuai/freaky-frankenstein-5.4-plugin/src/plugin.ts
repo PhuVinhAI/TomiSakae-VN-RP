@@ -7,6 +7,7 @@ import {
   expandHostMacros,
   normalizeSettings,
   PLACEMENT_AI_OUTPUT,
+  applyPromptRegexToMessages,
   type ChatMessage,
   type FfGlobalSettings,
   type FfPreset,
@@ -40,6 +41,10 @@ declare const Risuai: {
   hideContainer(): Promise<void>;
   getCharacter(): Promise<HostCharacter | null>;
   getDatabase(includeOnly?: string[] | "all"): Promise<HostDatabase | null>;
+  getCurrentCharacterIndex(): Promise<number>;
+  getCurrentChatIndex(): Promise<number>;
+  getChatFromIndex(characterIndex: number, chatIndex: number): Promise<HostChatSnapshot | null>;
+  setChatToIndex(characterIndex: number, chatIndex: number, chat: HostChatSnapshot): Promise<void>;
   addRisuReplacer(
     type: "beforeRequest",
     callback: (messages: ChatMessage[], type: string) => Promise<ChatMessage[]>,
@@ -65,6 +70,17 @@ declare const Risuai: {
 
 interface HostChat {
   bindedPersona?: string;
+}
+
+interface HostChatMessage {
+  role?: "user" | "char";
+  data?: string;
+  [key: string]: unknown;
+}
+
+interface HostChatSnapshot {
+  message?: HostChatMessage[];
+  [key: string]: unknown;
 }
 
 interface HostCharacter {
@@ -390,8 +406,40 @@ async function getHostMacroContext(): Promise<{
   };
 }
 
+let historyCleanup: Promise<void> | undefined;
+
+async function cleanSavedHistory(): Promise<void> {
+  const characterIndex = await Risuai.getCurrentCharacterIndex();
+  const chatIndex = await Risuai.getCurrentChatIndex();
+  const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
+  if (!chat?.message?.length) return;
+
+  const sourceMessages: ChatMessage[] = chat.message.map((message) => ({
+    role: message.role === "char" ? "assistant" : "user",
+    content: String(message.data ?? ""),
+  }));
+  const cleanedMessages = applyPromptRegexToMessages(sourceMessages, preset, settings);
+  let changed = false;
+  const message = chat.message.map((entry, index) => {
+    const content = cleanedMessages[index]?.content ?? String(entry.data ?? "");
+    if (content !== String(entry.data ?? "")) changed = true;
+    return content === entry.data ? entry : { ...entry, data: content };
+  });
+  if (changed) await Risuai.setChatToIndex(characterIndex, chatIndex, { ...chat, message });
+}
+
+async function cleanSavedHistoryOnce(): Promise<void> {
+  if (!historyCleanup) {
+    historyCleanup = cleanSavedHistory().finally(() => {
+      historyCleanup = undefined;
+    });
+  }
+  await historyCleanup;
+}
+
 const beforeRequest = async (messages: ChatMessage[], type: string): Promise<ChatMessage[]> => {
   if (!settings.enabled || !mainGeneration(type)) return messages;
+  await cleanSavedHistoryOnce();
   const macroContext = await getHostMacroContext();
   return buildRequestMessages(messages, preset, settings, async (content) =>
     expandHostMacros(content, macroContext),

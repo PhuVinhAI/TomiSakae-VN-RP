@@ -73,6 +73,9 @@ export interface HostMacroContext {
 export const PLACEMENT_USER_INPUT = 1;
 export const PLACEMENT_AI_OUTPUT = 2;
 
+const SCENE_HEADER_RE =
+  /\[\s*🕰️\s*([^|\]\r\n]*?)\s*\|\s*🗓️\s*([^|\]\r\n]*?)\s*\|\s*📍\s*([^|\]\r\n]*?)\s*\|\s*([^\]\r\n]*?)\s*\]/gu;
+
 const RELATIVE_POSITION = 0;
 const ABSOLUTE_POSITION = 1;
 const MARKER_IDENTIFIERS = new Set([
@@ -538,11 +541,8 @@ function escapeDisplayHtml(value: string): string {
 }
 
 export function adaptVietnameseHeaderForRisuAI(input: string): string {
-  const sceneHeaderRe =
-    /\[\s*🕰️\s*([^\]|\r\n]*?)\s*\|\s*🗓️\s*([^\]|\r\n]*?)\s*\|\s*📍\s*([^\]|\r\n]*?)\s*\|\s*([^\]\r\n]*?)\s*\]/gu;
-
   return input.replace(
-    sceneHeaderRe,
+    SCENE_HEADER_RE,
     (_match, time: string, date: string, location: string, weather: string) => {
       const cards = [
         ["🕰️ Thời gian", time],
@@ -558,6 +558,11 @@ export function adaptVietnameseHeaderForRisuAI(input: string): string {
       return `<div data-ff54="scene-header" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:8px;margin:0 0 12px;padding:10px;border:1px solid rgba(148,163,184,.28);border-radius:12px;background:rgba(15,23,42,.22)">${cards}</div>`;
     },
   );
+}
+
+/** Remove only scene headers from the request copy; saved chat history keeps them. */
+export function removeSceneHeadersForRequest(input: string): string {
+  return input.replace(SCENE_HEADER_RE, "");
 }
 
 
@@ -630,6 +635,10 @@ export async function buildRequestMessages(
     (message) => !String(message.memo ?? "").startsWith("ff54:"),
   );
   const regexed = applyPromptRegexToMessages(hostMessages, preset, settings);
+  const requestHistory = regexed.map((message) => ({
+    ...message,
+    content: removeSceneHeadersForRequest(message.content),
+  }));
   const composed = await composePresetPrompts(preset, settings, parseHostMacros, macroContext);
   return [
     ...composed.leading,
@@ -642,7 +651,7 @@ export async function buildRequestMessages(
           },
         ]
       : []),
-    ...injectAbsoluteAtDepth(regexed, composed.absolute),
+    ...injectAbsoluteAtDepth(requestHistory, composed.absolute),
     ...composed.trailing,
   ];
 }

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   adaptDisplayMarkupForRisuAI,
   adaptVietnameseHeaderForRisuAI,
+  removeSceneHeadersForRequest,
   applyRegexScripts,
   applyPromptRegexToMessages,
   buildRequestMessages,
@@ -461,7 +462,9 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     );
     expect(pluginSource).toContain('const STORAGE_KEY = "ff54-global-settings-v1"');
     expect(pluginSource).toContain('location: "chat"');
-    expect(pluginSource).not.toMatch(/getCurrent(Character|Chat)Index|characterIndex|chatIndex/);
+    expect(pluginSource).toContain("getCurrentCharacterIndex");
+    expect(pluginSource).toContain("getCurrentChatIndex");
+    expect(pluginSource).toContain("setChatToIndex");
     expect(pluginSource.match(/pluginStorage\.getItem\(STORAGE_KEY\)/g)).toHaveLength(1);
     expect(pluginSource.match(/pluginStorage\.setItem\(STORAGE_KEY, settings\)/g)).toHaveLength(1);
     const unavailableParserApi = ["parse", "Risu", "Chat"].join("");
@@ -489,6 +492,14 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     const output = applyPromptRegexToMessages(messages, data, settings);
     expect(output[0]!.content).toBe("old");
     expect(output[2]!.content).toContain("<internal_states>NEW</internal_states>");
+  });
+
+  it("keeps scene headers in history but removes them from the request copy", () => {
+    const header =
+      "[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 | 📍 Đại học | ☀️ Nắng, 20 °C ]";
+    const input = `${header}\n\nNội dung nhập vai`;
+    expect(removeSceneHeadersForRequest(input)).toBe("\n\nNội dung nhập vai");
+    expect(input).toContain(header);
   });
 
   it("uses a RisuAI-safe display wrapper without exposing internal-state tags", () => {
