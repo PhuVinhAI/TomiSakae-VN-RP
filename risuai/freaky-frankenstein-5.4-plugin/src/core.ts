@@ -538,26 +538,28 @@ function escapeDisplayHtml(value: string): string {
 }
 
 export function adaptVietnameseHeaderForRisuAI(input: string): string {
-  if (input.includes('data-ff54="scene-header"')) return input;
-  const match = input.match(
-    /(^|<\/(?:details|Thoughts|think)>)(\s*)\[\s*🕰️\s*Thời gian\s+([^|\]\r\n]+?\s(?:SA|CH))\s*\|\s*🗓️\s*Ngày\s+([^|\]\r\n]+?\s(?:SCN|TCN))\s*\|\s*📍\s*([^|\]\r\n]+?)\s*\|\s*([^|\]\r\n]+?,\s*-?\d+(?:[.,]\d+)?\s*°C)\s*\]/iu,
-  );
-  if (!match) return input;
+  const sceneHeaderRe =
+    /\[\s*🕰️\s*([^\]|\r\n]*?)\s*\|\s*🗓️\s*([^\]|\r\n]*?)\s*\|\s*📍\s*([^\]|\r\n]*?)\s*\|\s*([^\]\r\n]*?)\s*\]/gu;
 
-  const cards = [
-    ["🕰️ Thời gian", match[3]],
-    ["🗓️ Ngày", match[4]],
-    ["📍 Địa điểm", match[5]],
-    ["🌤️ Thời tiết", match[6]],
-  ]
-    .map(
-      ([label, value]) =>
-        `<div style="min-width:0;padding:10px 12px;border:1px solid rgba(148,163,184,.24);border-radius:10px;background:rgba(15,23,42,.3)"><div style="margin-bottom:4px;color:#a5b4fc;font-size:.76em;font-weight:700">${label}</div><div style="overflow-wrap:anywhere;line-height:1.4">${escapeDisplayHtml(value!)}</div></div>`,
-    )
-    .join("");
-  const header = `<div data-ff54="scene-header" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:8px;margin:0 0 12px;padding:10px;border:1px solid rgba(148,163,184,.28);border-radius:12px;background:rgba(15,23,42,.22)">${cards}</div>`;
-  return `${input.slice(0, match.index)}${match[1]}${match[2]}${header}${input.slice((match.index ?? 0) + match[0].length)}`;
+  return input.replace(
+    sceneHeaderRe,
+    (_match, time: string, date: string, location: string, weather: string) => {
+      const cards = [
+        ["🕰️ Thời gian", time],
+        ["🗓️ Ngày", date],
+        ["📍 Địa điểm", location],
+        ["🌤️ Thời tiết", weather],
+      ]
+        .map(
+          ([label, value]) =>
+            `<div style="min-width:0;padding:10px 12px;border:1px solid rgba(148,163,184,.24);border-radius:10px;background:rgba(15,23,42,.3)"><div style="margin-bottom:4px;color:#a5b4fc;font-size:.76em;font-weight:700">${label}</div><div style="overflow-wrap:anywhere;line-height:1.4">${escapeDisplayHtml(value!)}</div></div>`,
+        )
+        .join("");
+      return `<div data-ff54="scene-header" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:8px;margin:0 0 12px;padding:10px;border:1px solid rgba(148,163,184,.28);border-radius:12px;background:rgba(15,23,42,.22)">${cards}</div>`;
+    },
+  );
 }
+
 
 export function applyPromptRegexToMessages(
   messages: ChatMessage[],

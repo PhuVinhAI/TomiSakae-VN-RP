@@ -543,11 +543,34 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(output).not.toContain("[ 🕰️ Thời gian 14:25 CH");
   });
 
-  it("leaves legacy scene headers unchanged", () => {
+  it("renders legacy scene headers without restricting field vocabulary", () => {
     const input =
       "[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 - Thứ Bảy, ngày 04 tháng 04 năm 2026 Kỷ nguyên | 📍 Đại học - Đường hoa anh đào | ☀️ Nắng ráo, 68°F ]";
 
-    expect(adaptVietnameseHeaderForRisuAI(input)).toBe(input);
+    const output = adaptVietnameseHeaderForRisuAI(input);
+    expect(output).toContain('data-ff54="scene-header"');
+    expect(output).toContain("68°F");
+  });
+
+  it("renders headers from marker structure without guessing field vocabulary", () => {
+    const inputs = [
+      "[ 🕰️ Thời gian 07:00 tối | 🗓️ Ngày 1 - Thứ Hai | 📍 Trường học - Hành lang | Trời lạnh, có mưa ]",
+      "[ 🕰️ 19 giờ 00 phút, buổi tối | 🗓️ Thứ Hai, ngày 05 tháng 03 | 📍 Ký túc xá | 🌙 Có mây, 18 độ C ]",
+      "[ 🕰️ Time 14:25 PM, late afternoon | 🗓️ Day 1 - Monday | 📍 School - Hallway | ☀️ Sunny, 64°F ]",
+    ];
+
+    for (const input of inputs) {
+      const output = adaptVietnameseHeaderForRisuAI(input);
+      expect(output).toContain('data-ff54="scene-header"');
+      expect(output).not.toContain(input);
+    }
+  });
+
+  it("renders every structured header in a response", () => {
+    const input =
+      "[ 🕰️ 07:00 | 🗓️ Ngày 1 | 📍 Phòng khách | ☀️ Nắng ]\n\nNội dung\n\n[ 🕰️ 08:00 | 🗓️ Ngày 1 | 📍 Nhà bếp | 🌧️ Mưa ]";
+
+    expect(adaptVietnameseHeaderForRisuAI(input).match(/data-ff54="scene-header"/g)).toHaveLength(2);
   });
 
   it("master disable returns the host request without mutation", async () => {
