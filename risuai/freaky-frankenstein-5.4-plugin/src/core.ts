@@ -75,6 +75,24 @@ export const PLACEMENT_AI_OUTPUT = 2;
 
 const SCENE_HEADER_RE =
   /\[\s*🕰️\s*([^|\]\r\n]*?)\s*\|\s*🗓️\s*([^|\]\r\n]*?)\s*\|\s*📍\s*([^|\]\r\n]*?)\s*\|\s*([^\]\r\n]*?)\s*\]/gu;
+const INTERNAL_STATE_BLOCK_RE =
+  /(?:<!--\s{0,8}GFX_START\s{0,8}-->\s*)?<internal_states>[\s\S]{0,50000}?(?:<\/internal_states>|$)(?:\s*<!--\s{0,8}GFX_END\s{0,8}-->)?/gi;
+const GFX_MARKER_RE = /<!--\s{0,8}GFX_(START|END)\s{0,8}-->/gi;
+
+function removeOrphanTrailingGfxEnd(input: string): string {
+  let output = input;
+  while (true) {
+    let open = 0;
+    let orphanEnd: RegExpExecArray | undefined;
+    for (const marker of output.matchAll(GFX_MARKER_RE)) {
+      if (marker[1]?.toUpperCase() === "START") open += 1;
+      else if (open > 0) open -= 1;
+      else orphanEnd = marker;
+    }
+    if (!orphanEnd || output.slice(orphanEnd.index + orphanEnd[0].length).trim()) return output;
+    output = output.slice(0, orphanEnd.index).trimEnd();
+  }
+}
 
 const RELATIVE_POSITION = 0;
 const ABSOLUTE_POSITION = 1;
@@ -89,13 +107,23 @@ const MARKER_IDENTIFIERS = new Set([
   "chatHistory",
 ]);
 
+const REALISM_MODE_ID = "019f62e8-892f-700c-9795-53ecb3381d7d";
+const FREAKY_MODE_ID = "019f62e8-892f-700d-b070-4add983aeae1";
+
 export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
   const order = preset.prompt_order[0]?.order ?? [];
   const regexScripts = preset.extensions?.regex_scripts ?? [];
   return {
     enabled: true,
     promptEnabled: Object.fromEntries(
-      order.map((entry) => [entry.identifier, entry.enabled !== false]),
+      order.map((entry) => [
+        entry.identifier,
+        entry.identifier === REALISM_MODE_ID
+          ? true
+          : entry.identifier === FREAKY_MODE_ID
+            ? false
+            : entry.enabled !== false,
+      ]),
     ),
     regexEnabled: Object.fromEntries(
       regexScripts.map((script) => [script.id, script.disabled !== true]),
@@ -512,6 +540,11 @@ export function applyRegexScripts(
     if (options.edit && !script.runOnEdit) continue;
     const scriptDepth = options.depthForScript?.(script) ?? options.depth;
     if (!depthAllowed(script, scriptDepth)) continue;
+    if (options.prompt && script.scriptName === "FF5 - Context Saver (Universal)") {
+      output = removeOrphanTrailingGfxEnd(output.replace(INTERNAL_STATE_BLOCK_RE, ""));
+      continue;
+    }
+    if (options.prompt && script.scriptName === "FF5 - GFX Stripper") continue;
     const localized = settings.vietnameseOutputEnabled
       ? adaptRegexForVietnamese(script.findRegex, String(script.replaceString ?? ""))
       : { findRegex: script.findRegex, replaceString: String(script.replaceString ?? "") };
@@ -617,7 +650,6 @@ export function applyRequestFiltersToMessages(
   });
 }
 
-
 export function applyPromptRegexToMessages(
   messages: ChatMessage[],
   preset: FfPreset,
@@ -643,8 +675,10 @@ export function applyPromptRegexToMessages(
         prompt: true,
         ...(depths.has(message) ? { depth: depths.get(message)! } : {}),
         ...(contextSaver !== undefined && placement === PLACEMENT_AI_OUTPUT
-          ? { depthForScript: (script: FfRegexScript) =>
-              script.id === contextSaver.id ? contextSaverDepths.get(message) : undefined }
+          ? {
+              depthForScript: (script: FfRegexScript) =>
+                script.id === contextSaver.id ? contextSaverDepths.get(message) : undefined,
+            }
           : {}),
       }),
     };

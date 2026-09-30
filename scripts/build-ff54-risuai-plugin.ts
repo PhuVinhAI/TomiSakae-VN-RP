@@ -4,7 +4,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "esbuild";
 
-const DEFAULT_SOURCE = "C:/Users/tomis/Downloads/Freaky Frankenstein 5.4 Internal States (2).json";
+const DEFAULT_SOURCE = "risuai/freaky-frankenstein-5.4-plugin/source/ff54-sillytavern-preset.json";
 const DEFAULT_OUTPUT = "risuai/freaky-frankenstein-5.4-plugin/dist/ff54-risuai-plugin.js";
 
 interface Options {

@@ -372,7 +372,7 @@ async function showSettings(): Promise<void> {
     await saveSettings();
     await showSettings();
     document.getElementById("status")!.textContent =
-      "Đã khôi phục toàn bộ lựa chọn mặc định của preset gốc.";
+      "Đã khôi phục cấu hình mặc định của plugin (Chế độ Hiện thực).";
   });
   await Risuai.showContainer("fullscreen");
 }

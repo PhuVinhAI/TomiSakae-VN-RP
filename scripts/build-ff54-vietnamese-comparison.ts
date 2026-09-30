@@ -10,7 +10,7 @@ import {
   VIETNAMESE_REASONING_REPLACEMENTS,
 } from "../risuai/freaky-frankenstein-5.4-plugin/src/vietnamese.js";
 
-const DEFAULT_SOURCE = "C:/Users/tomis/Downloads/Freaky Frankenstein 5.4 Internal States (2).json";
+const DEFAULT_SOURCE = "risuai/freaky-frankenstein-5.4-plugin/source/ff54-sillytavern-preset.json";
 const DEFAULT_OUTPUT_DIRECTORY = "risuai/freaky-frankenstein-5.4-plugin/comparison";
 
 interface SourcePrompt {

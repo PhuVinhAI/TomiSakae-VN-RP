@@ -31,22 +31,43 @@ import {
   SOURCE_SEPARATOR_IDS,
 } from "../risuai/freaky-frankenstein-5.4-plugin/src/ui-vi.js";
 
-const source = "C:/Users/tomis/Downloads/Freaky Frankenstein 5.4 Internal States (2).json";
+const source = "risuai/freaky-frankenstein-5.4-plugin/source/ff54-sillytavern-preset.json";
+const realismModeId = "019f62e8-892f-700c-9795-53ecb3381d7d";
+const freakyModeId = "019f62e8-892f-700d-b070-4add983aeae1";
 
 async function preset(): Promise<FfPreset> {
   return JSON.parse(await readFile(source, "utf8")) as FfPreset;
 }
 
 describe("FF5.4 RisuAI plugin compatibility", () => {
-  it("copies every source prompt and regex toggle default", async () => {
+  it("copies source toggle defaults except for the default adult mode", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);
     expect(Object.keys(settings.promptEnabled)).toHaveLength(data.prompt_order[0]!.order.length);
     expect(Object.keys(settings.regexEnabled)).toHaveLength(data.extensions!.regex_scripts!.length);
     for (const entry of data.prompt_order[0]!.order) {
-      expect(settings.promptEnabled[entry.identifier]).toBe(entry.enabled !== false);
+      expect(settings.promptEnabled[entry.identifier]).toBe(
+        entry.identifier === realismModeId
+          ? true
+          : entry.identifier === freakyModeId
+            ? false
+            : entry.enabled !== false,
+      );
     }
+    expect(settings.promptEnabled[realismModeId]).toBe(true);
+    expect(settings.promptEnabled[freakyModeId]).toBe(false);
     expect(settings.vietnameseOutputEnabled).toBe(true);
+  });
+
+  it("keeps an explicitly saved Freaky choice", async () => {
+    const data = await preset();
+    const saved = {
+      promptEnabled: { [realismModeId]: false, [freakyModeId]: true },
+    };
+    const settings = normalizeSettings(data, saved);
+    normalizeExclusivePromptGroups(settings, data.prompt_order[0]!.order);
+    expect(settings.promptEnabled[realismModeId]).toBe(false);
+    expect(settings.promptEnabled[freakyModeId]).toBe(true);
   });
 
   it("defaults old global settings to Vietnamese output while preserving an explicit choice", async () => {
@@ -540,11 +561,20 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     const settings = createDefaultSettings(data);
     const header = "[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 | 📍 Đại học | ☀️ Nắng, 20 °C ]";
     const messages = [
-      { role: "assistant" as const, content: `${header}\nold<internal_states>OLD</internal_states>` },
+      {
+        role: "assistant" as const,
+        content: `${header}\nold<internal_states>OLD</internal_states>`,
+      },
       { role: "user" as const, content: "first user" },
-      { role: "assistant" as const, content: `${header}\nrecent<internal_states>RECENT</internal_states>` },
+      {
+        role: "assistant" as const,
+        content: `${header}\nrecent<internal_states>RECENT</internal_states>`,
+      },
       { role: "user" as const, content: "second user" },
-      { role: "assistant" as const, content: `${header}\nrecent<internal_states>NEW</internal_states>` },
+      {
+        role: "assistant" as const,
+        content: `${header}\nrecent<internal_states>NEW</internal_states>`,
+      },
       { role: "user" as const, content: "latest" },
     ];
 
@@ -557,9 +587,58 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(cleanedHistory[4]!.content).toContain("<internal_states>NEW</internal_states>");
   });
 
+  it("preserves story GFX in saved history and requests while cleaning old internal state", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    const letter =
+      '<!-- GFX_START -->\n<div style="color:#fff">Thư hẹn gặp lúc tám giờ.</div>\n<!-- GFX_END -->';
+    const internal =
+      "<!-- GFX_START -->\n<internal_states><details>SECRET</details></internal_states>\n<!-- GFX_END -->";
+    const messages = [
+      { role: "assistant" as const, content: `old\n${letter}\n${internal}\nending` },
+      { role: "user" as const, content: "first user" },
+      { role: "assistant" as const, content: `recent\n${letter}\n${internal}` },
+      { role: "user" as const, content: "second user" },
+      { role: "assistant" as const, content: `newest\n${letter}\n${internal}` },
+      { role: "user" as const, content: "latest" },
+    ];
+
+    const history = applyPromptRegexToMessages(messages, data, settings);
+    const request = applyRequestFiltersToMessages(messages, data, settings);
+    for (const output of [history, request]) {
+      for (const index of [0, 2, 4]) expect(output[index]!.content).toContain(letter);
+      expect(output[0]!.content).toContain("ending");
+      expect(output[0]!.content).not.toContain("SECRET");
+      expect(output[0]!.content).not.toContain("<internal_states>");
+      expect(output[2]!.content).toContain(internal);
+      expect(output[4]!.content).toContain(internal);
+    }
+  });
+
+  it("removes an orphan GFX_END at the end of an old AI response", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    const storyGfx = "<!-- GFX_START -->\n<div>Thư trong truyện</div>\n<!-- GFX_END -->";
+    const messages = [
+      { role: "assistant" as const, content: `Nội dung nhập vai\n\n<!-- GFX_END -->` },
+      { role: "assistant" as const, content: `Nội dung khác\n${storyGfx}\n<!-- GFX_END -->` },
+      { role: "assistant" as const, content: `Gần nhất\n${storyGfx}` },
+      { role: "assistant" as const, content: `Mới nhất\n${storyGfx}` },
+    ];
+
+    for (const output of [
+      applyPromptRegexToMessages(messages, data, settings),
+      applyRequestFiltersToMessages(messages, data, settings),
+    ]) {
+      expect(output[0]!.content).toBe("Nội dung nhập vai");
+      expect(output[1]!.content).toBe(`Nội dung khác\n${storyGfx}`);
+      expect(output[2]!.content).toContain(storyGfx);
+      expect(output[3]!.content).toContain(storyGfx);
+    }
+  });
+
   it("keeps scene headers in history but removes them from the request copy", () => {
-    const header =
-      "[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 | 📍 Đại học | ☀️ Nắng, 20 °C ]";
+    const header = "[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 | 📍 Đại học | ☀️ Nắng, 20 °C ]";
     const input = `${header}\n\nNội dung nhập vai`;
     expect(removeSceneHeadersForRequest(input)).toBe("\n\nNội dung nhập vai");
     expect(input).toContain(header);
@@ -644,7 +723,9 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     const input =
       "[ 🕰️ 07:00 | 🗓️ Ngày 1 | 📍 Phòng khách | ☀️ Nắng ]\n\nNội dung\n\n[ 🕰️ 08:00 | 🗓️ Ngày 1 | 📍 Nhà bếp | 🌧️ Mưa ]";
 
-    expect(adaptVietnameseHeaderForRisuAI(input).match(/data-ff54="scene-header"/g)).toHaveLength(2);
+    expect(adaptVietnameseHeaderForRisuAI(input).match(/data-ff54="scene-header"/g)).toHaveLength(
+      2,
+    );
   });
 
   it("master disable returns the host request without mutation", async () => {

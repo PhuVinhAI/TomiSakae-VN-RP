@@ -8,7 +8,7 @@ The raw build uses the source JSON's existing ON/OFF states. It applies no clean
 
 ## Build Facts
 
-- Source: `C:/Users/tomis/Downloads/Freaky Frankenstein 5.4 Internal States (2).json`
+- Source: `risuai/freaky-frankenstein-5.4-plugin/source/ff54-sillytavern-preset.json`
 - Source bytes: 144032
 - Raw selected prompt blocks: 26
 - Raw master blocks: 24
