@@ -313,13 +313,18 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "risuai/freaky-frankenstein-5.4-plugin/src/plugin.ts",
       "utf8",
     );
-    expect(pluginSource).toContain("Cấu hình FF5.4");
-    expect(pluginSource).toContain("Lưu toàn cục");
-    expect(pluginSource).toContain("Khôi phục mặc định");
+    const styles = await readFile("risuai/freaky-frankenstein-5.4-plugin/src/ui-style.ts", "utf8");
+    expect(pluginSource).toContain("Điều khiển <em>FF5.4.</em>");
+    expect(pluginSource).toContain("Lưu cấu hình");
+    expect(pluginSource).toContain("Khôi phục");
     expect(pluginSource).toContain("Nhóm chọn một");
-    expect(pluginSource).toContain('select[data-kind="choice"]');
-    expect(pluginSource).toContain("@media(max-width:640px)");
-    expect(pluginSource).toContain("grid-template-columns:1fr");
+    expect(pluginSource).toContain('type="radio"');
+    expect(pluginSource).toContain('input[data-kind="choice"][data-group=');
+    expect(pluginSource).toContain('type="checkbox"');
+    expect(pluginSource).toContain('aria-live="polite"');
+    expect(styles).toContain("@media(max-width:700px)");
+    expect(styles).toContain("grid-template-columns:1fr");
+    expect(styles).toContain("prefers-reduced-motion:reduce");
     expect(pluginSource).not.toContain("Global configuration");
     expect(pluginSource).not.toContain("Reset source defaults");
     expect(pluginSource).not.toContain("Save globally");

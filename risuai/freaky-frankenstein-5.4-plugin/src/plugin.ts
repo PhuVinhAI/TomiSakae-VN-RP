@@ -24,6 +24,7 @@ import {
   SOURCE_SEPARATOR_IDS,
   type ExclusivePromptGroup,
 } from "./ui-vi.js";
+import { SETTINGS_STYLES } from "./ui-style.js";
 
 declare const Risuai: {
   registerButton(
@@ -140,13 +141,13 @@ function checkbox(
   detail: string,
 ): string {
   return `<label class="toggle-row">
-    <input type="checkbox" data-kind="${kind}" data-id="${escapeHtml(id)}" ${checked ? "checked" : ""}>
+    <input class="switch" type="checkbox" data-kind="${kind}" data-id="${escapeHtml(id)}" ${checked ? "checked" : ""}>
     <span class="toggle-copy"><strong>${escapeHtml(label)}</strong><small>${escapeHtml(detail)}</small></span>
   </label>`;
 }
 
 function sourceState(enabled: boolean): string {
-  return enabled ? "Mặc định bật" : "Mặc định tắt";
+  return enabled ? "Preset gốc: bật" : "Preset gốc: tắt";
 }
 
 function selectedGroupPrompt(group: ExclusivePromptGroup): string {
@@ -161,9 +162,11 @@ function selectedGroupPrompt(group: ExclusivePromptGroup): string {
 function exclusiveGroup(
   group: ExclusivePromptGroup,
   prompts: Map<string, FfPreset["prompts"][number]>,
+  index: number,
 ): string {
   const selected = selectedGroupPrompt(group);
-  const offOption = `<option value="" data-detail="${escapeHtml(group.offDescription)}" ${selected ? "" : "selected"}>${escapeHtml(group.offLabel)}</option>`;
+  const option = (identifier: string, name: string, detail: string, source?: string) =>
+    `<label class="choice-option"><input type="radio" name="choice-${escapeHtml(group.id)}" data-kind="choice" data-group="${escapeHtml(group.id)}" value="${escapeHtml(identifier)}" data-detail="${escapeHtml(detail)}" ${selected === identifier ? "checked" : ""}><span class="radio-body"><span class="radio-dot"></span><span class="radio-copy"><strong>${escapeHtml(name)}</strong>${source ? `<small>${escapeHtml(source)}</small>` : ""}</span></span></label>`;
   const options = group.memberIds
     .map((identifier) => {
       const prompt = prompts.get(identifier);
@@ -171,7 +174,7 @@ function exclusiveGroup(
       const copy = promptUiCopy(prompt);
       const sourceEnabled =
         orderEntries().find((entry) => entry.identifier === identifier)?.enabled !== false;
-      return `<option value="${escapeHtml(identifier)}" data-detail="${escapeHtml(copy.description)}" ${selected === identifier ? "selected" : ""}>${escapeHtml(copy.name)} · ${sourceState(sourceEnabled)}</option>`;
+      return option(identifier, copy.name, copy.description, sourceState(sourceEnabled));
     })
     .join("");
   const selectedPrompt = selected ? prompts.get(selected) : undefined;
@@ -179,8 +182,8 @@ function exclusiveGroup(
     ? promptUiCopy(selectedPrompt).description
     : group.offDescription;
   return `<article class="choice-card">
-    <label for="choice-${escapeHtml(group.id)}"><strong>${escapeHtml(group.label)}</strong><span>${escapeHtml(group.description)}</span></label>
-    <select id="choice-${escapeHtml(group.id)}" data-kind="choice" data-group="${escapeHtml(group.id)}">${offOption}${options}</select>
+    <div class="choice-head"><span class="choice-number">${String(index + 1).padStart(2, "0")}</span><div><strong>${escapeHtml(group.label)}</strong><small>${escapeHtml(group.description)}</small></div></div>
+    <div class="choice-options">${options}${option("", group.offLabel, group.offDescription)}</div>
     <p class="choice-detail" data-choice-detail="${escapeHtml(group.id)}">${escapeHtml(selectedDescription)}</p>
   </article>`;
 }
@@ -244,9 +247,9 @@ async function showSettings(): Promise<void> {
   const ungroupedPromptIds = orderEntries()
     .map((entry) => entry.identifier)
     .filter((identifier) => !groupedPromptIds.has(identifier));
-  const choiceGroups = EXCLUSIVE_PROMPT_GROUPS.map((group) => exclusiveGroup(group, prompts)).join(
-    "",
-  );
+  const choiceGroups = EXCLUSIVE_PROMPT_GROUPS.map((group, index) =>
+    exclusiveGroup(group, prompts, index),
+  ).join("");
   const sections = [
     ...PROMPT_SECTIONS,
     ...(ungroupedPromptIds.length > 0
@@ -278,7 +281,7 @@ async function showSettings(): Promise<void> {
           );
         })
         .join("");
-      return `<details ${section.open ? "open" : ""}><summary><span>${escapeHtml(section.label)}</span><small>${escapeHtml(section.description)}</small></summary><div class="list">${rows}</div></details>`;
+      return `<details ${section.open ? "open" : ""}><summary><span class="summary-copy"><strong>${escapeHtml(section.label)}</strong><small>${escapeHtml(section.description)}</small></span></summary><div class="list">${rows}</div></details>`;
     })
     .join("");
   const regexMap = new Map(
@@ -301,63 +304,54 @@ async function showSettings(): Promise<void> {
     return `<section class="mini-group"><h3>${escapeHtml(group.label)}</h3>${rows}</section>`;
   }).join("");
 
-  document.head.innerHTML = `<meta name="viewport" content="width=device-width,initial-scale=1">
-  <style>
-    :root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#111318;color:#f4f4f5}
-    *{box-sizing:border-box}body{margin:0;background:#111318;color:#f4f4f5}.shell{max-width:980px;margin:auto;padding:18px}
-    header{position:sticky;top:0;z-index:2;background:rgba(17,19,24,.96);backdrop-filter:blur(12px);padding:8px 0 14px;border-bottom:1px solid #30333b}
-    h1{font-size:1.45rem;margin:0 0 5px}.sub{color:#a5a7ae;font-size:.78rem;overflow-wrap:anywhere}.bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-    button{min-height:42px;border:1px solid #414552;background:#242730;color:#fff;border-radius:9px;padding:9px 13px;cursor:pointer;font-weight:650}button.primary{background:#7c3aed;border-color:#8b5cf6}
-    .master{display:flex;align-items:flex-start;gap:12px;padding:13px;border:1px solid #4c3a75;background:#211b31;border-radius:12px;margin:14px 0}.master input{flex:0 0 auto;width:21px;height:21px;margin-top:2px}
-    .section-title{font-size:1.08rem;margin:20px 2px 8px}.section-note{color:#a5a7ae;font-size:.84rem;line-height:1.45;margin:0 2px 10px}
-    .choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.choice-card{border:1px solid #30333b;background:#181a20;border-radius:12px;padding:13px;min-width:0}.choice-card label{display:flex;flex-direction:column;gap:4px}.choice-card label span,.choice-detail{color:#a5a7ae;font-size:.78rem;line-height:1.42}.choice-card select{width:100%;min-height:44px;margin-top:10px;border:1px solid #454957;border-radius:9px;background:#242730;color:#fff;padding:8px 36px 8px 10px;font:inherit}.choice-detail{margin:9px 1px 0;color:#c4c6cc}
-    details{border:1px solid #30333b;border-radius:12px;margin:10px 0;background:#181a20;overflow:hidden}summary{cursor:pointer;padding:13px 14px;font-weight:750;background:#20232b;display:flex;flex-direction:column;gap:3px}summary small{color:#999ca4;font-size:.74rem;font-weight:450;line-height:1.35}
-    .list{padding:5px 12px 10px}.toggle-row{display:flex;gap:11px;align-items:flex-start;padding:10px 3px;border-bottom:1px solid #292c34;min-height:48px}.toggle-row:last-child{border-bottom:0}.toggle-row input{flex:0 0 auto;margin-top:3px;width:19px;height:19px}.toggle-copy{display:flex;flex-direction:column;min-width:0}.toggle-copy strong{font-size:.91rem;line-height:1.3}.toggle-copy small{color:#9a9da5;font-size:.75rem;line-height:1.4;margin-top:3px}
-    .mini-group{border-bottom:1px solid #30333b;padding:5px 12px 8px}.mini-group:last-child{border-bottom:0}.mini-group h3{font-size:.86rem;color:#c4b5fd;margin:9px 3px 3px}.note{color:#c8cad0;line-height:1.45;font-size:.84rem}.status{min-height:1.2em;color:#a7f3d0;font-size:.82rem;margin-top:8px}
-    @media(max-width:640px){.shell{padding:10px}header{padding-top:4px}.choice-grid{grid-template-columns:1fr}.bar{display:grid;grid-template-columns:1fr 1fr}.bar button{width:100%}.bar .primary{grid-column:1/-1;grid-row:1}.master{margin:10px 0}.section-title{margin-top:16px}details{border-radius:10px}summary{padding:12px}.list{padding:4px 9px 8px}.toggle-row{padding:10px 2px}.choice-card{padding:12px}.choice-card select{font-size:16px}}
-  </style>`;
+  document.head.innerHTML = `<meta name="viewport" content="width=device-width,initial-scale=1"><style>${SETTINGS_STYLES}</style>`;
   document.body.innerHTML = `<main class="shell">
-    <header><h1>Cấu hình FF5.4</h1><div class="sub">Cấu hình chung cho mọi thẻ nhân vật và cuộc trò chuyện · ${escapeHtml(__FF54_SOURCE_NAME__)} · SHA-256 ${escapeHtml(__FF54_SOURCE_SHA256__)}</div>
-      <div class="bar"><button class="primary" id="save">Lưu toàn cục</button><button id="reset">Khôi phục mặc định</button><button id="close">Đóng</button></div><div class="status" id="status"></div>
-    </header>
-    <label class="master"><input id="master" type="checkbox" ${settings.enabled ? "checked" : ""}><span><strong>Bật FF5.4 trên toàn bộ RisuAI</strong><br><span class="note">Một cấu hình dùng chung cho mọi thẻ nhân vật và cuộc trò chuyện. Tiện ích chỉ can thiệp khi mô hình đang tạo phản hồi.</span></span></label>
-    <details open><summary><span>Module của plugin</span><small>Tính năng bổ sung riêng cho bản RisuAI.</small></summary><div class="list">${checkbox(
+    <div class="masthead"><div class="brand"><span class="brand-mark">ff</span><span>Trạm điều khiển FF5.4</span></div><span class="edition">Bảng điều khiển / 5.4</span></div>
+    <section class="hero"><div><span class="eyebrow">Không gian cấu hình</span><h1>Điều khiển <em>FF5.4.</em></h1><p class="hero-copy">Thiết lập nhịp kể, góc nhìn và những quy tắc vận hành. Mọi lựa chọn ở đây áp dụng chung cho các thẻ nhân vật và cuộc trò chuyện.</p></div><div class="hero-side"><span class="index">Một cấu hình duy nhất</span><p>Chọn cách thế giới của bạn vận hành.</p><small>Chọn một trong mỗi nhóm, bật các module cần dùng, rồi lưu ở thanh bên dưới.</small></div></section>
+    <div class="workspace"><nav class="rail" aria-label="Điều hướng cấu hình"><p class="rail-title">Danh mục</p><a href="#general"><span>01</span>Tổng quan</a><a href="#choices"><span>02</span>Nhóm chọn một</a><a href="#modules"><span>03</span>Module độc lập</a><a href="#filters"><span>04</span>Bộ lọc kỹ thuật</a><p class="rail-note">Các thay đổi chỉ có hiệu lực sau khi bấm “Lưu cấu hình”.</p></nav>
+    <div class="content">
+    <section id="general" class="panel"><div class="panel-heading"><span class="index">01 / Nền tảng</span><h2>Tổng quan</h2></div>
+    <label class="master"><span class="master-copy"><strong>Bật FF5.4 trên toàn bộ RisuAI</strong><small>Một cấu hình dùng chung cho mọi thẻ nhân vật và cuộc trò chuyện. Plugin chỉ can thiệp khi mô hình đang tạo phản hồi.</small></span><input class="switch" id="master" type="checkbox" ${settings.enabled ? "checked" : ""}></label>
+    <details open><summary><span class="summary-copy"><strong>Module của plugin</strong><small>Tính năng bổ sung riêng cho bản RisuAI.</small></span></summary><div class="list">${checkbox(
       "plugin",
       "vietnamese-output",
       settings.vietnameseOutputEnabled,
       "🇻🇳 Đầu ra tiếng Việt",
       "Viết tiếng Việt tự nhiên; bản địa hóa mẫu và từ vựng có thể đi vào phản hồi ở mọi CoT liên quan · Mặc định bật",
-    )}</div></details>
-    <h2 class="section-title">Nhóm chọn một</h2><p class="section-note">Mỗi nhóm chỉ kích hoạt một lựa chọn. Chọn “không dùng” để tắt toàn bộ nhóm.</p><div class="choice-grid">${choiceGroups}</div>
-    <h2 class="section-title">Module độc lập</h2>${promptSections}
-    <details><summary><span>Bộ lọc kỹ thuật (${preset.extensions?.regex_scripts?.length ?? 0})</span><small>Các bộ lọc gốc dùng khi gửi ngữ cảnh và hiển thị phản hồi. Chỉ nên thay đổi khi hiểu rõ biểu thức tương ứng.</small></summary><div class="regex-groups">${regexGroups}</div></details>
+    )}</div></details></section>
+    <section id="choices" class="panel"><div class="panel-heading"><span class="index">02 / Quy tắc lựa chọn</span><h2>Nhóm chọn một</h2></div><p class="section-note">Mỗi nhóm chỉ kích hoạt một lựa chọn. Chọn “không dùng” để tắt toàn bộ nhóm.</p><div class="choice-grid">${choiceGroups}</div></section>
+    <section id="modules" class="panel"><div class="panel-heading"><span class="index">03 / Bộ công cụ</span><h2>Module độc lập</h2></div><p class="section-note">Mở một nhóm để xem chức năng và bật những module bạn cần.</p>${promptSections}</section>
+    <section id="filters" class="panel"><div class="panel-heading"><span class="index">04 / Vận hành</span><h2>Bộ lọc kỹ thuật</h2></div><p class="section-note">Các bộ lọc gốc dùng khi gửi ngữ cảnh và hiển thị phản hồi. Chỉ thay đổi khi bạn hiểu rõ tác dụng của chúng.</p><details><summary><span class="summary-copy"><strong>Xem ${preset.extensions?.regex_scripts?.length ?? 0} bộ lọc</strong><small>Được chia theo công việc để dễ tìm.</small></span></summary><div class="regex-groups">${regexGroups}</div></details></section>
+    <p class="source-note">Nguồn: ${escapeHtml(__FF54_SOURCE_NAME__)}<br>SHA-256: ${escapeHtml(__FF54_SOURCE_SHA256__)}</p>
+    </div></div>
+    <div class="command-bar"><div class="command-inner"><span class="command-label">FF5.4 / Cấu hình toàn cục</span><button class="action primary" id="save">Lưu cấu hình</button><button class="action" id="reset">Khôi phục</button><button class="action" id="close">Đóng</button><div class="status" id="status" role="status" aria-live="polite"></div></div></div>
   </main>`;
 
   const status = document.getElementById("status")!;
   const readUi = () => {
     settings.enabled = (document.getElementById("master") as HTMLInputElement).checked;
-    for (const node of document.querySelectorAll<HTMLSelectElement>('select[data-kind="choice"]')) {
-      const group = EXCLUSIVE_PROMPT_GROUPS.find(
-        (candidate) => candidate.id === node.dataset.group,
+    for (const group of EXCLUSIVE_PROMPT_GROUPS) {
+      const node = document.querySelector<HTMLInputElement>(
+        `input[data-kind="choice"][data-group="${group.id}"]:checked`,
       );
-      if (!group) continue;
       for (const identifier of group.memberIds) settings.promptEnabled[identifier] = false;
-      if (node.value) settings.promptEnabled[node.value] = true;
+      if (node?.value) settings.promptEnabled[node.value] = true;
     }
-    for (const node of document.querySelectorAll<HTMLInputElement>("input[data-kind]")) {
+    for (const node of document.querySelectorAll<HTMLInputElement>(
+      'input[type="checkbox"][data-kind]',
+    )) {
       const id = node.dataset.id!;
       if (node.dataset.kind === "prompt") settings.promptEnabled[id] = node.checked;
       else if (node.dataset.kind === "regex") settings.regexEnabled[id] = node.checked;
       else if (id === "vietnamese-output") settings.vietnameseOutputEnabled = node.checked;
     }
   };
-  for (const node of document.querySelectorAll<HTMLSelectElement>('select[data-kind="choice"]')) {
+  for (const node of document.querySelectorAll<HTMLInputElement>('input[data-kind="choice"]')) {
     node.addEventListener("change", () => {
       const detail = document.querySelector<HTMLElement>(
         `[data-choice-detail="${node.dataset.group}"]`,
       );
-      const option = node.selectedOptions[0];
-      if (detail && option) detail.textContent = option.dataset.detail ?? "";
+      if (detail) detail.textContent = node.dataset.detail ?? "";
     });
   }
   document.getElementById("close")!.addEventListener("click", () => void Risuai.hideContainer());
