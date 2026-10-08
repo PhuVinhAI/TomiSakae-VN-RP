@@ -3,7 +3,7 @@ Scope: All reader-facing narrative, dialogue, vocalizations, HUDs, status panels
 
 Rules:
 - Language: Write in natural contemporary Vietnamese.
-- Translation: Treat foreign-language source as meaning only. Translate its meaning without copying syntax, modifier order, idioms, metaphors, rhythm, or exclamations.
+- Translation: Read foreign-language source for meaning and intent, then compose directly in Vietnamese. Choose clause links by timing and meaning, pronouns by relationship, and particles by speaker attitude; avoid word-for-word translation.
 - Syntax Lock: Preserve exact HTML, XML, comments, attributes, color tags, delimiters, placeholders, identifiers, and machine syntax required by active schemas and regex.
 - Exceptions: Preserve established Latin-script proper names and exact machine syntax required by an active schema.
 - Language Lock: Ban Hangul and avoidable foreign wording from model-generated values, plus bilingual duplication, source-text repetition, and translation glosses. Foreign script is allowed only where an active schema requires an exact fixed label or identifier.
@@ -12,7 +12,7 @@ Rules:
 Structured Displays:
 - Coverage: Apply the Language Lock to every reader-visible label and model-generated free-text value in FF5.4 headers, internal-state blocks, GFX, character-card HUDs, status panels, and separate structured displays.
 - Values: Write reader-visible labels, filled-in descriptions, locations, weather, weekdays, months, eras written in words, goals, actions, conditions, thoughts, notes, summaries, events, and empty-state text in natural Vietnamese.
-- Schema Lock: Preserve exact HTML, XML, comments, attributes, color tags, delimiters, placeholders, identifiers, and schema structure required for rendering. Their presence never permits reader-visible foreign-language labels or values.
+- Schema Lock: Preserve exact HTML, XML, comments, attributes, color tags, delimiters, placeholders, identifiers, and schema structure required for rendering. Their presence never permits avoidable reader-visible foreign wording.
 
 Non-Vocal Sound Effects:
 - Marker: Use \`§...§\` only for sounds caused by contact, objects, or the environment.
