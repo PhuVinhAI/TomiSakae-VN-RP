@@ -130,11 +130,11 @@ export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, str
   ],
   [
     '- Conjunctions: Max 2 clauses per sentence using "and", "as", or "while". Break long actions into separate sentences.',
-    '- Conjunctions: Connect related clauses using "và", "khi", "trong khi", or "vừa... vừa...". Vary sentence length; split only when needed for clarity.',
+    '- Conjunctions: Connect related clauses using "và", "khi", "trong khi", or "vừa... vừa...". Split long actions only when needed for clarity.',
   ],
   [
     '- Conjunctions: Max 2 clauses per sentence using "and", "as", or "while". Must split long actions into separate sentences.',
-    '- Conjunctions: Connect related clauses using "và", "khi", "trong khi", or "vừa... vừa...". Vary sentence length; split only when needed for clarity.',
+    '- Conjunctions: Connect related clauses using "và", "khi", "trong khi", or "vừa... vừa...". Split long actions only when needed for clarity.',
   ],
   [
     '("you" / "your")',
@@ -200,7 +200,7 @@ export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, str
   ],
   [
     '- Ban Coordinating Conjunctions: Ban "and" and "or" in spoken dialogue. Split statements with periods, commas, or action beats.',
-    "- Conjunctions: Use natural Vietnamese conjunctions where appropriate. Avoid mechanical clause chaining and run-on dialogue; use periods, commas, or action beats when needed.",
+    "- Conjunctions: Use natural Vietnamese conjunctions in spoken dialogue; ban run-on sentences. Split statements with periods, commas, or action beats when needed.",
   ],
   [
     '- No "Of" Genitive Overuse Chains: Ban phrases like "the sound of him" or "the heat of her". Use Saxon possessives "his sound", "her heat", or active verbs.',
@@ -277,7 +277,7 @@ export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, str
   ],
   [
     '- Ban the coordinate conjunctions "or" and "and" in spoken dialogue. Instead, split ideas into separate statements using periods, commas, or action beats.',
-    "- Conjunctions: Use natural Vietnamese conjunctions where appropriate. Avoid mechanical clause chaining and run-on dialogue; use periods, commas, or action beats when needed.",
+    "- Use natural Vietnamese conjunctions in spoken dialogue. Split ideas into separate statements using periods, commas, or action beats when needed.",
   ],
   [
     "- Felines = purr. Canines = growl/whine. Avians = chirp. Humans = groans/sighs/moans. Humans must never make animal sounds.",
@@ -330,8 +330,8 @@ export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, str
   ['dismissal: "Tch." "Hmph.", "Pfft."', 'dismissal: "chậc.", "hừm.", "xì."'],
   ['surprise: "Eep!" "Hah?!" Oi!"', 'surprise: "ối!", "hả?!", "ôi!"'],
   [
-    'style: write continuous, fluid, and flowing dialogue but without run-on sentences; avoid short, punchy speech. Exception: You may break speech with a movement, action, or interruption to avoid monologues. You must ban "and", "but" and "or" in spoken NPC dialogue.',
-    "style: write continuous, fluid, and flowing dialogue but without run-on sentences; avoid short, punchy speech. Exception: You may break speech with a movement, action, or interruption to avoid monologues. Use natural Vietnamese conjunctions where appropriate; avoid mechanical clause chaining and run-on dialogue.",
+    'You must ban "and", "but" and "or" in spoken NPC dialogue.',
+    "Use natural Vietnamese conjunctions in spoken NPC dialogue.",
   ],
   [
     "allowed: soft, warm, quiet, clear, bright, airy, gentle, light, steady, even, lilting",
@@ -341,12 +341,32 @@ export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, str
     "banned: low, deep, husky, gravelly, throaty, heavy, thundering, rumbling, bass, chest-voice",
     "banned: trầm thấp, sâu, khàn gợi cảm, khàn sạn, khàn cổ, nặng, vang như sấm, ầm rung, giọng bass, giọng ngực",
   ],
+  [
+    "- Flow: Varied sentence lengths, smooth paragraphs. Ban word fragments, choppy text, and em-dash breaks (word—word—word).",
+    "- Flow: Varied sentence lengths, smooth paragraphs. Ban word fragments, choppy text, and em-dashes (—) in narrative prose.",
+  ],
+  [
+    "- Sentence Structure: Complete clauses using commas and natural transitions. Ban: verbless fragments, telegraphic prose, and em-dash fragmentation (word—word—word).",
+    "- Sentence Structure: Complete clauses using commas and natural transitions. Ban: verbless fragments, telegraphic prose, and em-dashes (—) in narrative prose.",
+  ],
+  [
+    "You must ban verbless fragments, telegraphic prose, and em-dash fragmentation (e.g., word—word—word).",
+    "You must ban verbless fragments, telegraphic prose, and em-dashes (—) in narrative prose.",
+  ],
+  [
+    "- Punctuation Exemption: Em-dashes and ellipses ARE permitted in spoken dialogue for cadence, vocal pauses, interruptions.",
+    "- Punctuation: Ban em-dashes (—). Ellipses ARE permitted in spoken dialogue for cadence, vocal pauses, interruptions.",
+  ],
+  [
+    "- Em dashes and ellipses *allowed* in spoken NPC dialogue only to create unique speech per NPC (em dashes only banned in narrative prose).",
+    "- Ban em-dashes (—) in spoken NPC dialogue. Ellipses are *allowed* to create unique speech per NPC.",
+  ],
 ];
 
 export const VIETNAMESE_REASONING_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
   [
     'I will not use the coordinating conjunctions ["or"] and ["and"] in spoken dialogue, using periods, commas, semicolons, or action beats to separate ideas.',
-    "I will use natural Vietnamese conjunctions where appropriate, avoiding mechanical clause chaining and run-on dialogue; I will use periods, commas, semicolons, or action beats when needed.",
+    "I will use natural Vietnamese conjunctions in spoken dialogue, using periods, commas, semicolons, or action beats to separate ideas when needed.",
   ],
   [
     'all CAP words for yelling only during peak arousal/VAD e.g., "NO!"',
@@ -375,11 +395,11 @@ export const VIETNAMESE_REASONING_REPLACEMENTS: ReadonlyArray<readonly [string, 
   ],
   [
     'Enforce the ban on coordinate conjunctions ["or"] and ["and"] in spoken dialogue, using periods, commas, semicolons, or action beats.',
-    "Use natural Vietnamese conjunctions where appropriate. Avoid mechanical clause chaining and run-on dialogue; use periods, commas, semicolons, or action beats when needed.",
+    "Use natural Vietnamese conjunctions in spoken dialogue, using periods, commas, semicolons, or action beats when needed.",
   ],
   [
     'I will enforce the ban on coordinating conjunctions ["or"], ["and"] in dialogue, using periods, commas, semicolons, or action beats instead.',
-    "I will use natural Vietnamese conjunctions where appropriate, avoiding mechanical clause chaining and run-on dialogue; I will use periods, commas, semicolons, or action beats when needed.",
+    "I will use natural Vietnamese conjunctions in dialogue, using periods, commas, semicolons, or action beats when needed.",
   ],
   [
     'all CAP words for yelling e.g., "NO!" Only for high emotion/VAD.',
