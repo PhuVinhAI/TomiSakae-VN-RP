@@ -1,7 +1,9 @@
 export const SETTINGS_STYLES = `
   :root{font-family:'Segoe UI',Arial,sans-serif;color:#202722;background:#eae7dc;font-synthesis:none}
   *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-width:320px;background:#eae7dc;color:#202722}
-  button,input{font:inherit}button{cursor:pointer}:focus-visible{outline:3px solid #d54b31;outline-offset:3px}
+  button,input,select{font:inherit}button{cursor:pointer}:focus-visible{outline:3px solid #d54b31;outline-offset:3px}
+  .preset-panel{padding:20px;border:1px solid #bfc3b7;background:#f3f1e8;margin-bottom:18px}.preset-field{display:grid;gap:8px;min-width:0;font-size:13px;font-weight:700}.preset-field input,.preset-field select{width:100%;min-height:44px;padding:10px;border:1px solid #818a7c;background:#fff;color:#202722}.preset-panel .section-note{margin:12px 0}.preset-create{display:flex;align-items:end;gap:10px;margin-bottom:10px}.preset-create .preset-field{flex:1}.preset-panel .action{color:#202722;border-color:#818a7c;min-width:110px}.preset-panel .action:hover{background:#dce5d1}.preset-panel small{font-size:12px;color:#687167}.preset-field select:disabled{opacity:.6}
+  @media(max-width:480px){.preset-create{flex-direction:column;align-items:stretch}.preset-create .action{width:100%}}
   .shell{max-width:1440px;margin:0 auto;padding:0 28px 112px}
   .masthead{min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #bcbdb1}
   .brand{display:flex;align-items:center;gap:11px;font-size:12px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}

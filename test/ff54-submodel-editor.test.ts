@@ -8,6 +8,12 @@ import {
   type FfPreset,
 } from "../risuai/freaky-frankenstein-5.4-plugin/src/core.js";
 import { buildEditorReferenceMessages } from "../risuai/freaky-frankenstein-5.4-plugin/src/submodel-context.js";
+import {
+  CONFIG_PRESETS_STORAGE_KEY,
+  createConfigPreset,
+  normalizePresetStore,
+  selectCardPreset,
+} from "../risuai/freaky-frankenstein-5.4-plugin/src/presets.js";
 
 interface SavedMessage {
   role: "user" | "char";
@@ -20,6 +26,7 @@ interface SavedMessage {
 interface SavedChat {
   id: string;
   message: SavedMessage[];
+  isStreaming?: boolean;
 }
 
 interface OutputEvent {
@@ -64,7 +71,7 @@ beforeAll(async () => {
 
 afterEach(() => vi.useRealTimers());
 
-async function startPlugin(enabled = true) {
+async function startPlugin(enabled = true, automatic = false, savedPresets?: unknown) {
   const callbacks = {
     beforeRequest: undefined as
       ((messages: ChatMessage[], type: string) => Promise<ChatMessage[]>) | undefined,
@@ -88,6 +95,80 @@ async function startPlugin(enabled = true) {
     ["0:1", { id: "chat-b", message: [{ role: "user", data: "Chào Bình.", chatId: "user-b" }] }],
   ]);
   let selectedChat = 0;
+  let selectedCharacter = 0;
+  const cardIds = new Map([
+    [0, "card-a"],
+    [1, "card-b"],
+  ]);
+  const storage = new Map<string, unknown>([
+    [
+      "ff54-global-settings-v1",
+      enabled
+        ? { submodelEditorEnabled: true, submodelAutoRewriteEnabled: automatic }
+        : { submodelAutoRewriteEnabled: automatic },
+    ],
+    [CONFIG_PRESETS_STORAGE_KEY, savedPresets],
+  ]);
+  let openSettings!: () => void;
+  interface UiNode {
+    value: string;
+    checked: boolean;
+    dataset: Record<string, string>;
+    textContent: string;
+    handlers: Map<string, () => void | Promise<void>>;
+    addEventListener(type: string, handler: () => void | Promise<void>): void;
+  }
+  const uiNodes = new Map<string, UiNode>();
+  const inputs: UiNode[] = [];
+  const makeNode = (key: string, attributes = "") => {
+    const node: UiNode = {
+      value: attributes.match(/value="([^"]*)"/)?.[1] ?? "",
+      checked: /\bchecked\b/.test(attributes),
+      dataset: Object.fromEntries(
+        [...attributes.matchAll(/data-(\w+)="([^"]*)"/g)].map((match) => [match[1]!, match[2]!]),
+      ),
+      textContent: "",
+      handlers: new Map(),
+      addEventListener(type, handler) {
+        node.handlers.set(type, handler);
+      },
+    };
+    uiNodes.set(key, node);
+    return node;
+  };
+  const uiDocument = {
+    head: { innerHTML: "" },
+    body: {
+      set innerHTML(html: string) {
+        uiNodes.clear();
+        inputs.length = 0;
+        for (const match of html.matchAll(/<input\b([^>]*)>/g)) {
+          const attributes = match[1]!;
+          const id = attributes.match(/\bid="([^"]*)"/)?.[1] ?? `input-${inputs.length}`;
+          inputs.push(makeNode(id, attributes));
+        }
+        for (const match of html.matchAll(/<(?:button|div)\b[^>]*\bid="([^"]*)"/g))
+          makeNode(match[1]!);
+        const selected = html.match(/<option value="([^"]*)" selected/);
+        makeNode("config-preset").value = selected?.[1] ?? "";
+      },
+    },
+    getElementById: (id: string) => uiNodes.get(id),
+    querySelectorAll: (selector: string) =>
+      inputs.filter((node) =>
+        selector.includes('type="checkbox"')
+          ? !!node.dataset.kind && node.dataset.kind !== "choice"
+          : node.dataset.kind === "choice",
+      ),
+    querySelector: (selector: string) => {
+      const group = selector.match(/data-group="([^"]*)"/)?.[1];
+      return (
+        inputs.find(
+          (node) => node.dataset.kind === "choice" && node.dataset.group === group && node.checked,
+        ) ?? null
+      );
+    },
+  };
   let ready!: () => void;
   const initialized = new Promise<void>((resolve) => {
     ready = resolve;
@@ -113,7 +194,8 @@ async function startPlugin(enabled = true) {
       if (selector.includes("input:focus")) return control?.attached && focused ? {} : null;
       if (selector.includes(".risu-chat")) {
         const match = selector.match(/data-chat-index="(\d+)"/);
-        return Number(match?.[1]) === chats.get(`0:${selectedChat}`)!.message.length - 1
+        return Number(match?.[1]) ===
+          chats.get(`${selectedCharacter}:${selectedChat}`)!.message.length - 1
           ? row
           : null;
       }
@@ -146,14 +228,26 @@ async function startPlugin(enabled = true) {
   const observer = { observe: vi.fn(), disconnect: vi.fn() };
   const api = {
     pluginStorage: {
-      getItem: async () => (enabled ? { submodelEditorEnabled: true } : {}),
-      setItem: async () => {},
+      getItem: async (key: string) => structuredClone(storage.get(key)),
+      setItem: async (key: string, value: unknown) => {
+        storage.set(key, structuredClone(value));
+      },
     },
-    registerButton: async () => ({ id: "ff54" }),
+    registerButton: async (_options: unknown, callback: () => void) => {
+      openSettings = callback;
+      return { id: "ff54" };
+    },
     unregisterUIPart: async () => {},
-    getCurrentCharacterIndex: async () => 0,
+    showContainer: vi.fn().mockResolvedValue(undefined),
+    hideContainer: vi.fn().mockResolvedValue(undefined),
+    getCurrentCharacterIndex: async () => selectedCharacter,
     getCurrentChatIndex: async () => selectedChat,
-    getCharacter: async () => ({ name: "An", chatPage: selectedChat, chats: [] }),
+    getCharacter: async () => ({
+      chaId: cardIds.get(selectedCharacter),
+      name: "An",
+      chatPage: selectedChat,
+      chats: [],
+    }),
     getDatabase: async () => ({ personas: [], selectedPersona: 0 }),
     getChatFromIndex: async (character: number, chat: number) =>
       structuredClone(chats.get(`${character}:${chat}`)),
@@ -189,6 +283,8 @@ async function startPlugin(enabled = true) {
     structuredClone,
     setTimeout,
     clearTimeout,
+    crypto: { randomUUID: () => `test-${storage.size}-${Math.random()}` },
+    document: uiDocument,
     console: { warn: vi.fn() },
   });
   await initialized;
@@ -201,6 +297,25 @@ async function startPlugin(enabled = true) {
     api,
     root,
     observer,
+    storage,
+    async settingsUi() {
+      const shown = new Promise<void>((resolve) => {
+        api.showContainer.mockImplementation(async () => {
+          resolve();
+        });
+      });
+      openSettings();
+      await shown;
+    },
+    ui(id: string) {
+      return uiNodes.get(id)!;
+    },
+    toggle(id: string) {
+      return inputs.find((node) => node.dataset.id === id)!;
+    },
+    async uiEvent(id: string, type = "click") {
+      await uiNodes.get(id)!.handlers.get(type)!();
+    },
     button() {
       return control;
     },
@@ -219,6 +334,16 @@ async function startPlugin(enabled = true) {
     selectChat(index: number) {
       selectedChat = index;
     },
+    selectCard(index: number, id?: string) {
+      selectedCharacter = index;
+      selectedChat = 0;
+      if (id) cardIds.set(index, id);
+      if (!chats.has(`${index}:0`))
+        chats.set(`${index}:0`, {
+          id: `chat-card-${index}`,
+          message: [{ role: "user", data: "Chào.", chatId: `user-card-${index}` }],
+        });
+    },
     async request(
       messages: ChatMessage[] = [
         { role: "system", content: "Card, lore và memory." },
@@ -227,8 +352,8 @@ async function startPlugin(enabled = true) {
     ) {
       return callbacks.beforeRequest!(messages, "model");
     },
-    complete(original: string, chatIndex = selectedChat) {
-      const chat = chats.get(`0:${chatIndex}`)!;
+    complete(original: string, chatIndex = selectedChat, characterIndex = selectedCharacter) {
+      const chat = chats.get(`${characterIndex}:${chatIndex}`)!;
       const messageIndex = chat.message.length;
       chat.message.push({
         role: "char",
@@ -236,7 +361,7 @@ async function startPlugin(enabled = true) {
         chatId: `reply-${chatIndex}-${messageIndex}`,
       });
       return callbacks.output!({
-        characterIndex: 0,
+        characterIndex,
         chatIndex,
         messageIndex,
         chat: structuredClone(chat),
@@ -252,6 +377,10 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(normalizeSettings(preset, { submodelEditorEnabled: true }).submodelEditorEnabled).toBe(
       true,
     );
+    expect(normalizeSettings(preset, {}).submodelAutoRewriteEnabled).toBe(false);
+    expect(
+      normalizeSettings(preset, { submodelAutoRewriteEnabled: true }).submodelAutoRewriteEnabled,
+    ).toBe(true);
   });
 
   it("uses the selected submodel with complete main context and saved history", async () => {
@@ -281,6 +410,7 @@ describe("FF5.4 Submodel editor integration", () => {
     );
     expect(options.messages.at(-1)!.content).not.toContain("Complete saved chat history");
     expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe("An bước tới, nhẹ giọng chào bạn.");
+    expect(plugin.api.alert).toHaveBeenCalledWith(expect.stringContaining("Đã biên tập"));
   });
 
   it("does not call submodel when the toggle is off", async () => {
@@ -667,6 +797,278 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(plugin.button()?.html).toContain("disabled");
     await plugin.rewrite();
     expect(plugin.runModel).not.toHaveBeenCalled();
+  });
+});
+
+describe("Named presets in plugin UI and requests", () => {
+  it("creates and saves a named preset without changing Mặc định, then remembers it after reload", async () => {
+    const plugin = await startPlugin();
+    await plugin.settingsUi();
+    expect(plugin.ui("config-preset").value).toBe("default");
+    plugin.ui("preset-name").value = "Văn xuôi";
+    plugin.toggle("vietnamese-output").checked = false;
+    await plugin.uiEvent("create-preset");
+    const saved = normalizePresetStore(preset, plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
+    expect(saved.presets).toHaveLength(2);
+    const created = saved.presets.find((entry) => entry.name === "Văn xuôi")!;
+    expect(saved.cardPresets["card-a"]).toBe(created.id);
+    expect(created.settings.vietnameseOutputEnabled).toBe(false);
+    expect(saved.presets[0]!.settings.vietnameseOutputEnabled).toBe(true);
+    expect(plugin.ui("config-preset").value).toBe(created.id);
+    expect(
+      (await plugin.request()).some((message) => message.memo === "ff54:vietnamese-output"),
+    ).toBe(false);
+    plugin.toggle("vietnamese-output").checked = true;
+    await plugin.uiEvent("save");
+    expect(plugin.ui("status").textContent).toContain("Đã lưu preset");
+    const reloaded = await startPlugin(true, false, plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
+    await reloaded.settingsUi();
+    expect(reloaded.ui("config-preset").value).toBe(created.id);
+    expect(
+      (await reloaded.request()).some((message) => message.memo === "ff54:vietnamese-output"),
+    ).toBe(true);
+    reloaded.selectCard(1);
+    await reloaded.settingsUi();
+    expect(reloaded.ui("config-preset").value).toBe("default");
+  });
+
+  it("applies the chosen preset per card to requests and display without modifying card data", async () => {
+    const store = normalizePresetStore(preset, undefined, { submodelEditorEnabled: true });
+    const disabled = createConfigPreset(store, "Tắt FF5.4", store.presets[0]!.settings, "off");
+    disabled.settings.enabled = false;
+    selectCardPreset(store, "card-b", disabled.id);
+    const plugin = await startPlugin(true, false, store);
+    expect((await plugin.request()).some((message) => message.memo === "ff54:main")).toBe(true);
+    plugin.selectCard(1);
+    await plugin.settingsUi();
+    expect(plugin.ui("config-preset").value).toBe("off");
+    const raw = [{ role: "user" as const, content: "Tiếp đi." }];
+    expect(await plugin.request(raw)).toEqual(raw);
+    const header = "[ 🕰️ 14:25 | 🗓️ Ngày 1 | 📍 Đại học | Nắng ]";
+    expect(await plugin.callbacks.display!(header)).toBe(header);
+    plugin.ui("config-preset").value = "default";
+    await plugin.uiEvent("config-preset", "change");
+    expect(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY)).toMatchObject({
+      cardPresets: { "card-b": "default" },
+    });
+    expect((await plugin.request(raw)).some((message) => message.memo === "ff54:main")).toBe(true);
+    expect(await plugin.callbacks.display!(header)).toContain('data-ff54="scene-header"');
+    expect(plugin.writes).not.toHaveBeenCalled();
+  });
+
+  it("shares saved preset edits across assigned cards and keeps UI drafts unapplied until save", async () => {
+    const store = normalizePresetStore(preset, undefined);
+    const shared = createConfigPreset(store, "Chung", store.presets[0]!.settings, "shared");
+    selectCardPreset(store, "card-a", shared.id);
+    selectCardPreset(store, "card-b", shared.id);
+    const plugin = await startPlugin(true, false, store);
+    await plugin.settingsUi();
+    plugin.toggle("vietnamese-output").checked = false;
+    expect(
+      (await plugin.request()).some((message) => message.memo === "ff54:vietnamese-output"),
+    ).toBe(true);
+    await plugin.uiEvent("save");
+    plugin.selectCard(1);
+    expect(
+      (await plugin.request()).some((message) => message.memo === "ff54:vietnamese-output"),
+    ).toBe(false);
+    await plugin.settingsUi();
+    expect(plugin.ui("config-preset").value).toBe("shared");
+    await plugin.uiEvent("reset");
+    expect(
+      (await plugin.request()).some((message) => message.memo === "ff54:vietnamese-output"),
+    ).toBe(true);
+    expect(
+      normalizePresetStore(preset, plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY)).presets,
+    ).toHaveLength(2);
+  });
+
+  it("uses the generating card's editor configuration when output finishes after switching cards", async () => {
+    const store = normalizePresetStore(preset, undefined);
+    const automatic = createConfigPreset(store, "Tự sửa", store.presets[0]!.settings, "auto");
+    automatic.settings.submodelEditorEnabled = true;
+    automatic.settings.submodelAutoRewriteEnabled = true;
+    selectCardPreset(store, "card-a", automatic.id);
+    const plugin = await startPlugin(true, false, store);
+    await plugin.request();
+    plugin.selectCard(1);
+    await plugin.request();
+    const original =
+      "[ 🕰️ 14:25 | 🗓️ Ngày 1 | 📍 Đại học | Nắng ]\nAn di chuyển tới.\n<internal_states>Bond: 3</internal_states>";
+    plugin.runModel.mockResolvedValue({
+      type: "success",
+      result: original.replace("di chuyển", "bước"),
+    });
+    await plugin.complete(original, 0, 0);
+    expect(plugin.runModel).toHaveBeenCalledTimes(1);
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toContain("An bước tới.");
+    expect(plugin.chats.get("1:0")!.message).toHaveLength(1);
+    expect(plugin.runModel.mock.calls[0]![0].messages.at(-2)!.content).toContain(
+      "Repair only existing malformed markup",
+    );
+  });
+});
+
+describe("Automatic Submodel editing", () => {
+  const header = "[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 | 📍 Đại học | ☀️ Nắng ráo, 20 °C ]";
+  const state = "<!--GFX_START--><internal_states><b>Bond: 3</b></internal_states><!--GFX_END-->";
+  const original = `${header}\nAn di chuyển tới.\n${state}`;
+  const edited = `${header}\nAn bước tới.\n${state}`;
+
+  it("rewrites completed eligible output automatically and notifies after verified saving", async () => {
+    const plugin = await startPlugin(true, true);
+    await plugin.request();
+    const prefix = "<Thoughts>Main reasoning.</Thoughts>\nPlanning before the header.\n";
+    plugin.runModel.mockResolvedValue({ type: "success", result: edited });
+    await plugin.complete(prefix + original);
+    expect(plugin.runModel).toHaveBeenCalledTimes(1);
+    const options = plugin.runModel.mock.calls[0]![0];
+    expect(options.mode).toBe("submodel");
+    expect(options.allowPlugins).toBe(false);
+    expect(options).not.toHaveProperty("staticModel");
+    expect(options.messages.at(-1)!.content).toContain(original);
+    expect(options.messages.at(-1)!.content).not.toContain("Main reasoning");
+    expect(
+      options.messages.slice(0, -1).some((message) => message.content.includes(original)),
+    ).toBe(false);
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(prefix + edited);
+    expect(plugin.writes).toHaveBeenCalledTimes(1);
+    expect(plugin.api.alert).toHaveBeenCalledWith(expect.stringContaining("Đã tự động biên tập"));
+    expect(plugin.api.alertError).not.toHaveBeenCalled();
+  });
+
+  it("keeps the existing manual behavior when automatic editing is off", async () => {
+    const plugin = await startPlugin();
+    await plugin.request();
+    plugin.runModel.mockResolvedValue({ type: "success", result: edited });
+    await plugin.complete(original);
+    expect(plugin.runModel).not.toHaveBeenCalled();
+    await plugin.rewrite();
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(edited);
+  });
+
+  it("does not run when the Submodel module is disabled", async () => {
+    const plugin = await startPlugin(false, true);
+    await plugin.request();
+    await plugin.complete(original);
+    expect(plugin.runModel).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    `An di chuyển tới.\n${state}`,
+    `${header}\nAn di chuyển tới.`,
+    `${header}\nAn di chuyển tới.\n<internal_states>Bond: 3`,
+    `${header}\nAn di chuyển tới.\n<internal_states></internal_states>`,
+    original.replace("📍 Đại học", "📍 "),
+  ])("skips a response missing a complete header or state block: %s", async (response) => {
+    const plugin = await startPlugin(true, true);
+    await plugin.request();
+    await plugin.complete(response);
+    expect(plugin.runModel).not.toHaveBeenCalled();
+    expect(plugin.writes).not.toHaveBeenCalled();
+  });
+
+  it("waits for streaming to finish even if a display chunk contains the whole schema", async () => {
+    const plugin = await startPlugin(true, true);
+    await plugin.request();
+    await plugin.callbacks.display!(original);
+    expect(plugin.runModel).not.toHaveBeenCalled();
+    plugin.chats.get("0:0")!.isStreaming = true;
+    await plugin.complete(original);
+    expect(plugin.runModel).not.toHaveBeenCalled();
+    plugin.chats.get("0:0")!.isStreaming = false;
+    plugin.runModel.mockResolvedValue({ type: "success", result: edited });
+    await plugin.callbacks.output!({
+      characterIndex: 0,
+      chatIndex: 0,
+      messageIndex: 2,
+      chat: structuredClone(plugin.chats.get("0:0")!),
+      char: {},
+    });
+    expect(plugin.runModel).toHaveBeenCalledTimes(1);
+  });
+
+  it("prevents repeat output events and manual clicks from launching another concurrent edit", async () => {
+    const plugin = await startPlugin(true, true);
+    await plugin.request();
+    let resolveModel!: (result: unknown) => void;
+    const started = new Promise<void>((resolveStarted) => {
+      plugin.runModel.mockImplementation(() => {
+        resolveStarted();
+        return new Promise((resolve) => {
+          resolveModel = resolve;
+        });
+      });
+    });
+    const completion = plugin.complete(original);
+    await started;
+    expect(plugin.button()?.html).toContain("disabled");
+    expect(plugin.button()?.html).toContain("⏳");
+    const repeat = () =>
+      plugin.callbacks.output!({
+        characterIndex: 0,
+        chatIndex: 0,
+        messageIndex: 2,
+        chat: structuredClone(plugin.chats.get("0:0")!),
+        char: {},
+      });
+    await repeat();
+    await plugin.rewrite();
+    expect(plugin.runModel).toHaveBeenCalledTimes(1);
+    resolveModel({ type: "success", result: edited });
+    await completion;
+    await repeat();
+    expect(plugin.runModel).toHaveBeenCalledTimes(1);
+    expect(plugin.button()?.html).not.toContain("disabled");
+    await plugin.request();
+    plugin.runModel.mockResolvedValue({ type: "success", result: edited });
+    await plugin.complete(original);
+    expect(plugin.runModel).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not edit older messages or replies without captured main context", async () => {
+    const plugin = await startPlugin(true, true);
+    await plugin.complete(original);
+    expect(plugin.runModel).not.toHaveBeenCalled();
+    await plugin.request();
+    const chat = plugin.chats.get("0:0")!;
+    chat.message.push({ role: "user", data: "Tiếp đi.", chatId: "next-user" });
+    await plugin.callbacks.output!({
+      characterIndex: 0,
+      chatIndex: 0,
+      messageIndex: 2,
+      chat: structuredClone(chat),
+      char: {},
+    });
+    expect(plugin.runModel).not.toHaveBeenCalled();
+  });
+
+  it("keeps user edits and never announces a successful save when the target changed", async () => {
+    const plugin = await startPlugin(true, true);
+    await plugin.request();
+    plugin.runModel.mockImplementation(async () => {
+      plugin.chats.get("0:0")!.message.at(-1)!.data = "Người dùng tự sửa.";
+      return { type: "success", result: edited };
+    });
+    await plugin.complete(original);
+    expect(plugin.writes).not.toHaveBeenCalled();
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe("Người dùng tự sửa.");
+    expect(plugin.api.alert).not.toHaveBeenCalledWith(
+      expect.stringContaining("Đã tự động biên tập"),
+    );
+  });
+
+  it("notifies on failure and keeps the main reply", async () => {
+    const plugin = await startPlugin(true, true);
+    await plugin.request();
+    plugin.runModel.mockResolvedValue({ type: "fail", result: "Provider unavailable" });
+    await plugin.complete(original);
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(original);
+    expect(plugin.writes).not.toHaveBeenCalled();
+    expect(plugin.api.alertError).toHaveBeenCalledWith(
+      expect.stringContaining("Provider unavailable"),
+    );
+    expect(plugin.api.alert).not.toHaveBeenCalled();
   });
 });
 

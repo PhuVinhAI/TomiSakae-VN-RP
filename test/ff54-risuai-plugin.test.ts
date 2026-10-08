@@ -484,7 +484,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     );
   });
 
-  it("uses one global settings object rather than card or chat settings", async () => {
+  it("stores named presets and card assignments in plugin storage and reads legacy settings", async () => {
     const pluginSource = await readFile(
       "risuai/freaky-frankenstein-5.4-plugin/src/plugin.ts",
       "utf8",
@@ -495,7 +495,11 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(pluginSource).toContain("getCurrentChatIndex");
     expect(pluginSource).toContain("setChatToIndex");
     expect(pluginSource.match(/pluginStorage\.getItem\(STORAGE_KEY\)/g)).toHaveLength(1);
-    expect(pluginSource.match(/pluginStorage\.setItem\(STORAGE_KEY, settings\)/g)).toHaveLength(1);
+    expect(pluginSource).toContain("pluginStorage.getItem(CONFIG_PRESETS_STORAGE_KEY)");
+    expect(pluginSource).toContain(
+      "pluginStorage.setItem(CONFIG_PRESETS_STORAGE_KEY, configPresets)",
+    );
+    expect(pluginSource).toContain("cardId: character?.chaId");
     const unavailableParserApi = ["parse", "Risu", "Chat"].join("");
     expect(pluginSource).not.toContain(unavailableParserApi);
   });

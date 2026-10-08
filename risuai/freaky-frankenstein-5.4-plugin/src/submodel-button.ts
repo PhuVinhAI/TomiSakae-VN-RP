@@ -29,6 +29,7 @@ export interface RewriteButtonTarget {
   messageId: unknown;
   chatId: unknown;
   available: boolean;
+  busy?: boolean;
 }
 
 export interface RewriteButtonController {
@@ -58,7 +59,8 @@ export async function createRewriteButton(
 
   const paint = async () => {
     if (!control) return;
-    const title = busy
+    const rewriting = busy || current?.busy;
+    const title = rewriting
       ? "Đang viết lại bằng Submodel…"
       : current?.available
         ? "Viết lại tiếng Việt bằng Submodel"
@@ -67,7 +69,7 @@ export async function createRewriteButton(
     // A native checkbox records activation until IPC reads it, preventing
     // unrelated clicks from calling the model. It is displayed as an icon button.
     await control.setInnerHTML(
-      `<label title="${title}" style="position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:28px;min-height:28px;border-radius:4px;opacity:${busy || !current?.available ? ".5" : "1"};cursor:${busy ? "wait" : current?.available ? "pointer" : "not-allowed"}"><input type="checkbox" role="button" aria-label="${title}" ${busy || !current?.available ? "disabled" : ""} style="position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:inherit"><span aria-hidden="true">${busy ? "⏳" : "✍️"}</span></label>`,
+      `<label title="${title}" style="position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:28px;min-height:28px;border-radius:4px;opacity:${rewriting || !current?.available ? ".5" : "1"};cursor:${rewriting ? "wait" : current?.available ? "pointer" : "not-allowed"}"><input type="checkbox" role="button" aria-label="${title}" ${rewriting || !current?.available ? "disabled" : ""} style="position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:inherit"><span aria-hidden="true">${rewriting ? "⏳" : "✍️"}</span></label>`,
     );
   };
 
@@ -94,6 +96,7 @@ export async function createRewriteButton(
       if (
         current?.key === target.key &&
         current.available === target.available &&
+        current.busy === target.busy &&
         (await toolbar.querySelector(marker))
       )
         return;
@@ -129,9 +132,9 @@ export async function createRewriteButton(
   };
 
   const activate = async (keyboard = false) => {
-    if (disposed || busy || !current?.available) return;
+    if (disposed || busy || current?.busy || !current?.available) return;
     const activated = await root.querySelector(`${marker} input:${keyboard ? "focus" : "checked"}`);
-    if (!activated || disposed || busy || !current?.available) return;
+    if (!activated || disposed || busy || current?.busy || !current?.available) return;
     const target = current;
     busy = true;
     try {

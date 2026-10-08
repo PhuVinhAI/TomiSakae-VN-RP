@@ -5,11 +5,11 @@ import {
   buildRequestMessages,
   createDefaultSettings,
   expandHostMacros,
-  normalizeSettings,
   PLACEMENT_AI_OUTPUT,
   applyPromptRegexToMessages,
   applyRequestFiltersToMessages,
   splitBeforeSceneHeader,
+  hasCompleteSceneHeader,
   type ChatMessage,
   type FfGlobalSettings,
   type FfPreset,
@@ -34,6 +34,14 @@ import {
   type RewriteButtonTarget,
 } from "./submodel-button.js";
 import { buildEditorReferenceMessages } from "./submodel-context.js";
+import {
+  CONFIG_PRESETS_STORAGE_KEY,
+  createConfigPreset,
+  normalizePresetStore,
+  presetForCard,
+  selectCardPreset,
+  type ConfigPresetStore,
+} from "./presets.js";
 
 declare const Risuai: {
   registerButton(
@@ -123,6 +131,7 @@ interface ChatOutputListenerArgument {
 }
 
 interface HostCharacter {
+  chaId?: string;
   name?: string;
   nickname?: string;
   chatPage?: number;
@@ -148,7 +157,16 @@ declare const __FF54_SOURCE_SHA256__: string;
 const STORAGE_KEY = "ff54-global-settings-v1";
 const BUTTON_ID = "ff54-global-config";
 const preset = __FF54_PRESET__;
-let settings: FfGlobalSettings = createDefaultSettings(preset);
+let configPresets: ConfigPresetStore = normalizePresetStore(preset, undefined);
+const cardIdsByIndex = new Map<number, string | undefined>();
+
+async function activeConfigPreset() {
+  const index = await Risuai.getCurrentCharacterIndex();
+  if (!cardIdsByIndex.has(index)) {
+    cardIdsByIndex.set(index, (await Risuai.getCharacter())?.chaId);
+  }
+  return presetForCard(configPresets, cardIdsByIndex.get(index));
+}
 
 const SUBMODEL_EDITOR_SYSTEM = `<vietnamese_editor>
 Task: Rewrite the supplied AI response in natural contemporary Vietnamese.
@@ -166,17 +184,19 @@ Syntax & Flow:
 Fidelity & Format:
 - Meaning: Preserve facts, events, actions, sequence, speaker intent, POV, agency, tone, emotional intensity, and RP state. Preserve negation, uncertainty, and degree.
 - State Lock: Copy technical/state blocks, including <internal_states>, GM Notebook sections, and state trackers, unchanged in full.
-- Syntax Lock: Preserve HTML/XML and color tags, headers, comments, internal/GFX/image/§...§ markers, placeholders, identifiers, numbers, schema text, and machine syntax exactly.
+- Syntax Lock: Preserve HTML/XML and color tags, headers, comments, internal/GFX/image/§...§ markers, placeholders, identifiers, numbers, schema text, and machine syntax exactly. Repair only existing malformed markup with a clear intended structure; preserve valid syntax and all state data.
 - Boundaries: Never add or omit content, continue the scene, summarize, explain, or answer the user.
 - Output: Return only the edited response. No code fences, notes, or commentary.
 </vietnamese_editor>`;
 
 interface PendingEditorRequest {
+  cardId: string | undefined;
   chatId: unknown;
   messages: ChatMessage[];
   history: ChatMessage[];
   responseId?: unknown;
   responseIndex?: number;
+  autoRewriteAttempted?: boolean;
 }
 
 const editorRequests = new Map<string, PendingEditorRequest>();
@@ -204,7 +224,7 @@ function promptById() {
 }
 
 async function saveSettings(): Promise<void> {
-  await Risuai.pluginStorage.setItem(STORAGE_KEY, settings);
+  await Risuai.pluginStorage.setItem(CONFIG_PRESETS_STORAGE_KEY, configPresets);
   await syncEditorButton();
 }
 
@@ -225,7 +245,7 @@ function sourceState(enabled: boolean): string {
   return enabled ? "Preset gốc: bật" : "Preset gốc: tắt";
 }
 
-function selectedGroupPrompt(group: ExclusivePromptGroup): string {
+function selectedGroupPrompt(group: ExclusivePromptGroup, settings: FfGlobalSettings): string {
   const enabled = group.memberIds.filter((identifier) => settings.promptEnabled[identifier]);
   if (enabled.length <= 1) return enabled[0] ?? "";
   const defaults = new Map(
@@ -238,8 +258,9 @@ function exclusiveGroup(
   group: ExclusivePromptGroup,
   prompts: Map<string, FfPreset["prompts"][number]>,
   index: number,
+  settings: FfGlobalSettings,
 ): string {
-  const selected = selectedGroupPrompt(group);
+  const selected = selectedGroupPrompt(group, settings);
   const option = (identifier: string, name: string, detail: string, source?: string) =>
     `<label class="choice-option"><input type="radio" name="choice-${escapeHtml(group.id)}" data-kind="choice" data-group="${escapeHtml(group.id)}" value="${escapeHtml(identifier)}" data-detail="${escapeHtml(detail)}" ${selected === identifier ? "checked" : ""}><span class="radio-body"><span class="radio-dot"></span><span class="radio-copy"><strong>${escapeHtml(name)}</strong>${source ? `<small>${escapeHtml(source)}</small>` : ""}</span></span></label>`;
   const options = group.memberIds
@@ -312,6 +333,20 @@ const REGEX_GROUPS = [
 ] as const;
 
 async function showSettings(): Promise<void> {
+  const [character, characterIndex] = await Promise.all([
+    Risuai.getCharacter(),
+    Risuai.getCurrentCharacterIndex(),
+  ]);
+  const cardId = character?.chaId;
+  cardIdsByIndex.set(characterIndex, cardId);
+  const profile = presetForCard(configPresets, cardId);
+  const settings = structuredClone(profile.settings);
+  const presetOptions = configPresets.presets
+    .map(
+      (entry) =>
+        `<option value="${escapeHtml(entry.id)}" ${entry.id === profile.id ? "selected" : ""}>${escapeHtml(entry.name)}</option>`,
+    )
+    .join("");
   const prompts = promptById();
   const groupedPromptIds = new Set([
     ...allExclusivePromptIds(),
@@ -323,7 +358,7 @@ async function showSettings(): Promise<void> {
     .map((entry) => entry.identifier)
     .filter((identifier) => !groupedPromptIds.has(identifier));
   const choiceGroups = EXCLUSIVE_PROMPT_GROUPS.map((group, index) =>
-    exclusiveGroup(group, prompts, index),
+    exclusiveGroup(group, prompts, index, settings),
   ).join("");
   const sections = [
     ...PROMPT_SECTIONS,
@@ -382,11 +417,12 @@ async function showSettings(): Promise<void> {
   document.head.innerHTML = `<meta name="viewport" content="width=device-width,initial-scale=1"><style>${SETTINGS_STYLES}</style>`;
   document.body.innerHTML = `<main class="shell">
     <div class="masthead"><div class="brand"><span class="brand-mark">ff</span><span>Trạm điều khiển FF5.4</span></div><span class="edition">Bảng điều khiển / 5.4</span></div>
-    <section class="hero"><div><span class="eyebrow">Không gian cấu hình</span><h1>Điều khiển <em>FF5.4.</em></h1><p class="hero-copy">Thiết lập nhịp kể, góc nhìn và những quy tắc vận hành. Mọi lựa chọn ở đây áp dụng chung cho các thẻ nhân vật và cuộc trò chuyện.</p></div><div class="hero-side"><span class="index">Một cấu hình duy nhất</span><p>Chọn cách thế giới của bạn vận hành.</p><small>Chọn một trong mỗi nhóm, bật các module cần dùng, rồi lưu ở thanh bên dưới.</small></div></section>
-    <div class="workspace"><nav class="rail" aria-label="Điều hướng cấu hình"><p class="rail-title">Danh mục</p><a href="#general"><span>01</span>Tổng quan</a><a href="#choices"><span>02</span>Nhóm chọn một</a><a href="#modules"><span>03</span>Module độc lập</a><a href="#filters"><span>04</span>Bộ lọc kỹ thuật</a><p class="rail-note">Các thay đổi chỉ có hiệu lực sau khi bấm “Lưu cấu hình”.</p></nav>
+    <section class="hero"><div><span class="eyebrow">Không gian cấu hình</span><h1>Điều khiển <em>FF5.4.</em></h1><p class="hero-copy">Thiết lập nhịp kể, góc nhìn và những quy tắc vận hành. Mỗi preset dùng chung cho các card đã chọn preset đó.</p></div><div class="hero-side"><span class="index">Preset: ${escapeHtml(profile.name)}</span><p>Chọn cách thế giới của bạn vận hành.</p><small>Card mới dùng “Mặc định”. Chọn preset khác để ghi nhớ cho card hiện tại.</small></div></section>
+    <div class="workspace"><nav class="rail" aria-label="Điều hướng cấu hình"><p class="rail-title">Danh mục</p><a href="#general"><span>01</span>Tổng quan</a><a href="#choices"><span>02</span>Nhóm chọn một</a><a href="#modules"><span>03</span>Module độc lập</a><a href="#filters"><span>04</span>Bộ lọc kỹ thuật</a><p class="rail-note">Sửa cấu hình rồi bấm “Lưu preset” để áp dụng.</p></nav>
     <div class="content">
     <section id="general" class="panel"><div class="panel-heading"><span class="index">01 / Nền tảng</span><h2>Tổng quan</h2></div>
-    <label class="master"><span class="master-copy"><strong>Bật FF5.4 trên toàn bộ RisuAI</strong><small>Một cấu hình dùng chung cho mọi thẻ nhân vật và cuộc trò chuyện. Plugin chỉ can thiệp khi mô hình đang tạo phản hồi.</small></span><input class="switch" id="master" type="checkbox" ${settings.enabled ? "checked" : ""}></label>
+    <div class="preset-panel"><label class="preset-field"><span>Preset cho ${escapeHtml(character?.nickname || character?.name || "card hiện tại")}</span><select id="config-preset" ${cardId ? "" : "disabled"}>${presetOptions}</select></label><p class="section-note">Chọn preset sẽ được ghi nhớ cho mọi chat của card này. Lưu cấu hình sẽ cập nhật preset cho tất cả card đang dùng nó.</p><div class="preset-create"><label class="preset-field"><span>Tên preset mới</span><input id="preset-name" type="text" placeholder="Nhập tên preset"></label><button class="action" id="create-preset">Tạo preset</button></div><small>Tạo preset sẽ sao chép cấu hình đang hiển thị.</small></div>
+    <label class="master"><span class="master-copy"><strong>Bật FF5.4 cho preset này</strong><small>Áp dụng cho mọi chat của các card dùng preset “${escapeHtml(profile.name)}”.</small></span><input class="switch" id="master" type="checkbox" ${settings.enabled ? "checked" : ""}></label>
     <details open><summary><span class="summary-copy"><strong>Module của plugin</strong><small>Tính năng bổ sung riêng cho bản RisuAI.</small></span></summary><div class="list">${checkbox(
       "plugin",
       "vietnamese-output",
@@ -398,14 +434,20 @@ async function showSettings(): Promise<void> {
       "submodel-editor",
       settings.submodelEditorEnabled,
       "✍️ Biên tập bằng Submodel",
-      "Hiện nút ✍️ ở phản hồi AI cuối. Chỉ khi bấm nút mới dùng preset Submodel hiện tại của PocketRisu để viết lại tiếng Việt",
+      "Hiện nút ✍️ ở phản hồi AI cuối để viết lại tiếng Việt bằng preset Submodel hiện tại của PocketRisu",
+    )}${checkbox(
+      "plugin",
+      "submodel-auto-rewrite",
+      settings.submodelAutoRewriteEnabled,
+      "🔄 Tự động biên tập bằng Submodel",
+      "Cần bật Biên tập bằng Submodel. Tự sửa phản hồi mới sau khi tạo xong, có đủ header và khối internal state hoàn chỉnh; thông báo khi đã lưu · Mặc định tắt",
     )}</div></details></section>
     <section id="choices" class="panel"><div class="panel-heading"><span class="index">02 / Quy tắc lựa chọn</span><h2>Nhóm chọn một</h2></div><p class="section-note">Mỗi nhóm chỉ kích hoạt một lựa chọn. Chọn “không dùng” để tắt toàn bộ nhóm.</p><div class="choice-grid">${choiceGroups}</div></section>
     <section id="modules" class="panel"><div class="panel-heading"><span class="index">03 / Bộ công cụ</span><h2>Module độc lập</h2></div><p class="section-note">Mở một nhóm để xem chức năng và bật những module bạn cần.</p>${promptSections}</section>
     <section id="filters" class="panel"><div class="panel-heading"><span class="index">04 / Vận hành</span><h2>Bộ lọc kỹ thuật</h2></div><p class="section-note">Các bộ lọc gốc dùng khi gửi ngữ cảnh và hiển thị phản hồi. Chỉ thay đổi khi bạn hiểu rõ tác dụng của chúng.</p><details><summary><span class="summary-copy"><strong>Xem ${preset.extensions?.regex_scripts?.length ?? 0} bộ lọc</strong><small>Được chia theo công việc để dễ tìm.</small></span></summary><div class="regex-groups">${regexGroups}</div></details></section>
     <p class="source-note">Nguồn: ${escapeHtml(__FF54_SOURCE_NAME__)}<br>SHA-256: ${escapeHtml(__FF54_SOURCE_SHA256__)}</p>
     </div></div>
-    <div class="command-bar"><div class="command-inner"><span class="command-label">FF5.4 / Cấu hình toàn cục</span><button class="action primary" id="save">Lưu cấu hình</button><button class="action" id="reset">Khôi phục</button><button class="action" id="close">Đóng</button><div class="status" id="status" role="status" aria-live="polite"></div></div></div>
+    <div class="command-bar"><div class="command-inner"><span class="command-label">FF5.4 / ${escapeHtml(profile.name)}</span><button class="action primary" id="save">Lưu preset</button><button class="action" id="reset">Khôi phục</button><button class="action" id="close">Đóng</button><div class="status" id="status" role="status" aria-live="polite"></div></div></div>
   </main>`;
 
   const status = document.getElementById("status")!;
@@ -426,6 +468,7 @@ async function showSettings(): Promise<void> {
       else if (node.dataset.kind === "regex") settings.regexEnabled[id] = node.checked;
       else if (id === "vietnamese-output") settings.vietnameseOutputEnabled = node.checked;
       else if (id === "submodel-editor") settings.submodelEditorEnabled = node.checked;
+      else if (id === "submodel-auto-rewrite") settings.submodelAutoRewriteEnabled = node.checked;
     }
   };
   for (const node of document.querySelectorAll<HTMLInputElement>('input[data-kind="choice"]')) {
@@ -437,18 +480,45 @@ async function showSettings(): Promise<void> {
     });
   }
   document.getElementById("close")!.addEventListener("click", () => void Risuai.hideContainer());
+  document.getElementById("config-preset")!.addEventListener("change", async () => {
+    if (!cardId) return;
+    selectCardPreset(
+      configPresets,
+      cardId,
+      (document.getElementById("config-preset") as HTMLSelectElement).value,
+    );
+    await saveSettings();
+    await showSettings();
+    document.getElementById("status")!.textContent = "Đã lưu preset được chọn cho card này.";
+  });
+  document.getElementById("create-preset")!.addEventListener("click", async () => {
+    try {
+      readUi();
+      const created = createConfigPreset(
+        configPresets,
+        (document.getElementById("preset-name") as HTMLInputElement).value,
+        settings,
+      );
+      if (cardId) selectCardPreset(configPresets, cardId, created.id);
+      await saveSettings();
+      await showSettings();
+      document.getElementById("status")!.textContent = `Đã tạo preset “${created.name}”.`;
+    } catch (error) {
+      status.textContent = error instanceof Error ? error.message : "Không thể tạo preset.";
+    }
+  });
   document.getElementById("save")!.addEventListener("click", async () => {
     readUi();
+    profile.settings = structuredClone(settings);
     await saveSettings();
-    status.textContent =
-      "Đã lưu. Cấu hình này đang áp dụng cho mọi thẻ nhân vật và cuộc trò chuyện.";
+    status.textContent = `Đã lưu preset “${profile.name}”.`;
   });
   document.getElementById("reset")!.addEventListener("click", async () => {
-    settings = createDefaultSettings(preset);
+    profile.settings = createDefaultSettings(preset);
     await saveSettings();
     await showSettings();
     document.getElementById("status")!.textContent =
-      "Đã khôi phục cấu hình mặc định của plugin (Chế độ Hiện thực).";
+      `Đã khôi phục cấu hình của preset “${profile.name}” về mặc định (Chế độ Hiện thực).`;
   });
   await Risuai.showContainer("fullscreen");
 }
@@ -457,15 +527,17 @@ function mainGeneration(type: string): boolean {
   return type === "model";
 }
 
-async function getHostMacroContext(): Promise<{
+async function getHostMacroContext(character: HostCharacter | null): Promise<{
   characterName: string;
   maxContext?: number;
   maxResponse?: number;
   userName: string;
 }> {
-  const [character, database] = await Promise.all([
-    Risuai.getCharacter(),
-    Risuai.getDatabase(["personas", "selectedPersona", "maxContext", "maxResponse"]),
+  const database = await Risuai.getDatabase([
+    "personas",
+    "selectedPersona",
+    "maxContext",
+    "maxResponse",
   ]);
   const characterName = character?.nickname || character?.name || "Character";
   const activeChat = character?.chats?.[character.chatPage ?? 0];
@@ -482,11 +554,13 @@ async function getHostMacroContext(): Promise<{
   };
 }
 
-let historyCleanup: Promise<void> | undefined;
+const historyCleanups = new Map<string, Promise<void>>();
 
-async function cleanSavedHistory(): Promise<void> {
-  const characterIndex = await Risuai.getCurrentCharacterIndex();
-  const chatIndex = await Risuai.getCurrentChatIndex();
+async function cleanSavedHistory(
+  settings: FfGlobalSettings,
+  characterIndex: number,
+  chatIndex: number,
+): Promise<void> {
   const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
   if (!chat?.message?.length) return;
 
@@ -504,33 +578,46 @@ async function cleanSavedHistory(): Promise<void> {
   if (changed) await Risuai.setChatToIndex(characterIndex, chatIndex, { ...chat, message });
 }
 
-async function cleanSavedHistoryOnce(): Promise<void> {
-  if (!historyCleanup) {
-    historyCleanup = cleanSavedHistory().finally(() => {
-      historyCleanup = undefined;
-    });
+async function cleanSavedHistoryOnce(
+  settings: FfGlobalSettings,
+  characterIndex: number,
+  chatIndex: number,
+): Promise<void> {
+  const key = editorChatKey(characterIndex, chatIndex);
+  if (!historyCleanups.has(key)) {
+    historyCleanups.set(
+      key,
+      cleanSavedHistory(settings, characterIndex, chatIndex).finally(() => {
+        historyCleanups.delete(key);
+      }),
+    );
   }
-  await historyCleanup;
+  await historyCleanups.get(key);
 }
 
 const beforeRequest = async (messages: ChatMessage[], type: string): Promise<ChatMessage[]> => {
-  if (!settings.enabled || !mainGeneration(type)) return messages;
-  await cleanSavedHistoryOnce();
-  const macroContext = await getHostMacroContext();
+  if (!mainGeneration(type)) return messages;
+  const [character, characterIndex, chatIndex] = await Promise.all([
+    Risuai.getCharacter(),
+    Risuai.getCurrentCharacterIndex(),
+    Risuai.getCurrentChatIndex(),
+  ]);
+  cardIdsByIndex.set(characterIndex, character?.chaId);
+  const settings = presetForCard(configPresets, character?.chaId).settings;
+  if (!settings.enabled) return messages;
+  await cleanSavedHistoryOnce(settings, characterIndex, chatIndex);
+  const macroContext = await getHostMacroContext(character);
   const built = await buildRequestMessages(messages, preset, settings, async (content) =>
     expandHostMacros(content, macroContext),
   );
   if (editorListenerRegistered) {
     try {
-      const [characterIndex, chatIndex] = await Promise.all([
-        Risuai.getCurrentCharacterIndex(),
-        Risuai.getCurrentChatIndex(),
-      ]);
       const key = editorChatKey(characterIndex, chatIndex);
       editorRequests.delete(key);
       const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
       if (chat) {
         editorRequests.set(key, {
+          cardId: character?.chaId,
           chatId: chat.id,
           messages: structuredClone(built),
           history: (chat.message ?? []).map((message) => ({
@@ -554,6 +641,7 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
 };
 
 const displayOutput = async (content: string): Promise<string> => {
+  const settings = (await activeConfigPreset()).settings;
   if (!settings.enabled) return content;
   return adaptVietnameseHeaderForRisuAI(
     adaptDisplayMarkupForRisuAI(
@@ -660,13 +748,45 @@ const submodelOutputListener = async ({
     messageIndex === (chat.message?.length ?? 0) - 1 &&
     target?.role === "char"
   ) {
+    const settings = presetForCard(configPresets, context.cardId).settings;
     context.responseId = target.chatId;
     context.responseIndex = messageIndex;
+    if (
+      settings.enabled &&
+      settings.submodelEditorEnabled &&
+      settings.submodelAutoRewriteEnabled &&
+      !chat.isStreaming &&
+      !context.autoRewriteAttempted &&
+      !editorBusyChats.has(key) &&
+      completeAutoRewriteResponse(String(target.data ?? ""))
+    ) {
+      context.autoRewriteAttempted = true;
+      await rewriteLatestResponse(
+        {
+          key: JSON.stringify([characterIndex, chatIndex, chat.id, target.chatId, messageIndex]),
+          characterIndex,
+          chatIndex,
+          messageIndex,
+          messageId: target.chatId,
+          chatId: chat.id,
+          available: true,
+        },
+        true,
+      );
+    }
   }
   await editorButton?.refresh();
 };
 
+function completeAutoRewriteResponse(text: string): boolean {
+  const { response } = splitEditorResponse(text);
+  if (!hasCompleteSceneHeader(response)) return false;
+  const state = response.match(/<internal_states>([\s\S]*?)<\/internal_states>/i);
+  return Boolean(state?.[1]?.trim());
+}
+
 async function getEditorButtonTarget(): Promise<RewriteButtonTarget | undefined> {
+  const settings = (await activeConfigPreset()).settings;
   if (!settings.enabled || !settings.submodelEditorEnabled || !editorListenerRegistered) return;
   const [characterIndex, chatIndex] = await Promise.all([
     Risuai.getCurrentCharacterIndex(),
@@ -686,6 +806,7 @@ async function getEditorButtonTarget(): Promise<RewriteButtonTarget | undefined>
     messageIndex,
     messageId: target.chatId,
     chatId: chat.id,
+    busy: editorBusyChats.has(editorChatKey(characterIndex, chatIndex)),
     available:
       context?.chatId === chat.id &&
       context?.responseId === target.chatId &&
@@ -694,11 +815,6 @@ async function getEditorButtonTarget(): Promise<RewriteButtonTarget | undefined>
 }
 
 async function syncEditorButton(): Promise<void> {
-  if (!settings.enabled || !settings.submodelEditorEnabled) {
-    await editorButton?.dispose();
-    editorButton = undefined;
-    return;
-  }
   try {
     editorButton ??= await createRewriteButton(
       Risuai,
@@ -711,12 +827,23 @@ async function syncEditorButton(): Promise<void> {
   }
 }
 
-async function rewriteLatestResponse(buttonTarget: RewriteButtonTarget): Promise<void> {
-  if (!settings.enabled || !settings.submodelEditorEnabled || !editorListenerRegistered) return;
+async function rewriteLatestResponse(
+  buttonTarget: RewriteButtonTarget,
+  automatic = false,
+): Promise<void> {
   const { characterIndex, chatIndex, messageIndex } = buttonTarget;
   const key = editorChatKey(characterIndex, chatIndex);
   const context = editorRequests.get(key);
   if (!context || editorBusyChats.has(key)) return;
+  const profile = presetForCard(configPresets, context.cardId);
+  const settings = profile.settings;
+  const editorEnabled = () =>
+    presetForCard(configPresets, context.cardId).id === profile.id &&
+    profile.settings.enabled &&
+    profile.settings.submodelEditorEnabled &&
+    editorListenerRegistered &&
+    (!automatic || profile.settings.submodelAutoRewriteEnabled);
+  if (!editorEnabled()) return;
   const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
   const target = chat?.message?.[messageIndex];
   if (
@@ -733,8 +860,11 @@ async function rewriteLatestResponse(buttonTarget: RewriteButtonTarget): Promise
     return;
   const original = String(target?.data ?? "");
   if (!original.trim()) return;
+  if (automatic && !completeAutoRewriteResponse(original)) return;
+  if (editorBusyChats.has(key)) return;
   editorBusyChats.add(key);
   try {
+    await editorButton?.refresh();
     const source = splitEditorResponse(original);
     const history = applyRequestFiltersToMessages(
       chat.message!.slice(0, messageIndex).map((message) => ({
@@ -746,7 +876,7 @@ async function rewriteLatestResponse(buttonTarget: RewriteButtonTarget): Promise
       settings,
     );
     const result = await runSubmodelEditor(context, source.response, history);
-    if (!settings.enabled || !settings.submodelEditorEnabled || !editorListenerRegistered) return;
+    if (!editorEnabled() || editorRequests.get(key) !== context) return;
     if (result === undefined)
       throw new Error("Submodel đã quá thời gian chờ 90 giây hoặc không trả về nội dung.");
     const body = splitEditorResponse(result).response;
@@ -763,7 +893,7 @@ async function rewriteLatestResponse(buttonTarget: RewriteButtonTarget): Promise
       );
       if (!saveAnyway) return;
     }
-    if (!settings.enabled || !settings.submodelEditorEnabled || !editorListenerRegistered) return;
+    if (!editorEnabled() || editorRequests.get(key) !== context) return;
     const edited = source.prefix + body;
     const latestChat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
     const latestMessage = latestChat?.message?.[messageIndex];
@@ -800,6 +930,11 @@ async function rewriteLatestResponse(buttonTarget: RewriteButtonTarget): Promise
     const savedChat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
     if (savedChat?.message?.[messageIndex]?.data !== edited)
       throw new Error("PocketRisu chưa lưu được bản sửa vào phản hồi cuối.");
+    await Risuai.alert(
+      automatic
+        ? "Đã tự động biên tập tiếng Việt bằng Submodel và lưu vào phản hồi cuối."
+        : "Đã biên tập tiếng Việt bằng Submodel và lưu vào phản hồi cuối.",
+    );
   } catch (error) {
     console.warn("[FF5.4] Submodel editor failed; keeping main response.", error);
     await Risuai.alertError(
@@ -807,12 +942,19 @@ async function rewriteLatestResponse(buttonTarget: RewriteButtonTarget): Promise
     );
   } finally {
     editorBusyChats.delete(key);
+    await editorButton?.refresh();
   }
 }
 
 void (async () => {
-  settings = normalizeSettings(preset, await Risuai.pluginStorage.getItem(STORAGE_KEY));
-  normalizeExclusivePromptGroups(settings, orderEntries());
+  configPresets = normalizePresetStore(
+    preset,
+    await Risuai.pluginStorage.getItem(CONFIG_PRESETS_STORAGE_KEY),
+    await Risuai.pluginStorage.getItem(STORAGE_KEY),
+  );
+  for (const profile of configPresets.presets)
+    normalizeExclusivePromptGroups(profile.settings, orderEntries());
+  await Risuai.pluginStorage.setItem(CONFIG_PRESETS_STORAGE_KEY, configPresets);
   const button = await Risuai.registerButton(
     { name: "FF5.4", icon: "⚡", iconType: "html", location: "chat", id: BUTTON_ID },
     () => void showSettings(),
