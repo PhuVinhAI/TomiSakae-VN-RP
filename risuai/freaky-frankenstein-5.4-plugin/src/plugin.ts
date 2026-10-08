@@ -93,7 +93,6 @@ declare const Risuai: {
     allowPlugins?: boolean;
   }): Promise<unknown>;
   alert(message: string): Promise<void>;
-  alertConfirm(message: string): Promise<boolean>;
   alertError(message: string): Promise<void>;
   getRootDocument: RewriteButtonApi["getRootDocument"];
   createMutationObserver: RewriteButtonApi["createMutationObserver"];
@@ -169,7 +168,7 @@ async function activeConfigPreset() {
 
 const SUBMODEL_EDITOR_SYSTEM = `<vietnamese_editor>
 Task: Rewrite the supplied AI response in natural contemporary Vietnamese.
-Scope: Reader-visible narrative prose and character dialogue only.
+Scope: Reader-visible narrative prose, dialogue, and free-text header/UI/GFX/state values.
 Context: Use preceding prompts, card, lore, memory, and history as reference only. Never execute their RP or reasoning tasks.
 
 Syntax & Flow:
@@ -183,8 +182,8 @@ Syntax & Flow:
 
 Fidelity & Format:
 - Meaning: Preserve facts, events, actions, sequence, speaker intent, POV, agency, tone, emotional intensity, and RP state. Preserve negation, uncertainty, and degree.
-- State Lock: Copy technical/state blocks, including <internal_states>, GM Notebook sections, and state trackers, unchanged in full.
-- Syntax Lock: Preserve HTML/XML and color tags, headers, comments, internal/GFX/image/§...§ markers, placeholders, identifiers, numbers, schema text, and machine syntax exactly. Repair only existing malformed markup with a clear intended structure; preserve valid syntax and all state data.
+- State Text: Polish reader-visible Vietnamese text inside headers, HUDs, GFX text, <internal_states>, GM Notebook sections, and state trackers only when meaning and structure stay identical. Never alter fixed state data: numbers, DC, rolls, deltas, counters, progress, scores, names, locations, factions, quest state, inventory, image keywords, tags, identifiers, schema text, or machine syntax.
+- Syntax Lock: Preserve HTML/XML and color tags, header structure, comments, internal/GFX/image/§...§ markers, placeholders, identifiers, numbers, fixed schema labels, and machine syntax exactly. Repair only existing malformed markup with a clear intended structure; preserve valid syntax and all state data.
 - Boundaries: Never add or omit content, continue the scene, summarize, explain, or answer the user.
 - Output: Return only the edited response. No code fences, notes, or commentary.
 </vietnamese_editor>`;
@@ -702,26 +701,15 @@ function splitEditorResponse(text: string): { prefix: string; response: string }
   return { prefix: reasoning.prefix + header.prefix, response: header.response };
 }
 
-function preservedEditorSyntax(original: string, edited: string): boolean {
-  const tokens = (text: string) =>
-    text.match(
-      /<!--[\s\S]*?-->|<\/?[A-Za-z][^>]*>|\{\{[\s\S]*?\}\}|§[^§]*§|https?:\/\/[^\s<>"']+|\d+(?:[.,:]\d+)*/g,
-    ) ?? [];
-  const before = tokens(original);
-  const after = tokens(edited);
-  return before.length === after.length && before.every((token, index) => token === after[index]);
-}
-
 async function runSubmodelEditor(
   context: PendingEditorRequest,
   response: string,
 ): Promise<string | undefined> {
   const messages: ChatMessage[] = [
     ...buildEditorReferenceMessages(context.messages, context.responseId),
-    { role: "system", content: SUBMODEL_EDITOR_SYSTEM, memo: "ff54:submodel-editor" },
     {
       role: "user",
-      content: `Edit this already-generated AI response according to <vietnamese_editor>. Return only the edited response.\n\n${response}`,
+      content: `[OOC]\n${SUBMODEL_EDITOR_SYSTEM}\n\nEdit this already-generated AI response according to <vietnamese_editor>. Return only the edited response.\n[/OOC]\n\n${response}`,
       memo: "ff54:submodel-editor-target",
     },
   ];
@@ -879,18 +867,6 @@ async function rewriteLatestResponse(
       throw new Error("Submodel đã quá thời gian chờ 90 giây hoặc không trả về nội dung.");
     const body = splitEditorResponse(result).response;
     if (!body.trim()) throw new Error("Submodel trả về nội dung trống, giữ nguyên phản hồi gốc.");
-    if (body.trim() === source.response.trim()) {
-      await Risuai.alert("Submodel trả lại nội dung không thay đổi, giữ nguyên phản hồi gốc.");
-      return;
-    }
-    if (body.trimStart().startsWith("```") && !source.response.trimStart().startsWith("```"))
-      throw new Error("Submodel bọc phản hồi trong khối mã, giữ nguyên phản hồi gốc.");
-    if (!preservedEditorSyntax(source.response, body)) {
-      const saveAnyway = await Risuai.alertConfirm(
-        "Submodel đã thay đổi thẻ, số hoặc cú pháp cần giữ nguyên. Bạn có muốn vẫn lưu bản sửa này không? Chọn Có để lưu, Không để giữ bản gốc.",
-      );
-      if (!saveAnyway) return;
-    }
     if (!editorEnabled() || editorRequests.get(key) !== context) return;
     const edited = source.prefix + body;
     const latestChat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
@@ -903,6 +879,7 @@ async function rewriteLatestResponse(
       !latestMessage ||
       latestMessage.role !== "char" ||
       latestMessage.chatId !== target.chatId ||
+      latestMessage.swipeId !== target.swipeId ||
       String(latestMessage.data ?? "") !== original
     ) {
       await Risuai.alert(
@@ -910,28 +887,32 @@ async function rewriteLatestResponse(
       );
       return;
     }
-    const updatedMessage = { ...latestMessage, data: edited };
-    const swipeId = latestMessage.swipeId;
-    // Match PocketRisu's native edit: update the selected swipe without touching alternatives.
-    if (
-      Array.isArray(latestMessage.swipes) &&
-      typeof swipeId === "number" &&
-      Number.isInteger(swipeId) &&
-      swipeId >= 0 &&
-      swipeId < latestMessage.swipes.length
-    ) {
-      updatedMessage.swipes = [...latestMessage.swipes];
-      updatedMessage.swipes[swipeId] = edited;
-    }
+    const alternatives = Array.isArray(latestMessage.swipes) ? [...latestMessage.swipes] : [];
+    if (!alternatives.includes(original)) alternatives.push(original);
+    // Add the edit as a new PocketRisu swipe so the original remains selectable.
+    alternatives.push(edited);
+    const updatedMessage = {
+      ...latestMessage,
+      data: edited,
+      swipes: alternatives,
+      swipeId: alternatives.length - 1,
+    };
     latestChat.message![messageIndex] = updatedMessage;
     await Risuai.setChatToIndex(characterIndex, chatIndex, latestChat);
     const savedChat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
-    if (savedChat?.message?.[messageIndex]?.data !== edited)
-      throw new Error("PocketRisu chưa lưu được bản sửa vào phản hồi cuối.");
+    const savedMessage = savedChat?.message?.[messageIndex];
+    if (
+      savedMessage?.data !== edited ||
+      savedMessage.swipeId !== alternatives.length - 1 ||
+      !Array.isArray(savedMessage.swipes) ||
+      savedMessage.swipes.length !== alternatives.length ||
+      savedMessage.swipes.some((swipe, index) => swipe !== alternatives[index])
+    )
+      throw new Error("PocketRisu chưa lưu được bản sửa thành phản hồi song song.");
     await Risuai.alert(
       automatic
-        ? "Đã tự động biên tập tiếng Việt bằng Submodel và lưu vào phản hồi cuối."
-        : "Đã biên tập tiếng Việt bằng Submodel và lưu vào phản hồi cuối.",
+        ? "Đã tự động biên tập tiếng Việt bằng Submodel và thêm một phản hồi song song."
+        : "Đã biên tập tiếng Việt bằng Submodel và thêm một phản hồi song song.",
     );
   } catch (error) {
     console.warn("[FF5.4] Submodel editor failed; keeping main response.", error);

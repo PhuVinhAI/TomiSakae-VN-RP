@@ -401,8 +401,15 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(options.mode).toBe("submodel");
     expect(options.allowPlugins).toBe(false);
     expect(options).not.toHaveProperty("staticModel");
-    const references = options.messages.slice(0, -2);
+    const references = options.messages.slice(0, -1);
     expect(references).toEqual(snapshot);
+    const editorMessage = options.messages.at(-1)!;
+    expect(editorMessage.role).toBe("user");
+    expect(editorMessage.content).toMatch(/^\[OOC\]\n<vietnamese_editor>/);
+    expect(editorMessage.content).toContain(
+      "[/OOC]\n\nAn di chuyển lại gần, nói lời chào với bạn.",
+    );
+    expect(options.messages.some((message) => message.memo === "ff54:submodel-editor")).toBe(false);
     expect(references.filter((message) => message.memo === "old-a")).toHaveLength(0);
     expect(references.filter((message) => message.memo === "user-a")).toHaveLength(1);
     expect(options.messages.at(-1)!.content).not.toContain(
@@ -410,6 +417,11 @@ describe("FF5.4 Submodel editor integration", () => {
     );
     expect(options.messages.at(-1)!.content).not.toContain("Complete saved chat history");
     expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe("An bước tới, nhẹ giọng chào bạn.");
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.swipes).toEqual([
+      "An di chuyển lại gần, nói lời chào với bạn.",
+      "An bước tới, nhẹ giọng chào bạn.",
+    ]);
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.swipeId).toBe(1);
     expect(plugin.api.alert).toHaveBeenCalledWith(expect.stringContaining("Đã biên tập"));
   });
 
@@ -506,7 +518,6 @@ describe("FF5.4 Submodel editor integration", () => {
   it.each([
     { type: "fail", result: "API error" },
     { type: "success", result: "  " },
-    { type: "success", result: "```text\nAn bước tới.\n```" },
     { type: "multiline", result: [["char", "An bước tới."]] },
   ])("keeps the main response on unsuccessful or invalid result $type", async (result) => {
     const plugin = await startPlugin();
@@ -518,7 +529,7 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(plugin.writes).not.toHaveBeenCalled();
   });
 
-  it("preserves markup and rejects changed tags or numeric state", async () => {
+  it("adds output with changed tags or numbers as a swipe without validation or confirmation", async () => {
     const original =
       "<pink:happy>An di chuyển tới.</pink:happy>\n§Cạch!§\n<!--GFX_START--><internal_states><b>Bond: 3</b></internal_states><!--GFX_END-->";
     for (const edited of [
@@ -531,9 +542,11 @@ describe("FF5.4 Submodel editor integration", () => {
       plugin.runModel.mockResolvedValue({ type: "success", result: edited });
       await plugin.complete(original);
       await plugin.rewrite();
-      expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(
-        edited === original.replace("di chuyển", "bước") ? edited : original,
-      );
+      const saved = plugin.chats.get("0:0")!.message.at(-1)!;
+      expect(saved.data).toBe(edited);
+      expect(saved.swipes).toEqual([original, edited]);
+      expect(saved.swipeId).toBe(1);
+      expect(plugin.api.alertConfirm).not.toHaveBeenCalled();
     }
   });
 
@@ -639,7 +652,7 @@ describe("FF5.4 Submodel editor integration", () => {
     );
   });
 
-  it("updates the selected swipe and keeps other alternatives intact", async () => {
+  it("appends a new selected swipe and keeps all existing alternatives intact", async () => {
     const plugin = await startPlugin();
     await plugin.request();
     await plugin.complete("An di chuyển tới.");
@@ -650,67 +663,114 @@ describe("FF5.4 Submodel editor integration", () => {
     await plugin.rewrite();
     const saved = plugin.chats.get("0:0")!.message.at(-1)!;
     expect(saved.data).toBe("An bước tới.");
-    expect(saved.swipes).toEqual(["Bản khác.", "An bước tới."]);
-    expect(saved.swipeId).toBe(1);
+    expect(saved.swipes).toEqual(["Bản khác.", "An di chuyển tới.", "An bước tới."]);
+    expect(saved.swipeId).toBe(2);
+    saved.swipeId = 1;
+    saved.data = saved.swipes![saved.swipeId]!;
+    expect(saved.data).toBe("An di chuyển tới.");
+    saved.swipeId = 2;
+    saved.data = saved.swipes![saved.swipeId]!;
+    expect(saved.data).toBe("An bước tới.");
   });
 
-  it("offers to save a syntax-changing edit and keeps the original when declined", async () => {
+  it.each([{ swipes: [] }, { swipes: ["Bản khác."] }])(
+    "preserves the current response missing from saved swipes: $swipes",
+    async ({ swipes }) => {
+      const plugin = await startPlugin();
+      await plugin.request();
+      const original = "An di chuyển tới.";
+      await plugin.complete(original);
+      plugin.chats.get("0:0")!.message.at(-1)!.swipes = swipes;
+      plugin.runModel.mockResolvedValue({ type: "success", result: "An bước tới." });
+      await plugin.rewrite();
+      const saved = plugin.chats.get("0:0")!.message.at(-1)!;
+      expect(saved.swipes).toEqual([...swipes, original, "An bước tới."]);
+      expect(saved.swipeId).toBe(swipes.length + 1);
+    },
+  );
+
+  it("saves polished header, HUD, GFX and state text while keeping the original swipe", async () => {
+    const plugin = await startPlugin();
+    await plugin.request();
+    const original =
+      '[ 🕰️ Thời gian 14:25 CH | 🗓️ Ngày 1 | 📍 Đại học | ☀️ Sunny, 20 °C ]\n<div class="card">Cảm thấy một cảm giác nhẹ nhõm.</div>\n<!--GFX_START--><internal_states><b>DC: 12 | Roll: 14 | Delta: +2</b>co gì phải sợ.</internal_states><!--GFX_END-->';
+    const edited = original
+      .replace("Sunny", "Nắng ráo")
+      .replace("Cảm thấy một cảm giác nhẹ nhõm.", "Cảm thấy nhẹ nhõm.")
+      .replace("co gì phải sợ.", "có gì phải sợ.");
+    await plugin.complete(original);
+    plugin.runModel.mockResolvedValue({ type: "success", result: edited });
+    await plugin.rewrite();
+    const saved = plugin.chats.get("0:0")!.message.at(-1)!;
+    expect(saved.swipes).toEqual([original, edited]);
+    expect(saved.data).toBe(edited);
+    expect(plugin.api.alertConfirm).not.toHaveBeenCalled();
+  });
+
+  it("saves a syntax-changing result as a new swipe without requesting confirmation", async () => {
     const plugin = await startPlugin();
     await plugin.request();
     await plugin.complete("<pink:happy>An chào bạn.</pink:happy>");
     plugin.runModel.mockResolvedValue({ type: "success", result: "An chào bạn." });
     await plugin.rewrite();
-    expect(plugin.api.alertConfirm).toHaveBeenCalledWith(expect.stringContaining("vẫn lưu"));
+    expect(plugin.api.alertConfirm).not.toHaveBeenCalled();
     expect(plugin.api.alertError).not.toHaveBeenCalled();
-    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.swipes).toEqual([
       "<pink:happy>An chào bạn.</pink:happy>",
-    );
-    expect(plugin.writes).not.toHaveBeenCalled();
+      "An chào bạn.",
+    ]);
+    expect(plugin.writes).toHaveBeenCalledTimes(1);
   });
 
   it.each(["An bước tới. Bond: 3", "<pink:happy>An bước tới.</pink:happy> Bond: 4"])(
-    "saves an approved syntax-changing edit without calling the model again: %s",
+    "adds a syntax-changing edit immediately without calling the model again: %s",
     async (edited) => {
       const plugin = await startPlugin();
       await plugin.request();
       await plugin.complete("<pink:happy>An di chuyển tới.</pink:happy> Bond: 3");
-      plugin.api.alertConfirm.mockResolvedValue(true);
       plugin.runModel.mockResolvedValue({ type: "success", result: edited });
       await plugin.rewrite();
       expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(edited);
       expect(plugin.runModel).toHaveBeenCalledTimes(1);
+      expect(plugin.api.alertConfirm).not.toHaveBeenCalled();
       expect(plugin.api.alertError).not.toHaveBeenCalled();
     },
   );
 
-  it("rechecks the message after approving an edit and preserves intervening user changes", async () => {
+  it("rechecks the selected swipe and preserves a swipe switch during editing", async () => {
     const plugin = await startPlugin();
     await plugin.request();
     await plugin.complete("<pink:happy>An di chuyển tới.</pink:happy>");
-    plugin.runModel.mockResolvedValue({ type: "success", result: "An bước tới." });
-    plugin.api.alertConfirm.mockImplementation(async () => {
-      plugin.chats.get("0:0")!.message.at(-1)!.data = "Người dùng tự sửa khi đang xác nhận.";
-      return true;
+    const original = plugin.chats.get("0:0")!.message.at(-1)!.data;
+    const message = plugin.chats.get("0:0")!.message.at(-1)!;
+    message.swipes = [original, "Bản khác."];
+    message.swipeId = 0;
+    plugin.runModel.mockImplementation(async () => {
+      message.swipeId = 1;
+      message.data = message.swipes![1]!;
+      return { type: "success", result: "An bước tới." };
     });
     await plugin.rewrite();
-    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(
-      "Người dùng tự sửa khi đang xác nhận.",
-    );
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe("Bản khác.");
     expect(plugin.writes).not.toHaveBeenCalled();
   });
 
-  it("reports an unchanged response and provider errors", async () => {
+  it("adds even an unchanged result as a swipe and keeps all swipes on provider failure", async () => {
     const plugin = await startPlugin();
     await plugin.request();
     await plugin.complete("An chào bạn.");
     plugin.runModel.mockResolvedValue({ type: "success", result: "An chào bạn." });
     await plugin.rewrite();
-    expect(plugin.api.alert).toHaveBeenCalledWith(expect.stringContaining("không thay đổi"));
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.swipes).toEqual([
+      "An chào bạn.",
+      "An chào bạn.",
+    ]);
     plugin.runModel.mockResolvedValue({ type: "fail", result: "Provider unavailable" });
     await plugin.rewrite();
     expect(plugin.api.alertError).toHaveBeenCalledWith(
       expect.stringContaining("Provider unavailable"),
     );
+    expect(plugin.writes).toHaveBeenCalledTimes(1);
   });
 
   it("checks that PocketRisu actually saved the rewritten message", async () => {
@@ -903,7 +963,7 @@ describe("Named presets in plugin UI and requests", () => {
     expect(plugin.runModel).toHaveBeenCalledTimes(1);
     expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toContain("An bước tới.");
     expect(plugin.chats.get("1:0")!.message).toHaveLength(1);
-    expect(plugin.runModel.mock.calls[0]![0].messages.at(-2)!.content).toContain(
+    expect(plugin.runModel.mock.calls[0]![0].messages.at(-1)!.content).toContain(
       "Repair only existing malformed markup",
     );
   });
