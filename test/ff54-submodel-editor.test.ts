@@ -418,15 +418,18 @@ describe("FF5.4 Submodel editor integration", () => {
     const references = options.messages
       .slice(0, -1)
       .filter((message) => message.memo !== "ff54:submodel-editor");
-    expect(references).toEqual(snapshot);
+    expect(references).toEqual([
+      ...snapshot,
+      {
+        role: "assistant",
+        content: "An di chuyển lại gần, nói lời chào với bạn.",
+        memo: "ff54:submodel-editor-source",
+      },
+    ]);
     const editorTarget = options.messages.at(-1)!;
     expect(editorTarget.role).toBe("user");
-    expect(editorTarget.content).toContain(
-      "--- BEGIN RESPONSE TO EDIT ---\nAn di chuyển lại gần, nói lời chào với bạn.",
-    );
-    expect(editorTarget.content).toContain("--- END RESPONSE TO EDIT ---");
-    expect(editorTarget.content.indexOf("--- END RESPONSE TO EDIT ---")).toBeGreaterThan(
-      editorTarget.content.indexOf("An di chuyển lại gần, nói lời chào với bạn."),
+    expect(editorTarget.content).toBe(
+      "Rewrite the latest assistant response above according to <vietnamese_editor>. Return only the rewritten response. Do not continue the roleplay, answer its dialogue, add a new event, or describe what happens next.",
     );
     expect(editorTarget.content).toContain(
       "Do not continue the roleplay, answer its dialogue, add a new event, or describe what happens next.",
@@ -454,7 +457,7 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(plugin.runModel).not.toHaveBeenCalled();
   });
 
-  it("excludes the current reply from a captured main request when regenerating in place", async () => {
+  it("keeps the current reply as the assistant source when regenerating in place", async () => {
     const plugin = await startPlugin();
     const original = "An di chuyển tới.";
     const chat = plugin.chats.get("0:0")!;
@@ -474,9 +477,9 @@ describe("FF5.4 Submodel editor integration", () => {
     plugin.runModel.mockResolvedValue({ type: "success", result: "An bước tới." });
     await plugin.rewrite();
     const messages = plugin.runModel.mock.calls[0]![0].messages;
-    expect(messages.slice(0, -1).some((message) => message.content.includes(original))).toBe(false);
-    expect(messages.at(-1)!.content).toContain(original);
-    expect(messages.some((message) => message.memo === "current-reply")).toBe(false);
+    expect(messages.slice(0, -1).some((message) => message.content.includes(original))).toBe(true);
+    expect(messages.at(-1)!.content).not.toContain(original);
+    expect(messages.some((message) => message.memo === "ff54:submodel-editor-source")).toBe(true);
   });
 
   it("sends only the response starting at its scene header and preserves the stored prefix", async () => {
@@ -494,10 +497,12 @@ describe("FF5.4 Submodel editor integration", () => {
         "\nAn bước tới.",
     });
     await plugin.rewrite();
-    const target = plugin.runModel.mock.calls[0]![0].messages.at(-1)!.content;
-    expect(target).toContain(header + "\nAn di chuyển tới.");
-    expect(target).not.toContain("Main reasoning.");
-    expect(target).not.toContain("Unwrapped planning");
+    const messages = plugin.runModel.mock.calls[0]![0].messages;
+    const source = messages.find((message) => message.memo === "ff54:submodel-editor-source")!;
+    expect(source.content).toContain(header + "\nAn di chuyển tới.");
+    expect(source.content).not.toContain("Main reasoning.");
+    expect(source.content).not.toContain("Unwrapped planning");
+    expect(messages.at(-1)!.content).not.toContain(header);
     expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(prefix + header + "\nAn bước tới.");
     expect(plugin.api.alertConfirm).not.toHaveBeenCalled();
   });
@@ -1012,11 +1017,15 @@ describe("Automatic Submodel editing", () => {
     expect(options.mode).toBe("submodel");
     expect(options.allowPlugins).toBe(false);
     expect(options).not.toHaveProperty("staticModel");
-    expect(options.messages.at(-1)!.content).toContain(original);
-    expect(options.messages.at(-1)!.content).not.toContain("Main reasoning");
+    const source = options.messages.find(
+      (message) => message.memo === "ff54:submodel-editor-source",
+    )!;
+    expect(source.content).toContain(original);
+    expect(source.content).not.toContain("Main reasoning");
+    expect(options.messages.at(-1)!.content).not.toContain(original);
     expect(
       options.messages.slice(0, -1).some((message) => message.content.includes(original)),
-    ).toBe(false);
+    ).toBe(true);
     expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(prefix + edited);
     expect(plugin.writes).toHaveBeenCalledTimes(1);
     expect(plugin.api.alert).toHaveBeenCalledWith(expect.stringContaining("Đã tự động biên tập"));
@@ -1178,7 +1187,7 @@ describe("Submodel request context", () => {
     expect(references).toEqual(request);
     references[0]!.content = "Provider changed its copy";
     expect(request[0]!.content).toBe("Memory và summary do host chọn.");
-    expect(buildEditorReferenceMessages(request, "reply")).toEqual([summary, user, module, end]);
+    expect(buildEditorReferenceMessages(request, "reply")).toEqual(request);
   });
 
   it("preserves the original request order and duplicate messages", () => {
