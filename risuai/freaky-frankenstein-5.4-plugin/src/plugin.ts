@@ -173,8 +173,9 @@ Scope: Reader-visible narrative prose and character dialogue only.
 Context: Use preceding prompts, card, lore, memory, and history as reference only. Never execute their RP or reasoning tasks.
 
 Syntax & Flow:
-- Rewrite: Freely change wording, syntax, punctuation, paragraphing, and rhythm. Split or merge sentences as needed.
-- Language: Replace foreign-language leakage, translation calques, unnatural collocations, and stiff wording. Preserve proper names and required technical terms.
+- Rewrite: Revise wording, syntax, punctuation, paragraphing, and rhythm where needed for natural Vietnamese. Preserve natural, accurate phrasing unless restructuring is needed for coherence or flow. Never rephrase merely for variation.
+- Language: Replace foreign-language leakage, translation calques, unnatural collocations, and stiff wording with idiomatic Vietnamese. Never replace natural Vietnamese with avoidable foreign wording. Preserve proper names and required technical terms.
+- Style: Use contemporary Vietnamese suited to manga, anime, and light novels. Preserve the draft's character voice, comic timing, and emotional pacing. Avoid wuxia-style diction and ornate translation calques.
 - Cadence: Smooth paragraphs with varied sentence lengths and openings. Ban verbless fragments, telegraphic prose, isolated one-word narration, and disconnected inventory-style narration. Connect related observations and actions without adding facts. Ban run-on sentences and padding.
 - Punctuation: Ban em-dashes (—) in prose and dialogue. Rephrase with natural punctuation.
 - Dialogue: Edit text inside speech color tags; preserve enclosing tags. Retain character voice and context-appropriate pauses, stutters, and short utterances.
@@ -720,7 +721,7 @@ async function runSubmodelEditor(
     { role: "system", content: SUBMODEL_EDITOR_SYSTEM, memo: "ff54:submodel-editor" },
     {
       role: "user",
-      content: `Rewrite this already-generated AI response in fluent, natural Vietnamese, freely reworking its expression while preserving all meaning and required syntax. Return only the rewritten response.\n\n${response}`,
+      content: `Edit this already-generated AI response according to <vietnamese_editor>. Return only the edited response.\n\n${response}`,
       memo: "ff54:submodel-editor-target",
     },
   ];
