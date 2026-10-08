@@ -211,9 +211,29 @@ interface PendingEditorRequest {
 const editorRequests = new Map<string, PendingEditorRequest>();
 let editorListenerRegistered = false;
 let editorButton: RewriteButtonController | undefined;
-const editorBusyChats = new Set<string>();
+const editorRuns = new Map<string, { controller: AbortController; targetKey: string }>();
 const editorChatKey = (characterIndex: number, chatIndex: number) =>
   `${characterIndex}:${chatIndex}`;
+
+function createEditorAbortController(): AbortController {
+  if (typeof AbortController !== "undefined") return new AbortController();
+  const listeners = new Set<() => void>();
+  const signal = {
+    aborted: false,
+    reason: undefined as unknown,
+    addEventListener: (_type: string, listener: () => void) => listeners.add(listener),
+    removeEventListener: (_type: string, listener: () => void) => listeners.delete(listener),
+  } as unknown as AbortSignal;
+  return {
+    signal,
+    abort(reason?: unknown) {
+      if (signal.aborted) return;
+      Object.assign(signal, { aborted: true, reason });
+      for (const listener of [...listeners]) listener();
+      listeners.clear();
+    },
+  } as AbortController;
+}
 
 function escapeHtml(value: unknown): string {
   return String(value)
@@ -673,7 +693,16 @@ const displayOutput = async (content: string): Promise<string> => {
   );
 };
 
-async function readSubmodelResult(value: unknown): Promise<string | undefined> {
+async function readSubmodelResult(
+  value: unknown,
+  signal: AbortSignal,
+): Promise<string | undefined> {
+  if (signal.aborted) {
+    const stream = (value as { type?: string; result?: ReadableStream } | null)?.result;
+    if ((value as { type?: string } | null)?.type === "streaming" && stream?.cancel)
+      void stream.cancel().catch(() => {});
+    throw signal.reason;
+  }
   if (typeof value === "string") return value;
   if (!value || typeof value !== "object") throw new Error("Submodel không trả về kết quả hợp lệ.");
   const record = value as Record<string, unknown>;
@@ -686,15 +715,21 @@ async function readSubmodelResult(value: unknown): Promise<string | undefined> {
   if (!result || typeof result !== "object" || !("getReader" in result))
     throw new Error("Không đọc được luồng phản hồi của Submodel.");
   const reader = (result as ReadableStream<{ [key: string]: string }>).getReader();
+  const cancel = () => {
+    void reader.cancel().catch(() => {});
+  };
+  signal.addEventListener("abort", cancel, { once: true });
   let output = "";
   try {
     while (true) {
       const chunk = await reader.read();
+      if (signal.aborted) throw signal.reason;
       // PocketRisu stream chunks contain the full response so far.
       if (chunk.value) output = Object.values(chunk.value)[0] ?? output;
       if (chunk.done) return output || undefined;
     }
   } finally {
+    signal.removeEventListener("abort", cancel);
     reader.releaseLock();
   }
 }
@@ -730,6 +765,7 @@ function insertSubmodelEditorSystem(messages: ChatMessage[]): ChatMessage[] {
 async function runSubmodelEditor(
   context: PendingEditorRequest,
   response: string,
+  controller: AbortController,
 ): Promise<string | undefined> {
   const messages: ChatMessage[] = [
     ...insertSubmodelEditorSystem(
@@ -741,18 +777,31 @@ async function runSubmodelEditor(
       memo: "ff54:submodel-editor-target",
     },
   ];
-  let timer: ReturnType<typeof setTimeout> | undefined;
+  const { signal } = controller;
+  if (signal.aborted) throw signal.reason;
+  let onAbort!: () => void;
+  let timedOut = false;
+  const stopped = new Promise<string | undefined>((resolve, reject) => {
+    onAbort = () => {
+      if (timedOut) resolve(undefined);
+      else reject(signal.reason);
+    };
+    signal.addEventListener("abort", onAbort, { once: true });
+  });
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort(new Error("Submodel đã quá thời gian chờ 10 phút, giữ nguyên phản hồi gốc."));
+  }, 600_000);
   try {
     return await Promise.race([
-      Risuai.runLLMModel({ mode: "submodel", messages, allowPlugins: false }).then(
-        readSubmodelResult,
+      Risuai.runLLMModel({ mode: "submodel", messages, allowPlugins: false }).then((value) =>
+        readSubmodelResult(value, signal),
       ),
-      new Promise<undefined>((resolve) => {
-        timer = setTimeout(() => resolve(undefined), 90_000);
-      }),
+      stopped,
     ]);
   } finally {
-    if (timer !== undefined) clearTimeout(timer);
+    clearTimeout(timer);
+    signal.removeEventListener("abort", onAbort);
   }
 }
 
@@ -781,7 +830,7 @@ const submodelOutputListener = async ({
       settings.submodelAutoRewriteEnabled &&
       !chat.isStreaming &&
       !context.autoRewriteAttempted &&
-      !editorBusyChats.has(key) &&
+      !editorRuns.has(key) &&
       completeAutoRewriteResponse(String(target.data ?? ""))
     ) {
       context.autoRewriteAttempted = true;
@@ -830,7 +879,7 @@ async function getEditorButtonTarget(): Promise<RewriteButtonTarget | undefined>
     messageIndex,
     messageId: target.chatId,
     chatId: chat.id,
-    busy: editorBusyChats.has(editorChatKey(characterIndex, chatIndex)),
+    busy: editorRuns.has(editorChatKey(characterIndex, chatIndex)),
     available:
       context?.chatId === chat.id &&
       context?.responseId === target.chatId &&
@@ -844,6 +893,10 @@ async function syncEditorButton(): Promise<void> {
       Risuai,
       getEditorButtonTarget,
       rewriteLatestResponse,
+      (target) => {
+        const run = editorRuns.get(editorChatKey(target.characterIndex, target.chatIndex));
+        if (run?.targetKey === target.key) run.controller.abort("cancel");
+      },
     );
     await editorButton?.refresh();
   } catch (error) {
@@ -858,7 +911,7 @@ async function rewriteLatestResponse(
   const { characterIndex, chatIndex, messageIndex } = buttonTarget;
   const key = editorChatKey(characterIndex, chatIndex);
   const context = editorRequests.get(key);
-  if (!context || editorBusyChats.has(key)) return;
+  if (!context || editorRuns.has(key)) return;
   const profile = presetForCard(configPresets, context.cardId);
   const editorEnabled = () =>
     presetForCard(configPresets, context.cardId).id === profile.id &&
@@ -884,15 +937,17 @@ async function rewriteLatestResponse(
   const original = String(target?.data ?? "");
   if (!original.trim()) return;
   if (automatic && !completeAutoRewriteResponse(original)) return;
-  if (editorBusyChats.has(key)) return;
-  editorBusyChats.add(key);
+  if (editorRuns.has(key)) return;
+  const run = { controller: createEditorAbortController(), targetKey: buttonTarget.key };
+  editorRuns.set(key, run);
   try {
     await editorButton?.refresh();
     const source = splitEditorResponse(original);
-    const result = await runSubmodelEditor(context, source.response);
+    const result = await runSubmodelEditor(context, source.response, run.controller);
+    if (run.controller.signal.aborted) return;
     if (!editorEnabled() || editorRequests.get(key) !== context) return;
     if (result === undefined)
-      throw new Error("Submodel đã quá thời gian chờ 90 giây hoặc không trả về nội dung.");
+      throw new Error("Submodel không trả về nội dung, giữ nguyên phản hồi gốc.");
     const body = splitEditorResponse(result).response;
     if (!body.trim()) throw new Error("Submodel trả về nội dung trống, giữ nguyên phản hồi gốc.");
     if (!editorEnabled() || editorRequests.get(key) !== context) return;
@@ -943,12 +998,13 @@ async function rewriteLatestResponse(
         : "Đã biên tập tiếng Việt bằng Submodel và thêm một phản hồi song song.",
     );
   } catch (error) {
+    if (run.controller.signal.reason === "cancel") return;
     console.warn("[FF5.4] Submodel editor failed; keeping main response.", error);
     await Risuai.alertError(
       error instanceof Error ? error.message : "Không thể lưu bản sửa từ Submodel.",
     );
   } finally {
-    editorBusyChats.delete(key);
+    if (editorRuns.get(key) === run) editorRuns.delete(key);
     await editorButton?.refresh();
   }
 }
@@ -978,6 +1034,7 @@ void (async () => {
   await Risuai.onUnload(async () => {
     const unregisterEditor = editorListenerRegistered;
     editorListenerRegistered = false;
+    for (const run of editorRuns.values()) run.controller.abort("cancel");
     editorRequests.clear();
     await editorButton?.dispose();
     editorButton = undefined;

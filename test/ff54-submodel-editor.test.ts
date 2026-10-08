@@ -817,7 +817,7 @@ describe("FF5.4 Submodel editor integration", () => {
     );
     await plugin.complete("An di chuyển tới.");
     const output = plugin.rewrite();
-    await vi.advanceTimersByTimeAsync(90_000);
+    await vi.advanceTimersByTimeAsync(600_000);
     await output;
     resolveModel({ type: "success", result: "An bước tới." });
     await Promise.resolve();
@@ -849,7 +849,7 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(plugin.runModel).toHaveBeenCalledTimes(1);
   });
 
-  it("disables the icon and prevents repeat clicks while rewriting", async () => {
+  it("turns the icon into an interrupt button while rewriting", async () => {
     const plugin = await startPlugin();
     await plugin.request();
     await plugin.complete("An di chuyển tới.");
@@ -864,13 +864,15 @@ describe("FF5.4 Submodel editor integration", () => {
     });
     const rewriting = plugin.rewrite();
     await started;
-    expect(plugin.button()?.html).toContain("disabled");
-    expect(plugin.button()?.html).toContain("⏳");
+    expect(plugin.button()?.html).not.toContain("disabled");
+    expect(plugin.button()?.html).toContain("⏹");
     await plugin.rewrite();
     expect(plugin.runModel).toHaveBeenCalledTimes(1);
     resolveModel({ type: "success", result: "An bước tới." });
     await rewriting;
-    expect(plugin.button()?.html).not.toContain("disabled");
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe("An di chuyển tới.");
+    expect(plugin.writes).not.toHaveBeenCalled();
+    expect(plugin.button()?.html).toContain("✍️");
   });
 
   it("shows an inactive icon when a saved reply has no captured request context", async () => {
@@ -1086,8 +1088,8 @@ describe("Automatic Submodel editing", () => {
     });
     const completion = plugin.complete(original);
     await started;
-    expect(plugin.button()?.html).toContain("disabled");
-    expect(plugin.button()?.html).toContain("⏳");
+    expect(plugin.button()?.html).not.toContain("disabled");
+    expect(plugin.button()?.html).toContain("⏹");
     const repeat = () =>
       plugin.callbacks.output!({
         characterIndex: 0,
