@@ -5,6 +5,7 @@ This directory builds the original **Freaky Frankenstein 5.4 Internal States** S
 - The source JSON is embedded verbatim at build time.
 - The original preset is kept in `source/ff54-sillytavern-preset.json`; builds no longer depend on Downloads.
 - When Vietnamese Output is enabled, its adapter replaces the conjunction rule in Story Mode and Cinematic Realism: related clauses connect naturally, with sentence breaks chosen for clarity instead of a fixed two-clause limit. The source JSON remains unchanged; disabling Vietnamese Output keeps the original rule.
+- The same adapter allows natural Vietnamese conjunctions in all NPC Voice variants and MAX/BOLT/Micro, while retaining limits on mechanical clause chaining and run-on dialogue. Punctuation and action beats remain available when needed.
 - The chat-menu item **FF5.4** opens a fully Vietnamese, responsive configuration screen.
 - Source divider rows such as `=Pick one Prose Style=` are hidden because they do not produce prompts. Prose, POV, adult mode, user-action handling, dialogue color, and reasoning use compact single-choice controls; independent prompts remain switches.
 - Every visible prompt keeps a Vietnamese explanation translated from its source comment. Prompt controls are grouped into core rules, optional features, and internal states, while regex controls are grouped by function.

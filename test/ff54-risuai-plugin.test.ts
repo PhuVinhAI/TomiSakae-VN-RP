@@ -175,7 +175,9 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(built.some((entry) => entry.memo === `ff54:${disabledPrompt!.identifier}`)).toBe(false);
 
     const allContent = built.map((entry) => entry.content).join("\n");
-    expect(allContent).toContain('conjunctions ["và"], ["hoặc"], and ["hay là"]');
+    expect(allContent).toContain("I will use natural Vietnamese conjunctions where appropriate");
+    expect(allContent).not.toContain("I will not use the coordinating conjunctions");
+    expect(allContent).not.toContain("Ban Coordinating Conjunctions:");
     expect(allContent).toContain('e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!"');
     expect(allContent).toContain("(ưm..., aaaa..., suỵt, á!, ối!, hức!, ực!, hừ...)");
     expect(allContent).toContain(
