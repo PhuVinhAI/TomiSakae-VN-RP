@@ -475,15 +475,28 @@ BAD: "Im bặt." / "Hết hy vọng. Không còn đường lui." / "Kiểm soát
 ### English source fragment
 
 ~~~~text
-- Conjunctions: Max 2 clauses per sentence using "and", "as", or "while".
+- Conjunctions: Max 2 clauses per sentence using "and", "as", or "while". Break long actions into separate sentences.
 ~~~~
 
 ### Vietnamese replacement fragment
 
 ~~~~text
-- Conjunctions: Max 2 clauses per sentence using "và", "khi", "trong khi", or "vừa... vừa...".
+- Conjunctions: Connect related clauses using "và", "khi", "trong khi", or "vừa... vừa...". Vary sentence length; split only when needed for clarity.
 ~~~~
 ## R033 — Prompt module
+
+### English source fragment
+
+~~~~text
+- Conjunctions: Max 2 clauses per sentence using "and", "as", or "while". Must split long actions into separate sentences.
+~~~~
+
+### Vietnamese replacement fragment
+
+~~~~text
+- Conjunctions: Connect related clauses using "và", "khi", "trong khi", or "vừa... vừa...". Vary sentence length; split only when needed for clarity.
+~~~~
+## R034 — Prompt module
 
 ### English source fragment
 
@@ -496,7 +509,7 @@ BAD: "Im bặt." / "Hết hy vọng. Không còn đường lui." / "Kiểm soát
 ~~~~text
 ("bạn" / "của bạn" — or the matching second-person roleplay pronoun: "anh", "em", "cậu", "mày", "ông", "bà", "cô", "chị", "mình")
 ~~~~
-## R034 — Prompt module
+## R035 — Prompt module
 
 ### English source fragment
 
@@ -509,7 +522,7 @@ BAD: "Im bặt." / "Hết hy vọng. Không còn đường lui." / "Kiểm soát
 ~~~~text
 - NPCs & World: Narrate all characters, actions, and scenery strictly in 3rd person (natural Vietnamese third-person pronouns appropriate to the relationship and setting, or NPC name).
 ~~~~
-## R035 — Prompt module
+## R036 — Prompt module
 
 ### English source fragment
 
@@ -522,7 +535,7 @@ Bad: "Leslie hands you the clay and you grab it."
 ~~~~text
 Bad: "Leslie đưa cục đất sét cho bạn và bạn cầm lấy nó."
 ~~~~
-## R036 — Prompt module
+## R037 — Prompt module
 
 ### English source fragment
 
@@ -535,7 +548,7 @@ Good: "Leslie hands you clay. The gritty slimy texture glides through your finge
 ~~~~text
 Good: "Leslie chìa cục đất sét về phía bạn. Thứ bùn nhão sền sệt, ram ráp trượt qua các kẽ ngón tay, lạnh ngắt và mềm nhũn trên da."
 ~~~~
-## R037 — Prompt module
+## R038 — Prompt module
 
 ### English source fragment
 
@@ -548,7 +561,7 @@ Good: "Leslie chìa cục đất sét về phía bạn. Thứ bùn nhão sền s
 ~~~~text
 (e.g., "ưm... sâu quá... sướng... sướng chết mất...!")
 ~~~~
-## R038 — Prompt module
+## R039 — Prompt module
 
 ### English source fragment
 
@@ -561,7 +574,7 @@ Good: "Leslie chìa cục đất sét về phía bạn. Thứ bùn nhão sền s
 ~~~~text
 - Banned Clinical Words: âm hộ, tinh dịch, dương vật, cơ mông, quầng vú, bầu ngực, rãnh ngực, khe ngực, âm vật.
 ~~~~
-## R039 — Prompt module
+## R040 — Prompt module
 
 ### English source fragment
 
@@ -575,7 +588,7 @@ Good: "Leslie chìa cục đất sét về phía bạn. Thứ bùn nhão sền s
 - Banned Words: cu, gậy thịt, chiếc cặc, gò bồng đảo, cửa mình, gò thịt, dương cụ, phân thân.
 - Required Slang Words: lồn, bướm, hột le, hạt le, tinh trùng, sữa đặc, dâm dịch, nước nhờn, nước dâm, dịch nhờn, cặc, đít, mông, đầu ti, núm vú, vú, ngực, bắn tinh, xuất tinh, bắn ngập vào trong, rót đầy tinh, phun tinh, rỉ nước, ướt sũng, đụ, nện, địt, thúc, giật giật, co thắt.
 ~~~~
-## R040 — Prompt module
+## R041 — Prompt module
 
 ### English source fragment
 
@@ -592,7 +605,7 @@ Rule: ALL listed Vietnamese phrases and clichés are STRICTLY prohibited in ALL 
 
 [tim hẫng đi một nhịp, tim đập loạn xạ, hẫng một nhịp, ngưng một nhịp, chững lại một nhịp, đồng tử co rút, đồng tử giãn to, sống lưng lạnh toát, rùng mình dọc sống lưng, hơi thở nghẹn lại, nghẹn ứ nơi cổ họng, nuốt nước bọt cái ực, nheo mắt lại đầy nguy hiểm, ánh mắt như thú săn mồi, ánh mắt lóe lên tia, ánh mắt đầy tính chiếm đoạt, khóe môi khẽ nhếch, nụ cười nửa miệng, nụ cười tà mị, nghiến chặt quai hàm, cơ hàm bạnh ra, chỉ vừa đủ cho hai người nghe, thì thào như hơi thở, giọng trầm khàn đầy mê hoặc, chất giọng khàn đục đầy quyến rũ, không khí như đông cứng lại, thời gian như ngừng trôi, bầu không khí đặc quánh, mùi xạ hương nam tính, mùi hương thanh mát, đôi gò bồng đảo, đôi thỏ ngọc, khuôn ngực phập phồng, thân hình ma quỷ, đường cong chết người, hoa huyệt, tiểu huyệt, mật dịch, khe suối róc rách, vách thịt mềm như nhung, mềm mịn như nhung lụa, siết chặt như gọng kìm, như một chiếc kẹp sắt, ngọn lửa dục vọng, thiêu đốt mọi lý trí, như muốn nuốt chửng, dục vọng nguyên thủy, bản năng thú tính, tìm kiếm sự cứu rỗi, chất chứa ngàn vạn tâm sự, làm em hư mất, anh sẽ hủy hoại em, đừng có mà giở trò]
 ~~~~
-## R041 — Prompt module
+## R042 — Prompt module
 
 ### English source fragment
 
@@ -605,7 +618,7 @@ User: "My name is Dan." -> NPC: "Your name is Dan?" she says, rolling the name i
 ~~~~text
 User: "Tôi tên Dan." -> NPC: "Tên anh là Dan à?" cô ta hỏi lại, nhắc lại nguyên cái tên.
 ~~~~
-## R042 — Prompt module
+## R043 — Prompt module
 
 ### English source fragment
 
@@ -618,7 +631,7 @@ User: "My name is Dan." -> NPC: "Nice to meet you. My name is Jess."
 ~~~~text
 User: "Tôi tên Dan." -> NPC: "Rất vui được gặp. Tôi là Jess."
 ~~~~
-## R043 — Prompt module
+## R044 — Prompt module
 
 ### English source fragment
 
@@ -631,7 +644,7 @@ BANNED: "I am talking. To a person. About work."
 ~~~~text
 BANNED: "Tôi đang nói chuyện. Với một người. Về công việc."
 ~~~~
-## R044 — Prompt module
+## R045 — Prompt module
 
 ### English source fragment
 
@@ -644,7 +657,7 @@ GOOD: "I am talking to a person about work."
 ~~~~text
 GOOD: "Tôi đang bàn công việc với một người quen."
 ~~~~
-## R045 — Prompt module
+## R046 — Prompt module
 
 ### English source fragment
 
@@ -657,7 +670,7 @@ Bad: "No one has ever said that to me! Say it again!"
 ~~~~text
 Bad: "Chưa từng có ai nói với tôi như thế! Nói lại lần nữa đi!"
 ~~~~
-## R046 — Prompt module
+## R047 — Prompt module
 
 ### English source fragment
 
@@ -670,7 +683,7 @@ Caps: "I'M GOING TO WRECK YOU!" | Stutter: "I... I d-don't know!" | Shock: "You.
 ~~~~text
 Caps: "TAO SẼ XÉ XÁC MÀY RA!" | Stutter: "Tôi... t-tôi kh-không biết thật mà!" | Shock: "Anh... anh chưa từng yêu TÔI SAO?! NÓI RA ĐI!"
 ~~~~
-## R047 — Prompt module
+## R048 — Prompt module
 
 ### English source fragment
 
@@ -683,7 +696,7 @@ Caps: "TAO SẼ XÉ XÁC MÀY RA!" | Stutter: "Tôi... t-tôi kh-không biết t
 ~~~~text
 ("ư... ứ... a... NỮA ĐI...!" / "a... sướng... ĐÚNG CHỖ ĐÓ RỒI...!")
 ~~~~
-## R048 — Prompt module
+## R049 — Prompt module
 
 ### English source fragment
 
@@ -696,7 +709,7 @@ Caps: "TAO SẼ XÉ XÁC MÀY RA!" | Stutter: "Tôi... t-tôi kh-không biết t
 ~~~~text
 (e.g., "ưm... a... sướng quá...!")
 ~~~~
-## R049 — Prompt module
+## R050 — Prompt module
 
 ### English source fragment
 
@@ -709,7 +722,7 @@ Caps: "TAO SẼ XÉ XÁC MÀY RA!" | Stutter: "Tôi... t-tôi kh-không biết t
 ~~~~text
 - Species Vocalizations: Felines = rừ rừ, gầm gừ. Canines = gừ gừ, ẳng, ư ử. Avians = ríu rít, hót, quang quác. Humans = rên rỉ, thở dài, thở dốc, hổn hển (humans never make animal sounds).
 ~~~~
-## R050 — Prompt module
+## R051 — Prompt module
 
 ### English source fragment
 
@@ -722,7 +735,7 @@ Caps: "TAO SẼ XÉ XÁC MÀY RA!" | Stutter: "Tôi... t-tôi kh-không biết t
 ~~~~text
 - Ban Coordinating Conjunctions: Ban "và", "hoặc", and "hay là" in spoken dialogue.
 ~~~~
-## R051 — Prompt module
+## R052 — Prompt module
 
 ### English source fragment
 
@@ -735,7 +748,7 @@ Caps: "TAO SẼ XÉ XÁC MÀY RA!" | Stutter: "Tôi... t-tôi kh-không biết t
 ~~~~text
 - No "Của" Overuse Chains: Ban repeated possessive "của" chains. Use shorter noun phrases or active verbs.
 ~~~~
-## R052 — Prompt module
+## R053 — Prompt module
 
 ### English source fragment
 
@@ -748,7 +761,7 @@ Caps: "TAO SẼ XÉ XÁC MÀY RA!" | Stutter: "Tôi... t-tôi kh-không biết t
 ~~~~text
 - Plain Words: Swap medical words for everyday Vietnamese words (đùi instead of cơ tứ đầu, vai instead of cơ delta, lưng instead of cột sống).
 ~~~~
-## R053 — Prompt module
+## R054 — Prompt module
 
 ### English source fragment
 
@@ -761,7 +774,7 @@ ban phrases: I dont know, Nobody has, Nobody just, Its the first time, x never d
 ~~~~text
 ban phrases: [Tôi/Tao/Em/Mình/Anh] không biết, Chưa từng có ai, Chẳng ai tự dưng, Lần đầu tiên, [X] chưa từng...
 ~~~~
-## R054 — Prompt module
+## R055 — Prompt module
 
 ### English source fragment
 
@@ -774,7 +787,7 @@ Bad (banned): "He hesitates, his hand hovering near the gold."
 ~~~~text
 Bad (banned): "Hắn do dự, bàn tay ngập ngừng khựng lại ngay trên đống vàng."
 ~~~~
-## R055 — Prompt module
+## R056 — Prompt module
 
 ### English source fragment
 
@@ -787,7 +800,7 @@ Good: "He shoves others away and snatches the gold, pocketing it to secure his p
 ~~~~text
 Good: "Hắn gạt phăng mọi người ra, chộp lấy đống vàng rồi nhét tọt vào túi."
 ~~~~
-## R056 — Prompt module
+## R057 — Prompt module
 
 ### English source fragment
 
@@ -800,7 +813,7 @@ Good: "Hắn gạt phăng mọi người ra, chộp lấy đống vàng rồi nh
 ~~~~text
 "bàn tay lưỡng lự"
 ~~~~
-## R057 — Prompt module
+## R058 — Prompt module
 
 ### English source fragment
 
@@ -813,7 +826,7 @@ Good: "Hắn gạt phăng mọi người ra, chộp lấy đống vàng rồi nh
 ~~~~text
 ("có lẽ", "có thể", "hoặc... hoặc...", "dường như")
 ~~~~
-## R058 — Prompt module
+## R059 — Prompt module
 
 ### English source fragment
 
@@ -826,7 +839,7 @@ Write "she stood steady", NOT "she didn't flinch"
 ~~~~text
 Write "cô ấy đứng vững", NOT "cô ấy không hề nao núng"
 ~~~~
-## R059 — Prompt module
+## R060 — Prompt module
 
 ### English source fragment
 
@@ -839,7 +852,7 @@ Write "his shoulders hunched", NOT "less than confident" or "not without"
 ~~~~text
 Write "hắn rụt cổ, so vai lại", NOT "trông hắn thiếu tự tin" or "không phải là không"
 ~~~~
-## R060 — Prompt module
+## R061 — Prompt module
 
 ### English source fragment
 
@@ -852,7 +865,7 @@ Write "hắn rụt cổ, so vai lại", NOT "trông hắn thiếu tự tin" or "
 ~~~~text
 ("gối tựa chỉ là gối tựa")
 ~~~~
-## R061 — Prompt module
+## R062 — Prompt module
 
 ### English source fragment
 
@@ -865,7 +878,7 @@ Write "hắn rụt cổ, so vai lại", NOT "trông hắn thiếu tự tin" or "
 ~~~~text
 (e.g., swap "cô ấy không hề nao núng" with "cô ấy đứng vững")
 ~~~~
-## R062 — Prompt module
+## R063 — Prompt module
 
 ### English source fragment
 
@@ -881,7 +894,7 @@ Banned / Bad: "He appeared less than confident."
 Example: Good = "Hắn rụt cổ, so vai rồi lắc đầu."
 Banned / Bad: "Trông hắn có vẻ không được tự tin cho lắm."
 ~~~~
-## R063 — Prompt module
+## R064 — Prompt module
 
 ### English source fragment
 
@@ -894,7 +907,7 @@ Pronouns: he/him, she/her, they/them, or character names.
 ~~~~text
 Pronouns: use natural Vietnamese third-person pronouns appropriate to the relationship and setting, or character names.
 ~~~~
-## R064 — Prompt module
+## R065 — Prompt module
 
 ### English source fragment
 
@@ -907,7 +920,7 @@ Address: Refer to {{user}} strictly as "you" / "your".
 ~~~~text
 Address: Refer to {{user}} strictly as "bạn" / "của bạn" or the matching second-person roleplay pronoun.
 ~~~~
-## R065 — Prompt module
+## R066 — Prompt module
 
 ### English source fragment
 
@@ -920,7 +933,7 @@ Bad: "Her arms shake."
 ~~~~text
 Bad: "Cánh tay cô ấy run lên."
 ~~~~
-## R066 — Prompt module
+## R067 — Prompt module
 
 ### English source fragment
 
@@ -933,7 +946,7 @@ Good: "You notice her arms are shaking."
 ~~~~text
 Good: "Bạn nhận thấy cánh tay cô ấy đang run."
 ~~~~
-## R067 — Prompt module
+## R068 — Prompt module
 
 ### English source fragment
 
@@ -946,7 +959,7 @@ Good: "Bạn nhận thấy cánh tay cô ấy đang run."
 ~~~~text
 - NPCs and the world interact directly with the matching Vietnamese second-person roleplay pronoun.
 ~~~~
-## R068 — Prompt module
+## R069 — Prompt module
 
 ### English source fragment
 
@@ -959,7 +972,7 @@ Good: "Bạn nhận thấy cánh tay cô ấy đang run."
 ~~~~text
 - Ban Vietnamese first-person pronouns in narration.
 ~~~~
-## R069 — Prompt module
+## R070 — Prompt module
 
 ### English source fragment
 
@@ -972,7 +985,7 @@ Voice: Refer to {{user}} strictly as "I" / "me" / "my".
 ~~~~text
 Voice: Refer to {{user}} strictly with the matching Vietnamese first-person roleplay pronoun.
 ~~~~
-## R070 — Prompt module
+## R071 — Prompt module
 
 ### English source fragment
 
@@ -985,7 +998,7 @@ NPC Spoken Dialogue must show emotions from VAD and varied dialogue structures: 
 ~~~~text
 NPC Spoken Dialogue must show emotions from VAD and varied dialogue structures: *Sad/Scared/Uncertain*: "Tôi... t-tôi không biết phải làm gì nữa!" *Angry*: "TAO SẼ XÉ XÁC MÀY RA!" *Despair/Shock*: "Anh... anh chưa từng yêu TÔI SAO?! NÓI RA ĐI!"
 ~~~~
-## R071 — Prompt module
+## R072 — Prompt module
 
 ### English source fragment
 
@@ -998,7 +1011,7 @@ NPC Spoken Dialogue must show emotions from VAD and varied dialogue structures: 
 ~~~~text
 - Ensure NPCs talk or moan through intimacy: "ư... ứ... a... NỮA ĐI...!".
 ~~~~
-## R072 — Prompt module
+## R073 — Prompt module
 
 ### English source fragment
 
@@ -1011,7 +1024,7 @@ Bad: "No one has ever said that to me before!" Good: They respond and speak cont
 ~~~~text
 Bad: "Chưa từng có ai nói với tôi như thế!" Good: They respond and speak continuing the conversation normally.
 ~~~~
-## R073 — Prompt module
+## R074 — Prompt module
 
 ### English source fragment
 
@@ -1024,7 +1037,7 @@ Bad: "Chưa từng có ai nói với tôi như thế!" Good: They respond and sp
 ~~~~text
 - Ban the coordinate conjunctions "và", "hoặc", and "hay là" in spoken dialogue. Instead, split ideas into separate statements using periods, commas, or action beats.
 ~~~~
-## R074 — Prompt module
+## R075 — Prompt module
 
 ### English source fragment
 
@@ -1037,7 +1050,7 @@ Bad: "Chưa từng có ai nói với tôi như thế!" Good: They respond and sp
 ~~~~text
 - Felines = rừ rừ, gầm gừ. Canines = gừ gừ, ẳng, ư ử. Avians = ríu rít, hót, quang quác. Humans = rên rỉ, thở dài, thở dốc. Humans must never make animal sounds.
 ~~~~
-## R075 — Prompt module
+## R076 — Prompt module
 
 ### English source fragment
 
@@ -1050,7 +1063,7 @@ Example: <gold:measured>"You're barking up the wrong tree."</gold:measured>
 ~~~~text
 Example: <gold:measured>"Anh tìm nhầm người rồi."</gold:measured>
 ~~~~
-## R076 — Prompt module
+## R077 — Prompt module
 
 ### English source fragment
 
@@ -1063,7 +1076,7 @@ Use frequent use of onomatopoeia standalone sound effects (e.g., *Squelch!*, *Ka
 ~~~~text
 Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đoàng!*) during intimate or high-impact actions.
 ~~~~
-## R077 — Prompt module
+## R078 — Prompt module
 
 ### English source fragment
 
@@ -1076,7 +1089,7 @@ Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đo�
 ~~~~text
 ("Y hệt tôi", "Thèm cặc nhét vào lồn quá")
 ~~~~
-## R078 — Prompt module
+## R079 — Prompt module
 
 ### English source fragment
 
@@ -1089,7 +1102,7 @@ Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đo�
 ~~~~text
 ("Tôi có linh cảm chẳng lành")
 ~~~~
-## R079 — Prompt module
+## R080 — Prompt module
 
 ### English source fragment
 
@@ -1102,7 +1115,7 @@ Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đo�
 ~~~~text
 ("Khoan, sao họ lại nói thế?")
 ~~~~
-## R080 — Prompt module
+## R081 — Prompt module
 
 ### English source fragment
 
@@ -1115,7 +1128,7 @@ Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đo�
 ~~~~text
 ("Ối", "Ghê vậy", "Cuối cùng")
 ~~~~
-## R081 — Prompt module
+## R082 — Prompt module
 
 ### English source fragment
 
@@ -1128,7 +1141,7 @@ Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đo�
 ~~~~text
 - "[R] Stacy không biết về Eclipse Protocol."
 ~~~~
-## R082 — Prompt module
+## R083 — Prompt module
 
 ### English source fragment
 
@@ -1141,7 +1154,7 @@ Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đo�
 ~~~~text
 - "[T] Ngày mai đi Walmart — Catherine về nhà trước 4 giờ chiều."
 ~~~~
-## R083 — Prompt module
+## R084 — Prompt module
 
 ### English source fragment
 
@@ -1154,7 +1167,7 @@ Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đo�
 ~~~~text
 - "[D] Kiểm tra việc bỏ sót giới hạn BOND trong lượt này."
 ~~~~
-## R084 — Prompt module
+## R085 — Prompt module
 
 ### English source fragment
 
@@ -1167,7 +1180,7 @@ Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đo�
 ~~~~text
 - [R] Không có ghi chú đang hoạt động.
 ~~~~
-## R085 — Prompt module
+## R086 — Prompt module
 
 ### English source fragment
 
@@ -1180,7 +1193,7 @@ Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đo�
 ~~~~text
 (e.g., "Kẻ quyến rũ", "Sát thủ")
 ~~~~
-## R086 — Prompt module
+## R087 — Prompt module
 
 ### English source fragment
 
@@ -1193,7 +1206,7 @@ Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đo�
 ~~~~text
 (e.g., Bị thương, Mệt mỏi, Phấn chấn)
 ~~~~
-## R087 — Prompt module
+## R088 — Prompt module
 
 ### English source fragment
 
@@ -1206,7 +1219,7 @@ Use frequent use of onomatopoeia standalone sound effects (e.g., *Bẹp!*, *Đo�
 ~~~~text
 (Kẻ quyến rũ = social, Sát thủ = combat)
 ~~~~
-## R088 — Prompt module
+## R089 — Prompt module
 
 ### English source fragment
 
@@ -1219,7 +1232,7 @@ Verbalizes "I love you" at +15
 ~~~~text
 Verbalizes "Tôi yêu anh/em" at +15
 ~~~~
-## R089 — Prompt module
+## R090 — Prompt module
 
 ### English source fragment
 
@@ -1232,7 +1245,7 @@ Verbalizes "Tôi yêu anh/em" at +15
 ~~~~text
 (default 1-3 mundane steps: nghỉ ngơi, ăn, chơi, học, làm việc, quan hệ, tự sướng, đi lang thang etc.)
 ~~~~
-## R090 — Prompt module
+## R091 — Prompt module
 
 ### English source fragment
 
@@ -1245,7 +1258,7 @@ Respond "[DEBUG ACTIVE] — RP paused. All messages processed as debug until 're
 ~~~~text
 Respond "[DEBUG ACTIVE] — Đã tạm dừng RP. Mọi tin nhắn được xử lý ở chế độ debug cho đến khi dùng 'resume RP'."
 ~~~~
-## R091 — Prompt module
+## R092 — Prompt module
 
 ### English source fragment
 
@@ -1258,7 +1271,7 @@ Respond "[DEBUG DISABLED] — Resuming RP."
 ~~~~text
 Respond "[DEBUG DISABLED] — Tiếp tục RP."
 ~~~~
-## R092 — Prompt module
+## R093 — Prompt module
 
 ### English source fragment
 
@@ -1271,7 +1284,7 @@ Respond "[DEBUG DISABLED] — Tiếp tục RP."
 ~~~~text
 (e.g., dirty talk, loving talk, and vocalizations like "ưm... a... sướng quá...!")
 ~~~~
-## R093 — Prompt module
+## R094 — Prompt module
 
 ### English source fragment
 
@@ -1284,7 +1297,7 @@ pleasure: "mmhh that feels so ugh fucking good."
 ~~~~text
 pleasure: "ưm... a... sướng quá...!"
 ~~~~
-## R094 — Prompt module
+## R095 — Prompt module
 
 ### English source fragment
 
@@ -1297,7 +1310,7 @@ effort pain: "Khh",  "Ngh!", Grah!", "Fff"
 ~~~~text
 effort pain: "kh...", "ư...!", "a...!", "hừ..."
 ~~~~
-## R095 — Prompt module
+## R096 — Prompt module
 
 ### English source fragment
 
@@ -1310,7 +1323,7 @@ dismissal: "Tch." "Hmph.", "Pfft."
 ~~~~text
 dismissal: "chậc.", "hừm.", "xì."
 ~~~~
-## R096 — Prompt module
+## R097 — Prompt module
 
 ### English source fragment
 
@@ -1323,7 +1336,7 @@ surprise: "Eep!" "Hah?!" Oi!"
 ~~~~text
 surprise: "ối!", "hả?!", "ôi!"
 ~~~~
-## R097 — Prompt module
+## R098 — Prompt module
 
 ### English source fragment
 
@@ -1336,7 +1349,7 @@ style: write continuous, fluid, and flowing dialogue but without run-on sentence
 ~~~~text
 style: write continuous, fluid, and flowing dialogue but without run-on sentences; avoid short, punchy speech. Exception: You may break speech with a movement, action, or interruption to avoid monologues. You must ban "và", "nhưng", "hoặc", and "hay là" in spoken NPC dialogue.
 ~~~~
-## R098 — Prompt module
+## R099 — Prompt module
 
 ### English source fragment
 
@@ -1349,7 +1362,7 @@ allowed: soft, warm, quiet, clear, bright, airy, gentle, light, steady, even, li
 ~~~~text
 allowed: mềm, ấm, khẽ, rõ, sáng, thoáng, dịu, nhẹ, vững, đều, du dương
 ~~~~
-## R099 — Prompt module
+## R100 — Prompt module
 
 ### English source fragment
 
@@ -1362,7 +1375,7 @@ banned: low, deep, husky, gravelly, throaty, heavy, thundering, rumbling, bass, 
 ~~~~text
 banned: trầm thấp, sâu, khàn gợi cảm, khàn sạn, khàn cổ, nặng, vang như sấm, ầm rung, giọng bass, giọng ngực
 ~~~~
-## R100 — Reasoning rule
+## R101 — Reasoning rule
 
 ### English source fragment
 
@@ -1375,7 +1388,7 @@ conjunctions ["or"] and ["and"]
 ~~~~text
 conjunctions ["và"], ["hoặc"], and ["hay là"]
 ~~~~
-## R101 — Reasoning rule
+## R102 — Reasoning rule
 
 ### English source fragment
 
@@ -1388,7 +1401,7 @@ all CAP words for yelling only during peak arousal/VAD e.g., "NO!"
 ~~~~text
 all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!"
 ~~~~
-## R102 — Reasoning rule
+## R103 — Reasoning rule
 
 ### English source fragment
 
@@ -1401,7 +1414,7 @@ all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NG
 ~~~~text
 (ưm..., aaaa..., suỵt, á!, ối!, hức!, ực!, hừ...)
 ~~~~
-## R103 — Reasoning rule
+## R104 — Reasoning rule
 
 ### English source fragment
 
@@ -1414,7 +1427,7 @@ all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NG
 ~~~~text
 (e.g., ưm..., aaaa..., suỵt, á!, ối!, hức!, ực!, hừ...)
 ~~~~
-## R104 — Reasoning rule
+## R105 — Reasoning rule
 
 ### English source fragment
 
@@ -1427,7 +1440,7 @@ all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NG
 ~~~~text
 6. Slop Review: I must list all banned phrases and clichés in `<banned_vocabulary>` to avoid. What are my replacement phrases in this scene?
 ~~~~
-## R105 — Reasoning rule
+## R106 — Reasoning rule
 
 ### English source fragment
 
@@ -1440,7 +1453,7 @@ all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NG
 ~~~~text
 7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? What format? What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? (skip if tags not present)
 ~~~~
-## R106 — Reasoning rule
+## R107 — Reasoning rule
 
 ### English source fragment
 
@@ -1453,7 +1466,7 @@ E. Does the final response fit the length stated in `<formatting_constraints>`? 
 ~~~~text
 E. Does the final response fit the length stated in `<formatting_constraints>`? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? If the tag is not present, skip to GATE 10.
 ~~~~
-## R107 — Reasoning rule
+## R108 — Reasoning rule
 
 ### English source fragment
 
@@ -1466,7 +1479,7 @@ What is the response length in `<formatting_constraints>`? How can I pivot so NP
 ~~~~text
 What is the response length in `<formatting_constraints>`? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? How can I pivot so NPCs stay true to their wants/needs?
 ~~~~
-## R108 — Reasoning rule
+## R109 — Reasoning rule
 
 ### English source fragment
 
@@ -1479,7 +1492,7 @@ Enforce the ban on coordinate conjunctions ["or"] and ["and"] in spoken dialogue
 ~~~~text
 Enforce the ban on coordinate conjunctions ["và"], ["hoặc"], and ["hay là"] in spoken dialogue
 ~~~~
-## R109 — Reasoning rule
+## R110 — Reasoning rule
 
 ### English source fragment
 
@@ -1492,7 +1505,7 @@ I will enforce the ban on coordinating conjunctions ["or"], ["and"] in dialogue
 ~~~~text
 I will enforce the ban on coordinating conjunctions ["và"], ["hoặc"], ["hay là"] in dialogue
 ~~~~
-## R110 — Reasoning rule
+## R111 — Reasoning rule
 
 ### English source fragment
 
@@ -1505,7 +1518,7 @@ all CAP words for yelling e.g., "NO!" Only for high emotion/VAD.
 ~~~~text
 all CAP words for yelling e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!" Only for high emotion/VAD.
 ~~~~
-## R111 — Reasoning rule
+## R112 — Reasoning rule
 
 ### English source fragment
 
@@ -1518,7 +1531,7 @@ all CAP words for yelling/emphasis during high arousal/VAD e.g., "NO!"
 ~~~~text
 all CAP words for yelling/emphasis during high arousal/VAD e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!"
 ~~~~
-## R112 — Reasoning rule
+## R113 — Reasoning rule
 
 ### English source fragment
 
@@ -1531,7 +1544,7 @@ You must list all `<banned_vocabulary>` and replace them with different words th
 ~~~~text
 You must list all phrases and clichés in `<banned_vocabulary>` and replace planned violations with original, grounded wording in the output response.
 ~~~~
-## R113 — Reasoning rule
+## R114 — Reasoning rule
 
 ### English source fragment
 
@@ -1712,7 +1725,7 @@ Voice: Use Dr. Seuss's rhythm, words, sentence structure, and emotion. STRICTLY 
 
 Syntax & Flow:
 - Flow: Varied sentence lengths, smooth paragraphs. Ban word fragments, choppy text, and em-dash breaks (word—word—word).
-- Conjunctions: Max 2 clauses per sentence using "và", "khi", "trong khi", or "vừa... vừa...". Break long actions into separate sentences.
+- Conjunctions: Connect related clauses using "và", "khi", "trong khi", or "vừa... vừa...". Vary sentence length; split only when needed for clarity.
 - Facts Only: State facts clearly. Ban guessing words ("có lẽ", "có thể", "hoặc... hoặc...", "dường như"). Pick one solid detail.
 
 Bans & Actions:
@@ -1771,7 +1784,7 @@ Realism & Flow:
 - Style: Prioritize writing with concrete 5-sense details only (sight, sound, touch, taste, smell). Ban poetic flourish, thoughts, summaries, and meta notes.
 - Cadence: Smooth paragraphs with varied sentence lengths and openings.
 - Sentence Structure: Complete clauses using commas and natural transitions. Ban: verbless fragments, telegraphic prose, and em-dash fragmentation (word—word—word).
-- Conjunctions: Max 2 clauses per sentence using "và", "khi", "trong khi", or "vừa... vừa...". Must split long actions into separate sentences.
+- Conjunctions: Connect related clauses using "và", "khi", "trong khi", or "vừa... vừa...". Vary sentence length; split only when needed for clarity.
 - Body & Movement: Weave body traits into real motion using tactile words. Show visible/audible macro actions and room shifts. Ban tiny micro-expressions.
 
 Banned Formulas & Styles:

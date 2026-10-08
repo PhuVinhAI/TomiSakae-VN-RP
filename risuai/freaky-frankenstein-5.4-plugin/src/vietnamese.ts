@@ -129,8 +129,12 @@ export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, str
     'BAD: "Im bặt." / "Hết hy vọng. Không còn đường lui." / "Kiểm soát toàn diện."',
   ],
   [
-    '- Conjunctions: Max 2 clauses per sentence using "and", "as", or "while".',
-    '- Conjunctions: Max 2 clauses per sentence using "và", "khi", "trong khi", or "vừa... vừa...".',
+    '- Conjunctions: Max 2 clauses per sentence using "and", "as", or "while". Break long actions into separate sentences.',
+    '- Conjunctions: Connect related clauses using "và", "khi", "trong khi", or "vừa... vừa...". Vary sentence length; split only when needed for clarity.',
+  ],
+  [
+    '- Conjunctions: Max 2 clauses per sentence using "and", "as", or "while". Must split long actions into separate sentences.',
+    '- Conjunctions: Connect related clauses using "và", "khi", "trong khi", or "vừa... vừa...". Vary sentence length; split only when needed for clarity.',
   ],
   [
     '("you" / "your")',

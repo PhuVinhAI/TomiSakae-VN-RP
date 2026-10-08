@@ -110,7 +110,7 @@ Voice: Use Dr. Seuss's rhythm, words, sentence structure, and emotion. STRICTLY 
 
 Syntax & Flow:
 - Flow: Varied sentence lengths, smooth paragraphs. Ban word fragments, choppy text, and em-dash breaks (word—word—word).
-- Conjunctions: Max 2 clauses per sentence using "và", "khi", "trong khi", or "vừa... vừa...". Break long actions into separate sentences.
+- Conjunctions: Connect related clauses using "và", "khi", "trong khi", or "vừa... vừa...". Vary sentence length; split only when needed for clarity.
 - Facts Only: State facts clearly. Ban guessing words ("có lẽ", "có thể", "hoặc... hoặc...", "dường như"). Pick one solid detail.
 
 Bans & Actions:
@@ -139,7 +139,7 @@ Realism & Flow:
 - Style: Prioritize writing with concrete 5-sense details only (sight, sound, touch, taste, smell). Ban poetic flourish, thoughts, summaries, and meta notes.
 - Cadence: Smooth paragraphs with varied sentence lengths and openings.
 - Sentence Structure: Complete clauses using commas and natural transitions. Ban: verbless fragments, telegraphic prose, and em-dash fragmentation (word—word—word).
-- Conjunctions: Max 2 clauses per sentence using "và", "khi", "trong khi", or "vừa... vừa...". Must split long actions into separate sentences.
+- Conjunctions: Connect related clauses using "và", "khi", "trong khi", or "vừa... vừa...". Vary sentence length; split only when needed for clarity.
 - Body & Movement: Weave body traits into real motion using tactile words. Show visible/audible macro actions and room shifts. Ban tiny micro-expressions.
 
 Banned Formulas & Styles:
