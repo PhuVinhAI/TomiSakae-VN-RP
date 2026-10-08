@@ -419,7 +419,7 @@ async function showSettings(): Promise<void> {
     <div class="workspace"><nav class="rail" aria-label="Điều hướng cấu hình"><p class="rail-title">Danh mục</p><a href="#general"><span>01</span>Tổng quan</a><a href="#choices"><span>02</span>Nhóm chọn một</a><a href="#modules"><span>03</span>Module độc lập</a><a href="#filters"><span>04</span>Bộ lọc kỹ thuật</a><p class="rail-note">Sửa cấu hình rồi bấm “Lưu preset” để áp dụng.</p></nav>
     <div class="content">
     <section id="general" class="panel"><div class="panel-heading"><span class="index">01 / Nền tảng</span><h2>Tổng quan</h2></div>
-    <div class="preset-panel"><label class="preset-field"><span>Preset cho ${escapeHtml(character?.nickname || character?.name || "card hiện tại")}</span><select id="config-preset" ${cardId ? "" : "disabled"}>${presetOptions}</select></label><p class="section-note">Chọn preset sẽ được ghi nhớ cho mọi chat của card này. Lưu cấu hình sẽ cập nhật preset cho tất cả card đang dùng nó.</p><div class="preset-create"><label class="preset-field"><span>Tên preset mới</span><input id="preset-name" type="text" placeholder="Nhập tên preset"></label><button class="action" id="create-preset">Tạo preset</button></div><small>Tạo preset sẽ sao chép cấu hình đang hiển thị.</small></div>
+    <div class="preset-panel"><label class="preset-field"><span>Preset cho ${escapeHtml(character?.nickname || character?.name || "card hiện tại")}</span><div class="preset-picker" id="preset-picker"><select id="config-preset" class="preset-native" tabindex="-1" aria-hidden="true" ${cardId ? "" : "disabled"}>${presetOptions}</select><button class="preset-trigger" id="config-preset-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" ${cardId ? "" : "disabled"}>${escapeHtml(profile.name)}<span class="preset-trigger-mark" aria-hidden="true"></span></button><div class="preset-menu" id="config-preset-menu" role="listbox">${configPresets.presets.map((entry) => `<button class="preset-option${entry.id === profile.id ? " is-selected" : ""}" type="button" role="option" aria-selected="${entry.id === profile.id ? "true" : "false"}" data-preset-id="${escapeHtml(entry.id)}"><span>${escapeHtml(entry.name)}</span>${entry.id === profile.id ? '<span class="preset-option-mark" aria-hidden="true">✓</span>' : ""}</button>`).join("")}</div></div></label><p class="section-note">Chọn preset sẽ được ghi nhớ cho mọi chat của card này. Lưu cấu hình sẽ cập nhật preset cho tất cả card đang dùng nó.</p><div class="preset-create"><label class="preset-field"><span>Tên preset mới</span><input id="preset-name" type="text" placeholder="Nhập tên preset"></label><button class="action" id="create-preset">Tạo preset</button></div><small>Tạo preset sẽ sao chép cấu hình đang hiển thị.</small></div>
     <label class="master"><span class="master-copy"><strong>Bật FF5.4 cho preset này</strong><small>Áp dụng cho mọi chat của các card dùng preset “${escapeHtml(profile.name)}”.</small></span><input class="switch" id="master" type="checkbox" ${settings.enabled ? "checked" : ""}></label>
     <details open><summary><span class="summary-copy"><strong>Module của plugin</strong><small>Tính năng bổ sung riêng cho bản RisuAI.</small></span></summary><div class="list">${checkbox(
       "plugin",
@@ -478,6 +478,21 @@ async function showSettings(): Promise<void> {
     });
   }
   document.getElementById("close")!.addEventListener("click", () => void Risuai.hideContainer());
+  const presetPicker = document.getElementById("preset-picker")!;
+  const presetTrigger = document.getElementById("config-preset-trigger") as HTMLButtonElement;
+  const presetMenu = document.getElementById("config-preset-menu")!;
+  const presetSelect = document.getElementById("config-preset") as HTMLSelectElement;
+  presetTrigger.addEventListener("click", () => {
+    const open = presetPicker.dataset.open === "true";
+    presetPicker.dataset.open = open ? "false" : "true";
+    presetTrigger.setAttribute("aria-expanded", open ? "false" : "true");
+  });
+  presetMenu.addEventListener("click", (event) => {
+    const option = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-preset-id]");
+    if (!option || !presetSelect) return;
+    presetSelect.value = option.dataset.presetId ?? "";
+    presetSelect.dispatchEvent(new Event("change", { bubbles: true }));
+  });
   document.getElementById("config-preset")!.addEventListener("change", async () => {
     if (!cardId) return;
     selectCardPreset(
