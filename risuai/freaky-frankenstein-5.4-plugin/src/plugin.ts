@@ -701,15 +701,32 @@ function splitEditorResponse(text: string): { prefix: string; response: string }
   return { prefix: reasoning.prefix + header.prefix, response: header.response };
 }
 
+function insertSubmodelEditorSystem(messages: ChatMessage[]): ChatMessage[] {
+  const editorSystem: ChatMessage = {
+    role: "system",
+    content: SUBMODEL_EDITOR_SYSTEM,
+    memo: "ff54:submodel-editor",
+  };
+  const highRiskIndex = messages.findIndex(
+    (message) =>
+      message.memo === "ff54:jailbreak" ||
+      message.content.includes("High risk context is allowed."),
+  );
+  if (highRiskIndex < 0) return [...messages, editorSystem];
+  return [...messages.slice(0, highRiskIndex), editorSystem, ...messages.slice(highRiskIndex)];
+}
+
 async function runSubmodelEditor(
   context: PendingEditorRequest,
   response: string,
 ): Promise<string | undefined> {
   const messages: ChatMessage[] = [
-    ...buildEditorReferenceMessages(context.messages, context.responseId),
+    ...insertSubmodelEditorSystem(
+      buildEditorReferenceMessages(context.messages, context.responseId),
+    ),
     {
       role: "user",
-      content: `[OOC]\n${SUBMODEL_EDITOR_SYSTEM}\n\nEdit this already-generated AI response according to <vietnamese_editor>. Return only the edited response.\n[/OOC]\n\n${response}`,
+      content: `Edit this already-generated AI response according to <vietnamese_editor>. Return only the edited response.\n\n${response}`,
       memo: "ff54:submodel-editor-target",
     },
   ];

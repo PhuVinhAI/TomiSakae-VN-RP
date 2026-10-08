@@ -401,15 +401,30 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(options.mode).toBe("submodel");
     expect(options.allowPlugins).toBe(false);
     expect(options).not.toHaveProperty("staticModel");
-    const references = options.messages.slice(0, -1);
-    expect(references).toEqual(snapshot);
-    const editorMessage = options.messages.at(-1)!;
-    expect(editorMessage.role).toBe("user");
-    expect(editorMessage.content).toMatch(/^\[OOC\]\n<vietnamese_editor>/);
-    expect(editorMessage.content).toContain(
-      "[/OOC]\n\nAn di chuyển lại gần, nói lời chào với bạn.",
+    const editorIndex = options.messages.findIndex(
+      (message) => message.memo === "ff54:submodel-editor",
     );
-    expect(options.messages.some((message) => message.memo === "ff54:submodel-editor")).toBe(false);
+    const highRiskIndex = options.messages.findIndex(
+      (message) => message.memo === "ff54:jailbreak",
+    );
+    expect(editorIndex).toBeGreaterThan(-1);
+    expect(highRiskIndex).toBeGreaterThan(-1);
+    expect(editorIndex).toBeLessThan(highRiskIndex);
+    expect(options.messages[editorIndex]).toMatchObject({
+      role: "system",
+      content: expect.stringMatching(/^<vietnamese_editor>/),
+      memo: "ff54:submodel-editor",
+    });
+    const references = options.messages
+      .slice(0, -1)
+      .filter((message) => message.memo !== "ff54:submodel-editor");
+    expect(references).toEqual(snapshot);
+    const editorTarget = options.messages.at(-1)!;
+    expect(editorTarget.role).toBe("user");
+    expect(editorTarget.content).toBe(
+      "Edit this already-generated AI response according to <vietnamese_editor>. Return only the edited response.\n\nAn di chuyển lại gần, nói lời chào với bạn.",
+    );
+    expect(editorTarget.content).not.toContain("[OOC]");
     expect(references.filter((message) => message.memo === "old-a")).toHaveLength(0);
     expect(references.filter((message) => message.memo === "user-a")).toHaveLength(1);
     expect(options.messages.at(-1)!.content).not.toContain(
@@ -963,9 +978,11 @@ describe("Named presets in plugin UI and requests", () => {
     expect(plugin.runModel).toHaveBeenCalledTimes(1);
     expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toContain("An bước tới.");
     expect(plugin.chats.get("1:0")!.message).toHaveLength(1);
-    expect(plugin.runModel.mock.calls[0]![0].messages.at(-1)!.content).toContain(
-      "Repair only existing malformed markup",
-    );
+    expect(
+      plugin.runModel.mock.calls[0]![0].messages.find(
+        (message) => message.memo === "ff54:submodel-editor",
+      )!.content,
+    ).toContain("Repair only existing malformed markup");
   });
 });
 
