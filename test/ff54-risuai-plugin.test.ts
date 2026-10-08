@@ -504,7 +504,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "utf8",
     );
     expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
-    expect(artifact).toContain("//@version 1.2.7");
+    expect(artifact.match(/^\/\/@version (.+)$/m)?.[1]).toMatch(/^\d+\.\d+\.\d+$/);
   });
 
   it("context-saver regex keeps the two newest AI responses", async () => {

@@ -57,6 +57,7 @@ export interface FfGlobalSettings {
   promptEnabled: Record<string, boolean>;
   regexEnabled: Record<string, boolean>;
   vietnameseOutputEnabled: boolean;
+  submodelEditorEnabled: boolean;
 }
 
 export interface MacroContext {
@@ -129,6 +130,7 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
       regexScripts.map((script) => [script.id, script.disabled !== true]),
     ),
     vietnameseOutputEnabled: true,
+    submodelEditorEnabled: false,
   };
 }
 
@@ -158,6 +160,9 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
   if (typeof record.enabled === "boolean") defaults.enabled = record.enabled;
   if (typeof record.vietnameseOutputEnabled === "boolean") {
     defaults.vietnameseOutputEnabled = record.vietnameseOutputEnabled;
+  }
+  if (typeof record.submodelEditorEnabled === "boolean") {
+    defaults.submodelEditorEnabled = record.submodelEditorEnabled;
   }
   return defaults;
 }
@@ -598,6 +603,13 @@ export function adaptVietnameseHeaderForRisuAI(input: string): string {
 /** Remove scene headers from the request copy; saved history remains unchanged. */
 export function removeSceneHeadersForRequest(input: string): string {
   return input.replace(SCENE_HEADER_RE, "");
+}
+
+/** Keep the complete response starting at the same header recognized by the renderer. */
+export function splitBeforeSceneHeader(input: string): { prefix: string; response: string } {
+  const header = new RegExp(SCENE_HEADER_RE.source, SCENE_HEADER_RE.flags).exec(input);
+  const index = header?.index ?? 0;
+  return { prefix: input.slice(0, index), response: input.slice(index) };
 }
 
 function messageDepths(messages: ChatMessage[]): Map<ChatMessage, number> {
