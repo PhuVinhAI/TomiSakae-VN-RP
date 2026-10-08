@@ -421,8 +421,15 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(references).toEqual(snapshot);
     const editorTarget = options.messages.at(-1)!;
     expect(editorTarget.role).toBe("user");
-    expect(editorTarget.content).toBe(
-      "Edit this already-generated AI response according to <vietnamese_editor>. Return only the edited response.\n\nAn di chuyển lại gần, nói lời chào với bạn.",
+    expect(editorTarget.content).toContain(
+      "--- BEGIN RESPONSE TO EDIT ---\nAn di chuyển lại gần, nói lời chào với bạn.",
+    );
+    expect(editorTarget.content).toContain("--- END RESPONSE TO EDIT ---");
+    expect(editorTarget.content.indexOf("--- END RESPONSE TO EDIT ---")).toBeGreaterThan(
+      editorTarget.content.indexOf("An di chuyển lại gần, nói lời chào với bạn."),
+    );
+    expect(editorTarget.content).toContain(
+      "Do not continue the roleplay, answer its dialogue, add a new event, or describe what happens next.",
     );
     expect(editorTarget.content).not.toContain("[OOC]");
     expect(references.filter((message) => message.memo === "old-a")).toHaveLength(0);
