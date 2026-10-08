@@ -383,7 +383,7 @@ describe("FF5.4 Submodel editor integration", () => {
     ).toBe(true);
   });
 
-  it("uses the selected submodel with complete main context and saved history", async () => {
+  it("uses the selected submodel with the exact captured main request and no restored history", async () => {
     const plugin = await startPlugin();
     const built = await plugin.request();
     const snapshot = structuredClone(built);
@@ -402,8 +402,8 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(options.allowPlugins).toBe(false);
     expect(options).not.toHaveProperty("staticModel");
     const references = options.messages.slice(0, -2);
-    expect(references.filter((message) => message.memo !== "old-a")).toEqual(snapshot);
-    expect(references.filter((message) => message.memo === "old-a")).toHaveLength(1);
+    expect(references).toEqual(snapshot);
+    expect(references.filter((message) => message.memo === "old-a")).toHaveLength(0);
     expect(references.filter((message) => message.memo === "user-a")).toHaveLength(1);
     expect(options.messages.at(-1)!.content).not.toContain(
       "Sự kiện cũ không còn trong request main.",
@@ -1072,9 +1072,13 @@ describe("Automatic Submodel editing", () => {
   });
 });
 
-describe("Submodel reference history", () => {
-  it("restores missing turns once and keeps interleaved module prompts in place", () => {
-    const old: ChatMessage = { role: "assistant", content: "Sự kiện cũ.", memo: "old" };
+describe("Submodel request context", () => {
+  it("clones the already-cut request without restoring missing history", () => {
+    const summary: ChatMessage = {
+      role: "system",
+      content: "Memory và summary do host chọn.",
+      memo: "summary",
+    };
     const user: ChatMessage = { role: "user", content: "Tiếp đi.", memo: "user" };
     const reply: ChatMessage = { role: "assistant", content: "Phản hồi trước.", memo: "reply" };
     const end: ChatMessage = { role: "user", content: "End injection.", memo: "ff54:end" };
@@ -1083,24 +1087,21 @@ describe("Submodel reference history", () => {
       content: "Module.",
       memo: "ff54:absolute:1:0:system",
     };
-    const history = [old, user, reply];
-    const request = [user, module, reply, end];
-    expect(buildEditorReferenceMessages(request, history, history, "target")).toEqual([
-      old,
-      user,
-      module,
-      reply,
-      end,
-    ]);
-    expect(request).toEqual([user, module, reply, end]);
+    const request = [summary, user, module, reply, end];
+    const references = buildEditorReferenceMessages(request, "target");
+    expect(references).toEqual(request);
+    references[0]!.content = "Provider changed its copy";
+    expect(request[0]!.content).toBe("Memory và summary do host chọn.");
+    expect(buildEditorReferenceMessages(request, "reply")).toEqual([summary, user, module, end]);
   });
 
-  it("keeps identical dialogue from distinct messages while removing duplicate message IDs", () => {
+  it("preserves the original request order and duplicate messages", () => {
     const first: ChatMessage = { role: "user", content: "Ừ.", memo: "first" };
     const second: ChatMessage = { role: "user", content: "Ừ.", memo: "second" };
-    const history = [first, second];
-    expect(
-      buildEditorReferenceMessages([first, first, second], history, history, "target"),
-    ).toEqual(history);
+    expect(buildEditorReferenceMessages([first, first, second], undefined)).toEqual([
+      first,
+      first,
+      second,
+    ]);
   });
 });

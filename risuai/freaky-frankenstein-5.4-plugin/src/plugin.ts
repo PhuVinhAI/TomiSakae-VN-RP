@@ -7,7 +7,6 @@ import {
   expandHostMacros,
   PLACEMENT_AI_OUTPUT,
   applyPromptRegexToMessages,
-  applyRequestFiltersToMessages,
   splitBeforeSceneHeader,
   hasCompleteSceneHeader,
   type ChatMessage,
@@ -193,7 +192,6 @@ interface PendingEditorRequest {
   cardId: string | undefined;
   chatId: unknown;
   messages: ChatMessage[];
-  history: ChatMessage[];
   responseId?: unknown;
   responseIndex?: number;
   autoRewriteAttempted?: boolean;
@@ -620,11 +618,6 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
           cardId: character?.chaId,
           chatId: chat.id,
           messages: structuredClone(built),
-          history: (chat.message ?? []).map((message) => ({
-            role: message.role === "char" ? "assistant" : "user",
-            content: String(message.data ?? ""),
-            ...(typeof message.chatId === "string" ? { memo: message.chatId } : {}),
-          })),
         });
       }
     } catch (error) {
@@ -706,10 +699,9 @@ function preservedEditorSyntax(original: string, edited: string): boolean {
 async function runSubmodelEditor(
   context: PendingEditorRequest,
   response: string,
-  history: ChatMessage[],
 ): Promise<string | undefined> {
   const messages: ChatMessage[] = [
-    ...buildEditorReferenceMessages(context.messages, history, context.history, context.responseId),
+    ...buildEditorReferenceMessages(context.messages, context.responseId),
     { role: "system", content: SUBMODEL_EDITOR_SYSTEM, memo: "ff54:submodel-editor" },
     {
       role: "user",
@@ -836,7 +828,6 @@ async function rewriteLatestResponse(
   const context = editorRequests.get(key);
   if (!context || editorBusyChats.has(key)) return;
   const profile = presetForCard(configPresets, context.cardId);
-  const settings = profile.settings;
   const editorEnabled = () =>
     presetForCard(configPresets, context.cardId).id === profile.id &&
     profile.settings.enabled &&
@@ -866,16 +857,7 @@ async function rewriteLatestResponse(
   try {
     await editorButton?.refresh();
     const source = splitEditorResponse(original);
-    const history = applyRequestFiltersToMessages(
-      chat.message!.slice(0, messageIndex).map((message) => ({
-        role: message.role === "char" ? "assistant" : "user",
-        content: String(message.data ?? ""),
-        ...(typeof message.chatId === "string" ? { memo: message.chatId } : {}),
-      })),
-      preset,
-      settings,
-    );
-    const result = await runSubmodelEditor(context, source.response, history);
+    const result = await runSubmodelEditor(context, source.response);
     if (!editorEnabled() || editorRequests.get(key) !== context) return;
     if (result === undefined)
       throw new Error("Submodel đã quá thời gian chờ 90 giây hoặc không trả về nội dung.");
