@@ -9,13 +9,66 @@ Register: Prefer modern, conversational Vietnamese. Avoid wuxia, xianxia, Sino-V
 Setting: Preserve the setting's own culture, names, terminology, and genre when explicitly defined. Do not force Japanese words or anime references into unrelated settings.
 </anime_manga_light_novel_style>`;
 
-const ANIME_STYLE_REASONING_PROMPTS = new Set([
-  "019f62e8-892f-7032-b004-1869f8bc0782", // MAX
-  "634ecfec-1862-4ce0-821e-e31057acadfa", // BOLT
-  "b5db9430-857a-408c-817c-32e975a71430", // Micro
-]);
-const ANIME_STYLE_REASONING_REMINDER =
-  "Style reminder: Apply <anime_manga_light_novel_style> to the final response.";
+export const VIETNAMESE_NATURAL_WRITING_PROMPT = `<vietnamese_natural_writing>
+Scope: Narrative prose, NPC dialogue, vocalizations, and free-text display values.
+
+Language: Write idiomatic contemporary Vietnamese. Correct spelling, diacritics, grammar, collocations, and translation calques; remove accidental foreign wording and mixed-script leakage. Preserve proper names and required terms.
+Cadence: Vary sentence lengths and pauses. Connect related actions, sensations, and reactions with natural Vietnamese particles and conjunctions. Avoid choppy narration, repetitive beats, disconnected fragments, and run-ons. Use no fixed sentence pattern or English clause-count limit. Avoid em-dashes in prose and dialogue.
+Composition: Build paragraphs through concrete action, physical or sensory consequence, then visible reaction or dialogue. Alternate narration and dialogue naturally; avoid inventory-like lists of disconnected observations.
+Embodiment: Show emotion through purposeful movement, touch, sound, and sensory consequence. Prefer active verbs and concrete reactions over emotion labels or decorative adjectives.
+Detail: Use vivid, causally connected details. Recast incidental gestures, props, textures, and sensory cues when useful; keep them compatible with the scene and avoid filler.
+Dialogue: Use natural Vietnamese particles, hesitation, subtext, and character-specific wording. Preserve idiolect and emotional cadence. Adjust pronouns and forms of address to relationships, status, age, setting, and nuance; keep referents clear.
+Display: Write free-text header, HUD, GFX, internal-state, and GM Notebook values in natural Vietnamese while preserving their underlying facts.
+Syntax: Preserve valid HTML/XML and color tags, markers, identifiers, placeholders, fixed labels, and machine syntax. Naturalize only free text; keep state numbers and outcomes unchanged.
+</vietnamese_natural_writing>`;
+
+const MAX_REASONING_ID = "019f62e8-892f-7032-b004-1869f8bc0782";
+const BOLT_REASONING_ID = "634ecfec-1862-4ce0-821e-e31057acadfa";
+const MICRO_REASONING_ID = "b5db9430-857a-408c-817c-32e975a71430";
+
+function applyReasoningModuleGuidance(
+  content: string,
+  identifier: string,
+  settings: Pick<
+    FfGlobalSettings,
+    "animeMangaLightNovelStyleEnabled" | "vietnameseNaturalWritingEnabled"
+  >,
+): string {
+  if (![MAX_REASONING_ID, BOLT_REASONING_ID, MICRO_REASONING_ID].includes(identifier)) {
+    return content;
+  }
+  const actions: string[] = [];
+  if (settings.animeMangaLightNovelStyleEnabled) {
+    actions.push("<anime_manga_light_novel_style> for anime, manga, and light-novel pacing");
+  }
+  if (settings.vietnameseNaturalWritingEnabled) {
+    actions.push("<vietnamese_natural_writing> for idiomatic Vietnamese prose and dialogue");
+  }
+  if (actions.length === 0) return content;
+  const action = `Apply ${actions.join(" and ")} in the final response.`;
+
+  if (identifier === MAX_REASONING_ID) {
+    const task =
+      "B. You must list out concisely all the main rules in `<prose_rules>` to apply the correct narrative style to the scene.";
+    if (!content.includes(task)) return content;
+    return content.replace(
+      task,
+      `${task.slice(0, -1)}; ${action[0]!.toLowerCase()}${action.slice(1)}`,
+    );
+  }
+
+  const taskStart =
+    identifier === BOLT_REASONING_ID ? "3. Prose Style:" : "2. Prose, Formatting & Boundaries:";
+  const nextTask =
+    identifier === BOLT_REASONING_ID ? "4. Natural Dialogue:" : "3. Natural Dialogue:";
+  const start = content.indexOf(taskStart);
+  const end = content.indexOf(nextTask, start + taskStart.length);
+  if (start < 0 || end < 0) return content;
+  const taskBody = content.slice(start, end);
+  const trailingWhitespace = taskBody.match(/\s*$/)?.[0] ?? "";
+  const task = taskBody.slice(0, taskBody.length - trailingWhitespace.length);
+  return `${content.slice(0, start)}${task} ${action}${trailingWhitespace}${content.slice(end)}`;
+}
 
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
@@ -75,6 +128,7 @@ export interface FfGlobalSettings {
   regexEnabled: Record<string, boolean>;
   vietnameseOutputEnabled: boolean;
   animeMangaLightNovelStyleEnabled: boolean;
+  vietnameseNaturalWritingEnabled: boolean;
   submodelEditorEnabled: boolean;
   submodelAutoRewriteEnabled: boolean;
 }
@@ -150,6 +204,7 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
     ),
     vietnameseOutputEnabled: true,
     animeMangaLightNovelStyleEnabled: true,
+    vietnameseNaturalWritingEnabled: true,
     submodelEditorEnabled: false,
     submodelAutoRewriteEnabled: false,
   };
@@ -184,6 +239,9 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
   }
   if (typeof record.animeMangaLightNovelStyleEnabled === "boolean") {
     defaults.animeMangaLightNovelStyleEnabled = record.animeMangaLightNovelStyleEnabled;
+  }
+  if (typeof record.vietnameseNaturalWritingEnabled === "boolean") {
+    defaults.vietnameseNaturalWritingEnabled = record.vietnameseNaturalWritingEnabled;
   }
   if (typeof record.submodelEditorEnabled === "boolean") {
     defaults.submodelEditorEnabled = record.submodelEditorEnabled;
@@ -406,17 +464,16 @@ export function composePresetPrompts(
         continue;
       const prompt = map.get(entry.identifier);
       if (!prompt || prompt.marker || typeof prompt.content !== "string") continue;
+      const guidedContent = applyReasoningModuleGuidance(
+        prompt.content,
+        prompt.identifier,
+        settings,
+      );
       const sourceContent = settings.vietnameseOutputEnabled
-        ? adaptPromptForVietnamese(prompt.content)
-        : prompt.content;
+        ? adaptPromptForVietnamese(guidedContent)
+        : guidedContent;
       let content = expandSourceMacros(sourceContent, variables, macroContext);
       content = await parseHostMacros(content, promptRole(prompt));
-      if (
-        settings.animeMangaLightNovelStyleEnabled &&
-        ANIME_STYLE_REASONING_PROMPTS.has(prompt.identifier)
-      ) {
-        content = `${content.trimEnd()}\n\n${ANIME_STYLE_REASONING_REMINDER}`;
-      }
       if (!content.trim()) continue;
       const message: ChatMessage = {
         role: promptRole(prompt),
@@ -783,6 +840,15 @@ export async function buildRequestMessages(
             role: "system" as const,
             content: VIETNAMESE_OUTPUT_PROMPT,
             memo: "ff54:vietnamese-output",
+          },
+        ]
+      : []),
+    ...(settings.vietnameseNaturalWritingEnabled
+      ? [
+          {
+            role: "system" as const,
+            content: VIETNAMESE_NATURAL_WRITING_PROMPT,
+            memo: "ff54:vietnamese-natural-writing",
           },
         ]
       : []),

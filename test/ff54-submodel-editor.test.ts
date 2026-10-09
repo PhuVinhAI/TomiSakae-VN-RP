@@ -422,6 +422,9 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(
       options.messages.filter((message) => message.memo === "ff54:anime-manga-light-novel-style"),
     ).toHaveLength(1);
+    expect(
+      options.messages.filter((message) => message.memo === "ff54:vietnamese-natural-writing"),
+    ).toHaveLength(1);
     const references = options.messages
       .slice(0, -1)
       .filter((message) => message.memo !== "ff54:submodel-editor");

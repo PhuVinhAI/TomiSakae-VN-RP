@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import {
   ANIME_MANGA_LIGHT_NOVEL_STYLE_PROMPT,
+  VIETNAMESE_NATURAL_WRITING_PROMPT,
   adaptDisplayMarkupForRisuAI,
   adaptVietnameseHeaderForRisuAI,
   removeSceneHeadersForRequest,
@@ -59,7 +60,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(settings.promptEnabled[freakyModeId]).toBe(false);
     expect(settings.vietnameseOutputEnabled).toBe(true);
     expect(settings.animeMangaLightNovelStyleEnabled).toBe(true);
-    expect(settings.animeMangaLightNovelStyleEnabled).toBe(true);
+    expect(settings.vietnameseNaturalWritingEnabled).toBe(true);
   });
 
   it("keeps an explicitly saved Freaky choice", async () => {
@@ -90,10 +91,10 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       normalizeSettings(data, { ...oldSettings, animeMangaLightNovelStyleEnabled: false })
         .animeMangaLightNovelStyleEnabled,
     ).toBe(false);
-    expect(normalizeSettings(data, oldSettings).animeMangaLightNovelStyleEnabled).toBe(true);
+    expect(normalizeSettings(data, oldSettings).vietnameseNaturalWritingEnabled).toBe(true);
     expect(
-      normalizeSettings(data, { ...oldSettings, animeMangaLightNovelStyleEnabled: false })
-        .animeMangaLightNovelStyleEnabled,
+      normalizeSettings(data, { ...oldSettings, vietnameseNaturalWritingEnabled: false })
+        .vietnameseNaturalWritingEnabled,
     ).toBe(false);
   });
 
@@ -162,8 +163,18 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     const built = await buildRequestMessages(messages, data, settings, async (value) => value);
     const composed = await composePresetPrompts(data, settings, async (value) => value);
     const vietnamese = built.filter((entry) => entry.memo === "ff54:vietnamese-output");
+    const naturalWriting = built.filter(
+      (entry) => entry.memo === "ff54:vietnamese-natural-writing",
+    );
     const style = built.filter((entry) => entry.memo === "ff54:anime-manga-light-novel-style");
     expect(vietnamese).toHaveLength(1);
+    expect(naturalWriting).toEqual([
+      {
+        role: "system",
+        content: VIETNAMESE_NATURAL_WRITING_PROMPT,
+        memo: "ff54:vietnamese-natural-writing",
+      },
+    ]);
     expect(style).toEqual([
       {
         role: "system",
@@ -174,7 +185,8 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(vietnamese[0]!.content).toBe(VIETNAMESE_OUTPUT_PROMPT);
     expect(built.slice(0, composed.leading.length)).toEqual(composed.leading);
     expect(built.indexOf(vietnamese[0]!)).toBe(composed.leading.length);
-    expect(built.indexOf(style[0]!)).toBe(built.indexOf(vietnamese[0]!) + 1);
+    expect(built.indexOf(naturalWriting[0]!)).toBe(built.indexOf(vietnamese[0]!) + 1);
+    expect(built.indexOf(style[0]!)).toBe(built.indexOf(naturalWriting[0]!) + 1);
     const npcCreationIndex = built.findIndex((entry) => entry.content.includes("<npc_creation>"));
     expect(npcCreationIndex).toBeGreaterThanOrEqual(0);
     expect(built.indexOf(vietnamese[0]!)).toBe(npcCreationIndex + 1);
@@ -201,16 +213,22 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "Preserve exact HTML, XML, comments, attributes, color tags, delimiters, placeholders, identifiers, and schema structure required for rendering",
     );
     expect(built.some((entry) => entry.memo === `ff54:${disabledPrompt!.identifier}`)).toBe(false);
-    const styleReminder =
-      "Style reminder: Apply <anime_manga_light_novel_style> to the final response.";
-    const reminderCount =
-      built
-        .map((entry) => entry.content)
-        .join("\n")
-        .split(styleReminder).length - 1;
-    expect(reminderCount).toBe(3);
-
     const allContent = built.map((entry) => entry.content).join("\n");
+    const reasoningChecks: Array<[string, string]> = [
+      ["GATE 7. Sensory Physics and Cinematography:", "GATE 8. User POV and Autonomy:"],
+      ["3. Prose Style:", "4. Natural Dialogue:"],
+      ["2. Prose, Formatting & Boundaries:", "3. Natural Dialogue:"],
+    ];
+    for (const [startMarker, endMarker] of reasoningChecks) {
+      const startIndex = allContent.indexOf(startMarker);
+      const endIndex = allContent.indexOf(endMarker, startIndex + startMarker.length);
+      const task = allContent.slice(startIndex, endIndex);
+      expect(startIndex).toBeGreaterThanOrEqual(0);
+      expect(endIndex).toBeGreaterThan(startIndex);
+      expect(task).toContain("<anime_manga_light_novel_style>");
+      expect(task).toContain("<vietnamese_natural_writing>");
+    }
+    expect(allContent).toContain("Vary sentence lengths and pauses.");
     expect(allContent).toContain("I will use natural Vietnamese conjunctions in spoken dialogue");
     expect(allContent).not.toContain("I will not use the coordinating conjunctions");
     expect(allContent).not.toContain("Ban Coordinating Conjunctions:");
@@ -236,11 +254,12 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     );
   });
 
-  it("can disable the style module and its reasoning reminders independently", async () => {
+  it("toggles natural Vietnamese writing and anime style independently in requests and reasoning", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);
     settings.vietnameseOutputEnabled = false;
     settings.animeMangaLightNovelStyleEnabled = false;
+    settings.vietnameseNaturalWritingEnabled = true;
     const reasoningIds = [
       "019f62e8-892f-7032-b004-1869f8bc0782",
       "634ecfec-1862-4ce0-821e-e31057acadfa",
@@ -257,14 +276,38 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     const composed = await composePresetPrompts(data, settings, parse, macroContext);
     expect(built).toEqual([
       ...composed.leading,
+      {
+        role: "system",
+        content: VIETNAMESE_NATURAL_WRITING_PROMPT,
+        memo: "ff54:vietnamese-natural-writing",
+      },
       ...injectAbsoluteAtDepth(messages, composed.absolute),
       ...composed.trailing,
     ]);
     expect(built.some((entry) => entry.memo === "ff54:vietnamese-output")).toBe(false);
     expect(built.some((entry) => entry.memo === "ff54:anime-manga-light-novel-style")).toBe(false);
-    expect(built.map((entry) => entry.content).join("\n")).not.toContain(
-      "Style reminder: Apply <anime_manga_light_novel_style>",
+    expect(built.some((entry) => entry.memo === "ff54:vietnamese-natural-writing")).toBe(true);
+    const naturalOnly = built.map((entry) => entry.content).join("\n");
+    expect(naturalOnly).not.toContain("<anime_manga_light_novel_style>");
+    expect(naturalOnly.match(/<vietnamese_natural_writing>/g)).toHaveLength(4);
+
+    const styleOnlySettings = structuredClone(settings);
+    styleOnlySettings.animeMangaLightNovelStyleEnabled = true;
+    styleOnlySettings.vietnameseNaturalWritingEnabled = false;
+    const styleOnly = await buildRequestMessages(
+      messages,
+      data,
+      styleOnlySettings,
+      parse,
+      macroContext,
     );
+    const styleOnlyContent = styleOnly.map((entry) => entry.content).join("\n");
+    expect(styleOnly.some((entry) => entry.memo === "ff54:anime-manga-light-novel-style")).toBe(
+      true,
+    );
+    expect(styleOnly.some((entry) => entry.memo === "ff54:vietnamese-natural-writing")).toBe(false);
+    expect(styleOnlyContent.match(/<anime_manga_light_novel_style>/g)).toHaveLength(4);
+    expect(styleOnlyContent).not.toContain("<vietnamese_natural_writing>");
   });
 
   it("rebuilds one FF5.4 injection set when the host retries a request", async () => {

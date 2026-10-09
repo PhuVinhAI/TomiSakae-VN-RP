@@ -450,6 +450,12 @@ async function showSettings(): Promise<void> {
       "Viết tiếng Việt tự nhiên; bản địa hóa mẫu và từ vựng có thể đi vào phản hồi ở mọi CoT liên quan · Mặc định bật",
     )}${checkbox(
       "plugin",
+      "vietnamese-natural-writing",
+      settings.vietnameseNaturalWritingEnabled,
+      "✍️ Văn phong tiếng Việt tự nhiên",
+      "Vận dụng nhịp câu, liên kết ý, miêu tả và lời thoại tiếng Việt tự nhiên ngay khi tạo phản hồi · Mặc định bật",
+    )}${checkbox(
+      "plugin",
       "anime-manga-light-novel-style",
       settings.animeMangaLightNovelStyleEnabled,
       "🎌 Nhịp kể Anime / Manga / Light Novel",
@@ -492,7 +498,9 @@ async function showSettings(): Promise<void> {
       if (node.dataset.kind === "prompt") settings.promptEnabled[id] = node.checked;
       else if (node.dataset.kind === "regex") settings.regexEnabled[id] = node.checked;
       else if (id === "vietnamese-output") settings.vietnameseOutputEnabled = node.checked;
-      else if (id === "anime-manga-light-novel-style") {
+      else if (id === "vietnamese-natural-writing") {
+        settings.vietnameseNaturalWritingEnabled = node.checked;
+      } else if (id === "anime-manga-light-novel-style") {
         settings.animeMangaLightNovelStyleEnabled = node.checked;
       } else if (id === "submodel-editor") settings.submodelEditorEnabled = node.checked;
       else if (id === "submodel-auto-rewrite") settings.submodelAutoRewriteEnabled = node.checked;
