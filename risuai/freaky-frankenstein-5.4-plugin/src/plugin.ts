@@ -180,6 +180,7 @@ Rules:
 - Embodiment: Show emotion through purposeful movement, touch, sound, and sensory consequence. Prefer active verbs and concrete reactions over emotion labels or decorative adjectives.
 - Detail: Freely enrich, trim, or recast incidental props, gestures, textures, and sensory cues. Prefer vivid, causally connected details over literal source wording. Keep them compatible with the scene; do not add a consequential event or continue the roleplay.
 - Language: Use idiomatic Vietnamese. Correct spelling, diacritics, grammar, and collocations; remove accidental foreign wording and mixed-script leakage. Preserve proper names and required technical terms.
+- Pronouns: Correct personal pronouns and forms of address to natural contemporary Vietnamese that fit identity, viewpoint, relationship, and tone. Keep references to people consistent; avoid demeaning or archaic, wuxia-style forms of address.
 - Dialogue: Favor flowing multi-sentence speech with natural Vietnamese particles, teasing, hesitation, subtext, and character-specific wording. Break speech with meaningful action beats. Retain idiolect, pauses, stutters, and short utterances. Adjust pronouns and forms of address to context; keep referents clear and preserve intended respect, distance, or intimacy.
 - Tone: Use only these dialogue tones: shout, whisper, measured, tremble.
 - Scene Flow: Let each paragraph advance the immediate interaction and leave room for {{user}} when the scene naturally supports it. Do not add a question, offer, gesture, or unresolved reaction solely to prompt {{user}}.

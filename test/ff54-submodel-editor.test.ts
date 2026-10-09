@@ -425,6 +425,9 @@ describe("FF5.4 Submodel editor integration", () => {
       "Translate or polish free-text values, including locations, factions, quests, inventory entries",
     );
     expect(options.messages[editorIndex]!.content).toContain(
+      "Correct personal pronouns and forms of address to natural contemporary Vietnamese that fit identity, viewpoint, relationship, and tone.",
+    );
+    expect(options.messages[editorIndex]!.content).toContain(
       "Do not add a question, offer, gesture, or unresolved reaction solely to prompt {{user}}.",
     );
     expect(options.messages[editorIndex]!.content).not.toContain("Lock all state data:");
