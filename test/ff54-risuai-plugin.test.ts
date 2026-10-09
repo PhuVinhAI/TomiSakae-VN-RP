@@ -217,30 +217,6 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(allContent).toContain(
       "Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue>",
     );
-    expect(allContent).toContain(
-      "Use only `shout`, `whisper`, `measured`, or `tremble` as tone values; omit `:tone` for normal delivery.",
-    );
-  });
-
-  it("keeps tone locking inside the three reasoning rules only", async () => {
-    const data = await preset();
-    const settings = createDefaultSettings(data);
-    for (const identifier of [
-      "019f62e8-892f-7032-b004-1869f8bc0782",
-      "634ecfec-1862-4ce0-821e-e31057acadfa",
-      "b5db9430-857a-408c-817c-32e975a71430",
-    ])
-      settings.promptEnabled[identifier] = true;
-    const composed = await composePresetPrompts(data, settings, async (value) => value);
-    const colored = composed.leading.find((entry) => entry.content.includes("<colored_dialogue>"));
-    expect(colored?.content).not.toContain("Tone lock:");
-    expect(VIETNAMESE_OUTPUT_PROMPT).not.toContain("Dialogue tones:");
-    const reasoningContent = [...composed.leading, ...composed.absolute, ...composed.trailing]
-      .map((entry) => entry.content)
-      .join("\n");
-    expect(
-      reasoningContent.match(/Use only `shout`, `whisper`, `measured`, or `tremble`/g),
-    ).toHaveLength(3);
   });
 
   it("rebuilds one FF5.4 injection set when the host retries a request", async () => {

@@ -365,14 +365,6 @@ export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, str
 
 export const VIETNAMESE_REASONING_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
   [
-    "  G. Execute `<colored_dialogue>` parameters on spoken dialogue. If tag not present, ignore and move to Gate 6.",
-    "  G. Execute `<colored_dialogue>` parameters on spoken dialogue. Use only `shout`, `whisper`, `measured`, or `tremble` as tone values; omit `:tone` for normal delivery. If tag not present, ignore and move to Gate 6.",
-  ],
-  [
-    "I must add `<colored_dialogue>` if present (retaining established NPC colors).",
-    "I must add `<colored_dialogue>` if present (retaining established NPC colors). Use only `shout`, `whisper`, `measured`, or `tremble` as tone values; omit `:tone` for normal delivery.",
-  ],
-  [
     'I will not use the coordinating conjunctions ["or"] and ["and"] in spoken dialogue, using periods, commas, semicolons, or action beats to separate ideas.',
     "I will use natural Vietnamese conjunctions in spoken dialogue, using periods, commas, semicolons, or action beats to separate ideas when needed.",
   ],
@@ -391,7 +383,7 @@ export const VIETNAMESE_REASONING_REPLACEMENTS: ReadonlyArray<readonly [string, 
   ],
   [
     "7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? What format? What is the target response length in <formatting_constraints>? (skip if tags not present)",
-    "7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? Use only `shout`, `whisper`, `measured`, or `tremble` as tone values; omit `:tone` for normal delivery. What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? (skip if tags not present)",
+    "7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? What format? What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? (skip if tags not present)",
   ],
   [
     "E. Does the final response fit the length stated in `<formatting_constraints>`? If the tag is not present, skip to GATE 10.",
