@@ -181,6 +181,7 @@ Rules:
 - Detail: Freely enrich, trim, or recast incidental props, gestures, textures, and sensory cues. Prefer vivid, causally connected details over literal source wording. Keep them compatible with the scene; do not add a consequential event or continue the roleplay.
 - Language: Use idiomatic Vietnamese. Correct spelling, diacritics, grammar, and collocations; remove accidental foreign wording and mixed-script leakage. Preserve proper names and required technical terms.
 - Dialogue: Favor flowing multi-sentence speech with natural Vietnamese particles, teasing, hesitation, subtext, and character-specific wording. Break speech with meaningful action beats. Retain idiolect, pauses, stutters, and short utterances. Adjust pronouns and forms of address to context; keep referents clear and preserve intended respect, distance, or intimacy.
+- Tone: Use only these dialogue tones: shout, whisper, measured, tremble.
 - Scene Flow: Let each paragraph advance the immediate interaction. End with an NPC question, offer, gesture, or unresolved reaction that leaves room for {{user}}.
 - Continuity: Preserve participants, core events and outcome, speaker intent, POV, agency, relationships, and emotional direction. Keep time, weather, location, and physical cause consistent when enriching. Never introduce a consequential new event, continue the roleplay, or answer the user.
 - Display Text: Polish free-text values in headers, HUDs, GFX, <internal_states>, GM Notebook sections, and trackers. Keep their underlying state unchanged.
