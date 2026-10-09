@@ -113,3 +113,36 @@ export function createConfigPreset(
   store.presets.push(profile);
   return profile;
 }
+
+export function renameConfigPreset(
+  store: ConfigPresetStore,
+  presetId: string,
+  name: string,
+): ConfigPreset {
+  const profile = store.presets.find((entry) => entry.id === presetId);
+  if (!profile) throw new Error("Không tìm thấy preset.");
+  if (presetId === DEFAULT_CONFIG_PRESET_ID) throw new Error("Không thể đổi tên preset Mặc định.");
+  const cleanName = name.trim();
+  if (!cleanName) throw new Error("Hãy nhập tên preset mới.");
+  if (
+    store.presets.some(
+      (entry) =>
+        entry.id !== presetId &&
+        entry.name.toLocaleLowerCase("vi") === cleanName.toLocaleLowerCase("vi"),
+    )
+  ) {
+    throw new Error("Tên preset đã tồn tại. Hãy chọn tên khác.");
+  }
+  profile.name = cleanName;
+  return profile;
+}
+
+export function deleteConfigPreset(store: ConfigPresetStore, presetId: string): void {
+  if (presetId === DEFAULT_CONFIG_PRESET_ID) throw new Error("Không thể xóa preset Mặc định.");
+  const index = store.presets.findIndex((entry) => entry.id === presetId);
+  if (index < 0) throw new Error("Không tìm thấy preset.");
+  store.presets.splice(index, 1);
+  for (const [cardId, selectedId] of Object.entries(store.cardPresets)) {
+    if (selectedId === presetId) delete store.cardPresets[cardId];
+  }
+}

@@ -6,8 +6,10 @@ import {
 } from "../risuai/freaky-frankenstein-5.4-plugin/src/core.js";
 import {
   createConfigPreset,
+  deleteConfigPreset,
   normalizePresetStore,
   presetForCard,
+  renameConfigPreset,
   selectCardPreset,
 } from "../risuai/freaky-frankenstein-5.4-plugin/src/presets.js";
 
@@ -79,6 +81,27 @@ describe("FF5.4 configuration presets", () => {
     createConfigPreset(store, "Tiểu thuyết", settings, "novel");
     expect(() => createConfigPreset(store, "TIỂU THUYẾT", settings, "other")).toThrow("đã tồn tại");
     expect(store.presets).toHaveLength(2);
+  });
+
+  it("renames custom presets and rejects reserved or duplicate names", () => {
+    const store = normalizePresetStore(source, undefined);
+    createConfigPreset(store, "Cinematic", store.presets[0]!.settings, "cinematic");
+    expect(renameConfigPreset(store, "cinematic", "  Tự nhiên  ").name).toBe("Tự nhiên");
+    expect(() => renameConfigPreset(store, "cinematic", "Mặc định")).toThrow("đã tồn tại");
+    expect(() => renameConfigPreset(store, "default", "Đổi tên")).toThrow("Mặc định");
+    expect(() => renameConfigPreset(store, "missing", "Tên mới")).toThrow("Không tìm thấy");
+  });
+
+  it("deletes custom presets and returns assigned cards to Mặc định", () => {
+    const store = normalizePresetStore(source, undefined);
+    createConfigPreset(store, "Tạm thời", store.presets[0]!.settings, "temporary");
+    selectCardPreset(store, "card-a", "temporary");
+    deleteConfigPreset(store, "temporary");
+    expect(store.presets).toHaveLength(1);
+    expect(store.cardPresets).not.toHaveProperty("card-a");
+    expect(presetForCard(store, "card-a").id).toBe("default");
+    expect(() => deleteConfigPreset(store, "default")).toThrow("Mặc định");
+    expect(() => deleteConfigPreset(store, "missing")).toThrow("Không tìm thấy");
   });
 
   it("falls back to Mặc định for missing presets and restores valid saved settings", () => {

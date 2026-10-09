@@ -985,6 +985,29 @@ describe("Named presets in plugin UI and requests", () => {
     expect(reloaded.ui("config-preset").value).toBe("default");
   });
 
+  it("renames and deletes a custom preset from the settings UI", async () => {
+    const plugin = await startPlugin();
+    await plugin.settingsUi();
+    plugin.ui("preset-name").value = "Tạm thời";
+    await plugin.uiEvent("create-preset");
+    const created = normalizePresetStore(
+      preset,
+      plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY),
+    ).presets.find((entry) => entry.name === "Tạm thời")!;
+    plugin.ui("rename-preset-name").value = "Bản đã đổi tên";
+    await plugin.uiEvent("rename-preset");
+    expect(
+      normalizePresetStore(preset, plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY)).presets.find(
+        (entry) => entry.id === created.id,
+      )?.name,
+    ).toBe("Bản đã đổi tên");
+    await plugin.uiEvent("delete-preset");
+    const saved = normalizePresetStore(preset, plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
+    expect(saved.presets).toHaveLength(1);
+    expect(saved.cardPresets).not.toHaveProperty("card-a");
+    expect(plugin.ui("config-preset").value).toBe("default");
+  });
+
   it("applies the chosen preset per card to requests and display without modifying card data", async () => {
     const store = normalizePresetStore(preset, undefined, { submodelEditorEnabled: true });
     const disabled = createConfigPreset(store, "Tắt FF5.4", store.presets[0]!.settings, "off");
