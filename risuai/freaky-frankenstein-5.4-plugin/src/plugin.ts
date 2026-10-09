@@ -521,12 +521,6 @@ async function showSettings(): Promise<void> {
       "Viết tiếng Việt tự nhiên; bản địa hóa mẫu và từ vựng có thể đi vào phản hồi ở mọi CoT liên quan · Mặc định bật",
     )}${checkbox(
       "plugin",
-      "image-optimization",
-      settings.imageOptimizationEnabled,
-      "🖼️ Tối ưu hình ảnh theo card",
-      "Dùng nhiều ảnh ở các vị trí phù hợp, đa dạng hóa khoảnh khắc và dùng cú pháp ảnh theo card/lore · Mặc định tắt",
-    )}${checkbox(
-      "plugin",
       "sound-notifications",
       settings.soundNotificationsEnabled,
       "🔔 Âm báo hoàn tất",
@@ -569,7 +563,6 @@ async function showSettings(): Promise<void> {
       if (node.dataset.kind === "prompt") settings.promptEnabled[id] = node.checked;
       else if (node.dataset.kind === "regex") settings.regexEnabled[id] = node.checked;
       else if (id === "vietnamese-output") settings.vietnameseOutputEnabled = node.checked;
-      else if (id === "image-optimization") settings.imageOptimizationEnabled = node.checked;
       else if (id === "sound-notifications") settings.soundNotificationsEnabled = node.checked;
       else if (id === "submodel-editor") settings.submodelEditorEnabled = node.checked;
       else if (id === "submodel-auto-rewrite") settings.submodelAutoRewriteEnabled = node.checked;

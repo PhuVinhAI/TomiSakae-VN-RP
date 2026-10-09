@@ -1,9 +1,4 @@
-import { addImageReasoningGuidance, IMAGE_OPTIMIZATION_PROMPT } from "./image.js";
-import {
-  adaptPromptForVietnamese,
-  applyDialogueToneLock,
-  VIETNAMESE_OUTPUT_PROMPT,
-} from "./vietnamese.js";
+import { adaptPromptForVietnamese, VIETNAMESE_OUTPUT_PROMPT } from "./vietnamese.js";
 
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
@@ -62,7 +57,6 @@ export interface FfGlobalSettings {
   promptEnabled: Record<string, boolean>;
   regexEnabled: Record<string, boolean>;
   vietnameseOutputEnabled: boolean;
-  imageOptimizationEnabled: boolean;
   soundNotificationsEnabled: boolean;
   submodelEditorEnabled: boolean;
   submodelAutoRewriteEnabled: boolean;
@@ -138,7 +132,6 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
       regexScripts.map((script) => [script.id, script.disabled !== true]),
     ),
     vietnameseOutputEnabled: true,
-    imageOptimizationEnabled: false,
     soundNotificationsEnabled: false,
     submodelEditorEnabled: false,
     submodelAutoRewriteEnabled: false,
@@ -171,9 +164,6 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
   if (typeof record.enabled === "boolean") defaults.enabled = record.enabled;
   if (typeof record.vietnameseOutputEnabled === "boolean") {
     defaults.vietnameseOutputEnabled = record.vietnameseOutputEnabled;
-  }
-  if (typeof record.imageOptimizationEnabled === "boolean") {
-    defaults.imageOptimizationEnabled = record.imageOptimizationEnabled;
   }
   if (typeof record.soundNotificationsEnabled === "boolean") {
     defaults.soundNotificationsEnabled = record.soundNotificationsEnabled;
@@ -399,13 +389,9 @@ export function composePresetPrompts(
         continue;
       const prompt = map.get(entry.identifier);
       if (!prompt || prompt.marker || typeof prompt.content !== "string") continue;
-      let sourceContent = settings.vietnameseOutputEnabled
+      const sourceContent = settings.vietnameseOutputEnabled
         ? adaptPromptForVietnamese(prompt.content)
         : prompt.content;
-      sourceContent = applyDialogueToneLock(sourceContent);
-      if (settings.imageOptimizationEnabled && promptRole(prompt) === "user") {
-        sourceContent = addImageReasoningGuidance(sourceContent);
-      }
       let content = expandSourceMacros(sourceContent, variables, macroContext);
       content = await parseHostMacros(content, promptRole(prompt));
       if (!content.trim()) continue;
@@ -455,13 +441,6 @@ export function composePresetPrompts(
           }
         }
       }
-    }
-    if (settings.imageOptimizationEnabled) {
-      leading.push({
-        role: "system",
-        content: IMAGE_OPTIMIZATION_PROMPT,
-        memo: "ff54:image-optimization",
-      });
     }
     return { leading, absolute, trailing, variables };
   })();

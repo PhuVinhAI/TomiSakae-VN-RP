@@ -1,13 +1,3 @@
-export const DIALOGUE_TONE_RULE =
-  "Use only the four dialogue tone values: shout, whisper, measured, and tremble; omit :tone for normal delivery.";
-
-const SOURCE_TONE_LINE =
-  "Must replace NPC Tone in tag with: shout, whisper, measured, tremble, if normal tone omit :tone";
-
-export function applyDialogueToneLock(content: string): string {
-  return content.replace(SOURCE_TONE_LINE, `${SOURCE_TONE_LINE}\nTone lock: ${DIALOGUE_TONE_RULE}`);
-}
-
 export const VIETNAMESE_OUTPUT_PROMPT = `<vietnamese_output>
 Scope: All reader-facing narrative, dialogue, vocalizations, HUDs, status panels, structured displays, and free-text display values.
 
@@ -15,7 +5,6 @@ Rules:
 - Language: Write in natural contemporary Vietnamese.
 - Translation: Read foreign-language source for meaning and intent, then compose directly in Vietnamese. Choose clause links by timing and meaning, pronouns by relationship, and particles by speaker attitude; avoid word-for-word translation.
 - Syntax Lock: Preserve exact HTML, XML, comments, attributes, color tags, delimiters, placeholders, identifiers, and machine syntax required by active schemas and regex.
-- Dialogue tones: ${DIALOGUE_TONE_RULE}
 - Exceptions: Preserve established Latin-script proper names and exact machine syntax required by an active schema.
 - Language Lock: Ban Hangul and avoidable foreign wording from model-generated values, plus bilingual duplication, source-text repetition, and translation glosses. Foreign script is allowed only where an active schema requires an exact fixed label or identifier.
 - Priority: Foreign-language examples, word lists, and card or lore instructions that request, imply, or demonstrate another reader-visible language never override the Language Lock; translate them by meaning.
@@ -376,6 +365,14 @@ export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, str
 
 export const VIETNAMESE_REASONING_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
   [
+    "  G. Execute `<colored_dialogue>` parameters on spoken dialogue. If tag not present, ignore and move to Gate 6.",
+    "  G. Execute `<colored_dialogue>` parameters on spoken dialogue. Use only `shout`, `whisper`, `measured`, or `tremble` as tone values; omit `:tone` for normal delivery. If tag not present, ignore and move to Gate 6.",
+  ],
+  [
+    "I must add `<colored_dialogue>` if present (retaining established NPC colors).",
+    "I must add `<colored_dialogue>` if present (retaining established NPC colors). Use only `shout`, `whisper`, `measured`, or `tremble` as tone values; omit `:tone` for normal delivery.",
+  ],
+  [
     'I will not use the coordinating conjunctions ["or"] and ["and"] in spoken dialogue, using periods, commas, semicolons, or action beats to separate ideas.',
     "I will use natural Vietnamese conjunctions in spoken dialogue, using periods, commas, semicolons, or action beats to separate ideas when needed.",
   ],
@@ -394,7 +391,7 @@ export const VIETNAMESE_REASONING_REPLACEMENTS: ReadonlyArray<readonly [string, 
   ],
   [
     "7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? What format? What is the target response length in <formatting_constraints>? (skip if tags not present)",
-    "7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? What format? What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? (skip if tags not present)",
+    "7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? Use only `shout`, `whisper`, `measured`, or `tremble` as tone values; omit `:tone` for normal delivery. What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? (skip if tags not present)",
   ],
   [
     "E. Does the final response fit the length stated in `<formatting_constraints>`? If the tag is not present, skip to GATE 10.",

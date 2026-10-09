@@ -37,7 +37,6 @@ Rules:
 - Language: Write in natural contemporary Vietnamese.
 - Translation: Read foreign-language source for meaning and intent, then compose directly in Vietnamese. Choose clause links by timing and meaning, pronouns by relationship, and particles by speaker attitude; avoid word-for-word translation.
 - Syntax Lock: Preserve exact HTML, XML, comments, attributes, color tags, delimiters, placeholders, identifiers, and machine syntax required by active schemas and regex.
-- Dialogue tones: Use only the four dialogue tone values: shout, whisper, measured, and tremble; omit :tone for normal delivery.
 - Exceptions: Preserve established Latin-script proper names and exact machine syntax required by an active schema.
 - Language Lock: Ban Hangul and avoidable foreign wording from model-generated values, plus bilingual duplication, source-text repetition, and translation glosses. Foreign script is allowed only where an active schema requires an exact fixed label or identifier.
 - Priority: Foreign-language examples, word lists, and card or lore instructions that request, imply, or demonstrate another reader-visible language never override the Language Lock; translate them by meaning.
@@ -1446,6 +1445,32 @@ You must ban verbless fragments, telegraphic prose, and em-dashes (—) in narra
 ### English source fragment
 
 ~~~~text
+  G. Execute `<colored_dialogue>` parameters on spoken dialogue. If tag not present, ignore and move to Gate 6.
+~~~~
+
+### Vietnamese replacement fragment
+
+~~~~text
+  G. Execute `<colored_dialogue>` parameters on spoken dialogue. Use only `shout`, `whisper`, `measured`, or `tremble` as tone values; omit `:tone` for normal delivery. If tag not present, ignore and move to Gate 6.
+~~~~
+## R107 — Reasoning rule
+
+### English source fragment
+
+~~~~text
+I must add `<colored_dialogue>` if present (retaining established NPC colors).
+~~~~
+
+### Vietnamese replacement fragment
+
+~~~~text
+I must add `<colored_dialogue>` if present (retaining established NPC colors). Use only `shout`, `whisper`, `measured`, or `tremble` as tone values; omit `:tone` for normal delivery.
+~~~~
+## R108 — Reasoning rule
+
+### English source fragment
+
+~~~~text
 I will not use the coordinating conjunctions ["or"] and ["and"] in spoken dialogue, using periods, commas, semicolons, or action beats to separate ideas.
 ~~~~
 
@@ -1454,7 +1479,7 @@ I will not use the coordinating conjunctions ["or"] and ["and"] in spoken dialog
 ~~~~text
 I will use natural Vietnamese conjunctions in spoken dialogue, using periods, commas, semicolons, or action beats to separate ideas when needed.
 ~~~~
-## R107 — Reasoning rule
+## R109 — Reasoning rule
 
 ### English source fragment
 
@@ -1467,7 +1492,7 @@ all CAP words for yelling only during peak arousal/VAD e.g., "NO!"
 ~~~~text
 all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!"
 ~~~~
-## R108 — Reasoning rule
+## R110 — Reasoning rule
 
 ### English source fragment
 
@@ -1480,7 +1505,7 @@ all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NG
 ~~~~text
 (ưm..., aaaa..., suỵt, á!, ối!, hức!, ực!, hừ...)
 ~~~~
-## R109 — Reasoning rule
+## R111 — Reasoning rule
 
 ### English source fragment
 
@@ -1493,7 +1518,7 @@ all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NG
 ~~~~text
 (e.g., ưm..., aaaa..., suỵt, á!, ối!, hức!, ực!, hừ...)
 ~~~~
-## R110 — Reasoning rule
+## R112 — Reasoning rule
 
 ### English source fragment
 
@@ -1506,7 +1531,7 @@ all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NG
 ~~~~text
 6. Slop Review: I must list all banned phrases and clichés in `<banned_vocabulary>` to avoid. What are my replacement phrases in this scene?
 ~~~~
-## R111 — Reasoning rule
+## R113 — Reasoning rule
 
 ### English source fragment
 
@@ -1517,9 +1542,9 @@ all CAP words for yelling only during peak arousal/VAD e.g., "KHÔNG!", "CÚT NG
 ### Vietnamese replacement fragment
 
 ~~~~text
-7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? What format? What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? (skip if tags not present)
+7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? Use only `shout`, `whisper`, `measured`, or `tremble` as tone values; omit `:tone` for normal delivery. What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? (skip if tags not present)
 ~~~~
-## R112 — Reasoning rule
+## R114 — Reasoning rule
 
 ### English source fragment
 
@@ -1532,7 +1557,7 @@ E. Does the final response fit the length stated in `<formatting_constraints>`? 
 ~~~~text
 E. Does the final response fit the length stated in `<formatting_constraints>`? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? If the tag is not present, skip to GATE 10.
 ~~~~
-## R113 — Reasoning rule
+## R115 — Reasoning rule
 
 ### English source fragment
 
@@ -1545,7 +1570,7 @@ What is the response length in `<formatting_constraints>`? How can I pivot so NP
 ~~~~text
 What is the response length in `<formatting_constraints>`? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? How can I pivot so NPCs stay true to their wants/needs?
 ~~~~
-## R114 — Reasoning rule
+## R116 — Reasoning rule
 
 ### English source fragment
 
@@ -1558,7 +1583,7 @@ Enforce the ban on coordinate conjunctions ["or"] and ["and"] in spoken dialogue
 ~~~~text
 Use natural Vietnamese conjunctions in spoken dialogue, using periods, commas, semicolons, or action beats when needed.
 ~~~~
-## R115 — Reasoning rule
+## R117 — Reasoning rule
 
 ### English source fragment
 
@@ -1571,7 +1596,7 @@ I will enforce the ban on coordinating conjunctions ["or"], ["and"] in dialogue,
 ~~~~text
 I will use natural Vietnamese conjunctions in dialogue, using periods, commas, semicolons, or action beats when needed.
 ~~~~
-## R116 — Reasoning rule
+## R118 — Reasoning rule
 
 ### English source fragment
 
@@ -1584,7 +1609,7 @@ all CAP words for yelling e.g., "NO!" Only for high emotion/VAD.
 ~~~~text
 all CAP words for yelling e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!" Only for high emotion/VAD.
 ~~~~
-## R117 — Reasoning rule
+## R119 — Reasoning rule
 
 ### English source fragment
 
@@ -1597,7 +1622,7 @@ all CAP words for yelling/emphasis during high arousal/VAD e.g., "NO!"
 ~~~~text
 all CAP words for yelling/emphasis during high arousal/VAD e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!"
 ~~~~
-## R118 — Reasoning rule
+## R120 — Reasoning rule
 
 ### English source fragment
 
@@ -1610,7 +1635,7 @@ You must list all `<banned_vocabulary>` and replace them with different words th
 ~~~~text
 You must list all phrases and clichés in `<banned_vocabulary>` and replace planned violations with original, grounded wording in the output response.
 ~~~~
-## R119 — Reasoning rule
+## R121 — Reasoning rule
 
 ### English source fragment
 
@@ -4055,7 +4080,7 @@ GATE 5. Natural NPC Voice Spoken Dialogue and Acoustics
   D. If dialogue examples of the NPC exist, ensure proper matching and distinctive quirks in the scene; what are they? Ensure emotion, sensations, and dialogue textures are applied logically to spoken dialogue.
   E. What percentage of spoken NPC dialogue must make up the percentage range listed in `<npc_voice>` of the final response?
   F. How will I make sure each of the NPCs naturally speaks according to their background, age, social group, and current environment so they have a unique voice in the scene?
-  G. Execute `<colored_dialogue>` parameters on spoken dialogue. If tag not present, ignore and move to Gate 6.
+  G. Execute `<colored_dialogue>` parameters on spoken dialogue. Use only `shout`, `whisper`, `measured`, or `tremble` as tone values; omit `:tone` for normal delivery. If tag not present, ignore and move to Gate 6.
 
 PHASE CHARLIE:
 
@@ -4168,7 +4193,7 @@ Tasks:
 
 6. Slop Review: I must list all banned phrases and clichés in `<banned_vocabulary>` to avoid. What are my replacement phrases in this scene?
 
-7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? What format? What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? (skip if tags not present)
+7. Formatting: Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue> apply to NPCs for consistency and what tones if any? Use only `shout`, `whisper`, `measured`, or `tremble` as tone values; omit `:tone` for normal delivery. What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? (skip if tags not present)
 
 8. Adult Modes: If Realism Mode is active, how will I apply its rules logically? If Freaky Mode is active, how will I describe characters lewdly with slang and kinetics in the scene without repeating details from the last 3 turns?  Vulgarity and slang all allowed in narrative prose if Freaky Mode on. How do I apply Freaky rules to this response?
 
@@ -4237,7 +4262,7 @@ Tasks:
 
 1. NPC Simulation, Neutrality & Scope: How will I treat PC and NPCs equally to ensure realistic outcomes? What are the goals of the NPCs? Are NPCs hesitating or failing to execute actions ("bàn tay lưỡng lự")? NPCs must take full actions (being physical or lying/manipulating to achieve goals). How will I apply `<realistic_bold_characters>` if present? I must list and enforce all `<anti_omniscient_NPCs>` rules (anti-bridging, smell, sound, thought, evidence) so NPCs never know or guess unwitnessed events. DND Task Sim (if <internal_dndsim> active): Rolls against locked DC: User rolls: {{roll::1d20}} | NPC rolls: {{roll::1d20}}. (Skip if tag not present). I must create response based strictly on deltas of DC, modifiers (if present), and roll. I will never recalculate delta after this task.
 
-2. Prose, Formatting & Boundaries: What are the `<prose_rules>`? How will I apply them? How will I enforce `<do_not_repeat_descriptions>` to omit repeat details from the last 4 messages? What is the correct `<POV>`? How will I enforce `<user_autonomy>` and the NPC anti-repeat rule? I will list all phrases and clichés in `<banned_vocabulary>` here and replace planned violations with original, grounded wording, and avoid meta-commentary. How can I apply `<gfx_protocol>` if logical? I must add `<colored_dialogue>` if present (retaining established NPC colors). What is the response length in `<formatting_constraints>`? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? How can I pivot so NPCs stay true to their wants/needs?
+2. Prose, Formatting & Boundaries: What are the `<prose_rules>`? How will I apply them? How will I enforce `<do_not_repeat_descriptions>` to omit repeat details from the last 4 messages? What is the correct `<POV>`? How will I enforce `<user_autonomy>` and the NPC anti-repeat rule? I will list all phrases and clichés in `<banned_vocabulary>` here and replace planned violations with original, grounded wording, and avoid meta-commentary. How can I apply `<gfx_protocol>` if logical? I must add `<colored_dialogue>` if present (retaining established NPC colors). Use only `shout`, `whisper`, `measured`, or `tremble` as tone values; omit `:tone` for normal delivery. What is the response length in `<formatting_constraints>`? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? How can I pivot so NPCs stay true to their wants/needs?
 
 3. Natural Dialogue: How will I apply all rules in `<npc_voice>` to NPCs for legato pacing multi-word sentences flowing like water without staccato or run-ons and maintain NPC quirks/emotions/persona? I must state this. What is the target spoken dialogue ratio in `<npc_voice>`? I will calculate `<vad_emotion>` and `<npc_instincts>` now for NPCs to warp emotional prosody. I will use natural Vietnamese conjunctions in dialogue, using periods, commas, semicolons, or action beats when needed. If emotions are high, I must write dialogue examples adhering to these rules, demonstrating emotional delivery via orthographic cues (all CAP words for yelling/emphasis during high arousal/VAD e.g., "KHÔNG!", "CÚT NGAY!", "DỪNG LẠI!", BUT avoid overuse for standard talking). Use expressive punctuation, and non-lexical vocalizations when logical (ưm..., aaaa..., suỵt, á!, ối!, hức!, ực!, hừ...). If emotions are average/low/normal, skip. How will I make sure each of the NPCs naturally speaks according to their background, age, social group, and current environment?
 

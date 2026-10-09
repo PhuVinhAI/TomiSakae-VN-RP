@@ -29,10 +29,6 @@ import {
   PROMPT_SECTIONS,
   SOURCE_SEPARATOR_IDS,
 } from "../risuai/freaky-frankenstein-5.4-plugin/src/ui-vi.js";
-import {
-  IMAGE_OPTIMIZATION_PROMPT,
-  addImageReasoningGuidance,
-} from "../risuai/freaky-frankenstein-5.4-plugin/src/image.js";
 
 const source = "risuai/freaky-frankenstein-5.4-plugin/source/ff54-sillytavern-preset.json";
 const realismModeId = "019f62e8-892f-700c-9795-53ecb3381d7d";
@@ -60,7 +56,6 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(settings.promptEnabled[realismModeId]).toBe(true);
     expect(settings.promptEnabled[freakyModeId]).toBe(false);
     expect(settings.vietnameseOutputEnabled).toBe(true);
-    expect(settings.imageOptimizationEnabled).toBe(false);
   });
 
   it("keeps an explicitly saved Freaky choice", async () => {
@@ -223,79 +218,29 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "Can I use <gfx_protocol> in this scene? Which locked colors from <colored_dialogue>",
     );
     expect(allContent).toContain(
-      "What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? (skip if tags not present)",
+      "Use only `shout`, `whisper`, `measured`, or `tremble` as tone values; omit `:tone` for normal delivery.",
     );
   });
 
-  it.each([true, false])(
-    "integrates image checks into existing tasks with Vietnamese output %s",
-    async (vietnameseOutputEnabled) => {
-      const data = await preset();
-      const settings = createDefaultSettings(data);
-      settings.vietnameseOutputEnabled = vietnameseOutputEnabled;
-      settings.imageOptimizationEnabled = true;
-      for (const identifier of [
-        "019f62e8-892f-7032-b004-1869f8bc0782",
-        "634ecfec-1862-4ce0-821e-e31057acadfa",
-        "b5db9430-857a-408c-817c-32e975a71430",
-      ])
-        settings.promptEnabled[identifier] = true;
-      const composed = await composePresetPrompts(data, settings, async (value) => value);
-      const all = [...composed.leading, ...composed.absolute, ...composed.trailing]
-        .map((entry) => entry.content)
-        .join("\n");
-      expect(
-        composed.leading.find((entry) => entry.memo === "ff54:image-optimization")?.content,
-      ).toBe(IMAGE_OPTIMIZATION_PROMPT);
-      expect(composed.leading.find((entry) => entry.memo === "ff54:image-optimization")?.role).toBe(
-        "system",
-      );
-      for (const [identifier, taskMarker] of [
-        ["019f62e8-892f-7032-b004-1869f8bc0782", "  B. You must list out concisely"],
-        ["634ecfec-1862-4ce0-821e-e31057acadfa", "7. Formatting:"],
-        ["b5db9430-857a-408c-817c-32e975a71430", "2. Prose, Formatting & Boundaries:"],
-      ] as const) {
-        const raw = data.prompts.find((entry) => entry.identifier === identifier)!.content;
-        if (typeof raw !== "string") throw new Error(`Missing reasoning prompt: ${identifier}`);
-        const before = vietnameseOutputEnabled ? adaptPromptForVietnamese(raw) : raw;
-        const after = addImageReasoningGuidance(before);
-        const lines = before.split("\n");
-        const updated = after.split("\n");
-        expect(updated).toHaveLength(lines.length);
-        const changed = updated.filter((line, index) => line !== lines[index]);
-        expect(changed).toHaveLength(1);
-        expect(changed[0]!.startsWith(taskMarker)).toBe(true);
-        expect(changed[0]).toContain("<image_optimization>");
-        expect(addImageReasoningGuidance(after)).toBe(after);
-        expect(all).toContain(changed[0]!);
-      }
-      expect(all.match(/<image_optimization>/g)).toHaveLength(4);
-      const disabled = await composePresetPrompts(
-        data,
-        { ...settings, imageOptimizationEnabled: false },
-        async (value) => value,
-      );
-      expect(
-        [...disabled.leading, ...disabled.absolute, ...disabled.trailing].some((entry) =>
-          entry.content.includes("<image_optimization>"),
-        ),
-      ).toBe(false);
-      expect(all).not.toContain("<anime_manga_light_novel_style>");
-      expect(all).not.toContain("IMG_PROMPT:");
-    },
-  );
-
-  it("locks dialogue tone values to the four FF5.4 tones", async () => {
+  it("keeps tone locking inside the three reasoning rules only", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);
+    for (const identifier of [
+      "019f62e8-892f-7032-b004-1869f8bc0782",
+      "634ecfec-1862-4ce0-821e-e31057acadfa",
+      "b5db9430-857a-408c-817c-32e975a71430",
+    ])
+      settings.promptEnabled[identifier] = true;
     const composed = await composePresetPrompts(data, settings, async (value) => value);
     const colored = composed.leading.find((entry) => entry.content.includes("<colored_dialogue>"));
-    expect(colored?.content).toContain(
-      "Tone lock: Use only the four dialogue tone values: shout, whisper, measured, and tremble; omit :tone for normal delivery.",
-    );
-    expect(VIETNAMESE_OUTPUT_PROMPT).toContain(
-      "Use only the four dialogue tone values: shout, whisper, measured, and tremble",
-    );
+    expect(colored?.content).not.toContain("Tone lock:");
+    expect(VIETNAMESE_OUTPUT_PROMPT).not.toContain("Dialogue tones:");
+    const reasoningContent = [...composed.leading, ...composed.absolute, ...composed.trailing]
+      .map((entry) => entry.content)
+      .join("\n");
+    expect(
+      reasoningContent.match(/Use only `shout`, `whisper`, `measured`, or `tremble`/g),
+    ).toHaveLength(3);
   });
 
   it("rebuilds one FF5.4 injection set when the host retries a request", async () => {
