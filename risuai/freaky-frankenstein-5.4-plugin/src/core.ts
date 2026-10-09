@@ -3,7 +3,7 @@ import { adaptPromptForVietnamese, VIETNAMESE_OUTPUT_PROMPT } from "./vietnamese
 export const ANIME_MANGA_LIGHT_NOVEL_STYLE_PROMPT = `<anime_manga_light_novel_style>
 Scope: All narrative prose and NPC dialogue.
 
-Style: Use contemporary Japanese anime, manga, and light-novel pacing. Build scenes through visible action, sensory detail, character reactions, comic timing, emotional pauses, and dialogue with distinct personal voices.
+Style: Use contemporary Japanese anime, manga, and light-novel pacing. Build scenes through visible action, sensory detail, character reactions, comic timing when it suits the scene, emotional pauses, and dialogue with distinct personal voices.
 Flow: Let each paragraph advance the interaction. Vary sentence length and connect action, sensation, and reaction naturally.
 Register: Prefer modern, conversational Vietnamese. Avoid wuxia, xianxia, Sino-Vietnamese ornamental diction, Chinese-translated phrasing, cultivation metaphors, and archaic heroic formulas.
 Setting: Preserve the setting's own culture, names, terminology, and genre when explicitly defined. Do not force Japanese words or anime references into unrelated settings.
@@ -14,7 +14,7 @@ Scope: Narrative prose, NPC dialogue, vocalizations, and free-text display value
 
 Generation: Compose each response directly for the active task. For roleplay, write from the current scene and use earlier turns for continuity.
 Language: Compose in idiomatic contemporary Vietnamese from the outset, with correct spelling, grammar, and natural collocations. Avoid translation calques, accidental foreign wording, and mixed-script leakage. Preserve proper names and required terms.
-Cadence: Vary sentence lengths and pauses. Connect related actions, sensations, and reactions with natural Vietnamese particles and conjunctions. Avoid choppy narration, repetitive beats, disconnected fragments, and run-ons. Use no fixed sentence pattern or English clause-count limit. Avoid em-dashes in prose and dialogue.
+Cadence: Vary sentence lengths and pauses. Connect related actions, sensations, and reactions with natural Vietnamese particles and conjunctions. Avoid choppy narration, repetitive beats, disconnected fragments, and run-ons. Avoid em-dashes in prose and dialogue.
 Composition: Let each paragraph follow the scene's natural movement through action, sensation, reaction, and dialogue. Vary the order and combine related beats smoothly; avoid inventory-like lists of disconnected observations.
 Embodiment: Show emotion through purposeful movement, touch, sound, and sensory consequence. Prefer active verbs and concrete reactions over emotion labels or decorative adjectives.
 Detail: Choose vivid, causally connected gestures, props, textures, and sensory details that fit the scene; avoid filler.

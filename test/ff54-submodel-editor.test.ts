@@ -418,6 +418,16 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(options.messages[editorIndex]!.content).toContain(
       "- Style: Use manga, anime, and light-novel pacing.",
     );
+    expect(options.messages[editorIndex]!.content).toContain(
+      "use comic timing when it suits the scene",
+    );
+    expect(options.messages[editorIndex]!.content).toContain(
+      "Translate or polish free-text values, including locations, factions, quests, inventory entries",
+    );
+    expect(options.messages[editorIndex]!.content).toContain(
+      "Do not add a question, offer, gesture, or unresolved reaction solely to prompt {{user}}.",
+    );
+    expect(options.messages[editorIndex]!.content).not.toContain("Lock all state data:");
     expect(options.messages[editorIndex]!.content).not.toContain("<anime_manga_light_novel_style>");
     expect(
       options.messages.filter((message) => message.memo === "ff54:anime-manga-light-novel-style"),
