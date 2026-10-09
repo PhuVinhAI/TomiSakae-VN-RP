@@ -1,8 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import {
-  ANIME_MANGA_LIGHT_NOVEL_STYLE_PROMPT,
-  VIETNAMESE_NATURAL_WRITING_PROMPT,
   adaptDisplayMarkupForRisuAI,
   adaptVietnameseHeaderForRisuAI,
   removeSceneHeadersForRequest,
@@ -14,7 +12,6 @@ import {
   createDefaultSettings,
   expandSourceMacros,
   expandHostMacros,
-  injectAbsoluteAtDepth,
   normalizeSettings,
   type FfPreset,
 } from "../risuai/freaky-frankenstein-5.4-plugin/src/core.js";
@@ -59,8 +56,6 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(settings.promptEnabled[realismModeId]).toBe(true);
     expect(settings.promptEnabled[freakyModeId]).toBe(false);
     expect(settings.vietnameseOutputEnabled).toBe(true);
-    expect(settings.animeMangaLightNovelStyleEnabled).toBe(true);
-    expect(settings.vietnameseNaturalWritingEnabled).toBe(true);
   });
 
   it("keeps an explicitly saved Freaky choice", async () => {
@@ -85,16 +80,6 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(
       normalizeSettings(data, { ...oldSettings, vietnameseOutputEnabled: false })
         .vietnameseOutputEnabled,
-    ).toBe(false);
-    expect(normalizeSettings(data, oldSettings).animeMangaLightNovelStyleEnabled).toBe(true);
-    expect(
-      normalizeSettings(data, { ...oldSettings, animeMangaLightNovelStyleEnabled: false })
-        .animeMangaLightNovelStyleEnabled,
-    ).toBe(false);
-    expect(normalizeSettings(data, oldSettings).vietnameseNaturalWritingEnabled).toBe(true);
-    expect(
-      normalizeSettings(data, { ...oldSettings, vietnameseNaturalWritingEnabled: false })
-        .vietnameseNaturalWritingEnabled,
     ).toBe(false);
   });
 
@@ -145,7 +130,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(built[latestIndex + 1]!.memo).toContain("ff54:absolute:0");
   });
 
-  it("adds the Vietnamese module once before card context and adapts only enabled prompts", async () => {
+  it("adds Vietnamese Output once before card context and keeps removed style modules out", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);
     const reasoningIds = [
@@ -163,30 +148,12 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     const built = await buildRequestMessages(messages, data, settings, async (value) => value);
     const composed = await composePresetPrompts(data, settings, async (value) => value);
     const vietnamese = built.filter((entry) => entry.memo === "ff54:vietnamese-output");
-    const naturalWriting = built.filter(
-      (entry) => entry.memo === "ff54:vietnamese-natural-writing",
-    );
-    const style = built.filter((entry) => entry.memo === "ff54:anime-manga-light-novel-style");
     expect(vietnamese).toHaveLength(1);
-    expect(naturalWriting).toEqual([
-      {
-        role: "system",
-        content: VIETNAMESE_NATURAL_WRITING_PROMPT,
-        memo: "ff54:vietnamese-natural-writing",
-      },
-    ]);
-    expect(style).toEqual([
-      {
-        role: "system",
-        content: ANIME_MANGA_LIGHT_NOVEL_STYLE_PROMPT,
-        memo: "ff54:anime-manga-light-novel-style",
-      },
-    ]);
+    expect(built.some((entry) => entry.memo === "ff54:vietnamese-natural-writing")).toBe(false);
+    expect(built.some((entry) => entry.memo === "ff54:anime-manga-light-novel-style")).toBe(false);
     expect(vietnamese[0]!.content).toBe(VIETNAMESE_OUTPUT_PROMPT);
     expect(built.slice(0, composed.leading.length)).toEqual(composed.leading);
     expect(built.indexOf(vietnamese[0]!)).toBe(composed.leading.length);
-    expect(built.indexOf(naturalWriting[0]!)).toBe(built.indexOf(vietnamese[0]!) + 1);
-    expect(built.indexOf(style[0]!)).toBe(built.indexOf(naturalWriting[0]!) + 1);
     const npcCreationIndex = built.findIndex((entry) => entry.content.includes("<npc_creation>"));
     expect(npcCreationIndex).toBeGreaterThanOrEqual(0);
     expect(built.indexOf(vietnamese[0]!)).toBe(npcCreationIndex + 1);
@@ -225,18 +192,11 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       const task = allContent.slice(startIndex, endIndex);
       expect(startIndex).toBeGreaterThanOrEqual(0);
       expect(endIndex).toBeGreaterThan(startIndex);
-      expect(task).toContain("<anime_manga_light_novel_style>");
-      expect(task).toContain("<vietnamese_natural_writing>");
+      expect(task).not.toContain("<anime_manga_light_novel_style>");
+      expect(task).not.toContain("<vietnamese_natural_writing>");
     }
-    expect(allContent).toContain("Vary sentence lengths and pauses.");
-    expect(ANIME_MANGA_LIGHT_NOVEL_STYLE_PROMPT).toContain("comic timing when it suits the scene");
-    expect(VIETNAMESE_NATURAL_WRITING_PROMPT).toContain(
-      "Compose each response directly for the active task.",
-    );
-    expect(VIETNAMESE_NATURAL_WRITING_PROMPT).not.toContain("Syntax:");
-    expect(VIETNAMESE_NATURAL_WRITING_PROMPT).not.toContain(
-      "Use no fixed sentence pattern or English clause-count limit.",
-    );
+    expect(allContent).not.toContain("<anime_manga_light_novel_style>");
+    expect(allContent).not.toContain("<vietnamese_natural_writing>");
     expect(allContent).toContain("I will use natural Vietnamese conjunctions in spoken dialogue");
     expect(allContent).not.toContain("I will not use the coordinating conjunctions");
     expect(allContent).not.toContain("Ban Coordinating Conjunctions:");
@@ -260,62 +220,6 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(allContent).toContain(
       "What is the target response length in <formatting_constraints>? How will I apply `<vietnamese_output>` to all reader-facing content, including headers and internal states? (skip if tags not present)",
     );
-  });
-
-  it("toggles natural Vietnamese writing and anime style independently in requests and reasoning", async () => {
-    const data = await preset();
-    const settings = createDefaultSettings(data);
-    settings.vietnameseOutputEnabled = false;
-    settings.animeMangaLightNovelStyleEnabled = false;
-    settings.vietnameseNaturalWritingEnabled = true;
-    const reasoningIds = [
-      "019f62e8-892f-7032-b004-1869f8bc0782",
-      "634ecfec-1862-4ce0-821e-e31057acadfa",
-      "b5db9430-857a-408c-817c-32e975a71430",
-    ];
-    for (const id of reasoningIds) settings.promptEnabled[id] = true;
-    const messages = [
-      { role: "system" as const, content: "host" },
-      { role: "user" as const, content: "latest" },
-    ];
-    const parse = async (value: string) => value;
-    const macroContext = { randomInt: () => 13 };
-    const built = await buildRequestMessages(messages, data, settings, parse, macroContext);
-    const composed = await composePresetPrompts(data, settings, parse, macroContext);
-    expect(built).toEqual([
-      ...composed.leading,
-      {
-        role: "system",
-        content: VIETNAMESE_NATURAL_WRITING_PROMPT,
-        memo: "ff54:vietnamese-natural-writing",
-      },
-      ...injectAbsoluteAtDepth(messages, composed.absolute),
-      ...composed.trailing,
-    ]);
-    expect(built.some((entry) => entry.memo === "ff54:vietnamese-output")).toBe(false);
-    expect(built.some((entry) => entry.memo === "ff54:anime-manga-light-novel-style")).toBe(false);
-    expect(built.some((entry) => entry.memo === "ff54:vietnamese-natural-writing")).toBe(true);
-    const naturalOnly = built.map((entry) => entry.content).join("\n");
-    expect(naturalOnly).not.toContain("<anime_manga_light_novel_style>");
-    expect(naturalOnly.match(/<vietnamese_natural_writing>/g)).toHaveLength(4);
-
-    const styleOnlySettings = structuredClone(settings);
-    styleOnlySettings.animeMangaLightNovelStyleEnabled = true;
-    styleOnlySettings.vietnameseNaturalWritingEnabled = false;
-    const styleOnly = await buildRequestMessages(
-      messages,
-      data,
-      styleOnlySettings,
-      parse,
-      macroContext,
-    );
-    const styleOnlyContent = styleOnly.map((entry) => entry.content).join("\n");
-    expect(styleOnly.some((entry) => entry.memo === "ff54:anime-manga-light-novel-style")).toBe(
-      true,
-    );
-    expect(styleOnly.some((entry) => entry.memo === "ff54:vietnamese-natural-writing")).toBe(false);
-    expect(styleOnlyContent.match(/<anime_manga_light_novel_style>/g)).toHaveLength(4);
-    expect(styleOnlyContent).not.toContain("<vietnamese_natural_writing>");
   });
 
   it("rebuilds one FF5.4 injection set when the host retries a request", async () => {

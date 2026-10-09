@@ -202,6 +202,7 @@ interface PendingEditorRequest {
 const editorRequests = new Map<string, PendingEditorRequest>();
 let editorListenerRegistered = false;
 let editorButton: RewriteButtonController | undefined;
+let editorButtonInitialization: Promise<RewriteButtonController | undefined> | undefined;
 const editorRuns = new Map<string, { controller: AbortController; targetKey: string }>();
 const editorChatKey = (characterIndex: number, chatIndex: number) =>
   `${characterIndex}:${chatIndex}`;
@@ -451,18 +452,6 @@ async function showSettings(): Promise<void> {
       "Viết tiếng Việt tự nhiên; bản địa hóa mẫu và từ vựng có thể đi vào phản hồi ở mọi CoT liên quan · Mặc định bật",
     )}${checkbox(
       "plugin",
-      "vietnamese-natural-writing",
-      settings.vietnameseNaturalWritingEnabled,
-      "✍️ Văn phong tiếng Việt tự nhiên",
-      "Vận dụng nhịp câu, liên kết ý, miêu tả và lời thoại tiếng Việt tự nhiên ngay khi tạo phản hồi · Mặc định bật",
-    )}${checkbox(
-      "plugin",
-      "anime-manga-light-novel-style",
-      settings.animeMangaLightNovelStyleEnabled,
-      "🎌 Nhịp kể Anime / Manga / Light Novel",
-      "Ưu tiên nhịp kể kiểu anime, manga, light novel Nhật; lưu riêng theo preset · Mặc định bật",
-    )}${checkbox(
-      "plugin",
       "submodel-editor",
       settings.submodelEditorEnabled,
       "✍️ Biên tập bằng Submodel",
@@ -499,11 +488,7 @@ async function showSettings(): Promise<void> {
       if (node.dataset.kind === "prompt") settings.promptEnabled[id] = node.checked;
       else if (node.dataset.kind === "regex") settings.regexEnabled[id] = node.checked;
       else if (id === "vietnamese-output") settings.vietnameseOutputEnabled = node.checked;
-      else if (id === "vietnamese-natural-writing") {
-        settings.vietnameseNaturalWritingEnabled = node.checked;
-      } else if (id === "anime-manga-light-novel-style") {
-        settings.animeMangaLightNovelStyleEnabled = node.checked;
-      } else if (id === "submodel-editor") settings.submodelEditorEnabled = node.checked;
+      else if (id === "submodel-editor") settings.submodelEditorEnabled = node.checked;
       else if (id === "submodel-auto-rewrite") settings.submodelAutoRewriteEnabled = node.checked;
     }
   };
@@ -915,15 +900,22 @@ async function getEditorButtonTarget(): Promise<RewriteButtonTarget | undefined>
 
 async function syncEditorButton(): Promise<void> {
   try {
-    editorButton ??= await createRewriteButton(
-      Risuai,
-      getEditorButtonTarget,
-      rewriteLatestResponse,
-      (target) => {
-        const run = editorRuns.get(editorChatKey(target.characterIndex, target.chatIndex));
-        if (run?.targetKey === target.key) run.controller.abort("cancel");
-      },
-    );
+    if (!editorButton) {
+      const initialization = (editorButtonInitialization ??= createRewriteButton(
+        Risuai,
+        getEditorButtonTarget,
+        rewriteLatestResponse,
+        (target) => {
+          const run = editorRuns.get(editorChatKey(target.characterIndex, target.chatIndex));
+          if (run?.targetKey === target.key) run.controller.abort("cancel");
+        },
+      ));
+      try {
+        editorButton = await initialization;
+      } finally {
+        if (editorButtonInitialization === initialization) editorButtonInitialization = undefined;
+      }
+    }
     await editorButton?.refresh();
   } catch (error) {
     console.warn("[FF5.4] Rewrite button requires PocketRisu's mainDom permission.", error);

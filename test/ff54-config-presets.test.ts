@@ -34,7 +34,18 @@ describe("FF5.4 configuration presets", () => {
     const store = normalizePresetStore(source, undefined, legacy);
     expect(store.presets).toHaveLength(1);
     expect(store.presets[0]!.name).toBe("Mặc định");
-    expect(presetForCard(store, "new-card").settings).toMatchObject(legacy);
+    expect(presetForCard(store, "new-card").settings).toMatchObject({
+      enabled: false,
+      vietnameseOutputEnabled: false,
+      submodelEditorEnabled: true,
+      submodelAutoRewriteEnabled: true,
+    });
+    expect(presetForCard(store, "new-card").settings).not.toHaveProperty(
+      "animeMangaLightNovelStyleEnabled",
+    );
+    expect(presetForCard(store, "new-card").settings).not.toHaveProperty(
+      "vietnameseNaturalWritingEnabled",
+    );
     expect(presetForCard(store).id).toBe("default");
   });
 
@@ -47,19 +58,13 @@ describe("FF5.4 configuration presets", () => {
       "prose",
     );
     alternate.settings.vietnameseOutputEnabled = false;
-    alternate.settings.animeMangaLightNovelStyleEnabled = false;
-    alternate.settings.vietnameseNaturalWritingEnabled = false;
     expect(store.presets[0]!.settings.vietnameseOutputEnabled).toBe(true);
-    expect(store.presets[0]!.settings.animeMangaLightNovelStyleEnabled).toBe(true);
-    expect(store.presets[0]!.settings.vietnameseNaturalWritingEnabled).toBe(true);
     selectCardPreset(store, "card-a", alternate.id);
     expect(presetForCard(store, "card-a")).toBe(alternate);
     expect(presetForCard(store, "card-b").id).toBe("default");
     const reloaded = normalizePresetStore(source, structuredClone(store));
     expect(presetForCard(reloaded, "card-a").name).toBe("Văn xuôi");
     expect(presetForCard(reloaded, "card-a").settings.vietnameseOutputEnabled).toBe(false);
-    expect(presetForCard(reloaded, "card-a").settings.animeMangaLightNovelStyleEnabled).toBe(false);
-    expect(presetForCard(reloaded, "card-a").settings.vietnameseNaturalWritingEnabled).toBe(false);
     selectCardPreset(reloaded, "card-b", "prose");
     expect(presetForCard(reloaded, "card-b")).toBe(presetForCard(reloaded, "card-a"));
   });

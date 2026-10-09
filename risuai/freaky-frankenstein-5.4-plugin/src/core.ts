@@ -1,75 +1,5 @@
 import { adaptPromptForVietnamese, VIETNAMESE_OUTPUT_PROMPT } from "./vietnamese.js";
 
-export const ANIME_MANGA_LIGHT_NOVEL_STYLE_PROMPT = `<anime_manga_light_novel_style>
-Scope: All narrative prose and NPC dialogue.
-
-Style: Use contemporary Japanese anime, manga, and light-novel pacing. Build scenes through visible action, sensory detail, character reactions, comic timing when it suits the scene, emotional pauses, and dialogue with distinct personal voices.
-Flow: Let each paragraph advance the interaction. Vary sentence length and connect action, sensation, and reaction naturally.
-Register: Prefer modern, conversational Vietnamese. Avoid wuxia, xianxia, Sino-Vietnamese ornamental diction, Chinese-translated phrasing, cultivation metaphors, and archaic heroic formulas.
-Setting: Preserve the setting's own culture, names, terminology, and genre when explicitly defined. Do not force Japanese words or anime references into unrelated settings.
-</anime_manga_light_novel_style>`;
-
-export const VIETNAMESE_NATURAL_WRITING_PROMPT = `<vietnamese_natural_writing>
-Scope: Narrative prose, NPC dialogue, vocalizations, and free-text display values.
-
-Generation: Compose each response directly for the active task. For roleplay, write from the current scene and use earlier turns for continuity.
-Language: Compose in idiomatic contemporary Vietnamese from the outset, with correct spelling, grammar, and natural collocations. Avoid translation calques, accidental foreign wording, and mixed-script leakage. Preserve proper names and required terms.
-Cadence: Vary sentence lengths and pauses. Connect related actions, sensations, and reactions with natural Vietnamese particles and conjunctions. Avoid choppy narration, repetitive beats, disconnected fragments, and run-ons. Avoid em-dashes in prose and dialogue.
-Composition: Let each paragraph follow the scene's natural movement through action, sensation, reaction, and dialogue. Vary the order and combine related beats smoothly; avoid inventory-like lists of disconnected observations.
-Embodiment: Show emotion through purposeful movement, touch, sound, and sensory consequence. Prefer active verbs and concrete reactions over emotion labels or decorative adjectives.
-Detail: Choose vivid, causally connected gestures, props, textures, and sensory details that fit the scene; avoid filler.
-Dialogue: Use natural Vietnamese particles, hesitation, subtext, and character-specific wording. Preserve idiolect and emotional cadence. Adjust pronouns and forms of address to relationships, status, age, setting, and nuance; keep referents clear.
-Display: Write free-text values in headers, HUDs, GFX, internal states, and GM Notebook in natural Vietnamese, keeping their stated meaning.
-</vietnamese_natural_writing>`;
-
-const MAX_REASONING_ID = "019f62e8-892f-7032-b004-1869f8bc0782";
-const BOLT_REASONING_ID = "634ecfec-1862-4ce0-821e-e31057acadfa";
-const MICRO_REASONING_ID = "b5db9430-857a-408c-817c-32e975a71430";
-
-function applyReasoningModuleGuidance(
-  content: string,
-  identifier: string,
-  settings: Pick<
-    FfGlobalSettings,
-    "animeMangaLightNovelStyleEnabled" | "vietnameseNaturalWritingEnabled"
-  >,
-): string {
-  if (![MAX_REASONING_ID, BOLT_REASONING_ID, MICRO_REASONING_ID].includes(identifier)) {
-    return content;
-  }
-  const actions: string[] = [];
-  if (settings.animeMangaLightNovelStyleEnabled) {
-    actions.push("<anime_manga_light_novel_style> for anime, manga, and light-novel pacing");
-  }
-  if (settings.vietnameseNaturalWritingEnabled) {
-    actions.push("<vietnamese_natural_writing> for idiomatic Vietnamese prose and dialogue");
-  }
-  if (actions.length === 0) return content;
-  const action = `Apply ${actions.join(" and ")} in the final response.`;
-
-  if (identifier === MAX_REASONING_ID) {
-    const task =
-      "B. You must list out concisely all the main rules in `<prose_rules>` to apply the correct narrative style to the scene.";
-    if (!content.includes(task)) return content;
-    return content.replace(
-      task,
-      `${task.slice(0, -1)}; ${action[0]!.toLowerCase()}${action.slice(1)}`,
-    );
-  }
-
-  const taskStart =
-    identifier === BOLT_REASONING_ID ? "3. Prose Style:" : "2. Prose, Formatting & Boundaries:";
-  const nextTask =
-    identifier === BOLT_REASONING_ID ? "4. Natural Dialogue:" : "3. Natural Dialogue:";
-  const start = content.indexOf(taskStart);
-  const end = content.indexOf(nextTask, start + taskStart.length);
-  if (start < 0 || end < 0) return content;
-  const taskBody = content.slice(start, end);
-  const trailingWhitespace = taskBody.match(/\s*$/)?.[0] ?? "";
-  const task = taskBody.slice(0, taskBody.length - trailingWhitespace.length);
-  return `${content.slice(0, start)}${task} ${action}${trailingWhitespace}${content.slice(end)}`;
-}
-
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
 export interface ChatMessage {
@@ -127,8 +57,6 @@ export interface FfGlobalSettings {
   promptEnabled: Record<string, boolean>;
   regexEnabled: Record<string, boolean>;
   vietnameseOutputEnabled: boolean;
-  animeMangaLightNovelStyleEnabled: boolean;
-  vietnameseNaturalWritingEnabled: boolean;
   submodelEditorEnabled: boolean;
   submodelAutoRewriteEnabled: boolean;
 }
@@ -203,8 +131,6 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
       regexScripts.map((script) => [script.id, script.disabled !== true]),
     ),
     vietnameseOutputEnabled: true,
-    animeMangaLightNovelStyleEnabled: true,
-    vietnameseNaturalWritingEnabled: true,
     submodelEditorEnabled: false,
     submodelAutoRewriteEnabled: false,
   };
@@ -236,12 +162,6 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
   if (typeof record.enabled === "boolean") defaults.enabled = record.enabled;
   if (typeof record.vietnameseOutputEnabled === "boolean") {
     defaults.vietnameseOutputEnabled = record.vietnameseOutputEnabled;
-  }
-  if (typeof record.animeMangaLightNovelStyleEnabled === "boolean") {
-    defaults.animeMangaLightNovelStyleEnabled = record.animeMangaLightNovelStyleEnabled;
-  }
-  if (typeof record.vietnameseNaturalWritingEnabled === "boolean") {
-    defaults.vietnameseNaturalWritingEnabled = record.vietnameseNaturalWritingEnabled;
   }
   if (typeof record.submodelEditorEnabled === "boolean") {
     defaults.submodelEditorEnabled = record.submodelEditorEnabled;
@@ -464,14 +384,9 @@ export function composePresetPrompts(
         continue;
       const prompt = map.get(entry.identifier);
       if (!prompt || prompt.marker || typeof prompt.content !== "string") continue;
-      const guidedContent = applyReasoningModuleGuidance(
-        prompt.content,
-        prompt.identifier,
-        settings,
-      );
       const sourceContent = settings.vietnameseOutputEnabled
-        ? adaptPromptForVietnamese(guidedContent)
-        : guidedContent;
+        ? adaptPromptForVietnamese(prompt.content)
+        : prompt.content;
       let content = expandSourceMacros(sourceContent, variables, macroContext);
       content = await parseHostMacros(content, promptRole(prompt));
       if (!content.trim()) continue;
@@ -840,24 +755,6 @@ export async function buildRequestMessages(
             role: "system" as const,
             content: VIETNAMESE_OUTPUT_PROMPT,
             memo: "ff54:vietnamese-output",
-          },
-        ]
-      : []),
-    ...(settings.vietnameseNaturalWritingEnabled
-      ? [
-          {
-            role: "system" as const,
-            content: VIETNAMESE_NATURAL_WRITING_PROMPT,
-            memo: "ff54:vietnamese-natural-writing",
-          },
-        ]
-      : []),
-    ...(settings.animeMangaLightNovelStyleEnabled
-      ? [
-          {
-            role: "system" as const,
-            content: ANIME_MANGA_LIGHT_NOVEL_STYLE_PROMPT,
-            memo: "ff54:anime-manga-light-novel-style",
           },
         ]
       : []),

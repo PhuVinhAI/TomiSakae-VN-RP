@@ -71,7 +71,12 @@ beforeAll(async () => {
 
 afterEach(() => vi.useRealTimers());
 
-async function startPlugin(enabled = true, automatic = false, savedPresets?: unknown) {
+async function startPlugin(
+  enabled = true,
+  automatic = false,
+  savedPresets?: unknown,
+  pauseButtonInitialization = false,
+) {
   const callbacks = {
     beforeRequest: undefined as
       ((messages: ChatMessage[], type: string) => Promise<ChatMessage[]>) | undefined,
@@ -177,6 +182,15 @@ async function startPlugin(enabled = true, automatic = false, savedPresets?: unk
   const writes = vi.fn();
   let checked = false;
   let focused = false;
+  let rewriteControlCount = 0;
+  let requestRootInitialization!: () => void;
+  const rootInitializationRequested = new Promise<void>((resolve) => {
+    requestRootInitialization = resolve;
+  });
+  let releaseRootInitialization!: () => void;
+  const rootInitializationGate = new Promise<void>((resolve) => {
+    releaseRootInitialization = resolve;
+  });
   let control: { html: string; attached: boolean } | undefined;
   const row = {
     querySelector: async () => ({ getParent: async () => toolbar }),
@@ -202,6 +216,7 @@ async function startPlugin(enabled = true, automatic = false, savedPresets?: unk
       return null;
     },
     createElement: async () => {
+      rewriteControlCount += 1;
       const node = {
         html: "",
         attached: false,
@@ -265,17 +280,22 @@ async function startPlugin(enabled = true, automatic = false, savedPresets?: unk
     removeRisuScriptHandler: vi.fn(),
     addRisuChatListener: async (_type: string, callback: typeof callbacks.output) => {
       callbacks.output = callback;
+      if (pauseButtonInitialization) ready();
     },
     removeRisuChatListener: vi.fn(),
     onUnload: async (callback: () => Promise<void>) => {
       callbacks.unload = callback;
-      ready();
+      if (!pauseButtonInitialization) ready();
     },
     runLLMModel: runModel,
     alert: vi.fn().mockResolvedValue(undefined),
     alertConfirm: vi.fn<(message: string) => Promise<boolean>>().mockResolvedValue(false),
     alertError: vi.fn().mockResolvedValue(undefined),
-    getRootDocument: async () => root,
+    getRootDocument: async () => {
+      requestRootInitialization();
+      if (pauseButtonInitialization) await rootInitializationGate;
+      return root;
+    },
     createMutationObserver: async () => observer,
   };
   runInNewContext(bundled, {
@@ -297,6 +317,9 @@ async function startPlugin(enabled = true, automatic = false, savedPresets?: unk
     api,
     root,
     observer,
+    rootInitializationRequested,
+    releaseRootInitialization,
+    rewriteControlCount: () => rewriteControlCount,
     storage,
     async settingsUi() {
       const shown = new Promise<void>((resolve) => {
@@ -372,6 +395,24 @@ async function startPlugin(enabled = true, automatic = false, savedPresets?: unk
 }
 
 describe("FF5.4 Submodel editor integration", () => {
+  it("creates only one rewrite button when saving settings races with startup", async () => {
+    const plugin = await startPlugin(true, false, undefined, true);
+    await plugin.rootInitializationRequested;
+    plugin.chats.get("0:0")!.message.push({
+      role: "char",
+      data: "Ruka chào bạn.",
+      chatId: "reply-a",
+    });
+    await plugin.settingsUi();
+    const save = plugin.ui("save").handlers.get("click");
+    expect(save).toBeDefined();
+    const saving = save!();
+    plugin.releaseRootInitialization();
+    await saving;
+    expect(plugin.rewriteControlCount()).toBe(1);
+    expect(plugin.observer.observe).toHaveBeenCalledTimes(1);
+  });
+
   it("defaults existing saves to off and preserves an explicitly saved toggle", () => {
     expect(normalizeSettings(preset, {}).submodelEditorEnabled).toBe(false);
     expect(normalizeSettings(preset, { submodelEditorEnabled: true }).submodelEditorEnabled).toBe(
@@ -434,10 +475,10 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(options.messages[editorIndex]!.content).not.toContain("<anime_manga_light_novel_style>");
     expect(
       options.messages.filter((message) => message.memo === "ff54:anime-manga-light-novel-style"),
-    ).toHaveLength(1);
+    ).toHaveLength(0);
     expect(
       options.messages.filter((message) => message.memo === "ff54:vietnamese-natural-writing"),
-    ).toHaveLength(1);
+    ).toHaveLength(0);
     const references = options.messages
       .slice(0, -1)
       .filter((message) => message.memo !== "ff54:submodel-editor");
