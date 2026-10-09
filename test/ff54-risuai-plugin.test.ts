@@ -229,6 +229,10 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       expect(task).toContain("<vietnamese_natural_writing>");
     }
     expect(allContent).toContain("Vary sentence lengths and pauses.");
+    expect(VIETNAMESE_NATURAL_WRITING_PROMPT).toContain(
+      "Compose each response directly for the active task.",
+    );
+    expect(VIETNAMESE_NATURAL_WRITING_PROMPT).not.toContain("Syntax:");
     expect(allContent).toContain("I will use natural Vietnamese conjunctions in spoken dialogue");
     expect(allContent).not.toContain("I will not use the coordinating conjunctions");
     expect(allContent).not.toContain("Ban Coordinating Conjunctions:");

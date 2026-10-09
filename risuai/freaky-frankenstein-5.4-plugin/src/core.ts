@@ -12,14 +12,14 @@ Setting: Preserve the setting's own culture, names, terminology, and genre when 
 export const VIETNAMESE_NATURAL_WRITING_PROMPT = `<vietnamese_natural_writing>
 Scope: Narrative prose, NPC dialogue, vocalizations, and free-text display values.
 
-Language: Write idiomatic contemporary Vietnamese. Correct spelling, diacritics, grammar, collocations, and translation calques; remove accidental foreign wording and mixed-script leakage. Preserve proper names and required terms.
+Generation: Compose each response directly for the active task. For roleplay, write from the current scene and use earlier turns for continuity.
+Language: Compose in idiomatic contemporary Vietnamese from the outset, with correct spelling, grammar, and natural collocations. Avoid translation calques, accidental foreign wording, and mixed-script leakage. Preserve proper names and required terms.
 Cadence: Vary sentence lengths and pauses. Connect related actions, sensations, and reactions with natural Vietnamese particles and conjunctions. Avoid choppy narration, repetitive beats, disconnected fragments, and run-ons. Use no fixed sentence pattern or English clause-count limit. Avoid em-dashes in prose and dialogue.
-Composition: Build paragraphs through concrete action, physical or sensory consequence, then visible reaction or dialogue. Alternate narration and dialogue naturally; avoid inventory-like lists of disconnected observations.
+Composition: Let each paragraph follow the scene's natural movement through action, sensation, reaction, and dialogue. Vary the order and combine related beats smoothly; avoid inventory-like lists of disconnected observations.
 Embodiment: Show emotion through purposeful movement, touch, sound, and sensory consequence. Prefer active verbs and concrete reactions over emotion labels or decorative adjectives.
-Detail: Use vivid, causally connected details. Recast incidental gestures, props, textures, and sensory cues when useful; keep them compatible with the scene and avoid filler.
+Detail: Choose vivid, causally connected gestures, props, textures, and sensory details that fit the scene; avoid filler.
 Dialogue: Use natural Vietnamese particles, hesitation, subtext, and character-specific wording. Preserve idiolect and emotional cadence. Adjust pronouns and forms of address to relationships, status, age, setting, and nuance; keep referents clear.
-Display: Write free-text header, HUD, GFX, internal-state, and GM Notebook values in natural Vietnamese while preserving their underlying facts.
-Syntax: Preserve valid HTML/XML and color tags, markers, identifiers, placeholders, fixed labels, and machine syntax. Naturalize only free text; keep state numbers and outcomes unchanged.
+Display: Write free-text values in headers, HUDs, GFX, internal states, and GM Notebook in natural Vietnamese, keeping their stated meaning.
 </vietnamese_natural_writing>`;
 
 const MAX_REASONING_ID = "019f62e8-892f-7032-b004-1869f8bc0782";
