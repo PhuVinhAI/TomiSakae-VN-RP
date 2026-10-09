@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import {
+  ANIME_MANGA_LIGHT_NOVEL_STYLE_PROMPT,
   adaptDisplayMarkupForRisuAI,
   adaptVietnameseHeaderForRisuAI,
   removeSceneHeadersForRequest,
@@ -57,6 +58,8 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(settings.promptEnabled[realismModeId]).toBe(true);
     expect(settings.promptEnabled[freakyModeId]).toBe(false);
     expect(settings.vietnameseOutputEnabled).toBe(true);
+    expect(settings.animeMangaLightNovelStyleEnabled).toBe(true);
+    expect(settings.animeMangaLightNovelStyleEnabled).toBe(true);
   });
 
   it("keeps an explicitly saved Freaky choice", async () => {
@@ -81,6 +84,16 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(
       normalizeSettings(data, { ...oldSettings, vietnameseOutputEnabled: false })
         .vietnameseOutputEnabled,
+    ).toBe(false);
+    expect(normalizeSettings(data, oldSettings).animeMangaLightNovelStyleEnabled).toBe(true);
+    expect(
+      normalizeSettings(data, { ...oldSettings, animeMangaLightNovelStyleEnabled: false })
+        .animeMangaLightNovelStyleEnabled,
+    ).toBe(false);
+    expect(normalizeSettings(data, oldSettings).animeMangaLightNovelStyleEnabled).toBe(true);
+    expect(
+      normalizeSettings(data, { ...oldSettings, animeMangaLightNovelStyleEnabled: false })
+        .animeMangaLightNovelStyleEnabled,
     ).toBe(false);
   });
 
@@ -134,6 +147,12 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
   it("adds the Vietnamese module once before card context and adapts only enabled prompts", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);
+    const reasoningIds = [
+      "019f62e8-892f-7032-b004-1869f8bc0782",
+      "634ecfec-1862-4ce0-821e-e31057acadfa",
+      "b5db9430-857a-408c-817c-32e975a71430",
+    ];
+    for (const id of reasoningIds) settings.promptEnabled[id] = true;
     const disabledPrompt = data.prompt_order[0]!.order.find((entry) => entry.enabled === false);
     expect(disabledPrompt).toBeDefined();
     const messages = [
@@ -143,10 +162,19 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     const built = await buildRequestMessages(messages, data, settings, async (value) => value);
     const composed = await composePresetPrompts(data, settings, async (value) => value);
     const vietnamese = built.filter((entry) => entry.memo === "ff54:vietnamese-output");
+    const style = built.filter((entry) => entry.memo === "ff54:anime-manga-light-novel-style");
     expect(vietnamese).toHaveLength(1);
+    expect(style).toEqual([
+      {
+        role: "system",
+        content: ANIME_MANGA_LIGHT_NOVEL_STYLE_PROMPT,
+        memo: "ff54:anime-manga-light-novel-style",
+      },
+    ]);
     expect(vietnamese[0]!.content).toBe(VIETNAMESE_OUTPUT_PROMPT);
     expect(built.slice(0, composed.leading.length)).toEqual(composed.leading);
     expect(built.indexOf(vietnamese[0]!)).toBe(composed.leading.length);
+    expect(built.indexOf(style[0]!)).toBe(built.indexOf(vietnamese[0]!) + 1);
     const npcCreationIndex = built.findIndex((entry) => entry.content.includes("<npc_creation>"));
     expect(npcCreationIndex).toBeGreaterThanOrEqual(0);
     expect(built.indexOf(vietnamese[0]!)).toBe(npcCreationIndex + 1);
@@ -173,6 +201,14 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       "Preserve exact HTML, XML, comments, attributes, color tags, delimiters, placeholders, identifiers, and schema structure required for rendering",
     );
     expect(built.some((entry) => entry.memo === `ff54:${disabledPrompt!.identifier}`)).toBe(false);
+    const styleReminder =
+      "Style reminder: Apply <anime_manga_light_novel_style> to the final response.";
+    const reminderCount =
+      built
+        .map((entry) => entry.content)
+        .join("\n")
+        .split(styleReminder).length - 1;
+    expect(reminderCount).toBe(3);
 
     const allContent = built.map((entry) => entry.content).join("\n");
     expect(allContent).toContain("I will use natural Vietnamese conjunctions in spoken dialogue");
@@ -200,10 +236,17 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     );
   });
 
-  it("keeps FF5.4 byte-identical when the Vietnamese module is disabled", async () => {
+  it("can disable the style module and its reasoning reminders independently", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);
     settings.vietnameseOutputEnabled = false;
+    settings.animeMangaLightNovelStyleEnabled = false;
+    const reasoningIds = [
+      "019f62e8-892f-7032-b004-1869f8bc0782",
+      "634ecfec-1862-4ce0-821e-e31057acadfa",
+      "b5db9430-857a-408c-817c-32e975a71430",
+    ];
+    for (const id of reasoningIds) settings.promptEnabled[id] = true;
     const messages = [
       { role: "system" as const, content: "host" },
       { role: "user" as const, content: "latest" },
@@ -218,6 +261,10 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       ...composed.trailing,
     ]);
     expect(built.some((entry) => entry.memo === "ff54:vietnamese-output")).toBe(false);
+    expect(built.some((entry) => entry.memo === "ff54:anime-manga-light-novel-style")).toBe(false);
+    expect(built.map((entry) => entry.content).join("\n")).not.toContain(
+      "Style reminder: Apply <anime_manga_light_novel_style>",
+    );
   });
 
   it("rebuilds one FF5.4 injection set when the host retries a request", async () => {

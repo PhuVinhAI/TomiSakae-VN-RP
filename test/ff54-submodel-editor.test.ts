@@ -415,6 +415,13 @@ describe("FF5.4 Submodel editor integration", () => {
       content: expect.stringMatching(/^<vietnamese_editor>/),
       memo: "ff54:submodel-editor",
     });
+    expect(options.messages[editorIndex]!.content).toContain(
+      "- Style: Use manga, anime, and light-novel pacing.",
+    );
+    expect(options.messages[editorIndex]!.content).not.toContain("<anime_manga_light_novel_style>");
+    expect(
+      options.messages.filter((message) => message.memo === "ff54:anime-manga-light-novel-style"),
+    ).toHaveLength(1);
     const references = options.messages
       .slice(0, -1)
       .filter((message) => message.memo !== "ff54:submodel-editor");

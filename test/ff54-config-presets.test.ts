@@ -26,6 +26,7 @@ describe("FF5.4 configuration presets", () => {
     const legacy = {
       enabled: false,
       vietnameseOutputEnabled: false,
+      animeMangaLightNovelStyleEnabled: false,
       submodelEditorEnabled: true,
       submodelAutoRewriteEnabled: true,
     };
@@ -45,13 +46,16 @@ describe("FF5.4 configuration presets", () => {
       "prose",
     );
     alternate.settings.vietnameseOutputEnabled = false;
+    alternate.settings.animeMangaLightNovelStyleEnabled = false;
     expect(store.presets[0]!.settings.vietnameseOutputEnabled).toBe(true);
+    expect(store.presets[0]!.settings.animeMangaLightNovelStyleEnabled).toBe(true);
     selectCardPreset(store, "card-a", alternate.id);
     expect(presetForCard(store, "card-a")).toBe(alternate);
     expect(presetForCard(store, "card-b").id).toBe("default");
     const reloaded = normalizePresetStore(source, structuredClone(store));
     expect(presetForCard(reloaded, "card-a").name).toBe("Văn xuôi");
     expect(presetForCard(reloaded, "card-a").settings.vietnameseOutputEnabled).toBe(false);
+    expect(presetForCard(reloaded, "card-a").settings.animeMangaLightNovelStyleEnabled).toBe(false);
     selectCardPreset(reloaded, "card-b", "prose");
     expect(presetForCard(reloaded, "card-b")).toBe(presetForCard(reloaded, "card-a"));
   });

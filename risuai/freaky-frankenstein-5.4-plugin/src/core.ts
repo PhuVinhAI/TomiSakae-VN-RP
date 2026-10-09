@@ -1,5 +1,22 @@
 import { adaptPromptForVietnamese, VIETNAMESE_OUTPUT_PROMPT } from "./vietnamese.js";
 
+export const ANIME_MANGA_LIGHT_NOVEL_STYLE_PROMPT = `<anime_manga_light_novel_style>
+Scope: All narrative prose and NPC dialogue.
+
+Style: Use contemporary Japanese anime, manga, and light-novel pacing. Build scenes through visible action, sensory detail, character reactions, comic timing, emotional pauses, and dialogue with distinct personal voices.
+Flow: Let each paragraph advance the interaction. Vary sentence length and connect action, sensation, and reaction naturally.
+Register: Prefer modern, conversational Vietnamese. Avoid wuxia, xianxia, Sino-Vietnamese ornamental diction, Chinese-translated phrasing, cultivation metaphors, and archaic heroic formulas.
+Setting: Preserve the setting's own culture, names, terminology, and genre when explicitly defined. Do not force Japanese words or anime references into unrelated settings.
+</anime_manga_light_novel_style>`;
+
+const ANIME_STYLE_REASONING_PROMPTS = new Set([
+  "019f62e8-892f-7032-b004-1869f8bc0782", // MAX
+  "634ecfec-1862-4ce0-821e-e31057acadfa", // BOLT
+  "b5db9430-857a-408c-817c-32e975a71430", // Micro
+]);
+const ANIME_STYLE_REASONING_REMINDER =
+  "Style reminder: Apply <anime_manga_light_novel_style> to the final response.";
+
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
 export interface ChatMessage {
@@ -57,6 +74,7 @@ export interface FfGlobalSettings {
   promptEnabled: Record<string, boolean>;
   regexEnabled: Record<string, boolean>;
   vietnameseOutputEnabled: boolean;
+  animeMangaLightNovelStyleEnabled: boolean;
   submodelEditorEnabled: boolean;
   submodelAutoRewriteEnabled: boolean;
 }
@@ -131,6 +149,7 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
       regexScripts.map((script) => [script.id, script.disabled !== true]),
     ),
     vietnameseOutputEnabled: true,
+    animeMangaLightNovelStyleEnabled: true,
     submodelEditorEnabled: false,
     submodelAutoRewriteEnabled: false,
   };
@@ -162,6 +181,9 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
   if (typeof record.enabled === "boolean") defaults.enabled = record.enabled;
   if (typeof record.vietnameseOutputEnabled === "boolean") {
     defaults.vietnameseOutputEnabled = record.vietnameseOutputEnabled;
+  }
+  if (typeof record.animeMangaLightNovelStyleEnabled === "boolean") {
+    defaults.animeMangaLightNovelStyleEnabled = record.animeMangaLightNovelStyleEnabled;
   }
   if (typeof record.submodelEditorEnabled === "boolean") {
     defaults.submodelEditorEnabled = record.submodelEditorEnabled;
@@ -389,6 +411,12 @@ export function composePresetPrompts(
         : prompt.content;
       let content = expandSourceMacros(sourceContent, variables, macroContext);
       content = await parseHostMacros(content, promptRole(prompt));
+      if (
+        settings.animeMangaLightNovelStyleEnabled &&
+        ANIME_STYLE_REASONING_PROMPTS.has(prompt.identifier)
+      ) {
+        content = `${content.trimEnd()}\n\n${ANIME_STYLE_REASONING_REMINDER}`;
+      }
       if (!content.trim()) continue;
       const message: ChatMessage = {
         role: promptRole(prompt),
@@ -755,6 +783,15 @@ export async function buildRequestMessages(
             role: "system" as const,
             content: VIETNAMESE_OUTPUT_PROMPT,
             memo: "ff54:vietnamese-output",
+          },
+        ]
+      : []),
+    ...(settings.animeMangaLightNovelStyleEnabled
+      ? [
+          {
+            role: "system" as const,
+            content: ANIME_MANGA_LIGHT_NOVEL_STYLE_PROMPT,
+            memo: "ff54:anime-manga-light-novel-style",
           },
         ]
       : []),
