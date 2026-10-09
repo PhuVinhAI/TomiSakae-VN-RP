@@ -436,6 +436,69 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(output).toContain("background:rgba");
   });
 
+  it("keeps every dialogue color through RisuAI quote and emphasis styling", async () => {
+    const data = await preset();
+    const originalScripts = JSON.stringify(data.extensions!.regex_scripts);
+    const settings = createDefaultSettings(data);
+    const colors = [
+      "cyan",
+      "pink",
+      "teal",
+      "orange",
+      "gold",
+      "violet",
+      "salmon",
+      "orchid",
+      "yellow",
+      "plum",
+    ];
+    const tones = ["", ":whisper", ":measured", ":shout", ":tremble"];
+    for (const vietnameseEnabled of [false, true]) {
+      settings.vietnameseOutputEnabled = vietnameseEnabled;
+      for (const color of colors) {
+        for (const tone of tones) {
+          const input = `Lời dẫn. <${color}${tone}>"Xin *chào*, **bạn**."</${color}${tone}> Lời kết.`;
+          const output = applyRegexScripts(input, data, settings, {
+            placement: 2,
+            markdown: true,
+            depth: 0,
+          });
+          expect(output).toMatch(
+            /^Lời dẫn\. <span style="[^"]+">"Xin \*chào\*, \*\*bạn\*\*\."<\/span> Lời kết\.$/,
+          );
+          expect(output).toContain(`color:${color};`);
+          for (const variable of ["Standard", "Italic", "Bold", "ItalicBold", "Quote1", "Quote2"]) {
+            expect(output).toContain(`--FontColor${variable}:${color};`);
+          }
+          if (tone === ":whisper")
+            expect(output).toContain("font-size:0.85em;opacity:0.75;font-style:italic;");
+          if (tone === ":measured")
+            expect(output).toContain("font-weight:bold;letter-spacing:0.8px;");
+          if (tone === ":shout") expect(output).toContain(`text-shadow:0 0 6px ${color};`);
+          if (tone === ":tremble")
+            expect(output).toContain("letter-spacing:1.5px;opacity:0.85;font-style:italic;");
+        }
+      }
+    }
+    expect(JSON.stringify(data.extensions!.regex_scripts)).toBe(originalScripts);
+  });
+
+  it("keeps dialogue color adaptation out of history, requests, and disabled display filters", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    const input =
+      '<pink:whisper>"Xin chào."</pink:whisper>\n<gold:measured>"Được."</gold:measured>';
+    expect(applyRegexScripts(input, data, settings, { placement: 2, prompt: true, depth: 0 })).toBe(
+      input,
+    );
+    expect(applyRegexScripts(input, data, settings, { placement: 2, depth: 0 })).toBe(input);
+    settings.regexEnabled["b32b68fe-45d5-4f98-82c1-2792efc4e6c2"] = false;
+    settings.regexEnabled["399b2f87-35e2-427c-ae2e-cf1559f9af2f"] = false;
+    expect(
+      applyRegexScripts(input, data, settings, { placement: 2, markdown: true, depth: 0 }),
+    ).toBe(input);
+  });
+
   it("keeps the untagged-thought filter compatible with the Vietnamese header", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);

@@ -560,10 +560,18 @@ export function applyRegexScripts(
       : { findRegex: script.findRegex, replaceString: String(script.replaceString ?? "") };
     const regex = parseRegexLiteral(localized.findRegex);
     if (!regex) continue;
+    // RisuAI gives nested quote/emphasis elements their own theme colors.
+    // Scope those variables to the dialogue span so they keep the source color.
+    const replacement = options.markdown
+      ? localized.replaceString.replace(
+          '<span style="color:$1;',
+          '<span style="color:$1;--FontColorStandard:$1;--FontColorItalic:$1;--FontColorBold:$1;--FontColorItalicBold:$1;--FontColorQuote1:$1;--FontColorQuote2:$1;',
+        )
+      : localized.replaceString;
     output = replaceWithSourceGroups(
       output,
       regex,
-      localized.replaceString.replace(/\\n/g, "\n"),
+      replacement.replace(/\\n/g, "\n"),
       script.trimStrings ?? [],
     );
   }
