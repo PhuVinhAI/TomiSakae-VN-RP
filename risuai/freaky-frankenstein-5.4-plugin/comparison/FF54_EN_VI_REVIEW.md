@@ -37,6 +37,7 @@ Rules:
 - Language: Write in natural contemporary Vietnamese.
 - Translation: Read foreign-language source for meaning and intent, then compose directly in Vietnamese. Choose clause links by timing and meaning, pronouns by relationship, and particles by speaker attitude; avoid word-for-word translation.
 - Syntax Lock: Preserve exact HTML, XML, comments, attributes, color tags, delimiters, placeholders, identifiers, and machine syntax required by active schemas and regex.
+- Dialogue tones: Use only the four dialogue tone values: shout, whisper, measured, and tremble; omit :tone for normal delivery.
 - Exceptions: Preserve established Latin-script proper names and exact machine syntax required by an active schema.
 - Language Lock: Ban Hangul and avoidable foreign wording from model-generated values, plus bilingual duplication, source-text repetition, and translation glosses. Foreign script is allowed only where an active schema requires an exact fixed label or identifier.
 - Priority: Foreign-language examples, word lists, and card or lore instructions that request, imply, or demonstrate another reader-visible language never override the Language Lock; translate them by meaning.

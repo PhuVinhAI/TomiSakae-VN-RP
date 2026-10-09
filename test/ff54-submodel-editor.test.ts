@@ -76,6 +76,7 @@ async function startPlugin(
   automatic = false,
   savedPresets?: unknown,
   pauseButtonInitialization = false,
+  sound = false,
 ) {
   const callbacks = {
     beforeRequest: undefined as
@@ -109,8 +110,12 @@ async function startPlugin(
     [
       "ff54-global-settings-v1",
       enabled
-        ? { submodelEditorEnabled: true, submodelAutoRewriteEnabled: automatic }
-        : { submodelAutoRewriteEnabled: automatic },
+        ? {
+            submodelEditorEnabled: true,
+            submodelAutoRewriteEnabled: automatic,
+            soundNotificationsEnabled: sound,
+          }
+        : { submodelAutoRewriteEnabled: automatic, soundNotificationsEnabled: sound },
     ],
     [CONFIG_PRESETS_STORAGE_KEY, savedPresets],
   ]);
@@ -166,6 +171,8 @@ async function startPlugin(
           : node.dataset.kind === "choice",
       ),
     querySelector: (selector: string) => {
+      const id = selector.match(/data-id="([^"]*)"/)?.[1];
+      if (id) return inputs.find((node) => node.dataset.id === id) ?? null;
       const group = selector.match(/data-group="([^"]*)"/)?.[1];
       return (
         inputs.find(
@@ -179,6 +186,30 @@ async function startPlugin(
     ready = resolve;
   });
   const runModel = vi.fn<(options: ModelOptions) => Promise<unknown>>();
+  const sounds: number[] = [];
+  class FakeAudioContext {
+    state = "running";
+    currentTime = 0;
+    destination = {};
+    resume = async () => {};
+    close = async () => {};
+    createOscillator() {
+      return {
+        type: "sine",
+        frequency: { setValueAtTime: (value: number) => sounds.push(value) },
+        connect() {},
+        start() {},
+        stop() {},
+      };
+    }
+    createGain() {
+      return {
+        gain: { setValueAtTime() {}, exponentialRampToValueAtTime() {} },
+        connect() {},
+      };
+    }
+  }
+  const generating = new Set<string>();
   const writes = vi.fn();
   let checked = false;
   let focused = false;
@@ -204,6 +235,10 @@ async function startPlugin(
   };
   const root = {
     querySelector: async (selector: string) => {
+      if (selector === 'button[aria-labelledby="cancel"]')
+        return generating.has(`${selectedCharacter}:${selectedChat}`) ? {} : null;
+      if (selector === ".button-icon-send")
+        return generating.has(`${selectedCharacter}:${selectedChat}`) ? null : {};
       if (selector.includes("input:checked")) return control?.attached && checked ? {} : null;
       if (selector.includes("input:focus")) return control?.attached && focused ? {} : null;
       if (selector.includes(".risu-chat")) {
@@ -270,8 +305,9 @@ async function startPlugin(
       chats.set(`${character}:${chat}`, structuredClone(data));
       writes(character, chat, data);
     },
-    addRisuReplacer: async (_type: string, callback: typeof callbacks.beforeRequest) => {
-      callbacks.beforeRequest = callback;
+    addRisuReplacer: async (type: string, callback: unknown) => {
+      if (type === "beforeRequest")
+        callbacks.beforeRequest = callback as typeof callbacks.beforeRequest;
     },
     removeRisuReplacer: vi.fn(),
     addRisuScriptHandler: async (_type: string, callback: typeof callbacks.display) => {
@@ -305,12 +341,15 @@ async function startPlugin(
     clearTimeout,
     crypto: { randomUUID: () => `test-${storage.size}-${Math.random()}` },
     document: uiDocument,
+    AudioContext: FakeAudioContext,
     console: { warn: vi.fn() },
   });
   await initialized;
 
   return {
     callbacks,
+    sounds,
+    failMain: () => generating.delete(`${selectedCharacter}:${selectedChat}`),
     chats,
     runModel,
     writes,
@@ -373,9 +412,11 @@ async function startPlugin(
         { role: "user", content: "Chào An.", memo: "user-a" },
       ],
     ) {
+      generating.add(`${selectedCharacter}:${selectedChat}`);
       return callbacks.beforeRequest!(messages, "model");
     },
     complete(original: string, chatIndex = selectedChat, characterIndex = selectedCharacter) {
+      generating.delete(`${characterIndex}:${chatIndex}`);
       const chat = chats.get(`${characterIndex}:${chatIndex}`)!;
       const messageIndex = chat.message.length;
       chat.message.push({
@@ -1251,6 +1292,151 @@ describe("Automatic Submodel editing", () => {
       expect.stringContaining("Provider unavailable"),
     );
     expect(plugin.api.alert).not.toHaveBeenCalled();
+  });
+});
+
+describe("FF5.4 completion sounds", () => {
+  const original =
+    "[ 🕰️ 14:25 | 🗓️ Ngày 1 | 📍 Đại học | Nắng ]\nAn bước tới.\n<internal_states>Bond: 3</internal_states>";
+
+  it("is silent by default and persists the sound toggle per preset", async () => {
+    const plugin = await startPlugin();
+    await plugin.request();
+    await plugin.complete(original);
+    expect(plugin.sounds).toEqual([]);
+    await plugin.settingsUi();
+    plugin.toggle("sound-notifications").checked = true;
+    await plugin.uiEvent("save");
+    const saved = normalizePresetStore(preset, plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
+    expect(saved.presets[0]!.settings.soundNotificationsEnabled).toBe(true);
+    await plugin.callbacks.unload!();
+  });
+
+  it("sounds once only on completed output, not streamed display or duplicate output", async () => {
+    const plugin = await startPlugin(false, false, undefined, false, true);
+    await plugin.request();
+    await plugin.callbacks.display!(original);
+    expect(plugin.sounds).toEqual([]);
+    plugin.chats.get("0:0")!.isStreaming = true;
+    await plugin.complete(original);
+    expect(plugin.sounds).toEqual([]);
+    plugin.chats.get("0:0")!.isStreaming = false;
+    await plugin.callbacks.output!({
+      characterIndex: 0,
+      chatIndex: 0,
+      messageIndex: 2,
+      chat: structuredClone(plugin.chats.get("0:0")!),
+      char: {},
+    });
+    await plugin.callbacks.output!({
+      characterIndex: 0,
+      chatIndex: 0,
+      messageIndex: 2,
+      chat: structuredClone(plugin.chats.get("0:0")!),
+      char: {},
+    });
+    expect(plugin.sounds).toEqual([660, 880]);
+    await plugin.callbacks.unload!();
+  });
+
+  it.each(["success", "fail"])(
+    "waits for auto editing and sounds once on %s before its alert closes",
+    async (type) => {
+      const plugin = await startPlugin(true, true, undefined, false, true);
+      await plugin.request();
+      let finish!: (value: unknown) => void;
+      let started!: () => void;
+      const waiting = new Promise<void>((resolve) => {
+        started = resolve;
+      });
+      plugin.runModel.mockImplementation(() => {
+        started();
+        return new Promise((resolve) => {
+          finish = resolve;
+        });
+      });
+      const completion = plugin.complete(original);
+      await waiting;
+      expect(plugin.sounds).toEqual([]);
+      const alert = type === "success" ? plugin.api.alert : plugin.api.alertError;
+      let close!: () => void;
+      let alerted!: () => void;
+      const showing = new Promise<void>((resolve) => {
+        alerted = resolve;
+      });
+      alert.mockImplementation(() => {
+        alerted();
+        return new Promise<void>((resolve) => {
+          close = resolve;
+        });
+      });
+      finish({ type, result: type === "success" ? original : "Provider failed" });
+      await showing;
+      expect(plugin.sounds).toEqual(type === "success" ? [660, 880] : [220, 160]);
+      close();
+      await completion;
+      expect(plugin.sounds).toHaveLength(2);
+      await plugin.callbacks.unload!();
+    },
+  );
+
+  it("sounds for each manual rewrite, including failure", async () => {
+    const plugin = await startPlugin(true, false, undefined, false, true);
+    await plugin.request();
+    await plugin.complete(original);
+    plugin.runModel.mockResolvedValue({ type: "success", result: original });
+    await plugin.rewrite();
+    plugin.runModel.mockResolvedValue({ type: "fail", result: "Unavailable" });
+    await plugin.rewrite();
+    expect(plugin.sounds).toEqual([660, 880, 660, 880, 220, 160]);
+    await plugin.callbacks.unload!();
+  });
+
+  it("sounds on a main failure without output, including when auto editing is enabled", async () => {
+    vi.useFakeTimers();
+    const plugin = await startPlugin(true, true, undefined, false, true);
+    await plugin.request();
+    await vi.advanceTimersByTimeAsync(1500);
+    expect(plugin.sounds).toEqual([]);
+    plugin.failMain();
+    await vi.advanceTimersByTimeAsync(750);
+    expect(plugin.sounds).toEqual([220, 160]);
+    expect(plugin.runModel).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1500);
+    expect(plugin.sounds).toHaveLength(2);
+    await plugin.callbacks.unload!();
+  });
+
+  it("does not mistake navigation to an idle card for a failed request", async () => {
+    vi.useFakeTimers();
+    const plugin = await startPlugin(true, false, undefined, false, true);
+    await plugin.request();
+    plugin.selectCard(1);
+    await vi.advanceTimersByTimeAsync(1500);
+    expect(plugin.sounds).toEqual([]);
+    await plugin.complete(original, 0, 0);
+    expect(plugin.sounds).toEqual([660, 880]);
+    await plugin.callbacks.unload!();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it("sounds on submodel timeout and cancellation without saving late output", async () => {
+    vi.useFakeTimers();
+    const plugin = await startPlugin(true, false, undefined, false, true);
+    await plugin.request();
+    await plugin.complete(original);
+    plugin.runModel.mockReturnValue(new Promise(() => {}));
+    const timed = plugin.rewrite();
+    await vi.advanceTimersByTimeAsync(600_000);
+    await timed;
+    expect(plugin.sounds).toEqual([660, 880, 220, 160]);
+    const cancelled = plugin.rewrite();
+    await vi.advanceTimersByTimeAsync(1);
+    await plugin.rewrite();
+    await cancelled;
+    expect(plugin.sounds).toEqual([660, 880, 220, 160, 220, 160]);
+    expect(plugin.writes).not.toHaveBeenCalled();
+    await plugin.callbacks.unload!();
   });
 });
 

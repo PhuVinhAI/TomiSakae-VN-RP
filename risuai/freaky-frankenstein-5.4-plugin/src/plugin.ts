@@ -33,6 +33,7 @@ import {
   type RewriteButtonTarget,
 } from "./submodel-button.js";
 import { buildEditorReferenceMessages } from "./submodel-context.js";
+import { createCompletionMonitor } from "./completion-monitor.js";
 import {
   CONFIG_PRESETS_STORAGE_KEY,
   createConfigPreset,
@@ -118,6 +119,7 @@ interface HostChatMessage {
 }
 
 interface HostChatSnapshot {
+  id?: unknown;
   message?: HostChatMessage[];
   [key: string]: unknown;
 }
@@ -129,6 +131,30 @@ interface ChatOutputListenerArgument {
   chat: HostChatSnapshot;
   char: unknown;
 }
+
+interface NotificationAudioContext {
+  state?: string;
+  currentTime: number;
+  destination: unknown;
+  createOscillator(): {
+    type: string;
+    frequency: { setValueAtTime(value: number, when: number): void };
+    connect(destination: unknown): void;
+    start(when?: number): void;
+    stop(when?: number): void;
+  };
+  createGain(): {
+    gain: {
+      setValueAtTime(value: number, when: number): void;
+      exponentialRampToValueAtTime(value: number, when: number): void;
+    };
+    connect(destination: unknown): void;
+  };
+  resume?(): Promise<void>;
+  close?(): Promise<void>;
+}
+
+type NotificationAudioContextConstructor = new () => NotificationAudioContext;
 
 interface HostCharacter {
   chaId?: string;
@@ -199,6 +225,7 @@ interface PendingEditorRequest {
   responseId?: unknown;
   responseIndex?: number;
   autoRewriteAttempted?: boolean;
+  outputHandled?: boolean;
 }
 
 const editorRequests = new Map<string, PendingEditorRequest>();
@@ -208,6 +235,46 @@ let editorButtonInitialization: Promise<RewriteButtonController | undefined> | u
 const editorRuns = new Map<string, { controller: AbortController; targetKey: string }>();
 const editorChatKey = (characterIndex: number, chatIndex: number) =>
   `${characterIndex}:${chatIndex}`;
+const mainCompletionMonitor = createCompletionMonitor(Risuai);
+let notificationAudio: NotificationAudioContext | undefined;
+let pluginUnloaded = false;
+
+function playCompletionSound(enabled: boolean, success: boolean): void {
+  if (!enabled || pluginUnloaded) return;
+  try {
+    const globals = globalThis as unknown as {
+      AudioContext?: NotificationAudioContextConstructor;
+      webkitAudioContext?: NotificationAudioContextConstructor;
+    };
+    const AudioContextConstructor = globals.AudioContext ?? globals.webkitAudioContext;
+    if (!AudioContextConstructor) return;
+    const audio = (notificationAudio ??= new AudioContextConstructor());
+    // Reuse the context unlocked by the settings gesture. Resume before scheduling
+    // tones so a suspended mobile context does not consume the notification.
+    void (async () => {
+      if (audio.state !== "running") await audio.resume?.();
+      if (pluginUnloaded || (audio.state && audio.state !== "running")) return;
+      const start = audio.currentTime;
+      const frequencies = success ? [660, 880] : [220, 160];
+      frequencies.forEach((frequency, index) => {
+        const when = start + index * 0.1;
+        const oscillator = audio.createOscillator();
+        const gain = audio.createGain();
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(frequency, when);
+        gain.gain.setValueAtTime(0.0001, when);
+        gain.gain.exponentialRampToValueAtTime(0.08, when + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.12);
+        oscillator.connect(gain);
+        gain.connect(audio.destination);
+        oscillator.start(when);
+        oscillator.stop(when + 0.13);
+      });
+    })().catch(() => {});
+  } catch {
+    // Optional audio feedback must never affect generation or editing.
+  }
+}
 
 function createEditorAbortController(): AbortController {
   if (typeof AbortController !== "undefined") return new AbortController();
@@ -454,6 +521,18 @@ async function showSettings(): Promise<void> {
       "Viết tiếng Việt tự nhiên; bản địa hóa mẫu và từ vựng có thể đi vào phản hồi ở mọi CoT liên quan · Mặc định bật",
     )}${checkbox(
       "plugin",
+      "image-optimization",
+      settings.imageOptimizationEnabled,
+      "🖼️ Tối ưu hình ảnh theo card",
+      "Dùng nhiều ảnh ở các vị trí phù hợp, đa dạng hóa khoảnh khắc và dùng cú pháp ảnh theo card/lore · Mặc định tắt",
+    )}${checkbox(
+      "plugin",
+      "sound-notifications",
+      settings.soundNotificationsEnabled,
+      "🔔 Âm báo hoàn tất",
+      "Báo cả thành công và thất bại; nếu tự biên tập thì chờ Submodel xong. Bật để nghe thử, rồi lưu preset · Mặc định tắt",
+    )}${checkbox(
+      "plugin",
       "submodel-editor",
       settings.submodelEditorEnabled,
       "✍️ Biên tập bằng Submodel",
@@ -490,6 +569,8 @@ async function showSettings(): Promise<void> {
       if (node.dataset.kind === "prompt") settings.promptEnabled[id] = node.checked;
       else if (node.dataset.kind === "regex") settings.regexEnabled[id] = node.checked;
       else if (id === "vietnamese-output") settings.vietnameseOutputEnabled = node.checked;
+      else if (id === "image-optimization") settings.imageOptimizationEnabled = node.checked;
+      else if (id === "sound-notifications") settings.soundNotificationsEnabled = node.checked;
       else if (id === "submodel-editor") settings.submodelEditorEnabled = node.checked;
       else if (id === "submodel-auto-rewrite") settings.submodelAutoRewriteEnabled = node.checked;
     }
@@ -502,6 +583,11 @@ async function showSettings(): Promise<void> {
       if (detail) detail.textContent = node.dataset.detail ?? "";
     });
   }
+  document
+    .querySelector<HTMLInputElement>('input[data-id="sound-notifications"]')
+    ?.addEventListener("change", (event) => {
+      playCompletionSound((event.currentTarget as HTMLInputElement).checked, true);
+    });
   document.getElementById("close")!.addEventListener("click", () => void Risuai.hideContainer());
   const presetPicker = document.getElementById("preset-picker")!;
   const presetTrigger = document.getElementById("config-preset-trigger") as HTMLButtonElement;
@@ -571,6 +657,8 @@ async function showSettings(): Promise<void> {
   });
   document.getElementById("save")!.addEventListener("click", async () => {
     readUi();
+    if (settings.soundNotificationsEnabled && notificationAudio?.state !== "running")
+      playCompletionSound(true, true);
     profile.settings = structuredClone(settings);
     await saveSettings();
     status.textContent = `Đã lưu preset “${profile.name}”.`;
@@ -675,14 +763,29 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
   if (editorListenerRegistered) {
     try {
       const key = editorChatKey(characterIndex, chatIndex);
+      mainCompletionMonitor.finish(key);
       editorRequests.delete(key);
       const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
       if (chat) {
-        editorRequests.set(key, {
+        const context: PendingEditorRequest = {
           cardId: character?.chaId,
           chatId: chat.id,
           messages: structuredClone(built),
-        });
+        };
+        editorRequests.set(key, context);
+        if (settings.soundNotificationsEnabled) {
+          mainCompletionMonitor.start(key, {
+            characterIndex,
+            chatIndex,
+            chatId: chat.id,
+            onIncomplete: () => {
+              if (editorRequests.get(key) !== context || context.outputHandled) return;
+              context.outputHandled = true;
+              const current = presetForCard(configPresets, context.cardId).settings;
+              playCompletionSound(current.enabled && current.soundNotificationsEnabled, false);
+            },
+          });
+        }
       }
     } catch (error) {
       editorRequests.clear();
@@ -817,16 +920,13 @@ async function runSubmodelEditor(
   const { signal } = controller;
   if (signal.aborted) throw signal.reason;
   let onAbort!: () => void;
-  let timedOut = false;
-  const stopped = new Promise<string | undefined>((resolve, reject) => {
+  const stopped = new Promise<never>((_resolve, reject) => {
     onAbort = () => {
-      if (timedOut) resolve(undefined);
-      else reject(signal.reason);
+      reject(signal.reason);
     };
     signal.addEventListener("abort", onAbort, { once: true });
   });
   const timer = setTimeout(() => {
-    timedOut = true;
     controller.abort(new Error("Submodel đã quá thời gian chờ 10 phút, giữ nguyên phản hồi gốc."));
   }, 600_000);
   try {
@@ -851,6 +951,14 @@ const submodelOutputListener = async ({
   const key = editorChatKey(characterIndex, chatIndex);
   const context = editorRequests.get(key);
   const target = chat.message?.[messageIndex];
+  const settings = presetForCard(configPresets, context?.cardId).settings;
+  if (!context || context.chatId !== chat.id || chat.isStreaming) {
+    await editorButton?.refresh();
+    return;
+  }
+  const firstOutput = !context.outputHandled;
+  context.outputHandled = true;
+  mainCompletionMonitor.finish(key);
   if (
     context &&
     context.chatId === chat.id &&
@@ -858,7 +966,6 @@ const submodelOutputListener = async ({
     messageIndex === (chat.message?.length ?? 0) - 1 &&
     target?.role === "char"
   ) {
-    const settings = presetForCard(configPresets, context.cardId).settings;
     context.responseId = target.chatId;
     context.responseIndex = messageIndex;
     if (
@@ -883,7 +990,11 @@ const submodelOutputListener = async ({
         },
         true,
       );
+    } else if (firstOutput) {
+      playCompletionSound(settings.enabled && settings.soundNotificationsEnabled, true);
     }
+  } else if (firstOutput) {
+    playCompletionSound(settings.enabled && settings.soundNotificationsEnabled, true);
   }
   await editorButton?.refresh();
 };
@@ -984,6 +1095,15 @@ async function rewriteLatestResponse(
   if (editorRuns.has(key)) return;
   const run = { controller: createEditorAbortController(), targetKey: buttonTarget.key };
   editorRuns.set(key, run);
+  let notified = false;
+  const notify = (success: boolean) => {
+    if (notified) return;
+    notified = true;
+    playCompletionSound(
+      profile.settings.enabled && profile.settings.soundNotificationsEnabled,
+      success,
+    );
+  };
   try {
     await editorButton?.refresh();
     const source = splitEditorResponse(original);
@@ -1009,6 +1129,7 @@ async function rewriteLatestResponse(
       latestMessage.swipeId !== target.swipeId ||
       String(latestMessage.data ?? "") !== original
     ) {
+      notify(false);
       await Risuai.alert(
         "Phản hồi hoặc cuộc trò chuyện đã thay đổi trong lúc Submodel chạy, nên bản sửa chưa được lưu.",
       );
@@ -1036,12 +1157,14 @@ async function rewriteLatestResponse(
       savedMessage.swipes.some((swipe, index) => swipe !== alternatives[index])
     )
       throw new Error("PocketRisu chưa lưu được bản sửa thành phản hồi song song.");
+    notify(true);
     await Risuai.alert(
       automatic
         ? "Đã tự động biên tập tiếng Việt bằng Submodel và thêm một phản hồi song song."
         : "Đã biên tập tiếng Việt bằng Submodel và thêm một phản hồi song song.",
     );
   } catch (error) {
+    notify(false);
     if (run.controller.signal.reason === "cancel") return;
     console.warn("[FF5.4] Submodel editor failed; keeping main response.", error);
     await Risuai.alertError(
@@ -1049,6 +1172,7 @@ async function rewriteLatestResponse(
     );
   } finally {
     if (editorRuns.get(key) === run) editorRuns.delete(key);
+    notify(false);
     await editorButton?.refresh();
   }
 }
@@ -1076,6 +1200,9 @@ void (async () => {
   }
   await syncEditorButton();
   await Risuai.onUnload(async () => {
+    pluginUnloaded = true;
+    mainCompletionMonitor.dispose();
+    await notificationAudio?.close?.().catch(() => {});
     const unregisterEditor = editorListenerRegistered;
     editorListenerRegistered = false;
     for (const run of editorRuns.values()) run.controller.abort("cancel");
