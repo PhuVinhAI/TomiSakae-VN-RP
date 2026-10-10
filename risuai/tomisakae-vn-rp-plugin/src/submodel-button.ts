@@ -128,7 +128,7 @@ export async function createRewriteButton(
           if (attached) return;
         }
         await refresh();
-      })().catch((error) => console.warn("[FF5.4] Could not refresh rewrite button.", error));
+      })().catch((error) => console.warn("[TomiSakae VN-RP] Could not refresh rewrite button.", error));
     }, 120);
   };
 
@@ -156,11 +156,11 @@ export async function createRewriteButton(
   };
 
   const clickId = await root.addEventListener("click", async () => {
-    await activate().catch((error) => console.warn("[FF5.4] Manual rewrite failed.", error));
+    await activate().catch((error) => console.warn("[TomiSakae VN-RP] Manual rewrite failed.", error));
   });
   const keyId = await root.addEventListener("keydown", async (event) => {
     if (event.key === "Enter") {
-      await activate(true).catch((error) => console.warn("[FF5.4] Manual rewrite failed.", error));
+      await activate(true).catch((error) => console.warn("[TomiSakae VN-RP] Manual rewrite failed.", error));
     }
   });
   const observer = await api.createMutationObserver(schedule);

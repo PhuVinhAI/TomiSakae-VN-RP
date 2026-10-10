@@ -12,7 +12,7 @@ export const SETTINGS_STYLES = `
   .brand-mark{display:grid;place-items:center;width:35px;height:35px;background:#d54b31;color:#fff;font-size:18px;font-style:italic;letter-spacing:-.12em;padding-right:4px}
   .edition{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#697168}
   .hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr);gap:40px;align-items:end;background:#202722;color:#f5f1e7;margin-top:16px;padding:48px 52px 42px;min-height:332px;position:relative;overflow:hidden}
-  .hero:after{content:"54";position:absolute;right:-18px;top:-96px;font-size:360px;font-weight:700;line-height:1;color:#f5f1e7;opacity:.035;pointer-events:none}
+  .hero:after{content:"VN";position:absolute;right:-18px;top:-96px;font-size:360px;font-weight:700;line-height:1;color:#f5f1e7;opacity:.035;pointer-events:none}
   .eyebrow,.index{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
   .eyebrow{color:#f4856e;display:flex;gap:12px;align-items:center}.eyebrow:before{content:"";width:24px;height:1px;background:currentColor}
   h1{font-size:clamp(44px,6.5vw,88px);line-height:1.12;font-weight:700;letter-spacing:-.045em;margin:22px 0 16px;max-width:760px}h1 em{font-style:normal;font-weight:700;color:#f4856e}

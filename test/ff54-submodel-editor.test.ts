@@ -6,14 +6,14 @@ import {
   normalizeSettings,
   type ChatMessage,
   type FfPreset,
-} from "../risuai/freaky-frankenstein-5.4-plugin/src/core.js";
-import { buildEditorReferenceMessages } from "../risuai/freaky-frankenstein-5.4-plugin/src/submodel-context.js";
+} from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
+import { buildEditorReferenceMessages } from "../risuai/tomisakae-vn-rp-plugin/src/submodel-context.js";
 import {
   CONFIG_PRESETS_STORAGE_KEY,
   createConfigPreset,
   normalizePresetStore,
   selectCardPreset,
-} from "../risuai/freaky-frankenstein-5.4-plugin/src/presets.js";
+} from "../risuai/tomisakae-vn-rp-plugin/src/presets.js";
 
 interface SavedMessage {
   role: "user" | "char";
@@ -49,12 +49,12 @@ let preset: FfPreset;
 
 beforeAll(async () => {
   const raw = await readFile(
-    "risuai/freaky-frankenstein-5.4-plugin/source/ff54-sillytavern-preset.json",
+    "risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json",
     "utf8",
   );
   preset = JSON.parse(raw) as FfPreset;
   const result = await build({
-    entryPoints: ["risuai/freaky-frankenstein-5.4-plugin/src/plugin.ts"],
+    entryPoints: ["risuai/tomisakae-vn-rp-plugin/src/plugin.ts"],
     bundle: true,
     write: false,
     format: "iife",
@@ -1456,17 +1456,17 @@ describe("Submodel request context", () => {
       memo: "ff54:absolute:1:0:system",
     };
     const request = [summary, user, module, reply, end];
-    const references = buildEditorReferenceMessages(request, "target");
+    const references = buildEditorReferenceMessages(request);
     expect(references).toEqual(request);
     references[0]!.content = "Provider changed its copy";
     expect(request[0]!.content).toBe("Memory và summary do host chọn.");
-    expect(buildEditorReferenceMessages(request, "reply")).toEqual(request);
+    expect(buildEditorReferenceMessages(request)).toEqual(request);
   });
 
   it("preserves the original request order and duplicate messages", () => {
     const first: ChatMessage = { role: "user", content: "Ừ.", memo: "first" };
     const second: ChatMessage = { role: "user", content: "Ừ.", memo: "second" };
-    expect(buildEditorReferenceMessages([first, first, second], undefined)).toEqual([
+    expect(buildEditorReferenceMessages([first, first, second])).toEqual([
       first,
       first,
       second,

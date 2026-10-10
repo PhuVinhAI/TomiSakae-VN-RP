@@ -1,13 +1,13 @@
-# FF5.4 for RisuAI
+# TomiSakae VN-RP for RisuAI
 
-This directory builds the original **Freaky Frankenstein 5.4 Internal States** SillyTavern preset into a single RisuAI API v3 plugin.
+This directory builds a Vietnamese roleplay plugin named **TomiSakae VN-RP**, using the original **Freaky Frankenstein 5.4 Internal States** SillyTavern preset as its prompt and behavior foundation.
 
 - The source JSON is embedded verbatim at build time.
 - The original preset is kept in `source/ff54-sillytavern-preset.json`; builds no longer depend on Downloads.
 - When Vietnamese Output is enabled, its adapter replaces the conjunction rule in Story Mode and Cinematic Realism: related clauses connect naturally, with sentence breaks chosen for clarity instead of a fixed two-clause limit. The source JSON remains unchanged; disabling Vietnamese Output keeps the original rule.
 - The same adapter allows natural Vietnamese conjunctions in all NPC Voice variants and MAX/BOLT/Micro, retaining dialogue flow and using sentence breaks or action beats when needed.
 - Vietnamese adaptations of prose and NPC Voice rules ban em-dashes used as narrative or dialogue punctuation. The editor rephrases them naturally while preserving dashes required by technical/state blocks and machine syntax; no global dash-replacement regex is applied.
-- The chat-menu item **FF5.4** opens a fully Vietnamese, responsive configuration screen.
+- The chat-menu item **TomiSakae VN-RP** opens a fully Vietnamese, responsive configuration screen. The UI identifies FF5.4 as the underlying prompt base.
 - Source divider rows such as `=Pick one Prose Style=` are hidden because they do not produce prompts. Prose, POV, adult mode, user-action handling, dialogue color, and reasoning use compact single-choice controls; independent prompts remain switches.
 - Every visible prompt keeps a Vietnamese explanation translated from its source comment. Prompt controls are grouped into core rules, optional features, and internal states, while regex controls are grouped by function.
 - Named configuration presets contain the master switch, prompt toggles, regex toggles, and Submodel editor options. Existing global settings migrate into **Mặc định**. Every unassigned card uses that preset; choosing another preset remembers its ID for all chats of that card, using the stable character `chaId`. Both preset definitions and card assignments live in `pluginStorage`; character and chat data are not changed by selecting a preset.
@@ -30,13 +30,13 @@ This directory builds the original **Freaky Frankenstein 5.4 Internal States** S
 Build from the repository root:
 
 ```powershell
-pnpm build:risuai:ff54-plugin
+pnpm build:risuai:tomisakae-vn-rp
 ```
 
 The generated importable plugin is:
 
 ```text
-risuai/freaky-frankenstein-5.4-plugin/dist/ff54-risuai-plugin.js
+risuai/tomisakae-vn-rp-plugin/dist/tomisakae-vn-rp-plugin.js
 ```
 
 Replace the previous plugin by importing that file in **RisuAI → Plugin Settings → Import Plugin**. RisuAI asks for replacer and database-read permission because the plugin composes prompts immediately before a normal model request and resolves the active user persona name.

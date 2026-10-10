@@ -8,10 +8,10 @@ import {
   VIETNAMESE_OUTPUT_PROMPT,
   VIETNAMESE_OUTPUT_REPLACEMENTS,
   VIETNAMESE_REASONING_REPLACEMENTS,
-} from "../risuai/freaky-frankenstein-5.4-plugin/src/vietnamese.js";
+} from "../risuai/tomisakae-vn-rp-plugin/src/vietnamese.js";
 
-const DEFAULT_SOURCE = "risuai/freaky-frankenstein-5.4-plugin/source/ff54-sillytavern-preset.json";
-const DEFAULT_OUTPUT_DIRECTORY = "risuai/freaky-frankenstein-5.4-plugin/comparison";
+const DEFAULT_SOURCE = "risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json";
+const DEFAULT_OUTPUT_DIRECTORY = "risuai/tomisakae-vn-rp-plugin/comparison";
 
 interface SourcePrompt {
   identifier: string;

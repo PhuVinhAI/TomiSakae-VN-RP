@@ -1,6 +1,6 @@
 # FF5.4 Vietnamese Adapter — All Prompt Modules
 
-Source: `C:/Users/tomis/TaiLieu/asmr-manga-prompt-compiler/risuai/freaky-frankenstein-5.4-plugin/source/ff54-sillytavern-preset.json`
+Source: `C:/Users/tomis/TaiLieu/asmr-manga-prompt-compiler/risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json`
 Source SHA-256: `1a42fbbfebdf23ce3bc243dc340b6d400bbb713ba882e8f81d921e162ccb893a`
 Source prompts: 63
 Ordered source entries: 56

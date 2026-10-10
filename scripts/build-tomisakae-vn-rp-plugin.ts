@@ -4,8 +4,8 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "esbuild";
 
-const DEFAULT_SOURCE = "risuai/freaky-frankenstein-5.4-plugin/source/ff54-sillytavern-preset.json";
-const DEFAULT_OUTPUT = "risuai/freaky-frankenstein-5.4-plugin/dist/ff54-risuai-plugin.js";
+const DEFAULT_SOURCE = "risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json";
+const DEFAULT_OUTPUT = "risuai/tomisakae-vn-rp-plugin/dist/tomisakae-vn-rp-plugin.js";
 
 interface Options {
   sourceFile: string;
@@ -59,7 +59,7 @@ export async function buildPlugin(options: Options): Promise<{ output: string; d
   const canonicalPreset = JSON.stringify(preset);
   const sourceDigest = createHash("sha256").update(raw).digest("hex");
   const result = await build({
-    entryPoints: [path.resolve("risuai/freaky-frankenstein-5.4-plugin/src/plugin.ts")],
+    entryPoints: [path.resolve("risuai/tomisakae-vn-rp-plugin/src/plugin.ts")],
     bundle: true,
     write: false,
     format: "iife",
@@ -74,8 +74,8 @@ export async function buildPlugin(options: Options): Promise<{ output: string; d
     },
     banner: {
       js: [
-        "//@name ff54_risuai",
-        "//@display-name Freaky Frankenstein 5.4",
+        "//@name tomisakae_vn_rp",
+        "//@display-name TomiSakae VN-RP",
         "//@api 3.0",
         "//@version 1.3.28",
         "",

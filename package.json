@@ -28,7 +28,7 @@
     "zip:handoff": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/export-project.ps1",
     "build:risuai": "tsx scripts/build-risuai-preset.ts",
     "build:risuai:comparison": "tsx scripts/build-risuai-comparison.ts",
-    "build:risuai:ff54-plugin": "tsx scripts/build-ff54-risuai-plugin.ts",
+    "build:risuai:tomisakae-vn-rp": "tsx scripts/build-tomisakae-vn-rp-plugin.ts",
     "build:risuai:ff54-vietnamese-comparison": "tsx scripts/build-ff54-vietnamese-comparison.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

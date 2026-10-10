@@ -14,13 +14,13 @@ import {
   expandHostMacros,
   normalizeSettings,
   type FfPreset,
-} from "../risuai/freaky-frankenstein-5.4-plugin/src/core.js";
+} from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
 import {
   adaptPromptForVietnamese,
   VIETNAMESE_OUTPUT_PROMPT,
   VIETNAMESE_OUTPUT_REPLACEMENTS,
   VIETNAMESE_REASONING_REPLACEMENTS,
-} from "../risuai/freaky-frankenstein-5.4-plugin/src/vietnamese.js";
+} from "../risuai/tomisakae-vn-rp-plugin/src/vietnamese.js";
 import { buildVietnameseComparison } from "../scripts/build-ff54-vietnamese-comparison.js";
 import {
   EXCLUSIVE_PROMPT_GROUPS,
@@ -28,9 +28,9 @@ import {
   normalizeExclusivePromptGroups,
   PROMPT_SECTIONS,
   SOURCE_SEPARATOR_IDS,
-} from "../risuai/freaky-frankenstein-5.4-plugin/src/ui-vi.js";
+} from "../risuai/tomisakae-vn-rp-plugin/src/ui-vi.js";
 
-const source = "risuai/freaky-frankenstein-5.4-plugin/source/ff54-sillytavern-preset.json";
+const source = "risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json";
 const realismModeId = "019f62e8-892f-700c-9795-53ecb3381d7d";
 const freakyModeId = "019f62e8-892f-700d-b070-4add983aeae1";
 
@@ -311,11 +311,15 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
 
   it("renders a Vietnamese responsive settings UI", async () => {
     const pluginSource = await readFile(
-      "risuai/freaky-frankenstein-5.4-plugin/src/plugin.ts",
+      "risuai/tomisakae-vn-rp-plugin/src/plugin.ts",
       "utf8",
     );
-    const styles = await readFile("risuai/freaky-frankenstein-5.4-plugin/src/ui-style.ts", "utf8");
-    expect(pluginSource).toContain("Điều khiển <em>FF5.4.</em>");
+    const styles = await readFile("risuai/tomisakae-vn-rp-plugin/src/ui-style.ts", "utf8");
+    expect(pluginSource).toContain("Điều khiển <em>TomiSakae VN-RP.</em>");
+    expect(pluginSource).toContain('{ name: "TomiSakae VN-RP"');
+    expect(pluginSource).toContain("Nền tảng FF5.4");
+    expect(pluginSource).not.toContain('{ name: "FF5.4"');
+    expect(styles).toContain('content:"VN"');
     expect(pluginSource).toContain("Lưu cấu hình");
     expect(pluginSource).toContain("Khôi phục");
     expect(pluginSource).toContain("Nhóm chọn một");
@@ -514,7 +518,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
 
   it("builds original and Vietnamese comparison files from every source module", async () => {
     const data = await preset();
-    const outputDirectory = "risuai/freaky-frankenstein-5.4-plugin/comparison";
+    const outputDirectory = "risuai/tomisakae-vn-rp-plugin/comparison";
     const result = await buildVietnameseComparison({
       sourceFile: source,
       outputDirectory,
@@ -548,7 +552,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
 
   it("stores named presets and card assignments in plugin storage and reads legacy settings", async () => {
     const pluginSource = await readFile(
-      "risuai/freaky-frankenstein-5.4-plugin/src/plugin.ts",
+      "risuai/tomisakae-vn-rp-plugin/src/plugin.ts",
       "utf8",
     );
     expect(pluginSource).toContain('const STORAGE_KEY = "ff54-global-settings-v1"');
@@ -568,7 +572,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
 
   it("does not bundle the unavailable chat-parser API", async () => {
     const artifact = await readFile(
-      "risuai/freaky-frankenstein-5.4-plugin/dist/ff54-risuai-plugin.js",
+      "risuai/tomisakae-vn-rp-plugin/dist/tomisakae-vn-rp-plugin.js",
       "utf8",
     );
     expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));

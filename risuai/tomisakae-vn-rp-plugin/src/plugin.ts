@@ -506,13 +506,13 @@ async function showSettings(): Promise<void> {
 
   document.head.innerHTML = `<meta name="viewport" content="width=device-width,initial-scale=1"><style>${SETTINGS_STYLES}</style>`;
   document.body.innerHTML = `<main class="shell">
-    <div class="masthead"><div class="brand"><span class="brand-mark">ff</span><span>Trạm điều khiển FF5.4</span></div><span class="edition">Bảng điều khiển / 5.4</span></div>
-    <section class="hero"><div><span class="eyebrow">Không gian cấu hình</span><h1>Điều khiển <em>FF5.4.</em></h1><p class="hero-copy">Thiết lập nhịp kể, góc nhìn và những quy tắc vận hành. Mỗi preset dùng chung cho các card đã chọn preset đó.</p></div><div class="hero-side"><span class="index">Preset: ${escapeHtml(profile.name)}</span><p>Chọn cách thế giới của bạn vận hành.</p><small>Card mới dùng “Mặc định”. Chọn preset khác để ghi nhớ cho card hiện tại.</small></div></section>
+    <div class="masthead"><div class="brand"><span class="brand-mark">ts</span><span>TomiSakae VN-RP</span></div><span class="edition">Nền tảng FF5.4</span></div>
+    <section class="hero"><div><span class="eyebrow">Không gian cấu hình</span><h1>Điều khiển <em>TomiSakae VN-RP.</em></h1><p class="hero-copy">Thiết lập nhịp kể, góc nhìn và những quy tắc vận hành trên nền FF5.4. Mỗi preset dùng chung cho các card đã chọn preset đó.</p></div><div class="hero-side"><span class="index">Preset: ${escapeHtml(profile.name)}</span><p>Chọn cách thế giới của bạn vận hành.</p><small>Card mới dùng “Mặc định”. Chọn preset khác để ghi nhớ cho card hiện tại.</small></div></section>
     <div class="workspace"><nav class="rail" aria-label="Điều hướng cấu hình"><p class="rail-title">Danh mục</p><a href="#general"><span>01</span>Tổng quan</a><a href="#choices"><span>02</span>Nhóm chọn một</a><a href="#modules"><span>03</span>Module độc lập</a><a href="#filters"><span>04</span>Bộ lọc kỹ thuật</a><p class="rail-note">Sửa cấu hình rồi bấm “Lưu preset” để áp dụng.</p></nav>
     <div class="content">
     <section id="general" class="panel"><div class="panel-heading"><span class="index">01 / Nền tảng</span><h2>Tổng quan</h2></div>
     <div class="preset-panel"><label class="preset-field"><span>Preset cho ${escapeHtml(character?.nickname || character?.name || "card hiện tại")}</span><div class="preset-picker" id="preset-picker"><select id="config-preset" class="preset-native" tabindex="-1" aria-hidden="true" ${cardId ? "" : "disabled"}>${presetOptions}</select><button class="preset-trigger" id="config-preset-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" ${cardId ? "" : "disabled"}>${escapeHtml(profile.name)}<span class="preset-trigger-mark" aria-hidden="true"></span></button><div class="preset-menu" id="config-preset-menu" role="listbox">${configPresets.presets.map((entry) => `<button class="preset-option${entry.id === profile.id ? " is-selected" : ""}" type="button" role="option" aria-selected="${entry.id === profile.id ? "true" : "false"}" data-preset-id="${escapeHtml(entry.id)}"><span>${escapeHtml(entry.name)}</span>${entry.id === profile.id ? '<span class="preset-option-mark" aria-hidden="true">✓</span>' : ""}</button>`).join("")}</div></div></label><p class="section-note">Chọn preset sẽ được ghi nhớ cho mọi chat của card này. Lưu cấu hình sẽ cập nhật preset cho tất cả card đang dùng nó.</p><div class="preset-create"><label class="preset-field"><span>Tên preset mới</span><input id="preset-name" type="text" placeholder="Nhập tên preset"></label><button class="action" id="create-preset">Tạo preset</button></div><div class="preset-manage"><label class="preset-field"><span>Đổi tên preset hiện tại</span><input id="rename-preset-name" type="text" value="${escapeHtml(profile.name)}" ${profile.id === "default" ? "disabled" : ""}></label><div class="preset-manage-actions"><button class="action" id="rename-preset" ${profile.id === "default" ? "disabled" : ""}>Đổi tên</button><button class="action danger" id="delete-preset" ${profile.id === "default" ? "disabled" : ""}>Xóa preset</button></div></div><small>Tạo preset sao chép cấu hình đang hiển thị. Preset Mặc định không thể đổi tên hoặc xóa.</small></div>
-    <label class="master"><span class="master-copy"><strong>Bật FF5.4 cho preset này</strong><small>Áp dụng cho mọi chat của các card dùng preset “${escapeHtml(profile.name)}”.</small></span><input class="switch" id="master" type="checkbox" ${settings.enabled ? "checked" : ""}></label>
+    <label class="master"><span class="master-copy"><strong>Bật TomiSakae VN-RP cho preset này</strong><small>Áp dụng cho mọi chat của các card dùng preset “${escapeHtml(profile.name)}”. Nền vận hành: FF5.4.</small></span><input class="switch" id="master" type="checkbox" ${settings.enabled ? "checked" : ""}></label>
     <details open><summary><span class="summary-copy"><strong>Module của plugin</strong><small>Tính năng bổ sung riêng cho bản RisuAI.</small></span></summary><div class="list">${checkbox(
       "plugin",
       "vietnamese-output",
@@ -543,7 +543,7 @@ async function showSettings(): Promise<void> {
     <section id="filters" class="panel"><div class="panel-heading"><span class="index">04 / Vận hành</span><h2>Bộ lọc kỹ thuật</h2></div><p class="section-note">Các bộ lọc gốc dùng khi gửi ngữ cảnh và hiển thị phản hồi. Chỉ thay đổi khi bạn hiểu rõ tác dụng của chúng.</p><details><summary><span class="summary-copy"><strong>Xem ${preset.extensions?.regex_scripts?.length ?? 0} bộ lọc</strong><small>Được chia theo công việc để dễ tìm.</small></span></summary><div class="regex-groups">${regexGroups}</div></details></section>
     <p class="source-note">Nguồn: ${escapeHtml(__FF54_SOURCE_NAME__)}<br>SHA-256: ${escapeHtml(__FF54_SOURCE_SHA256__)}</p>
     </div></div>
-    <div class="command-bar"><div class="command-inner"><span class="command-label">FF5.4 / ${escapeHtml(profile.name)}</span><button class="action primary" id="save">Lưu preset</button><button class="action" id="reset">Khôi phục</button><button class="action" id="close">Đóng</button><div class="status" id="status" role="status" aria-live="polite"></div></div></div>
+    <div class="command-bar"><div class="command-inner"><span class="command-label">TomiSakae VN-RP · FF5.4 / ${escapeHtml(profile.name)}</span><button class="action primary" id="save">Lưu preset</button><button class="action" id="reset">Khôi phục</button><button class="action" id="close">Đóng</button><div class="status" id="status" role="status" aria-live="polite"></div></div></div>
   </main>`;
 
   const status = document.getElementById("status")!;
@@ -782,14 +782,14 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
       }
     } catch (error) {
       editorRequests.clear();
-      console.warn("[FF5.4] Could not capture Submodel context; keeping main generation.", error);
+      console.warn("[TomiSakae VN-RP] Could not capture Submodel context; keeping main generation.", error);
     }
   } else {
     editorRequests.clear();
   }
   void editorButton
     ?.refresh()
-    .catch((error) => console.warn("[FF5.4] Could not refresh rewrite button.", error));
+    .catch((error) => console.warn("[TomiSakae VN-RP] Could not refresh rewrite button.", error));
   return built;
 };
 
@@ -1048,7 +1048,7 @@ async function syncEditorButton(): Promise<void> {
     }
     await editorButton?.refresh();
   } catch (error) {
-    console.warn("[FF5.4] Rewrite button requires PocketRisu's mainDom permission.", error);
+    console.warn("[TomiSakae VN-RP] Rewrite button requires PocketRisu's mainDom permission.", error);
   }
 }
 
@@ -1159,7 +1159,7 @@ async function rewriteLatestResponse(
   } catch (error) {
     notify(false);
     if (run.controller.signal.reason === "cancel") return;
-    console.warn("[FF5.4] Submodel editor failed; keeping main response.", error);
+    console.warn("[TomiSakae VN-RP] Submodel editor failed; keeping main response.", error);
     await Risuai.alertError(
       error instanceof Error ? error.message : "Không thể lưu bản sửa từ Submodel.",
     );
@@ -1180,7 +1180,7 @@ void (async () => {
     normalizeExclusivePromptGroups(profile.settings, orderEntries());
   await Risuai.pluginStorage.setItem(CONFIG_PRESETS_STORAGE_KEY, configPresets);
   const button = await Risuai.registerButton(
-    { name: "FF5.4", icon: "⚡", iconType: "html", location: "chat", id: BUTTON_ID },
+    { name: "TomiSakae VN-RP", icon: "⚡", iconType: "html", location: "chat", id: BUTTON_ID },
     () => void showSettings(),
   );
   await Risuai.addRisuReplacer("beforeRequest", beforeRequest);
@@ -1189,7 +1189,7 @@ void (async () => {
     await Risuai.addRisuChatListener("output", submodelOutputListener);
     editorListenerRegistered = true;
   } catch (error) {
-    console.warn("[FF5.4] Submodel editor requires PocketRisu's chat output API.", error);
+    console.warn("[TomiSakae VN-RP] Submodel editor requires PocketRisu's chat output API.", error);
   }
   await syncEditorButton();
   await Risuai.onUnload(async () => {

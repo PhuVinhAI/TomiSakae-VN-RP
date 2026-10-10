@@ -8,7 +8,7 @@ The raw build uses the source JSON's existing ON/OFF states. It applies no clean
 
 ## Build Facts
 
-- Source: `risuai/freaky-frankenstein-5.4-plugin/source/ff54-sillytavern-preset.json`
+- Source: `risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json`
 - Source bytes: 144032
 - Raw selected prompt blocks: 26
 - Raw master blocks: 24
