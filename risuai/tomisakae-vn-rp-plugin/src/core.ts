@@ -365,6 +365,7 @@ export function composePresetPrompts(
   settings: FfGlobalSettings,
   parseHostMacros: (content: string, role: ChatRole) => Promise<string>,
   macroContext: MacroContext = {},
+  onExpandedPrompt?: (message: ChatMessage, prompt: FfPrompt) => void,
 ): Promise<ComposedPrompt> {
   return (async () => {
     const map = promptMap(preset);
@@ -390,6 +391,7 @@ export function composePresetPrompts(
         content: content.trim(),
         memo: `ff54:${prompt.identifier}`,
       };
+      onExpandedPrompt?.(message, prompt);
       if (prompt.injection_position === ABSOLUTE_POSITION) {
         const depth = Math.max(0, Number(prompt.injection_depth) || 0);
         const bucket = absoluteByDepth.get(depth) ?? [];

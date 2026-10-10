@@ -96,6 +96,7 @@ async function startPlugin(savedPresets?: unknown, sound = false, legacySettings
     checked: boolean;
     dataset: Record<string, string>;
     textContent: string;
+    innerHTML: string;
     handlers: Map<string, () => void | Promise<void>>;
     addEventListener(type: string, handler: () => void | Promise<void>): void;
   }
@@ -109,6 +110,7 @@ async function startPlugin(savedPresets?: unknown, sound = false, legacySettings
         [...attributes.matchAll(/data-(\w+)="([^"]*)"/g)].map((match) => [match[1]!, match[2]!]),
       ),
       textContent: "",
+      innerHTML: "",
       handlers: new Map(),
       addEventListener(type, handler) {
         node.handlers.set(type, handler);
@@ -246,6 +248,8 @@ async function startPlugin(savedPresets?: unknown, sound = false, legacySettings
   runInNewContext(bundled, {
     Risuai: api,
     structuredClone,
+    TextEncoder,
+    TextDecoder,
     setTimeout,
     clearTimeout,
     crypto: { randomUUID: () => `test-${storage.size}-${Math.random()}` },
@@ -379,6 +383,29 @@ describe("Removed Submodel editing", () => {
 });
 
 describe("Named presets in plugin UI and requests", () => {
+  it("previews added prompt tokens immediately from UI drafts without making a request or saving", async () => {
+    const plugin = await startPlugin();
+    await plugin.settingsUi();
+    const saved = structuredClone(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
+    const original = plugin.ui("token-estimate-panel").innerHTML;
+    expect(original).toContain("Token prompt chèn thêm");
+    expect(original).toContain("o200k_base");
+    expect(original).toContain("🇻🇳 Đầu ra tiếng Việt");
+    const vietnamese = plugin.toggle("vietnamese-output");
+    vietnamese.checked = false;
+    await vietnamese.handlers.get("change")!();
+    expect(plugin.ui("token-estimate-panel").innerHTML).not.toContain("🇻🇳 Đầu ra tiếng Việt");
+    expect(plugin.ui("token-estimate-panel").innerHTML).not.toBe(original);
+    expect(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY)).toEqual(saved);
+    expect(plugin.runModel).not.toHaveBeenCalled();
+    expect(plugin.writes).not.toHaveBeenCalled();
+    plugin.ui("master").checked = false;
+    await plugin.uiEvent("master", "change");
+    expect(plugin.ui("token-estimate-panel").innerHTML).toContain('class="token-total">≈ 0');
+    expect(plugin.ui("token-estimate-panel").innerHTML).toContain("Plugin đang tắt");
+    await plugin.callbacks.unload!();
+  });
+
   it("creates and saves a named preset without changing Mặc định, then remembers it after reload", async () => {
     const plugin = await startPlugin();
     await plugin.settingsUi();

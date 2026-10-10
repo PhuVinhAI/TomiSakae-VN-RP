@@ -25,6 +25,7 @@ import {
 } from "./ui-vi.js";
 import { SETTINGS_STYLES } from "./ui-style.js";
 import { createCompletionMonitor } from "./completion-monitor.js";
+import { estimatePluginPromptTokens, type PluginTokenEstimate } from "./token-estimate.js";
 import {
   CONFIG_PRESETS_STORAGE_KEY,
   createConfigPreset,
@@ -263,6 +264,28 @@ function sourceState(enabled: boolean): string {
   return enabled ? "Preset gốc: bật" : "Preset gốc: tắt";
 }
 
+function tokenEstimateHtml(estimate: PluginTokenEstimate): string {
+  const number = (value: number) => value.toLocaleString("vi-VN");
+  const prompts = promptById();
+  const rows = [...estimate.entries]
+    .sort((left, right) => right.tokens - left.tokens)
+    .map((entry) => {
+      const prompt = prompts.get(entry.identifier);
+      const name =
+        entry.identifier === "vietnamese-output"
+          ? "🇻🇳 Đầu ra tiếng Việt"
+          : prompt
+            ? promptUiCopy(prompt).name
+            : entry.identifier;
+      return `<div class="token-row"><span>${escapeHtml(name)}</span><strong>≈ ${number(entry.tokens)}</strong></div>`;
+    })
+    .join("");
+  return `<div class="token-heading"><div><span class="index">Ước tính theo cấu hình đang chọn</span><h3>Token prompt chèn thêm</h3></div><strong class="token-total">≈ ${number(estimate.tokens)}</strong></div>
+    <div class="token-metrics"><span>Nội dung prompt <b>${number(estimate.contentTokens)}</b></span><span>Khung message <b>≈ ${number(estimate.framingTokens)}</b></span><span>Số message <b>${number(estimate.messageCount)}</b></span></div>
+    <p class="token-note">Dùng tokenizer o200k_base làm tham chiếu; số thực tế tùy model/API. Không tính card/lore, memory, lịch sử chat hay phản hồi AI. Cập nhật ngay khi đổi lựa chọn; bấm “Lưu preset” để áp dụng.</p>
+    ${rows ? `<details><summary><span class="summary-copy"><strong>Chi tiết theo module</strong><small>Từ nhiều token đến ít. Nội dung phụ thuộc được tính ở prompt dùng nó; tổng có thể lệch nhẹ do gộp message.</small></span></summary><div class="token-rows">${rows}</div></details>` : '<p class="token-note">Plugin đang tắt nên không chèn prompt.</p>'}`;
+}
+
 function selectedGroupPrompt(group: ExclusivePromptGroup, settings: FfGlobalSettings): string {
   const enabled = group.memberIds.filter((identifier) => settings.promptEnabled[identifier]);
   if (enabled.length <= 1) return enabled[0] ?? "";
@@ -441,6 +464,7 @@ async function showSettings(): Promise<void> {
     <section id="general" class="panel"><div class="panel-heading"><span class="index">01 / Nền tảng</span><h2>Tổng quan</h2></div>
     <div class="preset-panel"><label class="preset-field"><span>Preset cho ${escapeHtml(character?.nickname || character?.name || "card hiện tại")}</span><div class="preset-picker" id="preset-picker"><select id="config-preset" class="preset-native" tabindex="-1" aria-hidden="true" ${cardId ? "" : "disabled"}>${presetOptions}</select><button class="preset-trigger" id="config-preset-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" ${cardId ? "" : "disabled"}>${escapeHtml(profile.name)}<span class="preset-trigger-mark" aria-hidden="true"></span></button><div class="preset-menu" id="config-preset-menu" role="listbox">${configPresets.presets.map((entry) => `<button class="preset-option${entry.id === profile.id ? " is-selected" : ""}" type="button" role="option" aria-selected="${entry.id === profile.id ? "true" : "false"}" data-preset-id="${escapeHtml(entry.id)}"><span>${escapeHtml(entry.name)}</span>${entry.id === profile.id ? '<span class="preset-option-mark" aria-hidden="true">✓</span>' : ""}</button>`).join("")}</div></div></label><p class="section-note">Chọn preset sẽ được ghi nhớ cho mọi chat của card này. Lưu cấu hình sẽ cập nhật preset cho tất cả card đang dùng nó.</p><div class="preset-create"><label class="preset-field"><span>Tên preset mới</span><input id="preset-name" type="text" placeholder="Nhập tên preset"></label><button class="action" id="create-preset">Tạo preset</button></div><div class="preset-manage"><label class="preset-field"><span>Đổi tên preset hiện tại</span><input id="rename-preset-name" type="text" value="${escapeHtml(profile.name)}" ${profile.id === "default" ? "disabled" : ""}></label><div class="preset-manage-actions"><button class="action" id="rename-preset" ${profile.id === "default" ? "disabled" : ""}>Đổi tên</button><button class="action danger" id="delete-preset" ${profile.id === "default" ? "disabled" : ""}>Xóa preset</button></div></div><small>Tạo preset sao chép cấu hình đang hiển thị. Preset Mặc định không thể đổi tên hoặc xóa.</small></div>
     <label class="master"><span class="master-copy"><strong>Bật TomiSakae VN-RP cho preset này</strong><small>Áp dụng cho mọi chat của các card dùng preset “${escapeHtml(profile.name)}”. Nền vận hành: FF5.4.</small></span><input class="switch" id="master" type="checkbox" ${settings.enabled ? "checked" : ""}></label>
+    <div id="token-estimate-panel" class="token-panel" aria-live="polite"><p class="token-note">Đang ước tính token prompt…</p></div>
     <details open><summary><span class="summary-copy"><strong>Module của plugin</strong><small>Tính năng bổ sung riêng cho bản RisuAI.</small></span></summary><div class="list">${checkbox(
       "plugin",
       "vietnamese-output",
@@ -482,13 +506,53 @@ async function showSettings(): Promise<void> {
       else if (id === "sound-notifications") settings.soundNotificationsEnabled = node.checked;
     }
   };
+  const tokenPanel = document.getElementById("token-estimate-panel")!;
+  const tokenHostContext = await getHostMacroContext(character).catch(() => ({
+    characterName: character?.nickname || character?.name || "Character",
+    userName: "User",
+  }));
+  let tokenPreviewVersion = 0;
+  const refreshTokenEstimate = async () => {
+    const version = ++tokenPreviewVersion;
+    try {
+      const estimate = await estimatePluginPromptTokens(
+        preset,
+        structuredClone(settings),
+        tokenHostContext,
+      );
+      if (
+        version === tokenPreviewVersion &&
+        document.getElementById("token-estimate-panel") === tokenPanel
+      )
+        tokenPanel.innerHTML = tokenEstimateHtml(estimate);
+    } catch (error) {
+      if (
+        version === tokenPreviewVersion &&
+        document.getElementById("token-estimate-panel") === tokenPanel
+      )
+        tokenPanel.textContent = "Chưa thể ước tính token prompt.";
+      console.warn("[TomiSakae VN-RP] Could not estimate prompt tokens.", error);
+    }
+  };
+  const refreshTokenEstimateFromUi = async () => {
+    readUi();
+    await refreshTokenEstimate();
+  };
   for (const node of document.querySelectorAll<HTMLInputElement>('input[data-kind="choice"]')) {
-    node.addEventListener("change", () => {
+    node.addEventListener("change", async () => {
       const detail = document.querySelector<HTMLElement>(
         `[data-choice-detail="${node.dataset.group}"]`,
       );
       if (detail) detail.textContent = node.dataset.detail ?? "";
+      await refreshTokenEstimateFromUi();
     });
+  }
+  document.getElementById("master")!.addEventListener("change", refreshTokenEstimateFromUi);
+  for (const node of document.querySelectorAll<HTMLInputElement>(
+    'input[type="checkbox"][data-kind]',
+  )) {
+    if (node.dataset.kind === "prompt" || node.dataset.id === "vietnamese-output")
+      node.addEventListener("change", refreshTokenEstimateFromUi);
   }
   document
     .querySelector<HTMLInputElement>('input[data-id="sound-notifications"]')
@@ -577,6 +641,7 @@ async function showSettings(): Promise<void> {
     document.getElementById("status")!.textContent =
       `Đã khôi phục cấu hình của preset “${profile.name}” về mặc định (Chế độ Hiện thực).`;
   });
+  await refreshTokenEstimate();
   await Risuai.showContainer("fullscreen");
 }
 
