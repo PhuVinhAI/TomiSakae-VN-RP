@@ -1,4 +1,11 @@
-import type { RewriteButtonApi } from "./submodel-button.js";
+export interface CompletionMonitorApi {
+  getRootDocument(): Promise<{
+    querySelector(selector: string): Promise<unknown>;
+  } | null>;
+  getCurrentCharacterIndex(): Promise<number>;
+  getCurrentChatIndex(): Promise<number>;
+  getChatFromIndex(character: number, chat: number): Promise<{ id?: unknown } | null>;
+}
 
 interface PendingCompletion {
   characterIndex: number;
@@ -9,13 +16,7 @@ interface PendingCompletion {
 
 /** The output listener handles success. PocketRisu exposes no request-error listener,
  * so observe the current chat's generation control for a terminal run without output. */
-export function createCompletionMonitor(
-  api: Pick<RewriteButtonApi, "getRootDocument"> & {
-    getCurrentCharacterIndex(): Promise<number>;
-    getCurrentChatIndex(): Promise<number>;
-    getChatFromIndex(character: number, chat: number): Promise<{ id?: unknown } | null>;
-  },
-) {
+export function createCompletionMonitor(api: CompletionMonitorApi) {
   const pending = new Map<string, PendingCompletion>();
   let timer: ReturnType<typeof setTimeout> | undefined;
   let disposed = false;

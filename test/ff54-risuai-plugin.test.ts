@@ -3,8 +3,6 @@ import { describe, expect, it } from "vitest";
 import {
   adaptDisplayMarkupForRisuAI,
   adaptVietnameseHeaderForRisuAI,
-  hasCompleteSceneHeader,
-  splitBeforeSceneHeader,
   removeSceneHeadersForRequest,
   applyRegexScripts,
   applyPromptRegexToMessages,
@@ -778,7 +776,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(output).toContain("68°F");
   });
 
-  it("accepts the notepad date icon across rendering and editor header recognition", () => {
+  it("accepts the notepad date icon across rendering and request cleanup", () => {
     const header =
       "[ 🕰️ Thời gian 11:40 SA | 🗒️ Ngày #3 - Chủ Nhật, ngày 16 tháng 03 năm 2025 SCN | 📍 Studio của Ria - Khu giường | 🌤️ Nắng xuân dịu, 12°C ]";
     for (const value of [header, header.replace("🗒️", "🗒")]) {
@@ -788,11 +786,9 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
       expect(output).toContain("Studio của Ria - Khu giường");
       expect(output).toContain("🌤️ Nắng xuân dịu, 12°C");
       expect(output).not.toContain(value);
-      expect(hasCompleteSceneHeader(value)).toBe(true);
-      expect(splitBeforeSceneHeader("Planning before header.\n" + value)).toEqual({
-        prefix: "Planning before header.\n",
-        response: value,
-      });
+      expect(removeSceneHeadersForRequest(value + "\nNội dung nhập vai")).toBe(
+        "\nNội dung nhập vai",
+      );
     }
   });
 
@@ -806,14 +802,9 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     );
     expect(output.endsWith("</div>\nNội dung nhập vai")).toBe(true);
     expect(adaptVietnameseHeaderForRisuAI(output)).toBe(output);
-    expect(hasCompleteSceneHeader(header)).toBe(true);
-    expect(splitBeforeSceneHeader(`Planning before header.\n${input}`)).toEqual({
-      prefix: "Planning before header.\n",
-      response: input,
-    });
     expect(removeSceneHeadersForRequest(input)).toBe("\nNội dung nhập vai");
     const incomplete = header.slice(0, -1);
-    expect(hasCompleteSceneHeader(incomplete)).toBe(false);
+    expect(removeSceneHeadersForRequest(incomplete)).toBe(incomplete);
     expect(adaptVietnameseHeaderForRisuAI(incomplete)).toBe(incomplete);
   });
 
