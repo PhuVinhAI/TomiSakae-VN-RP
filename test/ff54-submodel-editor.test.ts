@@ -465,7 +465,7 @@ describe("FF5.4 Submodel editor integration", () => {
     ).toBe(true);
   });
 
-  it("uses the selected submodel with the exact captured main request and no restored history", async () => {
+  it("uses the selected submodel with retained prompts and no restored history", async () => {
     const plugin = await startPlugin();
     const built = await plugin.request();
     const snapshot = structuredClone(built);
@@ -560,6 +560,57 @@ describe("FF5.4 Submodel editor integration", () => {
     await plugin.request();
     await plugin.complete("An chào bạn.");
     expect(plugin.runModel).not.toHaveBeenCalled();
+  });
+
+  it("sends two prior exchanges and the latest user input without memory or older history", async () => {
+    const plugin = await startPlugin();
+    const history: ChatMessage[] = [
+      { role: "user", content: "Lượt cũ.", memo: "u0" },
+      { role: "assistant", content: "Phản hồi cũ.", memo: "a0" },
+      { role: "user", content: "Lượt trước thứ nhất.", memo: "u1" },
+      { role: "assistant", content: "Phản hồi trước thứ nhất.", memo: "a1" },
+      { role: "user", content: "Lượt trước thứ hai.", memo: "u2" },
+      { role: "assistant", content: "Phản hồi trước thứ hai.", memo: "a2" },
+      { role: "user", content: "Tin nhắn hiện tại.", memo: "u3" },
+    ];
+    const chat = plugin.chats.get("0:0")!;
+    chat.message = history.map((message) => ({
+      role: message.role === "assistant" ? "char" : "user",
+      data: message.content,
+      chatId: message.memo!,
+    }));
+    const request: ChatMessage[] = [
+      { role: "system", content: "Card và lore.", memo: "card" },
+      { role: "user", content: "Chỉ dẫn của preset host.", memo: "host-prompt" },
+      { role: "system", content: "Ký ức đầy đủ.", memo: "supaMemory" },
+      {
+        role: "system",
+        content: "[Roleplay Summary]\n<Past Events Summary>Tóm tắt cũ.</Past Events Summary>",
+      },
+      ...history,
+    ];
+    const built = await plugin.request(request);
+    const snapshot = structuredClone(built);
+    plugin.runModel.mockResolvedValue({ type: "success", result: "An bước tới." });
+    await plugin.complete("<Thoughts>Planning.</Thoughts>\nAn di chuyển tới.");
+    await plugin.rewrite();
+    const messages = plugin.runModel.mock.calls[0]![0].messages;
+    expect(
+      messages.filter((message) => history.some((entry) => entry.memo === message.memo)),
+    ).toEqual(history.slice(2));
+    expect(messages.some((message) => message.memo === "supaMemory")).toBe(false);
+    expect(messages.some((message) => message.content.includes("Tóm tắt cũ."))).toBe(false);
+    expect(messages.find((message) => message.memo === "host-prompt")?.content).toBe(
+      "Chỉ dẫn của preset host.",
+    );
+    expect(messages.find((message) => message.memo === "card")?.content).toBe("Card và lore.");
+    expect(messages.filter((message) => message.memo === "ff54:submodel-editor-source")).toEqual([
+      { role: "assistant", content: "An di chuyển tới.", memo: "ff54:submodel-editor-source" },
+    ]);
+    expect(messages.at(-1)?.memo).toBe("ff54:submodel-editor-target");
+    expect(built).toEqual(snapshot);
+    expect(built.some((message) => message.memo === "supaMemory")).toBe(true);
+    expect(chat.message[0]?.data).toBe("Lượt cũ.");
   });
 
   it("keeps the current reply as the assistant source when regenerating in place", async () => {
@@ -1441,12 +1492,13 @@ describe("FF5.4 completion sounds", () => {
 });
 
 describe("Submodel request context", () => {
-  it("clones the already-cut request without restoring missing history", () => {
+  it("removes marked memory while keeping prompt order and cloning retained messages", () => {
     const summary: ChatMessage = {
       role: "system",
       content: "Memory và summary do host chọn.",
-      memo: "summary",
+      memo: "supaMemory",
     };
+    const card: ChatMessage = { role: "system", content: "Card và lore." };
     const user: ChatMessage = { role: "user", content: "Tiếp đi.", memo: "user" };
     const reply: ChatMessage = { role: "assistant", content: "Phản hồi trước.", memo: "reply" };
     const end: ChatMessage = { role: "user", content: "End injection.", memo: "ff54:end" };
@@ -1455,21 +1507,73 @@ describe("Submodel request context", () => {
       content: "Module.",
       memo: "ff54:absolute:1:0:system",
     };
-    const request = [summary, user, module, reply, end];
+    const request = [card, summary, user, module, reply, end];
     const references = buildEditorReferenceMessages(request);
-    expect(references).toEqual(request);
+    expect(references).toEqual([card, user, module, reply, end]);
     references[0]!.content = "Provider changed its copy";
-    expect(request[0]!.content).toBe("Memory và summary do host chọn.");
-    expect(buildEditorReferenceMessages(request)).toEqual(request);
+    expect(request[0]!.content).toBe("Card và lore.");
+    expect(request[1]!.content).toBe("Memory và summary do host chọn.");
+    expect(buildEditorReferenceMessages(request)).toEqual([card, user, module, reply, end]);
   });
 
-  it("preserves the original request order and duplicate messages", () => {
-    const first: ChatMessage = { role: "user", content: "Ừ.", memo: "first" };
-    const second: ChatMessage = { role: "user", content: "Ừ.", memo: "second" };
-    expect(buildEditorReferenceMessages([first, first, second])).toEqual([
-      first,
-      first,
-      second,
+  it("removes memory wrappers without deleting other text from a merged system message", () => {
+    const request: ChatMessage[] = [
+      { role: "system", content: "Legacy memory.", memo: "hypaMemory" },
+      {
+        role: "system",
+        content:
+          "<Previous Conversation>[Roleplay Summary]\n<Past Events Summary>Old memory.</Past Events Summary></Previous Conversation>",
+      },
+      {
+        role: "system",
+        content:
+          "Card rules.\n[Roleplay Summary]\n<Past Events Summary>Memory.</Past Events Summary>\nLore rules.",
+      },
+      { role: "system", content: "The character has a good memory." },
+      { role: "user", content: "<Past Events Summary>User text.</Past Events Summary>" },
+    ];
+    expect(buildEditorReferenceMessages(request)).toEqual([
+      { role: "system", content: "Card rules.\n\nLore rules." },
+      request[3],
+      request[4],
     ]);
+  });
+
+  it("excludes the target before selecting two prior AI responses and their user inputs", () => {
+    const history: ChatMessage[] = [
+      { role: "user", content: "Old user.", memo: "u0" },
+      { role: "assistant", content: "Old response.", memo: "a0" },
+      { role: "user", content: "First user.", memo: "u1" },
+      { role: "assistant", content: "Repeated response.", memo: "a1" },
+      { role: "user", content: "Second user.", memo: "u2" },
+      { role: "assistant", content: "Repeated response.", memo: "a2" },
+      { role: "user", content: "Current user.", memo: "u3" },
+      { role: "assistant", content: "Target response.", memo: "target" },
+    ];
+    const example: ChatMessage = {
+      role: "assistant",
+      content: "Card example.",
+      name: "example_assistant",
+    };
+    const injection: ChatMessage = {
+      role: "user",
+      content: "Reasoning prompt.",
+      memo: "ff54:absolute:0:100:user",
+    };
+    const request = [example, ...history, injection];
+    expect(
+      buildEditorReferenceMessages(
+        request,
+        "target",
+        history.map((message) => message.memo!),
+      ),
+    ).toEqual([example, ...history.slice(2, -1), injection]);
+    expect(request).toHaveLength(10);
+  });
+
+  it("keeps only the latest user input when no prior AI response is available", () => {
+    const first: ChatMessage = { role: "user", content: "Older input.", memo: "first" };
+    const second: ChatMessage = { role: "user", content: "Current input.", memo: "second" };
+    expect(buildEditorReferenceMessages([first, second])).toEqual([second]);
   });
 });
