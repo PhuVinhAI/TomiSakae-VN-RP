@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   adaptDisplayMarkupForRisuAI,
   adaptVietnameseHeaderForRisuAI,
+  hasCompleteSceneHeader,
+  splitBeforeSceneHeader,
   removeSceneHeadersForRequest,
   applyRegexScripts,
   applyPromptRegexToMessages,
@@ -310,10 +312,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
   });
 
   it("renders a Vietnamese responsive settings UI", async () => {
-    const pluginSource = await readFile(
-      "risuai/tomisakae-vn-rp-plugin/src/plugin.ts",
-      "utf8",
-    );
+    const pluginSource = await readFile("risuai/tomisakae-vn-rp-plugin/src/plugin.ts", "utf8");
     const styles = await readFile("risuai/tomisakae-vn-rp-plugin/src/ui-style.ts", "utf8");
     expect(pluginSource).toContain("Điều khiển <em>TomiSakae VN-RP.</em>");
     expect(pluginSource).toContain('{ name: "TomiSakae VN-RP"');
@@ -551,10 +550,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
   });
 
   it("stores named presets and card assignments in plugin storage and reads legacy settings", async () => {
-    const pluginSource = await readFile(
-      "risuai/tomisakae-vn-rp-plugin/src/plugin.ts",
-      "utf8",
-    );
+    const pluginSource = await readFile("risuai/tomisakae-vn-rp-plugin/src/plugin.ts", "utf8");
     expect(pluginSource).toContain('const STORAGE_KEY = "ff54-global-settings-v1"');
     expect(pluginSource).toContain('location: "chat"');
     expect(pluginSource).toContain("getCurrentCharacterIndex");
@@ -780,6 +776,46 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     const output = adaptVietnameseHeaderForRisuAI(input);
     expect(output).toContain('data-ff54="scene-header"');
     expect(output).toContain("68°F");
+  });
+
+  it("accepts the notepad date icon across rendering and editor header recognition", () => {
+    const header =
+      "[ 🕰️ Thời gian 11:40 SA | 🗒️ Ngày #3 - Chủ Nhật, ngày 16 tháng 03 năm 2025 SCN | 📍 Studio của Ria - Khu giường | 🌤️ Nắng xuân dịu, 12°C ]";
+    for (const value of [header, header.replace("🗒️", "🗒")]) {
+      const output = adaptVietnameseHeaderForRisuAI(value + "\nNội dung nhập vai");
+      expect(output).toContain('data-ff54="scene-header"');
+      expect(output).toContain("Ngày #3 - Chủ Nhật, ngày 16 tháng 03 năm 2025 SCN");
+      expect(output).toContain("Studio của Ria - Khu giường");
+      expect(output).toContain("🌤️ Nắng xuân dịu, 12°C");
+      expect(output).not.toContain(value);
+      expect(hasCompleteSceneHeader(value)).toBe(true);
+      expect(splitBeforeSceneHeader("Planning before header.\n" + value)).toEqual({
+        prefix: "Planning before header.\n",
+        response: value,
+      });
+    }
+  });
+
+  it("preserves notepad headers in saved history and filters only old request headers", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    const header =
+      "[ 🕰️ Thời gian 11:40 SA | 🗒️ Ngày #3 - Chủ Nhật, ngày 16 tháng 03 năm 2025 SCN | 📍 Studio của Ria - Khu giường | 🌤️ Nắng xuân dịu, 12°C ]";
+    const messages = ["old", "recent", "newest"].flatMap((label) => [
+      { role: "assistant" as const, content: `${header}\n${label}` },
+      { role: "user" as const, content: "Tiếp tục." },
+    ]);
+    const saved = applyPromptRegexToMessages(messages, data, settings);
+    expect(
+      saved
+        .filter((message) => message.role === "assistant")
+        .every((message) => message.content.includes(header)),
+    ).toBe(true);
+    const request = applyRequestFiltersToMessages(saved, data, settings);
+    expect(request[0]!.content).toBe("\nold");
+    expect(request[2]!.content).toContain(header);
+    expect(request[4]!.content).toContain(header);
+    expect(messages[0]!.content).toContain(header);
   });
 
   it("renders headers from marker structure without guessing field vocabulary", () => {
