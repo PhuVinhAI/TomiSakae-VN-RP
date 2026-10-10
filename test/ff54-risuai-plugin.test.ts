@@ -796,6 +796,41 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     }
   });
 
+  it("keeps bracketed weather icons inside the complete scene header", () => {
+    const header =
+      "[ 🕰️ Thời gian 08:10 SA | 🗓️ Ngày 1 - Thứ Hai, ngày 05 tháng 09 năm 1911 SCN | 📍 Sankt-Peterburg - Trang đoàn Hoàng gia, Trung sảnh | [🌤️] Trời trong, se lạnh 11°C ]";
+    const input = `${header}\nNội dung nhập vai`;
+    const output = adaptVietnameseHeaderForRisuAI(input);
+    expect(output).toContain(
+      '<div style="overflow-wrap:anywhere;line-height:1.4">[🌤️] Trời trong, se lạnh 11°C</div>',
+    );
+    expect(output.endsWith("</div>\nNội dung nhập vai")).toBe(true);
+    expect(adaptVietnameseHeaderForRisuAI(output)).toBe(output);
+    expect(hasCompleteSceneHeader(header)).toBe(true);
+    expect(splitBeforeSceneHeader(`Planning before header.\n${input}`)).toEqual({
+      prefix: "Planning before header.\n",
+      response: input,
+    });
+    expect(removeSceneHeadersForRequest(input)).toBe("\nNội dung nhập vai");
+    const incomplete = header.slice(0, -1);
+    expect(hasCompleteSceneHeader(incomplete)).toBe(false);
+    expect(adaptVietnameseHeaderForRisuAI(incomplete)).toBe(incomplete);
+  });
+
+  it("preserves bracketed values without consuming following narrative or another header", () => {
+    const header =
+      "[ 🕰️ 08:10 [SA] | 🗓️ Ngày [1] | 📍 Cung điện [Cổng A] | [🌤️] Trời trong [11°C] ]";
+    const narrative = "\n[Thông báo trong truyện]\n";
+    const input = `${header}${narrative}${header}`;
+    const output = adaptVietnameseHeaderForRisuAI(input);
+    expect(output.match(/data-ff54="scene-header"/g)).toHaveLength(2);
+    expect(output).toContain("08:10 [SA]");
+    expect(output).toContain("Cung điện [Cổng A]");
+    expect(output).toContain("[🌤️] Trời trong [11°C]");
+    expect(output).toContain(narrative);
+    expect(removeSceneHeadersForRequest(input)).toBe(narrative);
+  });
+
   it("preserves notepad headers in saved history and filters only old request headers", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);

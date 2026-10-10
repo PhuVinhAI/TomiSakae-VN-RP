@@ -77,7 +77,7 @@ export const PLACEMENT_USER_INPUT = 1;
 export const PLACEMENT_AI_OUTPUT = 2;
 
 const SCENE_HEADER_RE =
-  /\[\s*🕰️\s*([^|\]\r\n]*?)\s*\|\s*(?:🗓|🗒)\uFE0F?\s*([^|\]\r\n]*?)\s*\|\s*📍\s*([^|\]\r\n]*?)\s*\|\s*([^\]\r\n]*?)\s*\]/gu;
+  /\[\s*🕰️\s*((?:\[[^|[\]\r\n]*\]|[^|[\]\r\n])*?)\s*\|\s*(?:🗓|🗒)\uFE0F?\s*((?:\[[^|[\]\r\n]*\]|[^|[\]\r\n])*?)\s*\|\s*📍\s*((?:\[[^|[\]\r\n]*\]|[^|[\]\r\n])*?)\s*\|\s*((?:\[[^[\]\r\n]*\]|[^[\]\r\n])*?)\s*\]/gu;
 const INTERNAL_STATE_BLOCK_RE =
   /(?:<!--\s{0,8}GFX_START\s{0,8}-->\s*)?<internal_states>[\s\S]{0,50000}?(?:<\/internal_states>|$)(?:\s*<!--\s{0,8}GFX_END\s{0,8}-->)?/gi;
 const GFX_MARKER_RE = /<!--\s{0,8}GFX_(START|END)\s{0,8}-->/gi;
