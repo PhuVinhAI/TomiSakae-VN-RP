@@ -504,14 +504,13 @@ describe("FF5.4 Submodel editor integration", () => {
       "use comic timing when it suits the scene",
     );
     expect(options.messages[editorIndex]!.content).toContain(
-      "Translate or polish free-text values, including locations, factions, quests, inventory entries",
+      "Translate or polish all free-text values without changing their meaning or underlying state.",
     );
     expect(options.messages[editorIndex]!.content).toContain(
       "Correct personal pronouns and forms of address to natural contemporary Vietnamese that fit identity, viewpoint, relationship, and tone.",
     );
-    expect(options.messages[editorIndex]!.content).toContain(
-      "Do not add a question, offer, gesture, or unresolved reaction solely to prompt {{user}}.",
-    );
+    expect(options.messages[editorIndex]!.content).not.toContain("- Scene Flow:");
+    expect(options.messages[editorIndex]!.content).not.toContain("- Display Text:");
     expect(options.messages[editorIndex]!.content).not.toContain("Lock all state data:");
     expect(options.messages[editorIndex]!.content).not.toContain("<anime_manga_light_novel_style>");
     expect(
