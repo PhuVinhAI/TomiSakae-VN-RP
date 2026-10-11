@@ -23,6 +23,7 @@ This directory builds a Vietnamese roleplay plugin named **TomiSakae VN-RP**, us
 - The source prompt order, roles, macro fragments, and regex definitions are retained. The plugin defaults to Realism Mode instead of the source preset's Freaky Mode; saved choices remain unchanged.
 - `{{user}}` and `{{char}}` resolve from the active RisuAI persona and character using API v3 methods available in RisuAI 2026.8.250.
 - Prompt regex cleans saved history before a request and filters the request copy. Context Saver removes old `<internal_states>` blocks while preserving story GFX, including letters, signs, maps, and screens. Display regex only changes rendered output.
+- Hapuppy thought display and cleanup remove the source's 20,000-character cap at runtime, so long closed reasoning blocks are still collapsed in the UI and removed from history/requests. Source JSON, supported markers, toggles, and depth rules remain unchanged.
 
 Build from the repository root:
 

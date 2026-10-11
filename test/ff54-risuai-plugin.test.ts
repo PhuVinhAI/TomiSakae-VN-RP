@@ -499,6 +499,65 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     ).toBe(input);
   });
 
+  it.each(["think", "Thoughts", "markdown"])(
+    "wraps and removes long closed reasoning without touching the response (%s)",
+    async (format) => {
+      const data = await preset();
+      const snapshot = JSON.stringify(data.extensions!.regex_scripts);
+      const settings = createDefaultSettings(data);
+      const reasoning = "Long provider reasoning. ".repeat(1300);
+      const block =
+        format === "markdown"
+          ? `### Reasoning\n${reasoning}\n### Response\n`
+          : `<${format}>${reasoning}</${format}>\n`;
+      const response =
+        "[ 🕰️ Thời gian 15:35 CH | 🗓️ Ngày 1 | 📍 Quán cà phê | ☀️ Nắng, 32°C ]\nNội dung nhập vai";
+      const input = block + response;
+      const messages = [{ role: "assistant" as const, content: input }];
+      const display = applyRegexScripts(input, data, settings, {
+        placement: 2,
+        markdown: true,
+        depth: 0,
+      });
+      expect(reasoning.length).toBeGreaterThan(20000);
+      expect(display).toContain("💭 Thoughts</summary>");
+      expect(display).toContain(reasoning);
+      expect(display).toContain(response);
+      expect(display).not.toContain(`<${format}>`);
+      expect(applyPromptRegexToMessages(messages, data, settings)[0]!.content.trim()).toBe(
+        response,
+      );
+      expect(applyRequestFiltersToMessages(messages, data, settings)[0]!.content.trim()).toBe(
+        response,
+      );
+      expect(JSON.stringify(data.extensions!.regex_scripts)).toBe(snapshot);
+    },
+  );
+
+  it("respects Hapuppy toggles and keeps unclosed reasoning unchanged", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    const reasoning = "Long provider reasoning. ".repeat(1300);
+    const input = `<think>${reasoning}</think>\nNội dung nhập vai`;
+    settings.regexEnabled["99f0756c-bfba-486f-916f-34e3cfb59e21"] = false;
+    settings.regexEnabled["ef99245c-ffe5-434c-b08c-fe68aa95e2c3"] = false;
+    expect(applyRegexScripts(input, data, settings, { placement: 2, markdown: true })).toBe(input);
+    expect(
+      applyPromptRegexToMessages([{ role: "assistant", content: input }], data, settings)[0]!
+        .content,
+    ).toBe(input);
+    settings.regexEnabled["99f0756c-bfba-486f-916f-34e3cfb59e21"] = true;
+    settings.regexEnabled["ef99245c-ffe5-434c-b08c-fe68aa95e2c3"] = true;
+    const unclosed = `<think>${reasoning}\nNội dung nhập vai`;
+    expect(applyRegexScripts(unclosed, data, settings, { placement: 2, markdown: true })).toBe(
+      unclosed,
+    );
+    expect(
+      applyPromptRegexToMessages([{ role: "assistant", content: unclosed }], data, settings)[0]!
+        .content,
+    ).toBe(unclosed);
+  });
+
   it("keeps the untagged-thought filter compatible with the Vietnamese header", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);

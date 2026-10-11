@@ -565,7 +565,14 @@ export function applyRegexScripts(
     const localized = settings.vietnameseOutputEnabled
       ? adaptRegexForVietnamese(script.findRegex, String(script.replaceString ?? ""))
       : { findRegex: script.findRegex, replaceString: String(script.replaceString ?? "") };
-    const regex = parseRegexLiteral(localized.findRegex);
+    // Provider reasoning can exceed the source's 20,000-character cap.
+    // Keep Hapuppy's closing-tag boundaries and toggle/depth rules intact.
+    const findRegex =
+      script.scriptName === "Hapuppy Delete Thoughts" ||
+      script.scriptName === "Hapuppy Hide Thoughts"
+        ? localized.findRegex.replaceAll("[\\s\\S]{0,20000}?", "[\\s\\S]*?")
+        : localized.findRegex;
+    const regex = parseRegexLiteral(findRegex);
     if (!regex) continue;
     // RisuAI gives nested quote/emphasis elements their own theme colors.
     // Scope those variables to the dialogue span so they keep the source color.
