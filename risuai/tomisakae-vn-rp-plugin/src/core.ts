@@ -58,6 +58,8 @@ export interface FfGlobalSettings {
   regexEnabled: Record<string, boolean>;
   vietnameseOutputEnabled: boolean;
   soundNotificationsEnabled: boolean;
+  submodelEditorEnabled: boolean;
+  submodelAutoRewriteEnabled: boolean;
 }
 
 export interface MacroContext {
@@ -131,6 +133,8 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
     ),
     vietnameseOutputEnabled: true,
     soundNotificationsEnabled: false,
+    submodelEditorEnabled: false,
+    submodelAutoRewriteEnabled: false,
   };
 }
 
@@ -163,6 +167,12 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
   }
   if (typeof record.soundNotificationsEnabled === "boolean") {
     defaults.soundNotificationsEnabled = record.soundNotificationsEnabled;
+  }
+  if (typeof record.submodelEditorEnabled === "boolean") {
+    defaults.submodelEditorEnabled = record.submodelEditorEnabled;
+  }
+  if (typeof record.submodelAutoRewriteEnabled === "boolean") {
+    defaults.submodelAutoRewriteEnabled = record.submodelAutoRewriteEnabled;
   }
   return defaults;
 }
@@ -613,6 +623,19 @@ export function adaptVietnameseHeaderForRisuAI(input: string): string {
 /** Remove scene headers from the request copy; saved history remains unchanged. */
 export function removeSceneHeadersForRequest(input: string): string {
   return input.replace(SCENE_HEADER_RE, "");
+}
+
+/** Recognize a closed scene header with all four display values present. */
+export function hasCompleteSceneHeader(input: string): boolean {
+  const header = new RegExp(SCENE_HEADER_RE.source, SCENE_HEADER_RE.flags).exec(input);
+  return header !== null && header.slice(1).every((value) => value.trim().length > 0);
+}
+
+/** Keep the complete response starting at the same header recognized by the renderer. */
+export function splitBeforeSceneHeader(input: string): { prefix: string; response: string } {
+  const header = new RegExp(SCENE_HEADER_RE.source, SCENE_HEADER_RE.flags).exec(input);
+  const index = header?.index ?? 0;
+  return { prefix: input.slice(0, index), response: input.slice(index) };
 }
 
 function messageDepths(messages: ChatMessage[]): Map<ChatMessage, number> {

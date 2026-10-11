@@ -328,60 +328,6 @@ async function startPlugin(savedPresets?: unknown, sound = false, legacySettings
   };
 }
 
-describe("Removed Submodel editing", () => {
-  it.each(["legacy", "presets"])(
-    "discards old %s settings and leaves completed responses and swipes untouched",
-    async (format) => {
-      const obsolete = {
-        submodelEditorEnabled: true,
-        submodelAutoRewriteEnabled: true,
-      };
-      const saved =
-        format === "presets"
-          ? {
-              version: 1,
-              presets: [{ id: "default", name: "Mặc định", settings: obsolete }],
-              cardPresets: {},
-            }
-          : undefined;
-      const plugin = await startPlugin(saved, false, format === "legacy" ? obsolete : undefined);
-      const normalized = plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY) as {
-        presets: Array<{ settings: Record<string, unknown> }>;
-      };
-      expect(normalized.presets[0]!.settings).not.toHaveProperty("submodelEditorEnabled");
-      expect(normalized.presets[0]!.settings).not.toHaveProperty("submodelAutoRewriteEnabled");
-      await plugin.settingsUi();
-      expect(plugin.toggle("submodel-editor")).toBeUndefined();
-      expect(plugin.toggle("submodel-auto-rewrite")).toBeUndefined();
-      const request = await plugin.request();
-      expect(request.some((message) => message.content.includes("<vietnamese_editor>"))).toBe(
-        false,
-      );
-      const original =
-        "[ 🕰️ 14:25 | 🗓️ Ngày 1 | 📍 Đại học | Nắng ]\nAn bước tới.\n<internal_states>Bond: 3</internal_states>";
-      await plugin.complete(original);
-      const chat = plugin.chats.get("0:0")!;
-      const target = chat.message.at(-1)!;
-      target.swipes = ["Bản gốc khác.", original];
-      target.swipeId = 1;
-      const snapshot = structuredClone(chat);
-      await plugin.callbacks.output!({
-        characterIndex: 0,
-        chatIndex: 0,
-        messageIndex: chat.message.length - 1,
-        chat: structuredClone(chat),
-        char: {},
-      });
-      expect(plugin.chats.get("0:0")).toEqual(snapshot);
-      expect(plugin.writes).not.toHaveBeenCalled();
-      expect(plugin.runModel).not.toHaveBeenCalled();
-      expect(plugin.api.createMutationObserver).not.toHaveBeenCalled();
-      expect(plugin.api.getRootDocument).not.toHaveBeenCalled();
-      await plugin.callbacks.unload!();
-    },
-  );
-});
-
 describe("Named presets in plugin UI and requests", () => {
   it("previews added prompt tokens immediately from UI drafts without making a request or saving", async () => {
     const plugin = await startPlugin();

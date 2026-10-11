@@ -24,6 +24,8 @@ describe("FF5.4 configuration presets", () => {
       vietnameseOutputEnabled: false,
       animeMangaLightNovelStyleEnabled: false,
       vietnameseNaturalWritingEnabled: false,
+      submodelEditorEnabled: true,
+      submodelAutoRewriteEnabled: true,
     };
     const store = normalizePresetStore(source, undefined, legacy);
     expect(store.presets).toHaveLength(1);
@@ -31,6 +33,8 @@ describe("FF5.4 configuration presets", () => {
     expect(presetForCard(store, "new-card").settings).toMatchObject({
       enabled: false,
       vietnameseOutputEnabled: false,
+      submodelEditorEnabled: true,
+      submodelAutoRewriteEnabled: true,
     });
     expect(presetForCard(store, "new-card").settings).not.toHaveProperty(
       "animeMangaLightNovelStyleEnabled",
@@ -98,7 +102,7 @@ describe("FF5.4 configuration presets", () => {
     const store = normalizePresetStore(source, {
       version: 1,
       presets: [
-        { id: "default", name: "Old name", settings: { soundNotificationsEnabled: true } },
+        { id: "default", name: "Old name", settings: { submodelAutoRewriteEnabled: true } },
         { id: "custom", name: "Tên riêng", settings: { enabled: false } },
         { id: "custom", name: "Duplicate", settings: {} },
         { id: "broken", name: "", settings: {} },
@@ -108,7 +112,7 @@ describe("FF5.4 configuration presets", () => {
     expect(store.presets).toHaveLength(2);
     expect(store.presets[0]!.name).toBe("Mặc định");
     expect(presetForCard(store, "a").settings.enabled).toBe(false);
-    expect(presetForCard(store, "b").settings.soundNotificationsEnabled).toBe(true);
+    expect(presetForCard(store, "b").settings.submodelAutoRewriteEnabled).toBe(true);
     expect(() => selectCardPreset(store, "a", "deleted")).toThrow("Không tìm thấy");
   });
 });
