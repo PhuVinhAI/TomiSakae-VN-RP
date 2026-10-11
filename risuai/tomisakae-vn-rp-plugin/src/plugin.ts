@@ -345,9 +345,11 @@ function tokenEstimateHtml(estimate: PluginTokenEstimate): string {
       const name =
         entry.identifier === "vietnamese-output"
           ? "🇻🇳 Đầu ra tiếng Việt"
-          : prompt
-            ? promptUiCopy(prompt).name
-            : entry.identifier;
+          : entry.identifier === "image-optimization"
+            ? "🖼️ Tối ưu hình ảnh theo card"
+            : prompt
+              ? promptUiCopy(prompt).name
+              : entry.identifier;
       return `<div class="token-row"><span>${escapeHtml(name)}</span><strong>≈ ${number(entry.tokens)}</strong></div>`;
     })
     .join("");
@@ -544,6 +546,12 @@ async function showSettings(): Promise<void> {
       "Viết tiếng Việt tự nhiên; bản địa hóa mẫu và từ vựng có thể đi vào phản hồi ở mọi CoT liên quan · Mặc định bật",
     )}${checkbox(
       "plugin",
+      "image-optimization",
+      settings.imageOptimizationEnabled,
+      "🖼️ Tối ưu hình ảnh theo card",
+      "Chọn ảnh đúng trạng thái và trang phục theo card/lore; đặt sát đoạn phù hợp, đa dạng xuyên suốt phản hồi, không đặt hai ảnh liên tiếp · Mặc định tắt",
+    )}${checkbox(
+      "plugin",
       "sound-notifications",
       settings.soundNotificationsEnabled,
       "🔔 Âm báo hoàn tất",
@@ -586,6 +594,7 @@ async function showSettings(): Promise<void> {
       if (node.dataset.kind === "prompt") settings.promptEnabled[id] = node.checked;
       else if (node.dataset.kind === "regex") settings.regexEnabled[id] = node.checked;
       else if (id === "vietnamese-output") settings.vietnameseOutputEnabled = node.checked;
+      else if (id === "image-optimization") settings.imageOptimizationEnabled = node.checked;
       else if (id === "sound-notifications") settings.soundNotificationsEnabled = node.checked;
       else if (id === "submodel-editor") settings.submodelEditorEnabled = node.checked;
       else if (id === "submodel-auto-rewrite") settings.submodelAutoRewriteEnabled = node.checked;
@@ -636,7 +645,11 @@ async function showSettings(): Promise<void> {
   for (const node of document.querySelectorAll<HTMLInputElement>(
     'input[type="checkbox"][data-kind]',
   )) {
-    if (node.dataset.kind === "prompt" || node.dataset.id === "vietnamese-output")
+    if (
+      node.dataset.kind === "prompt" ||
+      node.dataset.id === "vietnamese-output" ||
+      node.dataset.id === "image-optimization"
+    )
       node.addEventListener("change", refreshTokenEstimateFromUi);
   }
   document

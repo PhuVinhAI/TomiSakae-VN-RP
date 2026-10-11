@@ -77,6 +77,7 @@ describe("Plugin dashboard token estimates", () => {
       ) as FfPreset;
       const settings = createDefaultSettings(preset);
       settings.vietnameseOutputEnabled = vietnamese;
+      settings.imageOptimizationEnabled = true;
       const estimate = await estimatePluginPromptTokens(preset, settings, host);
       const request = await buildRequestMessages(
         [
@@ -94,6 +95,9 @@ describe("Plugin dashboard token estimates", () => {
         added.reduce((total, message) => total + tokenCount(message.content), 0),
       );
       expect(estimate.messageCount).toBe(added.length);
+      expect(
+        estimate.entries.filter((entry) => entry.identifier === "image-optimization"),
+      ).toHaveLength(1);
       expect(estimate.entries.some((entry) => entry.identifier === "vietnamese-output")).toBe(
         vietnamese,
       );

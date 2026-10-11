@@ -1047,6 +1047,34 @@ describe("FF5.4 Submodel editor integration", () => {
 });
 
 describe("Named presets in plugin UI and requests", () => {
+  it("saves the image module per preset and restores its toggle after reload", async () => {
+    const plugin = await startPlugin(false);
+    await plugin.settingsUi();
+    expect(plugin.toggle("image-optimization").checked).toBe(false);
+    plugin.toggle("image-optimization").checked = true;
+    expect(
+      (await plugin.request()).some((message) => message.memo === "ff54:image-optimization"),
+    ).toBe(false);
+    await plugin.uiEvent("save");
+    expect(
+      (await plugin.request()).filter((message) => message.memo === "ff54:image-optimization"),
+    ).toHaveLength(1);
+    const reloaded = await startPlugin(
+      false,
+      false,
+      plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY),
+    );
+    await reloaded.settingsUi();
+    expect(reloaded.toggle("image-optimization").checked).toBe(true);
+    reloaded.toggle("image-optimization").checked = false;
+    await reloaded.uiEvent("save");
+    expect(
+      (await reloaded.request()).some((message) => message.memo === "ff54:image-optimization"),
+    ).toBe(false);
+    await plugin.callbacks.unload!();
+    await reloaded.callbacks.unload!();
+  });
+
   it("creates and saves a named preset without changing Mặc định, then remembers it after reload", async () => {
     const plugin = await startPlugin();
     await plugin.settingsUi();

@@ -59,6 +59,12 @@ export async function estimatePluginPromptTokens(
     },
   );
   const messages = [...composed.leading, ...composed.absolute, ...composed.trailing];
+  const imagePrompt = composed.leading.find(
+    (message) => message.memo === "ff54:image-optimization",
+  );
+  if (imagePrompt) {
+    estimate.entries.push({ identifier: "image-optimization", tokens: count(imagePrompt.content) });
+  }
   if (settings.vietnameseOutputEnabled) {
     messages.push({ role: "system", content: VIETNAMESE_OUTPUT_PROMPT });
     estimate.entries.push({
