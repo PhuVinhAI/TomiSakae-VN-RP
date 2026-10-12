@@ -24,6 +24,7 @@ import {
   VIETNAMESE_REASONING_REPLACEMENTS,
 } from "../risuai/tomisakae-vn-rp-plugin/src/vietnamese.js";
 import { buildVietnameseComparison } from "../scripts/build-ff54-vietnamese-comparison.js";
+import { DIALOGUE_COLORS } from "../risuai/tomisakae-vn-rp-plugin/src/dialogue-colors.js";
 import {
   EXCLUSIVE_PROMPT_GROUPS,
   HOST_MARKER_IDS,
@@ -440,18 +441,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     const data = await preset();
     const originalScripts = JSON.stringify(data.extensions!.regex_scripts);
     const settings = createDefaultSettings(data);
-    const colors = [
-      "cyan",
-      "pink",
-      "teal",
-      "orange",
-      "gold",
-      "violet",
-      "salmon",
-      "orchid",
-      "yellow",
-      "plum",
-    ];
+    const colors = Object.keys(DIALOGUE_COLORS);
     const tones = ["", ":whisper", ":measured", ":shout", ":tremble"];
     for (const vietnameseEnabled of [false, true]) {
       settings.vietnameseOutputEnabled = vietnameseEnabled;

@@ -329,6 +329,29 @@ async function startPlugin(savedPresets?: unknown, sound = false, legacySettings
 }
 
 describe("Named presets in plugin UI and requests", () => {
+  it("reads theme changes on each request and survives unavailable theme APIs", async () => {
+    const plugin = await startPlugin();
+    const api = plugin.api as typeof plugin.api & { getColorScheme?: () => Promise<unknown> };
+    const themeApi = vi.fn().mockResolvedValue({ scheme: { type: "light", bgcolor: "#ffffff" } });
+    api.getColorScheme = themeApi;
+    const palette = (messages: ChatMessage[]) =>
+      messages.find((message) => message.content.includes("Must replace color in tag with:"))!
+        .content;
+    const light = palette(await plugin.request());
+    expect(light).toContain("Must replace color in tag with: teal, royalblue");
+    expect(light).not.toContain("cyan,");
+    themeApi.mockResolvedValue({ scheme: { type: "dark", bgcolor: "#282a36" } });
+    const dark = palette(await plugin.request());
+    expect(dark).toContain("Must replace color in tag with: cyan, pink, orange");
+    expect(themeApi).toHaveBeenCalledTimes(2);
+    themeApi.mockRejectedValue(new Error("Unavailable"));
+    const fallback = palette(await plugin.request());
+    expect(fallback).toContain("Must replace color in tag with: cyan, pink, teal, orange");
+    delete api.getColorScheme;
+    expect(palette(await plugin.request())).toBe(fallback);
+    await plugin.callbacks.unload!();
+  });
+
   it("previews added prompt tokens immediately from UI drafts without making a request or saving", async () => {
     const plugin = await startPlugin();
     await plugin.settingsUi();

@@ -78,7 +78,11 @@ describe("Plugin dashboard token estimates", () => {
       const settings = createDefaultSettings(preset);
       settings.vietnameseOutputEnabled = vietnamese;
       settings.imageOptimizationEnabled = true;
-      const estimate = await estimatePluginPromptTokens(preset, settings, host);
+      const themedHost = {
+        ...host,
+        dialogueTheme: { type: "light" as const, background: "#ffffff" },
+      };
+      const estimate = await estimatePluginPromptTokens(preset, settings, themedHost);
       const request = await buildRequestMessages(
         [
           { role: "system", content: "Card, lore, memory: must not count." },
@@ -88,7 +92,7 @@ describe("Plugin dashboard token estimates", () => {
         preset,
         settings,
         async (text) => expandHostMacros(text, host),
-        { randomInt: (minimum) => minimum },
+        { randomInt: (minimum) => minimum, dialogueTheme: themedHost.dialogueTheme },
       );
       const added = request.filter((message) => message.memo?.startsWith("ff54:"));
       expect(estimate.contentTokens).toBe(

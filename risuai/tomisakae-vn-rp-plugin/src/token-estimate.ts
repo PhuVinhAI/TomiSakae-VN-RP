@@ -53,7 +53,10 @@ export async function estimatePluginPromptTokens(
     settings,
     async (content) => expandHostMacros(content, hostContext),
     // Preview must not roll dice or affect the values used for actual generation.
-    { randomInt: (minimum) => minimum },
+    {
+      randomInt: (minimum) => minimum,
+      ...(hostContext.dialogueTheme ? { dialogueTheme: hostContext.dialogueTheme } : {}),
+    },
     (message, prompt) => {
       estimate.entries.push({ identifier: prompt.identifier, tokens: count(message.content) });
     },

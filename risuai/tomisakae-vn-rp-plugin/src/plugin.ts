@@ -12,7 +12,9 @@ import {
   type ChatMessage,
   type FfGlobalSettings,
   type FfPreset,
+  type HostMacroContext,
 } from "./core.js";
+import { resolveDialogueTheme } from "./dialogue-colors.js";
 import {
   allExclusivePromptIds,
   allSectionPromptIds,
@@ -62,6 +64,7 @@ declare const Risuai: {
   hideContainer(): Promise<void>;
   getCharacter(): Promise<HostCharacter | null>;
   getDatabase(includeOnly?: string[] | "all"): Promise<HostDatabase | null>;
+  getColorScheme?(): Promise<{ scheme: unknown }>;
   getCurrentCharacterIndex(): Promise<number>;
   getCurrentChatIndex(): Promise<number>;
   getChatFromIndex(characterIndex: number, chatIndex: number): Promise<HostChatSnapshot | null>;
@@ -747,17 +750,19 @@ function mainGeneration(type: string): boolean {
   return type === "model";
 }
 
-async function getHostMacroContext(character: HostCharacter | null): Promise<{
-  characterName: string;
-  maxContext?: number;
-  maxResponse?: number;
-  userName: string;
-}> {
-  const database = await Risuai.getDatabase([
-    "personas",
-    "selectedPersona",
-    "maxContext",
-    "maxResponse",
+async function getHostDialogueTheme() {
+  try {
+    const colors = await Risuai.getColorScheme?.();
+    return resolveDialogueTheme(colors?.scheme);
+  } catch {
+    return undefined;
+  }
+}
+
+async function getHostMacroContext(character: HostCharacter | null): Promise<HostMacroContext> {
+  const [database, dialogueTheme] = await Promise.all([
+    Risuai.getDatabase(["personas", "selectedPersona", "maxContext", "maxResponse"]),
+    getHostDialogueTheme(),
   ]);
   const characterName = character?.nickname || character?.name || "Character";
   const activeChat = character?.chats?.[character.chatPage ?? 0];
@@ -771,6 +776,7 @@ async function getHostMacroContext(character: HostCharacter | null): Promise<{
     ...(database?.maxContext !== undefined ? { maxContext: database.maxContext } : {}),
     ...(database?.maxResponse !== undefined ? { maxResponse: database.maxResponse } : {}),
     userName,
+    ...(dialogueTheme ? { dialogueTheme } : {}),
   };
 }
 
@@ -827,8 +833,12 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
   if (!settings.enabled) return messages;
   await cleanSavedHistoryOnce(settings, characterIndex, chatIndex);
   const macroContext = await getHostMacroContext(character);
-  const built = await buildRequestMessages(messages, preset, settings, async (content) =>
-    expandHostMacros(content, macroContext),
+  const built = await buildRequestMessages(
+    messages,
+    preset,
+    settings,
+    async (content) => expandHostMacros(content, macroContext),
+    macroContext.dialogueTheme ? { dialogueTheme: macroContext.dialogueTheme } : {},
   );
   if (editorListenerRegistered) {
     try {

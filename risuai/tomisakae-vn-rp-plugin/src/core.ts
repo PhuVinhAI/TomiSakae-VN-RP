@@ -1,5 +1,10 @@
 import { adaptPromptForVietnamese, VIETNAMESE_OUTPUT_PROMPT } from "./vietnamese.js";
 import { addImageReasoningGuidance, IMAGE_OPTIMIZATION_PROMPT } from "./image.js";
+import {
+  adaptDialogueColors,
+  adaptDialogueColorRegex,
+  type DialogueTheme,
+} from "./dialogue-colors.js";
 
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
@@ -66,6 +71,7 @@ export interface FfGlobalSettings {
 
 export interface MacroContext {
   randomInt?: (minimum: number, maximum: number) => number;
+  dialogueTheme?: DialogueTheme;
 }
 
 export interface HostMacroContext {
@@ -73,6 +79,7 @@ export interface HostMacroContext {
   maxContext?: number;
   maxResponse?: number;
   userName: string;
+  dialogueTheme?: DialogueTheme;
 }
 
 export const PLACEMENT_USER_INPUT = 1;
@@ -402,6 +409,9 @@ export function composePresetPrompts(
       if (settings.imageOptimizationEnabled && promptRole(prompt) === "user") {
         sourceContent = addImageReasoningGuidance(sourceContent);
       }
+      if (promptRole(prompt) === "system") {
+        sourceContent = adaptDialogueColors(sourceContent, macroContext.dialogueTheme);
+      }
       let content = expandSourceMacros(sourceContent, variables, macroContext);
       content = await parseHostMacros(content, promptRole(prompt));
       if (!content.trim()) continue;
@@ -588,7 +598,9 @@ export function applyRegexScripts(
       script.scriptName === "Hapuppy Hide Thoughts"
         ? localized.findRegex.replaceAll("[\\s\\S]{0,20000}?", "[\\s\\S]*?")
         : localized.findRegex;
-    const regex = parseRegexLiteral(findRegex);
+    const regex = parseRegexLiteral(
+      options.markdown ? adaptDialogueColorRegex(findRegex) : findRegex,
+    );
     if (!regex) continue;
     // RisuAI gives nested quote/emphasis elements their own theme colors.
     // Scope those variables to the dialogue span so they keep the source color.
