@@ -91,6 +91,12 @@ const INTERNAL_STATE_BLOCK_RE =
   /(?:<!--\s{0,8}GFX_START\s{0,8}-->\s*)?<internal_states>[\s\S]{0,50000}?(?:<\/internal_states>|$)(?:\s*<!--\s{0,8}GFX_END\s{0,8}-->)?/gi;
 const GFX_MARKER_RE = /<!--\s{0,8}GFX_(START|END)\s{0,8}-->/gi;
 
+/** Return the complete internal-state block before Context Saver removes it. */
+export function extractInternalStateBlock(input: string): string | undefined {
+  const matcher = new RegExp(INTERNAL_STATE_BLOCK_RE.source, INTERNAL_STATE_BLOCK_RE.flags);
+  return matcher.exec(input)?.[0];
+}
+
 function removeOrphanTrailingGfxEnd(input: string): string {
   let output = input;
   while (true) {
@@ -694,6 +700,34 @@ function assistantResponseDepths(messages: ChatMessage[]): Map<ChatMessage, numb
     if (message.role === "assistant") assistantDepth += 1;
   }
   return depths;
+}
+
+/**
+ * Context Saver keeps the same state that would survive the normal prompt
+ * cleanup at this response depth. This is shared with the history snapshot
+ * layer so restoring a deleted/branched history does not expose an old state
+ * that the configured minDepth would immediately remove again.
+ */
+export function keepsInternalStateInHistory(
+  messages: ChatMessage[],
+  target: ChatMessage,
+  preset: FfPreset,
+  settings: FfGlobalSettings,
+): boolean {
+  const contextSaver = (preset.extensions?.regex_scripts ?? []).find(
+    (script) => script.scriptName === "FF5 - Context Saver (Universal)",
+  );
+  if (
+    contextSaver === undefined ||
+    settings.regexEnabled[contextSaver.id] !== true ||
+    contextSaver.disabled ||
+    contextSaver.promptOnly !== true ||
+    contextSaver.markdownOnly === true ||
+    contextSaver.placement?.includes(PLACEMENT_AI_OUTPUT) !== true
+  )
+    return true;
+  const depth = assistantResponseDepths(messages).get(target);
+  return !depthAllowed(contextSaver, depth);
 }
 
 export function applyRequestFiltersToMessages(

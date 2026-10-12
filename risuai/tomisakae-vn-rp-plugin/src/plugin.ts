@@ -7,6 +7,8 @@ import {
   expandHostMacros,
   PLACEMENT_AI_OUTPUT,
   applyPromptRegexToMessages,
+  extractInternalStateBlock,
+  keepsInternalStateInHistory,
   splitBeforeSceneHeader,
   hasCompleteSceneHeader,
   type ChatMessage,
@@ -119,6 +121,8 @@ interface HostChatMessage {
   data?: string;
   swipes?: string[];
   swipeId?: number;
+  /** Hidden snapshot kept so an older/branched history can restore its state. */
+  ff54InternalState?: string;
   [key: string]: unknown;
 }
 
@@ -782,43 +786,159 @@ async function getHostMacroContext(character: HostCharacter | null): Promise<Hos
 
 const historyCleanups = new Map<string, Promise<void>>();
 
+function appendInternalState(content: string, state: string): string {
+  if (/<internal_states\b/i.test(content)) return content;
+  const body = content.trimEnd();
+  return body ? `${body}\n${state}` : state;
+}
+
+function savedHistorySignature(chat: HostChatSnapshot): string {
+  return [String(chat.id ?? ""), ...(chat.message ?? [])
+    .map((entry) =>
+      [
+        entry.chatId ?? "",
+        entry.role ?? "",
+        String(entry.data ?? ""),
+        entry.swipeId ?? "",
+        entry.swipes?.length ?? 0,
+        entry.ff54InternalState ?? "",
+      ].join("\u0001"),
+    )].join("\u0002");
+}
+
+function syncRestoredStatesToRequest(
+  messages: ChatMessage[],
+  chat: HostChatSnapshot,
+): ChatMessage[] {
+  const assistantHistory = (chat.message ?? []).filter((entry) => entry.role === "char");
+  const used = new Set<number>();
+  return messages.map((message) => {
+    if (message.role !== "assistant" || String(message.memo ?? "").startsWith("ff54:"))
+      return message;
+    const matchIndex = assistantHistory.findIndex((entry, index) => {
+      if (used.has(index)) return false;
+      const data = String(entry.data ?? "");
+      if (data === message.content) return true;
+      const state = extractInternalStateBlock(data);
+      return state !== undefined && data.replace(state, "").trimEnd() === message.content.trimEnd();
+    });
+    if (matchIndex < 0) return message;
+    used.add(matchIndex);
+    const restored = String(assistantHistory[matchIndex]?.data ?? "");
+    return restored && restored !== message.content ? { ...message, content: restored } : message;
+  });
+}
+
 async function cleanSavedHistory(
   settings: FfGlobalSettings,
   characterIndex: number,
   chatIndex: number,
+  skipStreaming = false,
 ): Promise<void> {
   const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
-  if (!chat?.message?.length) return;
+  if (!chat?.message?.length || (skipStreaming && chat.isStreaming)) return;
+  const sourceSignature = savedHistorySignature(chat);
 
   const sourceMessages: ChatMessage[] = chat.message.map((message) => ({
     role: message.role === "char" ? "assistant" : "user",
     content: String(message.data ?? ""),
   }));
-  const cleanedMessages = applyPromptRegexToMessages(sourceMessages, preset, settings);
   let changed = false;
+  const restoredMessages = sourceMessages.map((source, index) => {
+    const entry = chat.message![index]!;
+    if (source.role !== "assistant") return source;
+    const currentState = extractInternalStateBlock(source.content);
+    const storedState =
+      typeof entry.ff54InternalState === "string" && entry.ff54InternalState.trim()
+        ? entry.ff54InternalState
+        : undefined;
+    if (currentState && currentState !== storedState) {
+      entry.ff54InternalState = currentState;
+      changed = true;
+    }
+    const state = currentState ?? storedState;
+    if (!state || !keepsInternalStateInHistory(sourceMessages, source, preset, settings))
+      return source;
+    const restored = appendInternalState(source.content, state);
+    return restored === source.content ? source : { ...source, content: restored };
+  });
+  const cleanedMessages = applyPromptRegexToMessages(restoredMessages, preset, settings);
   const message = chat.message.map((entry, index) => {
     const content = cleanedMessages[index]?.content ?? String(entry.data ?? "");
     if (content !== String(entry.data ?? "")) changed = true;
     return content === entry.data ? entry : { ...entry, data: content };
   });
-  if (changed) await Risuai.setChatToIndex(characterIndex, chatIndex, { ...chat, message });
+  if (changed) {
+    const latest = await Risuai.getChatFromIndex(characterIndex, chatIndex);
+    if (
+      !latest ||
+      (skipStreaming && latest.isStreaming) ||
+      savedHistorySignature(latest) !== sourceSignature
+    )
+      return;
+    await Risuai.setChatToIndex(characterIndex, chatIndex, { ...chat, message });
+  }
 }
 
 async function cleanSavedHistoryOnce(
   settings: FfGlobalSettings,
   characterIndex: number,
   chatIndex: number,
+  skipStreaming = false,
 ): Promise<void> {
   const key = editorChatKey(characterIndex, chatIndex);
   if (!historyCleanups.has(key)) {
     historyCleanups.set(
       key,
-      cleanSavedHistory(settings, characterIndex, chatIndex).finally(() => {
+      cleanSavedHistory(settings, characterIndex, chatIndex, skipStreaming).finally(() => {
         historyCleanups.delete(key);
       }),
     );
   }
   await historyCleanups.get(key);
+}
+
+let historyRestoreTimer: unknown;
+
+async function restoreActiveHistory(): Promise<void> {
+  if (pluginUnloaded) return;
+  const [character, characterIndex, chatIndex] = await Promise.all([
+    Risuai.getCharacter(),
+    Risuai.getCurrentCharacterIndex(),
+    Risuai.getCurrentChatIndex(),
+  ]);
+  cardIdsByIndex.set(characterIndex, character?.chaId);
+  const settings = presetForCard(configPresets, character?.chaId).settings;
+  if (!settings.enabled) return;
+  await cleanSavedHistoryOnce(settings, characterIndex, chatIndex, true);
+}
+
+function startHistoryRestoreWatcher(): void {
+  const globals = globalThis as unknown as {
+    setInterval?: (callback: () => void, timeout: number) => unknown;
+  };
+  if (typeof globals.setInterval !== "function") return;
+  // PocketRisu has no public chat-delete/branch event. Polling the active
+  // snapshot lets a deletion, swipe change, or new branch restore its nearest
+  // retained internal state back into the visible history without waiting for
+  // another request.
+  void restoreActiveHistory().catch((error) =>
+    console.warn("[TomiSakae VN-RP] Could not restore active history.", error),
+  );
+  historyRestoreTimer = globals.setInterval(() => {
+    void restoreActiveHistory().catch((error) =>
+      console.warn("[TomiSakae VN-RP] Could not restore active history.", error),
+    );
+  }, 250);
+}
+
+function stopHistoryRestoreWatcher(): void {
+  const globals = globalThis as unknown as {
+    clearInterval?: (timer: unknown) => void;
+  };
+  if (historyRestoreTimer !== undefined && typeof globals.clearInterval === "function")
+    globals.clearInterval(historyRestoreTimer);
+  historyRestoreTimer = undefined;
 }
 
 const beforeRequest = async (messages: ChatMessage[], type: string): Promise<ChatMessage[]> => {
@@ -832,9 +952,13 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
   const settings = presetForCard(configPresets, character?.chaId).settings;
   if (!settings.enabled) return messages;
   await cleanSavedHistoryOnce(settings, characterIndex, chatIndex);
+  const restoredChat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
+  const requestMessages = restoredChat
+    ? syncRestoredStatesToRequest(messages, restoredChat)
+    : messages;
   const macroContext = await getHostMacroContext(character);
   const built = await buildRequestMessages(
-    messages,
+    requestMessages,
     preset,
     settings,
     async (content) => expandHostMacros(content, macroContext),
@@ -1275,9 +1399,11 @@ void (async () => {
   } catch (error) {
     console.warn("[TomiSakae VN-RP] Submodel editor requires PocketRisu's chat output API.", error);
   }
+  startHistoryRestoreWatcher();
   await syncEditorButton();
   await Risuai.onUnload(async () => {
     pluginUnloaded = true;
+    stopHistoryRestoreWatcher();
     mainCompletionMonitor.dispose();
     await notificationAudio?.close?.().catch(() => {});
     const unregisterEditor = editorListenerRegistered;
