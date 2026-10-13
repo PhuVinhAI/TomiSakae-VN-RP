@@ -20,6 +20,7 @@ import { resolveDialogueTheme } from "./dialogue-colors.js";
 import { promptUiCopy, regexUiCopy, type ExclusivePromptGroup } from "./ui-vi.js";
 import {
   PRESET_FAMILIES,
+  familyPrompts,
   familyOf,
   normalizePresetFamily,
   presetOrder,
@@ -321,7 +322,7 @@ function orderEntries(preset: FfPreset) {
 }
 
 function promptById(preset: FfPreset) {
-  return new Map(preset.prompts.map((prompt) => [prompt.identifier, prompt]));
+  return new Map(familyPrompts(preset).map((prompt) => [prompt.identifier, prompt]));
 }
 
 async function saveSettings(): Promise<void> {

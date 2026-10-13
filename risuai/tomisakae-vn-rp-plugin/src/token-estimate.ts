@@ -58,12 +58,14 @@ export async function estimatePluginPromptTokens(
       ...(hostContext.dialogueTheme ? { dialogueTheme: hostContext.dialogueTheme } : {}),
     },
     (message, prompt) => {
-      estimate.entries.push({ identifier: prompt.identifier, tokens: count(message.content) });
+      const existing = estimate.entries.find((entry) => entry.identifier === prompt.identifier);
+      if (existing) existing.tokens += count(message.content);
+      else estimate.entries.push({ identifier: prompt.identifier, tokens: count(message.content) });
     },
   );
   const messages = [...composed.leading, ...composed.absolute, ...composed.trailing];
-  const imagePrompt = composed.leading.find(
-    (message) => String(message.memo).endsWith(":image-optimization"),
+  const imagePrompt = composed.leading.find((message) =>
+    String(message.memo).endsWith(":image-optimization"),
   );
   if (imagePrompt) {
     estimate.entries.push({ identifier: "image-optimization", tokens: count(imagePrompt.content) });

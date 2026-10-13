@@ -1,4 +1,4 @@
-import type { FfGlobalSettings, FfPreset } from "./core.js";
+import type { FfGlobalSettings, FfPreset, FfPrompt } from "./core.js";
 import {
   VIETNAMESE_OUTPUT_PROMPT,
   SOLA_VIETNAMESE_OUTPUT_PROMPT,
@@ -12,6 +12,11 @@ import {
   VOYAGE_IMAGE_OPTIMIZATION_PROMPT,
   addImageReasoningGuidance,
 } from "./image.js";
+import {
+  addVoyageJailbreakToReasoning,
+  VOYAGE_FF54_JAILBREAK_CONTROL,
+  VOYAGE_FF54_JAILBREAK_ID,
+} from "./voyage-jailbreak.js";
 
 export const PRESET_FAMILIES = [
   {
@@ -57,6 +62,14 @@ export function presetOrder(preset: FfPreset) {
   );
 }
 
+export function familyPrompts(preset: FfPreset): FfPrompt[] {
+  return familyOf(preset) === "voyage"
+    ? [...preset.prompts, VOYAGE_FF54_JAILBREAK_CONTROL]
+    : preset.prompts;
+}
+
+export { VOYAGE_FF54_JAILBREAK_ID };
+
 export function pluginMemoPrefix(preset: FfPreset): string {
   return familyOf(preset) === "ff54" ? "ff54:" : `vn-rp:${familyOf(preset)}:`;
 }
@@ -99,6 +112,9 @@ export function adaptFamilyPrompt(
   } else {
     if (settings.vietnameseOutputEnabled) {
       content = adaptVoyagePromptForVietnamese(content);
+    }
+    if (settings.promptEnabled[VOYAGE_FF54_JAILBREAK_ID]) {
+      content = addVoyageJailbreakToReasoning(content);
     }
     content = content
       .replace("* > blockquote for documents and chat messages\n", "")

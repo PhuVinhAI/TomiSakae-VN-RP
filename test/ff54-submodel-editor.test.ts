@@ -1723,7 +1723,7 @@ describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
           message.memo ===
           (family === "sola"
             ? "vn-rp:sola:jailbreak"
-            : "vn-rp:voyage:713e9dd1-366f-4f2a-9e4b-5e28b6ee63a5"),
+            : "vn-rp:voyage:vn-rp-voyage-ff54-jailbreak:post-history"),
       );
       expect(editorIndex).toBeGreaterThan(-1);
       expect(editorIndex + 1).toBe(postHistoryIndex);

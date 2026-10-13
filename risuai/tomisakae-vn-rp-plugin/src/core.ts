@@ -1,5 +1,6 @@
 import {
   adaptFamilyPrompt,
+  familyPrompts,
   familyOf,
   imageOptimizationFor,
   isPluginMemo,
@@ -10,6 +11,7 @@ import {
   VOYAGE_ABILITY_CHECK_VALUE_ID,
   type PresetFamilyId,
 } from "./preset-family.js";
+import { VOYAGE_FF54_JAILBREAK_ID, VOYAGE_FF54_JAILBREAK_STAGES } from "./voyage-jailbreak.js";
 import {
   adaptDialogueColors,
   adaptDialogueColorRegex,
@@ -167,14 +169,16 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
     familyOf(preset) === "voyage"
       ? VOYAGE_PROMPT_DEFAULTS
       : { [REALISM_MODE_ID]: true, [FREAKY_MODE_ID]: false };
+  const promptEnabled = Object.fromEntries(
+    order.map((entry) => [
+      entry.identifier,
+      promptDefaults[entry.identifier] ?? entry.enabled !== false,
+    ]),
+  );
+  if (familyOf(preset) === "voyage") promptEnabled[VOYAGE_FF54_JAILBREAK_ID] = true;
   return {
     enabled: true,
-    promptEnabled: Object.fromEntries(
-      order.map((entry) => [
-        entry.identifier,
-        promptDefaults[entry.identifier] ?? entry.enabled !== false,
-      ]),
-    ),
+    promptEnabled,
     regexEnabled: Object.fromEntries(
       regexScripts.map((script) => [script.id, script.disabled !== true]),
     ),
@@ -397,7 +401,7 @@ export function expandHostMacros(content: string, context: HostMacroContext): st
 }
 
 function promptMap(preset: FfPreset): Map<string, FfPrompt> {
-  return new Map(preset.prompts.map((prompt) => [prompt.identifier, prompt]));
+  return new Map(familyPrompts(preset).map((prompt) => [prompt.identifier, prompt]));
 }
 
 function promptRole(prompt: FfPrompt): ChatRole {
@@ -453,8 +457,29 @@ export function composePresetPrompts(
     const memoPrefix = pluginMemoPrefix(preset);
     let afterHistory = false;
 
+    const pushVoyageJailbreakStage = async (
+      stage: (typeof VOYAGE_FF54_JAILBREAK_STAGES)[number],
+    ) => {
+      let content = expandSourceMacros(stage.prompt.content, variables, macroContext);
+      content = await parseHostMacros(content, promptRole(stage.prompt));
+      if (!content.trim()) return;
+      const message: ChatMessage = {
+        role: promptRole(stage.prompt),
+        content: content.trim(),
+        memo: `${memoPrefix}${VOYAGE_FF54_JAILBREAK_ID}:${stage.slot}`,
+      };
+      onExpandedPrompt?.(message, stage.prompt);
+      if (afterHistory) pushMerged(trailing, message);
+      else pushMerged(leading, message);
+    };
+
     for (const entry of order) {
       if (entry.identifier === "chatHistory") afterHistory = true;
+      if (familyOf(preset) === "voyage" && settings.promptEnabled[VOYAGE_FF54_JAILBREAK_ID]) {
+        for (const stage of VOYAGE_FF54_JAILBREAK_STAGES) {
+          if (stage.before === entry.identifier) await pushVoyageJailbreakStage(stage);
+        }
+      }
       // Voyage's automatic rule owns its result; expand the native random macro in place.
       const enabled =
         familyOf(preset) === "voyage" && entry.identifier === VOYAGE_ABILITY_CHECK_VALUE_ID

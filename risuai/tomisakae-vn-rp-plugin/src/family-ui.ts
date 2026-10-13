@@ -1,5 +1,11 @@
 import type { FfGlobalSettings, FfPreset } from "./core.js";
-import { familyOf, presetOrder, VOYAGE_ABILITY_CHECK_VALUE_ID } from "./preset-family.js";
+import {
+  familyOf,
+  familyPrompts,
+  presetOrder,
+  VOYAGE_ABILITY_CHECK_VALUE_ID,
+  VOYAGE_FF54_JAILBREAK_ID,
+} from "./preset-family.js";
 import { SOLA_SECTION_COPY, solaRegexUiCopy } from "./preset-ui-copy.js";
 import {
   EXCLUSIVE_PROMPT_GROUPS,
@@ -127,7 +133,7 @@ export function familyPromptSections(preset: FfPreset): PromptSection[] {
     for (const section of sections) for (const id of section.promptIds) excluded.add(id);
     for (const id of SOURCE_SEPARATOR_IDS) excluded.add(id);
   }
-  const map = new Map(preset.prompts.map((p) => [p.identifier, p]));
+  const map = new Map(familyPrompts(preset).map((p) => [p.identifier, p]));
   let current: PromptSection = {
     id: "source",
     label: "Module của preset",
@@ -244,6 +250,7 @@ const VOYAGE_SECTIONS: readonly PromptSection[] = [
     description: "Chủ đề trưởng thành, ngôn ngữ trực diện và khả năng chịu hậu quả lâu dài.",
     open: false,
     promptIds: [
+      VOYAGE_FF54_JAILBREAK_ID,
       "43769028-2d80-4b27-b795-bbbdf7730a44",
       "216aa279-7af9-401b-8d51-fea7cc725a43",
       "ee7a5f53-672d-4b32-a607-c976db5f32eb",
