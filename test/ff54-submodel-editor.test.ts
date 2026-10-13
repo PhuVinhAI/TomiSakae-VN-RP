@@ -1650,14 +1650,28 @@ describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
     expect(saved.presets[0]!.settings.presetFamily).toBe("sola");
     expect(saved.presets[0]!.settings.submodelEditorEnabled).toBe(true);
     expect(saved.presets[0]!.settings.soundNotificationsEnabled).toBe(true);
-    expect(plugin.settingsHtml()).toContain("Showrunner Master HUD");
+    expect(plugin.settingsHtml()).toContain("HUD tổng hợp trạng thái");
+    expect(plugin.settingsHtml()).toContain("Chỉ số cảm xúc TFDY");
+    expect(plugin.settingsHtml()).toContain("Header mở cảnh");
+    expect(plugin.settingsHtml()).toContain("Nhân vật của card kể ở ngôi thứ nhất");
+    expect(plugin.settingsHtml()).not.toContain("[Module]");
+    expect(plugin.settingsHtml()).not.toContain("Pick 1");
+    expect(plugin.settingsHtml()).not.toContain("Preset gốc không có chú thích");
+    expect(plugin.settingsHtml()).not.toContain("Sola Saver:");
     expect(plugin.settingsHtml()).not.toContain("Chế độ Hiện thực");
     const request = await plugin.request();
     expect(request.map((m) => m.content).join("\n")).toContain("## Vietnamese Output");
     await plugin.selectFamily("voyage");
     const voyageRequest = await plugin.request();
     expect(voyageRequest.map((m) => m.content).join("\n")).toContain("## Rule: Direct Prose");
-    expect(plugin.settingsHtml()).not.toContain("Showrunner Master HUD");
+    expect(plugin.settingsHtml()).not.toContain("HUD tổng hợp trạng thái");
+    expect(plugin.settingsHtml()).toContain("Luật cốt lõi &amp; lượt chơi");
+    expect(plugin.settingsHtml()).toContain("Hồ sơ nhân vật ẩn");
+    expect(plugin.settingsHtml()).toContain("Kiểm tra PbtA do người dùng tung");
+    expect(plugin.settingsHtml()).not.toContain("[V][R]");
+    expect(plugin.settingsHtml()).not.toContain("Preset gốc không có chú thích");
+    expect(plugin.settingsHtml()).toContain("Bộ preset này không có bộ lọc kỹ thuật riêng.");
+    expect(plugin.settingsHtml()).not.toContain("Xem 0 bộ lọc");
   });
 
   it.each(["sola", "voyage"] as const)(

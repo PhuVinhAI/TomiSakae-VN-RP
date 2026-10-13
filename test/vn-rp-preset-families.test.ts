@@ -33,9 +33,12 @@ import { estimatePluginPromptTokens } from "../risuai/tomisakae-vn-rp-plugin/src
 import {
   familyPromptSections,
   familyChoiceGroups,
+  familyHiddenPromptIds,
+  familyRegexGroups,
   normalizeFamilyChoices,
 } from "../risuai/tomisakae-vn-rp-plugin/src/family-ui.js";
-import { promptUiCopy } from "../risuai/tomisakae-vn-rp-plugin/src/ui-vi.js";
+import { promptUiCopy, regexUiCopy } from "../risuai/tomisakae-vn-rp-plugin/src/ui-vi.js";
+import { solaRegexUiCopy } from "../risuai/tomisakae-vn-rp-plugin/src/preset-ui-copy.js";
 import { adaptSolaSceneHeaderForDisplay } from "../risuai/tomisakae-vn-rp-plugin/src/sola-display.js";
 import {
   adaptSolaDialogueColors,
@@ -287,7 +290,7 @@ describe("TomiSakae VN-RP preset families", () => {
     }
   });
 
-  it("keeps Sola pronoun selections exclusive and uses the correct source names in UI", () => {
+  it("keeps Sola pronoun selections exclusive and uses family-specific Vietnamese UI copy", () => {
     const preset = sources.sola.preset;
     const settings = createDefaultSettings(preset);
     const group = familyChoiceGroups(preset).find((group) => group.id === "pronouns")!;
@@ -298,7 +301,7 @@ describe("TomiSakae VN-RP preset families", () => {
       const prompt = sources[family].preset.prompts.find(
         (prompt) => prompt.identifier === "jailbreak",
       )!;
-      expect(promptUiCopy(prompt, family).name).toBe(prompt.name);
+      expect(promptUiCopy(prompt, family).name).toContain("Chỉ dẫn sau lịch sử chat");
       expect(promptUiCopy(prompt, family).description).not.toContain("DS4 Pro");
     }
   });
@@ -329,9 +332,15 @@ describe("TomiSakae VN-RP preset families", () => {
         ...familyChoiceGroups(preset).flatMap((g) => g.memberIds),
         ...familyPromptSections(preset).flatMap((s) => s.promptIds),
       ];
+      const hidden = familyHiddenPromptIds(preset);
       for (const entry of presetOrder(preset)) {
         const prompt = preset.prompts.find((p) => p.identifier === entry.identifier);
-        if (!prompt?.marker && typeof prompt?.content === "string" && prompt.content.trim())
+        if (
+          !prompt?.marker &&
+          typeof prompt?.content === "string" &&
+          prompt.content.trim() &&
+          !hidden.has(entry.identifier)
+        )
           expect(visible).toContain(entry.identifier);
       }
       const estimate = await estimatePluginPromptTokens(preset, settings, host);
@@ -342,6 +351,63 @@ describe("TomiSakae VN-RP preset families", () => {
       expect(estimate.entries.some((entry) => entry.identifier === "vietnamese-output")).toBe(true);
     },
   );
+
+  it.each(["sola", "voyage"] as const)(
+    "localizes all %s controls and hides only source dividers",
+    (family) => {
+      const preset = sources[family].preset;
+      const sections = familyPromptSections(preset);
+      const groups = familyChoiceGroups(preset);
+      const visible = [
+        ...groups.flatMap((g) => g.memberIds),
+        ...sections.flatMap((s) => s.promptIds),
+      ];
+      expect(new Set(visible).size).toBe(visible.length);
+      for (const identifier of visible) {
+        const prompt = preset.prompts.find((p) => p.identifier === identifier)!;
+        const copy = promptUiCopy(prompt, family);
+        expect(copy.name).not.toBe(prompt.name);
+        expect(copy.name).not.toMatch(
+          /\[(?:Module|Core|V|R|Reasoning|Pronouns|Balancer|Jailbreak)\]|Pick 1|━/,
+        );
+        expect(copy.description.length).toBeGreaterThan(30);
+        expect(copy.description).not.toContain("Preset gốc không có chú thích");
+      }
+      for (const section of sections) {
+        expect(section.label).not.toMatch(/Foundations|Voice Styles|Trackers|Reasoning Stack|━/);
+        expect(section.description.length).toBeGreaterThan(30);
+      }
+      for (const group of groups) {
+        expect(group.description).not.toBe("Chọn một module theo preset nguồn.");
+        expect(group.offDescription.length).toBeGreaterThan(30);
+      }
+      const settings = createDefaultSettings(preset);
+      for (const id of familyHiddenPromptIds(preset)) {
+        expect(visible).not.toContain(id);
+        expect(settings.promptEnabled[id]).toBe(true);
+      }
+    },
+  );
+
+  it("localizes and groups every Sola regex without losing or duplicating a filter", () => {
+    const preset = sources.sola.preset;
+    const scripts = preset.extensions!.regex_scripts!;
+    const groups = familyRegexGroups(preset);
+    const ids = groups.flatMap((group) => group.ids);
+    expect(ids).toHaveLength(scripts.length);
+    expect(new Set(ids).size).toBe(scripts.length);
+    expect(groups.map((g) => g.label)).toContain("Header mở cảnh");
+    expect(groups.map((g) => g.label)).toContain("Tiết kiệm ngữ cảnh gửi model");
+    for (const script of scripts) {
+      expect(solaRegexUiCopy(script), script.scriptName).toBeDefined();
+      const copy = regexUiCopy(script);
+      expect(copy.name).not.toBe(script.scriptName);
+      expect(copy.name).not.toContain("Sola ");
+      expect(copy.description.length).toBeGreaterThan(30);
+      if (script.promptOnly) expect(copy.description).toContain(`độ sâu ${script.minDepth}`);
+    }
+    expect(familyRegexGroups(sources.voyage.preset)).toEqual([]);
+  });
 
   it.each(["sola", "voyage"] as const)(
     "returns %s's original prompts when Global prompt features are off",

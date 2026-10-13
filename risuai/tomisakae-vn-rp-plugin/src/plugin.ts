@@ -17,7 +17,7 @@ import {
   type HostMacroContext,
 } from "./core.js";
 import { resolveDialogueTheme } from "./dialogue-colors.js";
-import { promptUiCopy, regexUiName, type ExclusivePromptGroup } from "./ui-vi.js";
+import { promptUiCopy, regexUiCopy, type ExclusivePromptGroup } from "./ui-vi.js";
 import {
   PRESET_FAMILIES,
   familyOf,
@@ -28,7 +28,12 @@ import {
   type PresetSources,
   type PresetFamilyId,
 } from "./preset-family.js";
-import { familyChoiceGroups, familyPromptSections, normalizeFamilyChoices } from "./family-ui.js";
+import {
+  familyChoiceGroups,
+  familyPromptSections,
+  familyRegexGroups,
+  normalizeFamilyChoices,
+} from "./family-ui.js";
 import { insertSubmodelEditorSystem, editorUserFor } from "./editor-prompts.js";
 import { adaptSolaSceneHeaderForDisplay } from "./sola-display.js";
 import { SETTINGS_STYLES } from "./ui-style.js";
@@ -506,35 +511,20 @@ async function showSettings(): Promise<void> {
   const regexMap = new Map(
     (preset.extensions?.regex_scripts ?? []).map((script) => [script.id, script]),
   );
-  const filterGroups =
-    family.id === "ff54"
-      ? REGEX_GROUPS
-      : [
-          {
-            label: "Ngữ cảnh gửi model",
-            ids: [...regexMap.values()]
-              .filter((script) => script.promptOnly)
-              .map((script) => script.id),
-          },
-          {
-            label: "Hiển thị và định dạng",
-            ids: [...regexMap.values()]
-              .filter((script) => !script.promptOnly)
-              .map((script) => script.id),
-          },
-        ];
+  const filterGroups = family.id === "ff54" ? REGEX_GROUPS : familyRegexGroups(preset);
   const regexGroups = filterGroups
     .map((group) => {
       const rows = group.ids
         .map((identifier) => {
           const script = regexMap.get(identifier);
           if (!script) return "";
+          const copy = regexUiCopy(script);
           return checkbox(
             "regex",
             identifier,
             settings.regexEnabled[identifier] === true,
-            regexUiName(script),
-            `${sourceState(!script.disabled)} · Quy tắc kỹ thuật của preset gốc`,
+            copy.name,
+            `${copy.description} · ${sourceState(!script.disabled)}`,
           );
         })
         .join("");
@@ -590,9 +580,9 @@ async function showSettings(): Promise<void> {
       "Điều chỉnh bảng màu của bộ nền theo theme sáng/tối, giữ cú pháp màu riêng; bộ không có màu không bị thêm thẻ",
     )}</div></details></section>
     <section id="family" class="panel"><div class="panel-heading"><span class="index">02 / Bộ nền</span><h2>Bộ preset nền</h2></div><p class="section-note">Chọn một bộ cho cấu hình “${escapeHtml(profile.name)}”. Các module của mỗi bộ được lưu riêng; lựa chọn Global giữ nguyên.</p><div class="family-grid">${PRESET_FAMILIES.map((entry) => `<label class="choice-option family-option"><input type="radio" name="preset-family" data-family="${entry.id}" ${entry.id === family.id ? "checked" : ""}><span class="radio-body"><span class="radio-dot"></span><span class="family-copy"><strong>${escapeHtml(entry.name)}</strong><small>${escapeHtml(entry.description)}</small></span></span></label>`).join("")}</div></section>
-    <section id="choices" class="panel"><div class="panel-heading"><span class="index">03 / Quy tắc lựa chọn</span><h2>Nhóm chọn một</h2></div><p class="section-note">Mỗi nhóm chỉ kích hoạt một lựa chọn. Chọn “không dùng” để tắt toàn bộ nhóm.</p><div class="choice-grid">${choiceGroups}</div></section>
+    <section id="choices" class="panel"><div class="panel-heading"><span class="index">03 / Quy tắc lựa chọn</span><h2>Nhóm chọn một</h2></div><p class="section-note">Mỗi nhóm chỉ kích hoạt một lựa chọn; có lựa chọn tắt các module trong nhóm.</p><div class="choice-grid">${choiceGroups}</div></section>
     <section id="modules" class="panel"><div class="panel-heading"><span class="index">04 / Bộ công cụ</span><h2>Module độc lập</h2></div><p class="section-note">Mở một nhóm để xem chức năng và bật những module bạn cần.</p>${promptSections}</section>
-    <section id="filters" class="panel"><div class="panel-heading"><span class="index">05 / Vận hành</span><h2>Bộ lọc kỹ thuật</h2></div><p class="section-note">Các bộ lọc gốc dùng khi gửi ngữ cảnh và hiển thị phản hồi. Chỉ thay đổi khi bạn hiểu rõ tác dụng của chúng.</p><details><summary><span class="summary-copy"><strong>Xem ${preset.extensions?.regex_scripts?.length ?? 0} bộ lọc</strong><small>Được chia theo công việc để dễ tìm.</small></span></summary><div class="regex-groups">${regexGroups}</div></details></section>
+    <section id="filters" class="panel"><div class="panel-heading"><span class="index">05 / Vận hành</span><h2>Bộ lọc kỹ thuật</h2></div>${regexMap.size ? `<p class="section-note">Các bộ lọc gốc dùng khi gửi ngữ cảnh và hiển thị phản hồi. Chỉ thay đổi khi bạn hiểu rõ tác dụng của chúng.</p><details><summary><span class="summary-copy"><strong>Xem ${regexMap.size} bộ lọc</strong><small>Được chia theo công việc để dễ tìm.</small></span></summary><div class="regex-groups">${regexGroups}</div></details>` : '<p class="section-note">Bộ preset này không có bộ lọc kỹ thuật riêng.</p>'}</section>
     <p class="source-note">Nguồn: ${escapeHtml(source.sourceName)}<br>SHA-256: ${escapeHtml(source.sha256)}</p>
     </div></div>
     <div class="command-bar"><div class="command-inner"><span class="command-label">TomiSakae VN-RP · ${escapeHtml(family.name)} / ${escapeHtml(profile.name)}</span><button class="action primary" id="save">Lưu preset</button><button class="action" id="reset">Khôi phục</button><button class="action" id="close">Đóng</button><div class="status" id="status" role="status" aria-live="polite"></div></div></div>

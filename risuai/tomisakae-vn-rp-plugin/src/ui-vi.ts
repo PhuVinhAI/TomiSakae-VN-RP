@@ -1,4 +1,11 @@
 import type { FfGlobalSettings, FfOrderEntry, FfPrompt, FfRegexScript } from "./core.js";
+import {
+  SOLA_PROMPT_COPY,
+  SOLA_SECTION_COPY,
+  VOYAGE_PROMPT_COPY,
+  solaRegexUiCopy,
+  type UiCopy,
+} from "./preset-ui-copy.js";
 
 export interface ExclusivePromptGroup {
   id: string;
@@ -15,11 +22,6 @@ export interface PromptSection {
   description: string;
   promptIds: readonly string[];
   open: boolean;
-}
-
-interface UiCopy {
-  name: string;
-  description: string;
 }
 
 export const SOURCE_SEPARATOR_IDS = new Set([
@@ -378,9 +380,15 @@ const REGEX_NAMES: Readonly<Record<string, string>> = {
   "14a69f3b-da50-4179-9522-33d2b9b9c160": "Loại prompt tạo ảnh khỏi ngữ cảnh",
 };
 
-export function promptUiCopy(prompt: FfPrompt, family: "ff54" | "sola" | "voyage" = "ff54"): UiCopy {
+export function promptUiCopy(
+  prompt: FfPrompt,
+  family: "ff54" | "sola" | "voyage" = "ff54",
+): UiCopy {
   return (
-    (family === "ff54" ? PROMPT_COPY[prompt.identifier] : undefined) ?? {
+    { ff54: PROMPT_COPY, sola: SOLA_PROMPT_COPY, voyage: VOYAGE_PROMPT_COPY }[family][
+      prompt.identifier
+    ] ??
+    (family === "sola" ? SOLA_SECTION_COPY[prompt.identifier] : undefined) ?? {
       name: prompt.name || prompt.identifier,
       description: "Preset gốc không có chú thích cho module này.",
     }
@@ -388,7 +396,16 @@ export function promptUiCopy(prompt: FfPrompt, family: "ff54" | "sola" | "voyage
 }
 
 export function regexUiName(script: FfRegexScript): string {
-  return REGEX_NAMES[script.id] ?? script.scriptName ?? script.id;
+  return solaRegexUiCopy(script)?.name ?? REGEX_NAMES[script.id] ?? script.scriptName ?? script.id;
+}
+
+export function regexUiCopy(script: FfRegexScript): UiCopy {
+  return (
+    solaRegexUiCopy(script) ?? {
+      name: regexUiName(script),
+      description: "Quy tắc kỹ thuật của preset gốc",
+    }
+  );
 }
 
 export function allExclusivePromptIds(): Set<string> {
