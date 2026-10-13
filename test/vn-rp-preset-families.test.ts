@@ -20,6 +20,8 @@ import {
   adaptFamilyPrompt,
   VOYAGE_AUTOMATIC_PBTA_ID,
   VOYAGE_ABILITY_CHECK_VALUE_ID,
+  VOYAGE_MANUAL_PBTA_ID,
+  VOYAGE_OOC_ID,
   VOYAGE_FF54_JAILBREAK_ID,
   type PresetSources,
 } from "../risuai/tomisakae-vn-rp-plugin/src/preset-family.js";
@@ -37,9 +39,11 @@ import {
 } from "../risuai/tomisakae-vn-rp-plugin/src/editor-prompts.js";
 import { estimatePluginPromptTokens } from "../risuai/tomisakae-vn-rp-plugin/src/token-estimate.js";
 import {
+  addVoyageJailbreakIdentity,
+  voyageJailbreakReasoning,
   VOYAGE_CHAIN_OF_THOUGHT_ID,
   VOYAGE_FF54_JAILBREAK_STAGES,
-  VOYAGE_JAILBREAK_REASONING_LINE,
+  VOYAGE_JAILBREAK_IDENTITY,
 } from "../risuai/tomisakae-vn-rp-plugin/src/voyage-jailbreak.js";
 import {
   familyPromptSections,
@@ -168,9 +172,21 @@ describe("TomiSakae VN-RP preset families", () => {
     const reasoning = built.find(
       (message) => message.memo === `vn-rp:voyage:${VOYAGE_CHAIN_OF_THOUGHT_ID}`,
     );
-    expect(reasoning?.content).toContain(VOYAGE_JAILBREAK_REASONING_LINE);
-    expect(reasoning?.content).not.toMatch(
-      /never draft full prose|pre-planned scenes|concise ideas only|close think tags|output the final response immediately/i,
+    expect(reasoning?.content).toContain("Task 1 — Scene Lock");
+    expect(reasoning?.content).toContain("Complete Tasks 1-6");
+    expect(reasoning?.content).toContain("Task 6 — Final Lock");
+    expect(reasoning?.content).not.toMatch(/OOC|PbtA/);
+    expect(reasoning?.content).toContain(
+      "I am a GM creating an immersive simulation, I am not a helpful AI assistant.",
+    );
+    expect(reasoning?.content).toContain("Never draft prose, dialogue, or trial scenes.");
+    expect(reasoning?.content).not.toMatch(/internal_states|internal_dndsim|d20|locked DC/i);
+    const root = built.find(
+      (message) => message.memo === "vn-rp:voyage:48727501-cb02-4bb4-8be7-17d47d48e05c",
+    )?.content;
+    expect(root).toContain(VOYAGE_JAILBREAK_IDENTITY);
+    expect(root?.indexOf("...the goal is to have fun together!")).toBeLessThan(
+      root?.indexOf(VOYAGE_JAILBREAK_IDENTITY) ?? -1,
     );
 
     settings.promptEnabled[VOYAGE_FF54_JAILBREAK_ID] = false;
@@ -186,7 +202,58 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(
       disabled.find((message) => message.memo === `vn-rp:voyage:${VOYAGE_CHAIN_OF_THOUGHT_ID}`)
         ?.content,
-    ).not.toContain(VOYAGE_JAILBREAK_REASONING_LINE);
+    ).not.toContain("Task 1 — Scene Lock");
+    expect(disabled.map((message) => message.content).join("\n")).not.toContain(
+      VOYAGE_JAILBREAK_IDENTITY,
+    );
+  });
+
+  it.each([
+    [false, false, 6],
+    [true, false, 6],
+    [false, true, 7],
+    [true, true, 7],
+  ] as const)(
+    "builds Voyage jailbreak reasoning for OOC=%s and PbtA=%s",
+    async (ooc, pbta, taskCount) => {
+      const preset = sources.voyage.preset;
+      const settings = createDefaultSettings(preset);
+      settings.promptEnabled[VOYAGE_OOC_ID] = ooc;
+      settings.promptEnabled[VOYAGE_AUTOMATIC_PBTA_ID] = pbta;
+      settings.promptEnabled[VOYAGE_MANUAL_PBTA_ID] = false;
+      const built = await buildRequestMessages(
+        [{ role: "user", content: "Tiếp tục." }],
+        preset,
+        settings,
+        parse,
+        { randomInt: (minimum) => minimum },
+      );
+      const reasoning = built.find(
+        (message) => message.memo === `vn-rp:voyage:${VOYAGE_CHAIN_OF_THOUGHT_ID}`,
+      )?.content;
+      expect(reasoning).toContain(`Complete Tasks 1-${taskCount}`);
+      expect(reasoning).toContain(`Task ${taskCount} — Final Lock`);
+      expect(reasoning?.includes("OOC commands")).toBe(ooc);
+      expect(reasoning?.includes("PbtA Resolution")).toBe(pbta);
+      expect(reasoning?.match(/\* Task \d+ —/g)).toHaveLength(taskCount);
+    },
+  );
+
+  it("includes the dynamic PbtA task for Voyage's manual mode", async () => {
+    const preset = sources.voyage.preset;
+    const settings = createDefaultSettings(preset);
+    settings.promptEnabled[VOYAGE_AUTOMATIC_PBTA_ID] = false;
+    settings.promptEnabled[VOYAGE_MANUAL_PBTA_ID] = true;
+    const built = await buildRequestMessages(
+      [{ role: "user", content: "Tiếp tục." }],
+      preset,
+      settings,
+      parse,
+    );
+    expect(
+      built.find((message) => message.memo === `vn-rp:voyage:${VOYAGE_CHAIN_OF_THOUGHT_ID}`)
+        ?.content,
+    ).toContain("Task 3 — PbtA Resolution");
   });
 
   it("reports Voyage's three jailbreak stages as one combined token entry", async () => {
@@ -770,7 +837,14 @@ describe("TomiSakae VN-RP preset families", () => {
                 .replace("* ```codeblock``` for terminal and code\n", "")
             : prompt.content;
         if (family === "voyage" && prompt.identifier === VOYAGE_CHAIN_OF_THOUGHT_ID) {
-          expectedWithoutVietnamese = `${expectedWithoutVietnamese.trimEnd()}\n${VOYAGE_JAILBREAK_REASONING_LINE}\n`;
+          expectedWithoutVietnamese = voyageJailbreakReasoning(false, {
+            ooc: settings.promptEnabled[VOYAGE_OOC_ID] === true,
+            pbta:
+              settings.promptEnabled[VOYAGE_AUTOMATIC_PBTA_ID] === true ||
+              settings.promptEnabled[VOYAGE_MANUAL_PBTA_ID] === true,
+          });
+        } else if (family === "voyage") {
+          expectedWithoutVietnamese = addVoyageJailbreakIdentity(expectedWithoutVietnamese);
         }
         expect(
           adaptFamilyPrompt(prompt.content, preset, {

@@ -14,7 +14,8 @@ import {
   addImageReasoningGuidance,
 } from "./image.js";
 import {
-  addVoyageJailbreakToReasoning,
+  addVoyageJailbreakIdentity,
+  voyageJailbreakReasoning,
   VOYAGE_FF54_JAILBREAK_CONTROL,
   VOYAGE_FF54_JAILBREAK_ID,
 } from "./voyage-jailbreak.js";
@@ -39,7 +40,9 @@ export const PRESET_FAMILIES = [
 
 export type PresetFamilyId = (typeof PRESET_FAMILIES)[number]["id"];
 export const VOYAGE_AUTOMATIC_PBTA_ID = "f7855edd-a399-4f2c-a376-317368b545ee";
+export const VOYAGE_MANUAL_PBTA_ID = "766bc4f9-b685-4412-bec2-b56be47b4f9a";
 export const VOYAGE_ABILITY_CHECK_VALUE_ID = "58b58785-f5e9-49c4-9cd5-a3bbe0297e74";
+export const VOYAGE_OOC_ID = "867a59b8-8216-4d9f-bc24-222490ed0051";
 export interface PresetSource {
   preset: FfPreset;
   sourceName: string;
@@ -120,7 +123,15 @@ export function adaptFamilyPrompt(
       content = adaptVoyagePromptForVietnamese(content);
     }
     if (settings.promptEnabled[VOYAGE_FF54_JAILBREAK_ID]) {
-      content = addVoyageJailbreakToReasoning(content);
+      content = addVoyageJailbreakIdentity(content);
+      if (content.startsWith("## Rule: Chain of Thought\n")) {
+        content = voyageJailbreakReasoning(settings.vietnameseOutputEnabled, {
+          ooc: settings.promptEnabled[VOYAGE_OOC_ID] === true,
+          pbta:
+            settings.promptEnabled[VOYAGE_AUTOMATIC_PBTA_ID] === true ||
+            settings.promptEnabled[VOYAGE_MANUAL_PBTA_ID] === true,
+        });
+      }
     }
     content = content
       .replace("* > blockquote for documents and chat messages\n", "")

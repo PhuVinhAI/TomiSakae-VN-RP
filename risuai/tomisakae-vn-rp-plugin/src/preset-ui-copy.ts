@@ -332,7 +332,7 @@ export const SOLA_SECTION_COPY: Readonly<Record<string, UiCopy>> = {
 export const VOYAGE_PROMPT_COPY: Readonly<Record<string, UiCopy>> = {
   "vn-rp-voyage-ff54-jailbreak": copy(
     "⛓️ Phá rào FF5.4 cho Voyage",
-    "Ba chốt theo đúng thứ tự FF5.4: mở ngữ cảnh hư cấu người lớn, Icebreaker và nhắc high-risk sau lịch sử chat. Không áp đặt cách viết NSFW.",
+    "Các chốt jailbreak theo đúng thứ tự FF5.4: định danh mô phỏng, Freaky Mode, Icebreaker, Chain of Thought và high-risk sau lịch sử chat. Không áp đặt cách viết NSFW.",
   ),
   "48727501-cb02-4bb4-8be7-17d47d48e05c": copy(
     "🌍 Thế giới chưa biết: khung nhập vai",
