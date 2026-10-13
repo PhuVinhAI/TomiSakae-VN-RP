@@ -7,7 +7,11 @@ import {
   adaptVoyagePromptForVietnamese,
   adaptPromptForVietnamese,
 } from "./vietnamese.js";
-import { IMAGE_OPTIMIZATION_PROMPT, addImageReasoningGuidance } from "./image.js";
+import {
+  IMAGE_OPTIMIZATION_PROMPT,
+  VOYAGE_IMAGE_OPTIMIZATION_PROMPT,
+  addImageReasoningGuidance,
+} from "./image.js";
 
 export const PRESET_FAMILIES = [
   {
@@ -96,6 +100,9 @@ export function adaptFamilyPrompt(
     if (settings.vietnameseOutputEnabled) {
       content = adaptVoyagePromptForVietnamese(content);
     }
+    content = content
+      .replace("* > blockquote for documents and chat messages\n", "")
+      .replace("* ```codeblock``` for terminal and code\n", "");
     if (settings.imageOptimizationEnabled) {
       content = content.replace(
         "* explore three to five different ways to take the story",
@@ -108,10 +115,9 @@ export function adaptFamilyPrompt(
 
 export function imageOptimizationFor(preset: FfPreset): string {
   if (familyOf(preset) === "ff54") return IMAGE_OPTIMIZATION_PROMPT;
+  if (familyOf(preset) === "voyage") return VOYAGE_IMAGE_OPTIMIZATION_PROMPT;
   const rules = IMAGE_OPTIMIZATION_PROMPT.split("\n").filter((line) => line.startsWith("- "));
   const intro =
     "When card/lore provides images, follow its image syntax and available identifiers; apply these placement and coverage rules.";
-  return familyOf(preset) === "sola"
-    ? `## Image Coverage\n${intro}\n${rules.join("\n")}`
-    : `## Rule: Image Coverage\n${intro}\n${rules.map((line) => line.replace(/^- /, "* ")).join("\n")}`;
+  return `## Image Coverage\n${intro}\n${rules.join("\n")}`;
 }

@@ -468,7 +468,7 @@ export const VOYAGE_PROMPT_COPY: Readonly<Record<string, UiCopy>> = {
   ),
   "11600b2f-2ee0-4c23-8311-dbd9cba5276f": copy(
     "📝 Định dạng văn xuôi",
-    "Quy định văn thường cho trần thuật, ngoặc kép cho thoại, gạch dưới cho âm thanh, trích dẫn cho tài liệu và khối code cho terminal.",
+    "Quy định văn thường cho trần thuật, ngoặc kép cho thoại và gạch dưới cho âm thanh; khi bật Đầu ra tiếng Việt, âm thanh dùng §...§ trên dòng riêng.",
   ),
   "2ac42672-234d-4d50-94b5-6d267771e8f7": copy(
     "🌱 Khuyến khích tự do sáng tạo",

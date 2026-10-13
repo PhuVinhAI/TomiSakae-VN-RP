@@ -198,6 +198,41 @@ describe("TomiSakae VN-RP preset families", () => {
     }
   });
 
+  it.each([true, false])(
+    "omits unsupported Voyage formats with Vietnamese Output %s without changing the source",
+    async (vietnamese) => {
+      const preset = sources.voyage.preset;
+      const snapshot = structuredClone(preset);
+      const settings = createDefaultSettings(preset);
+      settings.vietnameseOutputEnabled = vietnamese;
+      settings.promptEnabled["11600b2f-2ee0-4c23-8311-dbd9cba5276f"] = true;
+      const built = await buildRequestMessages(
+        [{ role: "user", content: "Tiếp đi." }],
+        preset,
+        settings,
+        parse,
+      );
+      const text = built.map((message) => message.content).join("\n");
+      expect(text).toContain("## Rule: Prose Format");
+      expect(text).toContain("* plaintext for narration");
+      expect(text).toContain(
+        vietnamese ? "* double quotes for dialogue" : '* "quotes" for dialogue',
+      );
+      expect(text).toContain(
+        vietnamese
+          ? "* standalone §...§ on its own line for non-vocal sounds"
+          : "* _underscore_ for sounds",
+      );
+      expect(text).not.toContain("* > blockquote for documents and chat messages");
+      expect(text).not.toContain("* ```codeblock``` for terminal and code");
+      if (vietnamese) {
+        expect(vietnameseOutputFor(preset)).toContain("documents, messages, terminal output");
+        expect(vietnameseOutputFor(preset)).toContain("code syntax");
+      }
+      expect(preset).toEqual(snapshot);
+    },
+  );
+
   it("estimates Voyage's automatic result without consuming randomness and matches request tokens", async () => {
     const preset = sources.voyage.preset;
     const settings = createDefaultSettings(preset);
@@ -544,7 +579,7 @@ describe("TomiSakae VN-RP preset families", () => {
   });
 
   it.each(["sola", "voyage"] as const)(
-    "returns %s's original prompts when Global prompt features are off",
+    "keeps %s's prompts free of Global guidance when Global prompt features are off",
     async (family) => {
       const preset = sources[family].preset;
       const settings = createDefaultSettings(preset);
@@ -637,7 +672,13 @@ describe("TomiSakae VN-RP preset families", () => {
             vietnameseOutputEnabled: false,
           }),
           prompt.name,
-        ).toBe(prompt.content);
+        ).toBe(
+          family === "voyage"
+            ? prompt.content
+                .replace("* > blockquote for documents and chat messages\n", "")
+                .replace("* ```codeblock``` for terminal and code\n", "")
+            : prompt.content,
+        );
         settings.promptEnabled[prompt.identifier] = true;
       }
       const composed = await composePresetPrompts(preset, settings, parse, {
