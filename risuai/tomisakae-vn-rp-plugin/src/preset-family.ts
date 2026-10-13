@@ -11,6 +11,7 @@ import {
 } from "./vietnamese.js";
 import {
   IMAGE_OPTIMIZATION_PROMPT,
+  SOLA_IMAGE_OPTIMIZATION_PROMPT,
   VOYAGE_IMAGE_OPTIMIZATION_PROMPT,
   addImageReasoningGuidance,
 } from "./image.js";
@@ -160,8 +161,5 @@ export function adaptFamilyPrompt(
 export function imageOptimizationFor(preset: FfPreset): string {
   if (familyOf(preset) === "ff54") return IMAGE_OPTIMIZATION_PROMPT;
   if (familyOf(preset) === "voyage") return VOYAGE_IMAGE_OPTIMIZATION_PROMPT;
-  const rules = IMAGE_OPTIMIZATION_PROMPT.split("\n").filter((line) => line.startsWith("- "));
-  const intro =
-    "When card/lore provides images, follow its image syntax and available identifiers; apply these placement and coverage rules.";
-  return `## Image Coverage\n${intro}\n${rules.join("\n")}`;
+  return SOLA_IMAGE_OPTIMIZATION_PROMPT;
 }

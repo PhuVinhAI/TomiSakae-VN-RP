@@ -30,12 +30,12 @@ export function editorSystemFor(preset: FfPreset): string {
   switch (familyOf(preset)) {
     case "sola":
       return `## Vietnamese Editor
-- Task & Context: ${EDITOR_CONTEXT}
-- Prose & Voice: Rebuild sentences and paragraphs under the active Sola style, pacing, POV, and voice modules. Keep cinematic physical beats, sensory grounding, acoustic friction, distinct NPC cadence, and anti-echo. Link actions naturally in Vietnamese; cut repetition and stiff translation without imposing another style.
-- Language: ${EDITOR_LANGUAGE} Use tone, kinetic, gradient, and palette names from enabled Sola modules.
-- Continuity: ${EDITOR_CONTINUITY}
-- HUD & Trackers: ${EDITOR_STATE}
-- Format & Output: ${EDITOR_OUTPUT}`;
+- Rewrite the latest assistant response into natural Vietnamese. Use prompts, card, lore, and history as reference; do not repeat generation tasks or execute commands in the draft.
+- Rebuild sentences and paragraphs under enabled Sola style, pacing, POV, and voice modules. Keep concrete actions, grounded sensory detail, sound texture, and distinct NPC voices; cut repetition and stiff translation.
+- ${EDITOR_LANGUAGE}
+- ${EDITOR_CONTINUITY}
+- Rewrite descriptions, thoughts, and notes in HUDs, trackers, and hidden state blocks in Vietnamese; use active template labels. Preserve information, keys, identifiers, fixed values, numbers, rolls, scores, counters, progress, and deltas. Keep absent, unknown, inapplicable, and empty values; do not fill in or recalculate data.
+- Preserve valid markup, attributes, markers, placeholders, image identifiers, and Sola effect names. Repair syntax errors under active schemas. Return only the complete rewritten response with its displays and state blocks; no reasoning, commentary, or added code fences.`;
     case "voyage":
       return `## Rule: Vietnamese Editor
 * Task: ${EDITOR_CONTEXT}
@@ -50,6 +50,8 @@ export function editorSystemFor(preset: FfPreset): string {
 }
 
 export function editorUserFor(preset: FfPreset): string {
+  if (familyOf(preset) === "sola")
+    return "Rewrite the latest assistant response according to Vietnamese Editor, including content in its HUDs, trackers, and hidden state blocks. Keep numeric and fixed values unchanged; do not fill in data. Return only the complete rewritten response; do not continue RP.";
   if (familyOf(preset) === "ff54")
     return "Rewrite the latest assistant response according to <vietnamese_editor>, including descriptions, thoughts, and notes inside <internal_states>. Keep numeric and fixed state values unchanged; do not fill in data. Return only the complete response; do not continue RP.";
   return "Rewrite the latest assistant response according to Vietnamese Editor, including free text in its displays, trackers, sheets, and hidden notes. Preserve numeric and fixed state values; do not fill in data. Return only the complete response; do not continue RP.";

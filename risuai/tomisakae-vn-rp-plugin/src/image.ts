@@ -10,6 +10,13 @@ Rules:
 - Flow: Separate image commands with narrative or dialogue. Never place image commands consecutively, invent unavailable images, or add unrelated images to fill space.
 </image_optimization>`;
 
+export const SOLA_IMAGE_OPTIMIZATION_PROMPT = `## Image Coverage
+When card/lore provides images:
+- Use its image syntax and available identifiers. Match the current form, clothing, and setting; prioritize clothing changes, then action-driven changes in pose or physical state, then expression.
+- Place each image immediately before the narration or dialogue it depicts.
+- Illustrate meaningful changes throughout the response. Reassess images when action, expression, speaker, or scene focus changes, including later beats. Vary images with the depicted state; repeat only while that state continues and no better match exists.
+- Always separate images with narration or dialogue. Never place images consecutively, invent identifiers, or add unrelated images to fill space.`;
+
 export const VOYAGE_IMAGE_OPTIMIZATION_PROMPT = `## Rule: Image Coverage
 * When card/lore provides images, use its image syntax and available identifiers; apply the placement rules below.
 * Match the current form, clothing, and setting. Prioritize clothing changes; otherwise prioritize action-driven changes in pose or physical state, then expression. Use the best available match.
