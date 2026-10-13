@@ -6,7 +6,7 @@ import {
   type FfPreset,
   type HostMacroContext,
 } from "./core.js";
-import { VIETNAMESE_OUTPUT_PROMPT } from "./vietnamese.js";
+import { vietnameseOutputFor } from "./preset-family.js";
 
 // Literal tokenizer markers in a card or prompt are ordinary text here.
 const TEXT_OPTIONS = { allowedSpecial: new Set<string>(), disallowedSpecial: new Set<string>() };
@@ -63,16 +63,17 @@ export async function estimatePluginPromptTokens(
   );
   const messages = [...composed.leading, ...composed.absolute, ...composed.trailing];
   const imagePrompt = composed.leading.find(
-    (message) => message.memo === "ff54:image-optimization",
+    (message) => String(message.memo).endsWith(":image-optimization"),
   );
   if (imagePrompt) {
     estimate.entries.push({ identifier: "image-optimization", tokens: count(imagePrompt.content) });
   }
   if (settings.vietnameseOutputEnabled) {
-    messages.push({ role: "system", content: VIETNAMESE_OUTPUT_PROMPT });
+    const outputPrompt = vietnameseOutputFor(preset);
+    messages.push({ role: "system", content: outputPrompt });
     estimate.entries.push({
       identifier: "vietnamese-output",
-      tokens: count(VIETNAMESE_OUTPUT_PROMPT),
+      tokens: count(outputPrompt),
     });
   }
   for (const message of messages) {

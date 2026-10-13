@@ -7,6 +7,12 @@ import {
   type ChatMessage,
   type FfPreset,
 } from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
+import { loadPresetSources } from "../scripts/build-tomisakae-vn-rp-plugin.js";
+import { switchPresetFamily } from "../risuai/tomisakae-vn-rp-plugin/src/presets.js";
+import {
+  pluginMemoPrefix,
+  type PresetSources,
+} from "../risuai/tomisakae-vn-rp-plugin/src/preset-family.js";
 import { buildEditorReferenceMessages } from "../risuai/tomisakae-vn-rp-plugin/src/submodel-context.js";
 import {
   CONFIG_PRESETS_STORAGE_KEY,
@@ -47,6 +53,7 @@ interface ModelOptions {
 
 let bundled = "";
 let preset: FfPreset;
+let sources: PresetSources;
 
 beforeAll(async () => {
   const raw = await readFile(
@@ -54,6 +61,7 @@ beforeAll(async () => {
     "utf8",
   );
   preset = JSON.parse(raw) as FfPreset;
+  sources = await loadPresetSources();
   const result = await build({
     entryPoints: ["risuai/tomisakae-vn-rp-plugin/src/plugin.ts"],
     bundle: true,
@@ -63,6 +71,7 @@ beforeAll(async () => {
     target: "es2022",
     define: {
       __FF54_PRESET__: raw,
+      __PRESET_SOURCES__: JSON.stringify(sources),
       __FF54_SOURCE_NAME__: '"test-preset"',
       __FF54_SOURCE_SHA256__: '"test-digest"',
     },
@@ -148,10 +157,12 @@ async function startPlugin(
     uiNodes.set(key, node);
     return node;
   };
+  let settingsHtml = "";
   const uiDocument = {
     head: { innerHTML: "" },
     body: {
       set innerHTML(html: string) {
+        settingsHtml = html;
         uiNodes.clear();
         inputs.length = 0;
         for (const match of html.matchAll(/<input\b([^>]*)>/g)) {
@@ -168,9 +179,11 @@ async function startPlugin(
     getElementById: (id: string) => uiNodes.get(id),
     querySelectorAll: (selector: string) =>
       inputs.filter((node) =>
-        selector.includes('type="checkbox"')
-          ? !!node.dataset.kind && node.dataset.kind !== "choice"
-          : node.dataset.kind === "choice",
+        selector.includes("data-family")
+          ? !!node.dataset.family
+          : selector.includes('type="checkbox"')
+            ? !!node.dataset.kind && node.dataset.kind !== "choice"
+            : node.dataset.kind === "choice",
       ),
     querySelector: (selector: string) => {
       const id = selector.match(/data-id="([^"]*)"/)?.[1];
@@ -352,6 +365,12 @@ async function startPlugin(
   await initialized;
 
   return {
+    settingsHtml: () => settingsHtml,
+    async selectFamily(family: string) {
+      for (const node of inputs.filter((input) => input.dataset.family))
+        node.checked = node.dataset.family === family;
+      await inputs.find((node) => node.dataset.family === family)!.handlers.get("change")!();
+    },
     callbacks,
     sounds,
     failMain: () => generating.delete(`${selectedCharacter}:${selectedChat}`),
@@ -509,9 +528,7 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(options.messages[editorIndex]!.content).toContain(
       "Freely rebuild sentences and paragraphs with manga, anime, and light-novel pacing.",
     );
-    expect(options.messages[editorIndex]!.content).toContain(
-      "use comic timing when appropriate",
-    );
+    expect(options.messages[editorIndex]!.content).toContain("use comic timing when appropriate");
     expect(options.messages[editorIndex]!.content).toContain(
       "Rewrite free-text descriptions, thoughts, and notes inside <internal_states> into natural Vietnamese while preserving their information and meaning.",
     );
@@ -547,9 +564,7 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(editorTarget.content).toBe(
       "Rewrite the latest assistant response according to <vietnamese_editor>, including descriptions, thoughts, and notes inside <internal_states>. Keep numeric and fixed state values unchanged; do not fill in data. Return only the complete response; do not continue RP.",
     );
-    expect(editorTarget.content).toContain(
-      "do not continue RP.",
-    );
+    expect(editorTarget.content).toContain("do not continue RP.");
     expect(editorTarget.content).not.toContain("[OOC]");
     expect(references.filter((message) => message.memo === "old-a")).toHaveLength(0);
     expect(references.filter((message) => message.memo === "user-a")).toHaveLength(1);
@@ -1610,6 +1625,170 @@ describe("FF5.4 completion sounds", () => {
     expect(plugin.sounds).toEqual([660, 880, 220, 160, 220, 160]);
     expect(plugin.writes).not.toHaveBeenCalled();
     await plugin.callbacks.unload!();
+  });
+});
+
+describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
+  it("shows Global before full-version family choices and persists switching without losing Global", async () => {
+    const plugin = await startPlugin(true, false, undefined, false, true);
+    await plugin.settingsUi();
+    const html = plugin.settingsHtml();
+    expect(html.indexOf("<h2>Global</h2>")).toBeLessThan(html.indexOf("<h2>Bộ preset nền</h2>"));
+    expect(html).toContain("Freaky Frankenstein 5.4");
+    expect(html).toContain("Sola V2 Flame");
+    expect(html).toContain("Voyage-Universal-v5");
+    await plugin.selectFamily("sola");
+    const saved = plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY) as {
+      presets: Array<{
+        settings: {
+          presetFamily: string;
+          submodelEditorEnabled: boolean;
+          soundNotificationsEnabled: boolean;
+        };
+      }>;
+    };
+    expect(saved.presets[0]!.settings.presetFamily).toBe("sola");
+    expect(saved.presets[0]!.settings.submodelEditorEnabled).toBe(true);
+    expect(saved.presets[0]!.settings.soundNotificationsEnabled).toBe(true);
+    expect(plugin.settingsHtml()).toContain("Showrunner Master HUD");
+    expect(plugin.settingsHtml()).not.toContain("Chế độ Hiện thực");
+    const request = await plugin.request();
+    expect(request.map((m) => m.content).join("\n")).toContain("## Vietnamese Output");
+    await plugin.selectFamily("voyage");
+    const voyageRequest = await plugin.request();
+    expect(voyageRequest.map((m) => m.content).join("\n")).toContain("## Rule: Direct Prose");
+    expect(plugin.settingsHtml()).not.toContain("Showrunner Master HUD");
+  });
+
+  it.each(["sola", "voyage"] as const)(
+    "auto-rewrites %s without FF5.4 header/state requirements and adds a new swipe",
+    async (family) => {
+      const store = normalizePresetStore(preset, undefined, {
+        submodelEditorEnabled: true,
+        submodelAutoRewriteEnabled: true,
+      });
+      store.presets[0]!.settings = switchPresetFamily(
+        store.presets[0]!.settings,
+        sources[family].preset,
+      );
+      const plugin = await startPlugin(true, true, store);
+      await plugin.request([
+        { role: "system", content: "Card and lore." },
+        { role: "system", content: "Summary must not reach editor.", memo: "supaMemory" },
+        { role: "user", content: "Tôi mở cửa.", memo: "user-a" },
+      ]);
+      const raw =
+        family === "sola"
+          ? '<scene_header location="Hall" time="13:20" />\n<copper:bite>"Come in."</copper>\n<sola_hud digest="Day 1"><date>Day: 1</date></sola_hud>'
+          : '"Come in."\n<!-- * Name: An; A-Life: waiting in the hall -->';
+      const edited = raw.replace("Come in.", "Vào đi.");
+      plugin.runModel.mockResolvedValue({ type: "success", result: edited });
+      await plugin.complete(raw);
+      expect(plugin.runModel).toHaveBeenCalledOnce();
+      const sent = plugin.runModel.mock.calls[0]![0].messages;
+      const joined = sent.map((m) => m.content).join("\n");
+      expect(joined).toContain(
+        family === "sola" ? "## Vietnamese Editor" : "## Rule: Vietnamese Editor",
+      );
+      expect(joined).not.toContain("<vietnamese_editor>");
+      expect(joined).not.toContain("manga, anime, and light-novel pacing");
+      expect(joined).not.toContain("Summary must not reach editor.");
+      expect(sent.at(-2)).toMatchObject({ role: "assistant", content: raw });
+      expect(sent.at(-1)?.role).toBe("user");
+      const editorIndex = sent.findIndex(
+        (message) => message.memo === `${pluginMemoPrefix(sources[family].preset)}submodel-editor`,
+      );
+      const postHistoryIndex = sent.findIndex(
+        (message) =>
+          message.memo ===
+          (family === "sola"
+            ? "vn-rp:sola:jailbreak"
+            : "vn-rp:voyage:713e9dd1-366f-4f2a-9e4b-5e28b6ee63a5"),
+      );
+      expect(editorIndex).toBeGreaterThan(-1);
+      expect(editorIndex + 1).toBe(postHistoryIndex);
+      const saved = plugin.chats.get("0:0")!.message.at(-1)!;
+      expect(saved.swipes).toEqual([raw, edited]);
+      expect(saved.data).toBe(edited);
+      expect(saved.swipeId).toBe(1);
+      expect(plugin.api.alert).toHaveBeenCalled();
+    },
+  );
+
+  it("accepts a quiet Sola turn with no repeated header or changed HUD", async () => {
+    const store = normalizePresetStore(preset, undefined, {
+      submodelEditorEnabled: true,
+      submodelAutoRewriteEnabled: true,
+    });
+    store.presets[0]!.settings = switchPresetFamily(
+      store.presets[0]!.settings,
+      sources.sola.preset,
+    );
+    const plugin = await startPlugin(true, true, store);
+    await plugin.request();
+    plugin.runModel.mockResolvedValue({ type: "success", result: 'Cô khép cửa. "Ngồi đi."' });
+    await plugin.complete('She closes the door. "Sit down."');
+    expect(plugin.runModel).toHaveBeenCalledOnce();
+  });
+
+  it.each(["sola_hud", "solatag", "tempo", "cabinet", "arrow", "omen"])(
+    "does not auto-rewrite an unfinished Sola %s block",
+    async (tag) => {
+      const store = normalizePresetStore(preset, undefined, {
+        submodelEditorEnabled: true,
+        submodelAutoRewriteEnabled: true,
+      });
+      store.presets[0]!.settings = switchPresetFamily(
+        store.presets[0]!.settings,
+        sources.sola.preset,
+      );
+      const plugin = await startPlugin(true, true, store);
+      await plugin.request();
+      await plugin.complete(`A scene. <${tag}>unfinished`);
+      expect(plugin.runModel).not.toHaveBeenCalled();
+    },
+  );
+
+  it("does not auto-rewrite unbalanced nested Sola trackers or unfinished Voyage notes", async () => {
+    const store = normalizePresetStore(preset, undefined, {
+      submodelEditorEnabled: true,
+      submodelAutoRewriteEnabled: true,
+    });
+    store.presets[0]!.settings = switchPresetFamily(
+      store.presets[0]!.settings,
+      sources.sola.preset,
+    );
+    const plugin = await startPlugin(true, true, store);
+    await plugin.request();
+    await plugin.complete("A scene. <sola_hud><date><date>Day: 1</date></sola_hud>");
+    expect(plugin.runModel).not.toHaveBeenCalled();
+    await plugin.settingsUi();
+    await plugin.selectFamily("voyage");
+    await plugin.request();
+    await plugin.complete("A scene. <!-- Name: An");
+    expect(plugin.runModel).not.toHaveBeenCalled();
+  });
+
+  it("keeps Sola state in saved history while trimming only the request copy", async () => {
+    const store = normalizePresetStore(preset, undefined);
+    store.presets[0]!.settings = switchPresetFamily(
+      store.presets[0]!.settings,
+      sources.sola.preset,
+    );
+    const plugin = await startPlugin(false, false, store);
+    const state = '<sola_hud digest="Day 1"><date>Day: 1</date></sola_hud>';
+    const messages: ChatMessage[] = [
+      { role: "assistant", content: `Old scene. ${state}`, memo: "old-a" },
+      ...Array.from({ length: 6 }, (_, i) => ({
+        role: "user" as const,
+        content: `User ${i}`,
+        memo: `u${i}`,
+      })),
+    ];
+    plugin.chats.get("0:0")!.message[0]!.data = `Old scene. ${state}`;
+    const request = await plugin.request(messages);
+    expect(request.find((m) => m.memo === "old-a")?.content).not.toContain("<sola_hud");
+    expect(plugin.chats.get("0:0")!.message[0]!.data).toContain(state);
   });
 });
 

@@ -21,6 +21,84 @@ Non-Vocal Sound Effects:
 - Restraint: Add no decorative, unsupported, or quota-driven sound. Repeat an effect only while its cause continues.
 </vietnamese_output>`;
 
+// Sola keeps its cinematic voice modules and lean tracker syntax.
+export const SOLA_VIETNAMESE_OUTPUT_PROMPT = `## Vietnamese Output
+- Language: Compose narration, dialogue, vocal sounds, props, and generated display text directly in natural Vietnamese. Read foreign sources for intent; use Vietnamese clause links and particles instead of translated grammar. Use established Latin-script names and necessary terms; foreign speech must fit the speaker. Remove stray foreign characters and avoidable foreign wording. Foreign-language examples guide meaning and delivery, not output language.
+- Prose & Voice: Apply the active Sola prose, pacing, POV, idiolect, and acoustic modules in Vietnamese. Link physical beats by timing and consequence; carry diction, cadence, and evasion through character-specific pronouns, address, and particles. Keep natural hesitations and vocal friction without copying foreign spelling. Avoid repetitive sensory beats and forced melodrama.
+- HUD & Props: Write generated descriptions, thoughts, notes, and display values in Vietnamese, including display attributes. Keep tracker tags, field keys, palette/gradient/tone/kinetic names, telemetry codes, numeric state, and regex-dependent labels exact. Preserve scene_header and sola_hud structure; use 24-hour numeric time for chronology and skybox rendering.`;
+
+// Voyage keeps its direct GM voice, PbtA outcomes, and native text formatting.
+export const VOYAGE_VIETNAMESE_OUTPUT_PROMPT = `## Rule: Vietnamese Output
+* Compose narration, dialogue, sounds, documents, and generated sheet text directly in natural Vietnamese. Read foreign sources for intent; choose pronouns by relationship and particles by speaker attitude. Use established Latin-script names and necessary terms; foreign speech must fit the speaker. Remove stray foreign characters and avoidable foreign wording. Foreign-language examples guide meaning and delivery, not output language.
+* Apply the active Direct Prose, NPC Realistic Speech, POV, and Prose Format rules in Vietnamese. State actions and observable consequences plainly; link related clauses naturally. Keep each NPC's goal, state, and speech pattern without adding explanatory narration, ornamental language, or forced banter.
+* Use natural Vietnamese for generated character/location sheet descriptions and hidden GM notes. Preserve comment delimiters, sheet keys, fixed PbtA outcomes, rolls, numbers, identifiers, and schema syntax. Keep narration as plaintext, dialogue in quotes, sounds in underscores, documents in blockquotes, and terminal/code in their code blocks.`;
+
+export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
+  [
+    '- POV Check (First Person): 1st person present for {{char}} ("I"/"me"/"my"); strictly inside {{char}}\'s immediate field of view.',
+    "- POV Check (First Person): Vietnamese first-person self-reference for {{char}}; current events, strictly inside {{char}}'s immediate field of view.",
+  ],
+  [
+    '- POV Check (Second Person): 2nd person present for {{user}} ("you"/"your"); no "I" in narration; never narrate {{user}}\'s unvoiced thoughts.',
+    "- POV Check (Second Person): Vietnamese second-person address for {{user}}; current events, no first-person narration; never narrate {{user}}'s unvoiced thoughts.",
+  ],
+  [
+    '- POV Check (Hybrid): 3rd person for world/NPCs; 2nd person ("you") strictly for {{user}}\'s physical sensation/touch.',
+    "- POV Check (Hybrid): Third person for world/NPCs; Vietnamese second-person address strictly for {{user}}'s physical sensation/touch.",
+  ],
+  [
+    '- POV Check (Third Present): Strictly 3rd person present ("he/she/name", walks/speaks); {{user}} interiority is off-limits.',
+    "- POV Check (Third Present): Strictly Vietnamese third-person reference for current events; {{user}} interiority is off-limits.",
+  ],
+  [
+    '- Perspective: {{char}} is strictly "I" / "me" / "my" in present tense narration.',
+    "- Perspective: {{char}} narrates in first person with Vietnamese self-reference appropriate to identity and voice; keep events in the present.",
+  ],
+  [
+    '- Perspective: Address {{user}} strictly as "you" / "your" in present tense. Avoid 1st-person ("I") narration.',
+    "- Perspective: Address {{user}} in Vietnamese second person appropriate to the relationship; keep events in the present. Avoid first-person narration.",
+  ],
+  [
+    '- User Body: 2nd person ("you" / "your") strictly for {{user}}\'s physical, tactile sensations (touch, heat, pain, pressure).',
+    "- User Body: Vietnamese second-person address strictly for {{user}}'s physical, tactile sensations (touch, heat, pain, pressure).",
+  ],
+  [
+    '- Perspective: Strictly 3rd person for everyone, including {{user}} (he/she/they/name — never "I" or "you").',
+    "- Perspective: Strictly Vietnamese third-person reference or names for everyone, including {{user}}; never first- or second-person narration.",
+  ],
+  [
+    '- Perspective: 3rd person limited for all characters, including {{user}} (he/she/they/name — never "I" or "you").',
+    "- Perspective: Vietnamese third-person limited for all characters, including {{user}}; never first- or second-person narration.",
+  ],
+  [
+    "Always refer to {{user}} with she/her pronouns.",
+    "Refer to {{user}} with Vietnamese feminine reference appropriate to age, relationship, and POV.",
+  ],
+  [
+    "Always refer to {{user}} with he/him pronouns.",
+    "Refer to {{user}} with Vietnamese masculine reference appropriate to age, relationship, and POV.",
+  ],
+  [
+    "Always refer to {{user}} with they/them pronouns.",
+    "Refer to {{user}} with Vietnamese gender-neutral reference appropriate to relationship and POV.",
+  ],
+  [
+    '- Tense: Present tense throughout ("walks", "looks"). Simple past is permitted only for established backstory.',
+    "- Tense: Keep current events in the present; use Vietnamese time cues only as needed. Established backstory may refer to the past.",
+  ],
+  [
+    "- Tense: Past tense narration throughout.",
+    "- Tense: Narrate past events using natural Vietnamese time cues where needed, without repeating tense markers mechanically.",
+  ],
+];
+
+export const VOYAGE_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
+  [
+    "Address PC as you/your.",
+    "Address PC in Vietnamese second person appropriate to the relationship.",
+  ],
+];
+
 export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
   [
     "[ 🕰️ Time HH:MM AM/PM | 🗓️ Day # - 🗓️ DayOfWeek, Month DD, YYYY Era | 📍 Location - Specific Area | [WeatherEmoji] Weather, Temp °F ]",

@@ -90,6 +90,77 @@ function luminance(hex: string): number {
 
 const MINIMUM_TEXT_CONTRAST = 4.5;
 
+export function textContrast(color: string, background: string): number {
+  const foreground = luminance(color);
+  const behind = luminance(background);
+  return (Math.max(foreground, behind) + 0.05) / (Math.min(foreground, behind) + 0.05);
+}
+
+/** Keep Sola's palette names; adjust only their native swatches for the host background. */
+export const SOLA_DIALOGUE_COLORS: Readonly<Record<string, string>> = {
+  marigold: "#F4A261",
+  amber: "#F3B74B",
+  cider: "#E9A036",
+  coral: "#EE6C4D",
+  copper: "#E07A5F",
+  terracotta: "#C06C54",
+  sage: "#9AA87A",
+  rose: "#F4845F",
+  denim: "#7A8B99",
+  slate: "#8FA4B2",
+  indigo: "#8592E6",
+  heather: "#B08EA2",
+  ash: "#BAC3C7",
+  mist: "#98B9C7",
+  pine: "#789E8A",
+  obsidian: "#A3948A",
+};
+
+function readableSwatch(hex: string, theme: DialogueTheme): string {
+  if (textContrast(hex, theme.background) >= MINIMUM_TEXT_CONTRAST) return hex;
+  const destination =
+    textContrast("#000000", theme.background) >= textContrast("#ffffff", theme.background)
+      ? 0
+      : 255;
+  const channels = [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16));
+  for (let step = 1; step <= 20; step += 1) {
+    const adjusted = `#${channels
+      .map((value) =>
+        Math.round(value + ((destination - value) * step) / 20)
+          .toString(16)
+          .padStart(2, "0"),
+      )
+      .join("")}`;
+    if (textContrast(adjusted, theme.background) >= MINIMUM_TEXT_CONTRAST) return adjusted;
+  }
+  return hex;
+}
+
+export function adaptSolaDialogueColors(content: string, theme?: DialogueTheme): string {
+  if (!theme) return content;
+  const swatches = new Map(
+    Object.values(SOLA_DIALOGUE_COLORS).map((hex) => [
+      hex.toLowerCase(),
+      readableSwatch(hex, theme),
+    ]),
+  );
+  return content.replace(/#[\da-f]{6}\b/gi, (hex) => swatches.get(hex.toLowerCase()) ?? hex);
+}
+
+/** Apply the adjusted Sola swatches only to its voice-rendering scripts. */
+export function adaptSolaDialogueReplacement(
+  replacement: string,
+  scriptName: string,
+  theme?: DialogueTheme,
+): string {
+  if (!scriptName.startsWith("Sola Voice:")) return replacement;
+  return adaptSolaDialogueColors(replacement, theme).replace(
+    /<font color="(#[\da-f]{6})">/gi,
+    (_match, color: string) =>
+      `<font color="${color}" style="color:${color};--FontColorStandard:${color};--FontColorItalic:${color};--FontColorBold:${color};--FontColorItalicBold:${color};--FontColorQuote1:${color};--FontColorQuote2:${color};">`,
+  );
+}
+
 /** Change the palette in place; do not add prompt rules or rank NPC colors. */
 export function adaptDialogueColors(content: string, theme?: DialogueTheme): string {
   if (!theme) return content;

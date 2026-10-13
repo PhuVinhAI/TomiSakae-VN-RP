@@ -378,9 +378,9 @@ const REGEX_NAMES: Readonly<Record<string, string>> = {
   "14a69f3b-da50-4179-9522-33d2b9b9c160": "Loại prompt tạo ảnh khỏi ngữ cảnh",
 };
 
-export function promptUiCopy(prompt: FfPrompt): UiCopy {
+export function promptUiCopy(prompt: FfPrompt, family: "ff54" | "sola" | "voyage" = "ff54"): UiCopy {
   return (
-    PROMPT_COPY[prompt.identifier] ?? {
+    (family === "ff54" ? PROMPT_COPY[prompt.identifier] : undefined) ?? {
       name: prompt.name || prompt.identifier,
       description: "Preset gốc không có chú thích cho module này.",
     }

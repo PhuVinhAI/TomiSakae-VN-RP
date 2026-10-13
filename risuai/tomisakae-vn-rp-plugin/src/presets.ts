@@ -1,4 +1,5 @@
 import { normalizeSettings, type FfGlobalSettings, type FfPreset } from "./core.js";
+import { familyOf, normalizePresetFamily, type PresetSources } from "./preset-family.js";
 
 export const DEFAULT_CONFIG_PRESET_ID = "default";
 export const CONFIG_PRESETS_STORAGE_KEY = "ff54-config-presets-v1";
@@ -19,6 +20,7 @@ export function normalizePresetStore(
   source: FfPreset,
   value: unknown,
   legacySettings?: unknown,
+  sources?: PresetSources,
 ): ConfigPresetStore {
   const store: ConfigPresetStore = {
     version: 1,
@@ -26,7 +28,10 @@ export function normalizePresetStore(
       {
         id: DEFAULT_CONFIG_PRESET_ID,
         name: "Mặc định",
-        settings: normalizeSettings(source, legacySettings),
+        settings: normalizeSettings(
+          sourceForStoredSettings(source, legacySettings, sources),
+          legacySettings,
+        ),
       },
     ],
     cardPresets: {},
@@ -43,7 +48,10 @@ export function normalizePresetStore(
     const profile = {
       id: entry.id,
       name: entry.id === DEFAULT_CONFIG_PRESET_ID ? "Mặc định" : entry.name.trim(),
-      settings: normalizeSettings(source, entry.settings),
+      settings: normalizeSettings(
+        sourceForStoredSettings(source, entry.settings, sources),
+        entry.settings,
+      ),
     };
     seen.add(entry.id);
     if (entry.id === DEFAULT_CONFIG_PRESET_ID) store.presets[0] = profile;
@@ -70,6 +78,37 @@ export function normalizePresetStore(
     }
   }
   return store;
+}
+
+function sourceForStoredSettings(
+  fallback: FfPreset,
+  value: unknown,
+  sources?: PresetSources,
+): FfPreset {
+  const family =
+    value && typeof value === "object"
+      ? normalizePresetFamily((value as Record<string, unknown>).presetFamily)
+      : "ff54";
+  return sources?.[family].preset ?? fallback;
+}
+
+/** Switch only source-module banks; plugin features remain shared in the profile. */
+export function switchPresetFamily(settings: FfGlobalSettings, target: FfPreset): FfGlobalSettings {
+  const currentFamily = normalizePresetFamily(settings.presetFamily);
+  const nextFamily = familyOf(target);
+  const banks = structuredClone(settings.familyModules ?? {});
+  banks[currentFamily] = {
+    promptEnabled: structuredClone(settings.promptEnabled),
+    regexEnabled: structuredClone(settings.regexEnabled),
+  };
+  const next = normalizeSettings(target, {
+    ...settings,
+    promptEnabled: banks[nextFamily]?.promptEnabled ?? {},
+    regexEnabled: banks[nextFamily]?.regexEnabled ?? {},
+  });
+  next.presetFamily = nextFamily;
+  next.familyModules = banks;
+  return next;
 }
 
 export function presetForCard(store: ConfigPresetStore, cardId?: string): ConfigPreset {

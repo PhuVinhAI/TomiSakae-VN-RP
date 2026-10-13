@@ -3,6 +3,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "esbuild";
+import type { PresetSources } from "../risuai/tomisakae-vn-rp-plugin/src/preset-family.js";
+import type { FfPreset } from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
 
 const DEFAULT_SOURCE = "risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json";
 const DEFAULT_OUTPUT = "risuai/tomisakae-vn-rp-plugin/dist/tomisakae-vn-rp-plugin.js";
@@ -34,7 +36,6 @@ function parseArguments(argv: string[]): Options {
 function validatePreset(value: unknown): asserts value is {
   prompts: unknown[];
   prompt_order: Array<{ order: unknown[] }>;
-  extensions: { regex_scripts: unknown[] };
 } {
   if (!value || typeof value !== "object" || Array.isArray(value))
     throw new Error("Preset root must be an object.");
@@ -45,9 +46,6 @@ function validatePreset(value: unknown): asserts value is {
   const firstOrder = preset.prompt_order[0] as Record<string, unknown> | undefined;
   if (!firstOrder || !Array.isArray(firstOrder.order))
     throw new Error("Preset is missing prompt_order[0].order[].");
-  const extensions = preset.extensions as Record<string, unknown> | undefined;
-  if (!extensions || !Array.isArray(extensions.regex_scripts))
-    throw new Error("Preset is missing extensions.regex_scripts[].");
 }
 
 export async function buildPlugin(options: Options): Promise<{ output: string; digest: string }> {
@@ -58,6 +56,7 @@ export async function buildPlugin(options: Options): Promise<{ output: string; d
   validatePreset(preset);
   const canonicalPreset = JSON.stringify(preset);
   const sourceDigest = createHash("sha256").update(raw).digest("hex");
+  const sources = await loadPresetSources(sourcePath);
   const result = await build({
     entryPoints: [path.resolve("risuai/tomisakae-vn-rp-plugin/src/plugin.ts")],
     bundle: true,
@@ -71,13 +70,14 @@ export async function buildPlugin(options: Options): Promise<{ output: string; d
       __FF54_PRESET__: canonicalPreset,
       __FF54_SOURCE_NAME__: JSON.stringify(path.basename(sourcePath)),
       __FF54_SOURCE_SHA256__: JSON.stringify(sourceDigest),
+      __PRESET_SOURCES__: JSON.stringify(sources),
     },
     banner: {
       js: [
         "//@name tomisakae_vn_rp",
         "//@display-name TomiSakae VN-RP",
         "//@api 3.0",
-        "//@version 1.5.3",
+        "//@version 2.0.0",
         "",
       ].join("\n"),
     },
@@ -95,6 +95,37 @@ export async function buildPlugin(options: Options): Promise<{ output: string; d
     await writeFile(outputPath, output, "utf8");
   }
   return { output: outputPath, digest };
+}
+
+/** Bundle prompt/regex data only, never exported connection or sampling settings. */
+export async function loadPresetSources(ff54Source = DEFAULT_SOURCE): Promise<PresetSources> {
+  const sources = {} as PresetSources;
+  const inputs = [
+    ["ff54", ff54Source, path.basename(ff54Source)],
+    ["sola", "risuai/tomisakae-vn-rp-plugin/source/sola-v2-flame.json", "Sola V2 Flame.json"],
+    [
+      "voyage",
+      "risuai/tomisakae-vn-rp-plugin/source/voyage-universal-v5.json",
+      "Voyage-Universal-v5.json",
+    ],
+  ] as const;
+  for (const [family, filename, sourceName] of inputs) {
+    const raw = await readFile(path.resolve(filename), "utf8");
+    const data: unknown = JSON.parse(raw.replace(/^\uFEFF/, ""));
+    validatePreset(data);
+    const preset = data as FfPreset;
+    sources[family] = {
+      preset: {
+        family,
+        prompts: preset.prompts,
+        prompt_order: preset.prompt_order,
+        extensions: { regex_scripts: preset.extensions?.regex_scripts ?? [] },
+      },
+      sourceName,
+      sha256: createHash("sha256").update(raw).digest("hex"),
+    };
+  }
+  return sources;
 }
 
 export async function run(argv: string[]): Promise<number> {

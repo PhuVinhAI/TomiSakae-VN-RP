@@ -1,8 +1,18 @@
-import { adaptPromptForVietnamese, VIETNAMESE_OUTPUT_PROMPT } from "./vietnamese.js";
-import { addImageReasoningGuidance, IMAGE_OPTIMIZATION_PROMPT } from "./image.js";
+import {
+  adaptFamilyPrompt,
+  familyOf,
+  imageOptimizationFor,
+  isPluginMemo,
+  pluginMemoPrefix,
+  presetOrder,
+  vietnameseOutputFor,
+  type PresetFamilyId,
+} from "./preset-family.js";
 import {
   adaptDialogueColors,
   adaptDialogueColorRegex,
+  adaptSolaDialogueColors,
+  adaptSolaDialogueReplacement,
   type DialogueTheme,
 } from "./dialogue-colors.js";
 
@@ -60,6 +70,14 @@ export interface FfPreset {
 }
 
 export interface FfGlobalSettings {
+  presetFamily?: PresetFamilyId;
+  familyModules?: Partial<
+    Record<
+      PresetFamilyId,
+      { promptEnabled: Record<string, boolean>; regexEnabled: Record<string, boolean> }
+    >
+  >;
+  dialogueThemeEnabled?: boolean;
   enabled: boolean;
   promptEnabled: Record<string, boolean>;
   regexEnabled: Record<string, boolean>;
@@ -130,7 +148,7 @@ const REALISM_MODE_ID = "019f62e8-892f-700c-9795-53ecb3381d7d";
 const FREAKY_MODE_ID = "019f62e8-892f-700d-b070-4add983aeae1";
 
 export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
-  const order = preset.prompt_order[0]?.order ?? [];
+  const order = presetOrder(preset);
   const regexScripts = preset.extensions?.regex_scripts ?? [];
   return {
     enabled: true,
@@ -152,6 +170,7 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
     soundNotificationsEnabled: false,
     submodelEditorEnabled: false,
     submodelAutoRewriteEnabled: false,
+    ...(familyOf(preset) !== "ff54" ? { presetFamily: familyOf(preset) } : {}),
   };
 }
 
@@ -159,6 +178,16 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
   const defaults = createDefaultSettings(preset);
   if (!value || typeof value !== "object" || Array.isArray(value)) return defaults;
   const record = value as Record<string, unknown>;
+  if (typeof record.dialogueThemeEnabled === "boolean")
+    defaults.dialogueThemeEnabled = record.dialogueThemeEnabled;
+  if (
+    record.familyModules &&
+    typeof record.familyModules === "object" &&
+    !Array.isArray(record.familyModules)
+  )
+    defaults.familyModules = structuredClone(record.familyModules) as NonNullable<
+      FfGlobalSettings["familyModules"]
+    >;
   const promptEnabled =
     record.promptEnabled && typeof record.promptEnabled === "object"
       ? (record.promptEnabled as Record<string, unknown>)
@@ -302,6 +331,9 @@ function expandMacroPass(
       const [name, fallback] = splitMacroArgument(inner.slice("getvar::".length));
       const value = variables.get(name.trim());
       replacement = value === undefined || value === "" ? fallback : value;
+    } else if (normalized.startsWith("random::")) {
+      const choices = inner.slice("random::".length).split("::");
+      replacement = choices[rng(0, choices.length - 1)] ?? "";
     } else if (normalized.startsWith("roll::")) {
       replacement = rollDice(inner.slice("roll::".length), rng);
     }
@@ -334,7 +366,7 @@ export function expandSourceMacros(
 }
 
 /**
- * Resolves the host-name macros used by FF5.4 without relying on newer
+ * Resolves source host-name macros without relying on newer
  * RisuAI chat-parser APIs. Other macros stay intact for source fidelity.
  */
 export function expandHostMacros(content: string, context: HostMacroContext): string {
@@ -386,8 +418,8 @@ export interface ComposedPrompt {
 }
 
 /**
- * Builds FF5.4 around RisuAI's already assembled card/chat context. Source
- * marker slots are supplied by RisuAI, while FF5.4 keeps its own prompt order,
+ * Builds the selected preset around RisuAI's already assembled card/chat context.
+ * Marker slots are supplied by RisuAI; the preset keeps its own prompt order,
  * roles, relative sections, and absolute-depth injections.
  */
 export function composePresetPrompts(
@@ -403,21 +435,24 @@ export function composePresetPrompts(
     const leading: ChatMessage[] = [];
     const absoluteByDepth = new Map<number, FfPrompt[]>();
     const trailing: ChatMessage[] = [];
-    const order = preset.prompt_order[0]?.order ?? [];
+    const order = presetOrder(preset);
+    const memoPrefix = pluginMemoPrefix(preset);
+    let afterHistory = false;
 
     for (const entry of order) {
+      if (entry.identifier === "chatHistory") afterHistory = true;
       if (!settings.promptEnabled[entry.identifier] || MARKER_IDENTIFIERS.has(entry.identifier))
         continue;
       const prompt = map.get(entry.identifier);
       if (!prompt || prompt.marker || typeof prompt.content !== "string") continue;
-      let sourceContent = settings.vietnameseOutputEnabled
-        ? adaptPromptForVietnamese(prompt.content)
-        : prompt.content;
-      if (settings.imageOptimizationEnabled && promptRole(prompt) === "user") {
-        sourceContent = addImageReasoningGuidance(sourceContent);
-      }
-      if (promptRole(prompt) === "system") {
-        sourceContent = adaptDialogueColors(sourceContent, macroContext.dialogueTheme);
+      let sourceContent = adaptFamilyPrompt(prompt.content, preset, settings);
+      if (settings.dialogueThemeEnabled !== false && promptRole(prompt) === "system") {
+        sourceContent =
+          familyOf(preset) === "sola"
+            ? adaptSolaDialogueColors(sourceContent, macroContext.dialogueTheme)
+            : familyOf(preset) === "ff54"
+              ? adaptDialogueColors(sourceContent, macroContext.dialogueTheme)
+              : sourceContent;
       }
       let content = expandSourceMacros(sourceContent, variables, macroContext);
       content = await parseHostMacros(content, promptRole(prompt));
@@ -425,7 +460,7 @@ export function composePresetPrompts(
       const message: ChatMessage = {
         role: promptRole(prompt),
         content: content.trim(),
-        memo: `ff54:${prompt.identifier}`,
+        memo: `${memoPrefix}${prompt.identifier}`,
       };
       onExpandedPrompt?.(message, prompt);
       if (prompt.injection_position === ABSOLUTE_POSITION) {
@@ -433,7 +468,10 @@ export function composePresetPrompts(
         const bucket = absoluteByDepth.get(depth) ?? [];
         bucket.push({ ...prompt, content: message.content });
         absoluteByDepth.set(depth, bucket);
-      } else if (entry.identifier === "jailbreak") {
+      } else if (
+        entry.identifier === "jailbreak" ||
+        (familyOf(preset) !== "ff54" && afterHistory)
+      ) {
         pushMerged(trailing, message);
       } else if (
         prompt.injection_position === undefined ||
@@ -464,7 +502,7 @@ export function composePresetPrompts(
             absolute.push({
               role,
               content: contents.join("\n"),
-              memo: `ff54:absolute:${depth}:${order}:${role}`,
+              memo: `${memoPrefix}absolute:${depth}:${order}:${role}`,
             });
           }
         }
@@ -473,8 +511,8 @@ export function composePresetPrompts(
     if (settings.imageOptimizationEnabled) {
       leading.push({
         role: "system",
-        content: IMAGE_OPTIMIZATION_PROMPT,
-        memo: "ff54:image-optimization",
+        content: imageOptimizationFor(preset),
+        memo: `${memoPrefix}image-optimization`,
       });
     }
     return { leading, absolute, trailing, variables };
@@ -576,12 +614,12 @@ export function applyRegexScripts(
     edit?: boolean;
     depth?: number;
     depthForScript?: (script: FfRegexScript) => number | undefined;
+    dialogueTheme?: DialogueTheme;
   },
 ): string {
   let output = input;
   for (const script of preset.extensions?.regex_scripts ?? []) {
-    if (!settings.regexEnabled[script.id] || script.disabled || !script.findRegex || !output)
-      continue;
+    if (!settings.regexEnabled[script.id] || !script.findRegex || !output) continue;
     const eligibleMode =
       (script.markdownOnly && options.markdown) ||
       (script.promptOnly && options.prompt) ||
@@ -595,9 +633,10 @@ export function applyRegexScripts(
       continue;
     }
     if (options.prompt && script.scriptName === "FF5 - GFX Stripper") continue;
-    const localized = settings.vietnameseOutputEnabled
-      ? adaptRegexForVietnamese(script.findRegex, String(script.replaceString ?? ""))
-      : { findRegex: script.findRegex, replaceString: String(script.replaceString ?? "") };
+    const localized =
+      settings.vietnameseOutputEnabled && familyOf(preset) === "ff54"
+        ? adaptRegexForVietnamese(script.findRegex, String(script.replaceString ?? ""))
+        : { findRegex: script.findRegex, replaceString: String(script.replaceString ?? "") };
     // Provider reasoning can exceed the source's 20,000-character cap.
     // Keep Hapuppy's closing-tag boundaries and toggle/depth rules intact.
     const findRegex =
@@ -611,12 +650,20 @@ export function applyRegexScripts(
     if (!regex) continue;
     // RisuAI gives nested quote/emphasis elements their own theme colors.
     // Scope those variables to the dialogue span so they keep the source color.
+    const themedReplacement =
+      options.markdown && familyOf(preset) === "sola"
+        ? adaptSolaDialogueReplacement(
+            localized.replaceString,
+            script.scriptName ?? "",
+            settings.dialogueThemeEnabled !== false ? options.dialogueTheme : undefined,
+          )
+        : localized.replaceString;
     const replacement = options.markdown
-      ? localized.replaceString.replace(
+      ? themedReplacement.replace(
           '<span style="color:$1;',
           '<span style="color:$1;--FontColorStandard:$1;--FontColorItalic:$1;--FontColorBold:$1;--FontColorItalicBold:$1;--FontColorQuote1:$1;--FontColorQuote2:$1;',
         )
-      : localized.replaceString;
+      : themedReplacement;
     output = replaceWithSourceGroups(
       output,
       regex,
@@ -685,7 +732,7 @@ function messageDepths(messages: ChatMessage[]): Map<ChatMessage, number> {
     (message) =>
       (message.role === "user" || message.role === "assistant") &&
       message.isComment !== true &&
-      !String(message.memo ?? "").startsWith("ff54:"),
+      !isPluginMemo(message.memo),
   );
   const depths = new Map<ChatMessage, number>();
   [...history].reverse().forEach((message, depth) => depths.set(message, depth));
@@ -697,7 +744,7 @@ function assistantResponseDepths(messages: ChatMessage[]): Map<ChatMessage, numb
   let assistantDepth = 0;
   for (const message of [...messages].reverse()) {
     if (message.isComment === true) continue;
-    if (String(message.memo ?? "").startsWith("ff54:")) continue;
+    if (isPluginMemo(message.memo)) continue;
     if (message.role !== "user" && message.role !== "assistant") continue;
     depths.set(message, assistantDepth);
     if (message.role === "assistant") assistantDepth += 1;
@@ -807,7 +854,9 @@ export function injectAbsoluteAtDepth(
   // latest message and higher depths walk farther back.
   const byDepth = new Map<number, ChatMessage[]>();
   for (const message of injections) {
-    const match = String(message.memo ?? "").match(/^ff54:absolute:([0-9]+):/);
+    const match = String(message.memo ?? "").match(
+      /^(?:ff54:|vn-rp:(?:sola|voyage):)absolute:([0-9]+):/,
+    );
     const depth = match ? Number(match[1]) : 0;
     const bucket = byDepth.get(depth) ?? [];
     bucket.push(message);
@@ -830,9 +879,7 @@ export async function buildRequestMessages(
   macroContext: MacroContext = {},
 ): Promise<ChatMessage[]> {
   if (!settings.enabled) return messages;
-  const hostMessages = messages.filter(
-    (message) => !String(message.memo ?? "").startsWith("ff54:"),
-  );
+  const hostMessages = messages.filter((message) => !isPluginMemo(message.memo));
   const requestHistory = applyRequestFiltersToMessages(hostMessages, preset, settings);
   const composed = await composePresetPrompts(preset, settings, parseHostMacros, macroContext);
   return [
@@ -841,8 +888,8 @@ export async function buildRequestMessages(
       ? [
           {
             role: "system" as const,
-            content: VIETNAMESE_OUTPUT_PROMPT,
-            memo: "ff54:vietnamese-output",
+            content: vietnameseOutputFor(preset),
+            memo: `${pluginMemoPrefix(preset)}vietnamese-output`,
           },
         ]
       : []),

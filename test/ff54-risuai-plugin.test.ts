@@ -317,7 +317,8 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     const styles = await readFile("risuai/tomisakae-vn-rp-plugin/src/ui-style.ts", "utf8");
     expect(pluginSource).toContain("Điều khiển <em>TomiSakae VN-RP.</em>");
     expect(pluginSource).toContain('{ name: "TomiSakae VN-RP"');
-    expect(pluginSource).toContain("Nền tảng FF5.4");
+    expect(pluginSource).toContain("<h2>Global</h2>");
+    expect(pluginSource).toContain("<h2>Bộ preset nền</h2>");
     expect(pluginSource).not.toContain('{ name: "FF5.4"');
     expect(styles).toContain('content:"VN"');
     expect(pluginSource).toContain("Lưu cấu hình");

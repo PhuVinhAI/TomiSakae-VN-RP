@@ -1,4 +1,5 @@
 export const SETTINGS_STYLES = `
+  .family-grid{display:grid;gap:10px}.family-option .radio-body{padding:18px;min-height:80px}.family-copy{display:grid;gap:6px}.family-copy strong{font-size:18px}.family-copy small{font-size:12px;line-height:1.5;color:#687167}
   :root{font-family:'Segoe UI',Arial,sans-serif;color:#202722;background:#eae7dc;font-synthesis:none}
   *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-width:320px;background:#eae7dc;color:#202722}
   button,input,select{font:inherit}button{cursor:pointer}:focus-visible{outline:3px solid #d54b31;outline-offset:3px}

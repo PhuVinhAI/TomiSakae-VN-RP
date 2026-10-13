@@ -1,4 +1,5 @@
 import type { ChatMessage } from "./core.js";
+import { isPluginMemo } from "./preset-family.js";
 
 const MEMORY_MEMOS = new Set(["supaMemory", "hypaMemory"]);
 const MEMORY_BLOCK =
@@ -32,7 +33,7 @@ export function buildEditorReferenceMessages(
     if (message.role !== "user" && message.role !== "assistant") return [];
     const memo = String(message.memo ?? "");
     if (
-      memo.startsWith("ff54:") ||
+      isPluginMemo(memo) ||
       memo.startsWith("NewChat") ||
       message.name === "example_user" ||
       message.name === "example_assistant"
