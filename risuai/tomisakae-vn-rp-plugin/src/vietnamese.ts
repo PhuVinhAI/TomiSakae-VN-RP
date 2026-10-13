@@ -266,6 +266,10 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ['"You don\'t have to answer that"', '"Anh không cần trả lời điều đó"'],
   ['"How are you holding up?"', '"Anh đang xoay xở thế nào?"'],
   ['"What did you really mean by...?"', '"Thực ra anh có ý gì khi nói...?"'],
+  [
+    "Dialect grain: phonetic drop-sounds, contractions, and natural disfluency",
+    "Dialect grain: regional pronunciation, colloquial omission, and natural disfluency in Vietnamese",
+  ],
   ['"\'Member that?"', '"Nhớ vụ đó chứ?"'],
   ["\"Wha' you wan'?\"", '"Muốn gì đấy?"'],
   ["\"Ain't nobody askin'\"", '"Có ai hỏi đâu"'],
@@ -299,6 +303,10 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ['"Hold... on..."', '"Khoan... đã..."'],
   ['"Which way did they run?"', '"Họ chạy về phía nào?"'],
   ['"Danny\'s voice."', '"Lời thoại của Danny."'],
+  [
+    "Stylistic modules like Chromatic Gradients and Kinetic Emphasis govern prose and sound effects",
+    "Stylistic modules like Chromatic Gradients and Kinetic Emphasis govern prose",
+  ],
   ['"Spoken dialogue or monologue."', '"Lời thoại hoặc độc thoại."'],
   ['"Enough."', '"Đủ rồi."'],
   ['"You knew this whole time."', '"Anh biết từ đầu đến giờ."'],
@@ -700,6 +708,10 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
     "- POV Check (Third Present): Strictly Vietnamese third-person reference for current events; {{user}} interiority is off-limits.",
   ],
   [
+    "- POV Check (Third Limited): Third person, past tense, for all characters including {{user}}. One head at a time; no omniscience.",
+    "- POV Check (Third Limited): Third person for all characters including {{user}}; past events with natural Vietnamese time cues. One head at a time; no omniscience.",
+  ],
+  [
     '- Perspective: {{char}} is strictly "I" / "me" / "my" in present tense narration.',
     "- Perspective: {{char}} narrates in first person with Vietnamese self-reference appropriate to identity and voice; keep events in the present.",
   ],
@@ -742,6 +754,10 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
 ];
 
 export const VOYAGE_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
+  [
+    "GM states only what happens instead of contractions or implicating.",
+    "GM states only what happens directly, without negation-based contrasts or vague implications.",
+  ],
   ['* "quotes" for dialogue', '* "dấu ngoặc kép" for dialogue'],
   ["* _underscore_ for sounds", "* standalone §...§ on its own line for non-vocal sounds"],
   ["* He didn't just make haste, he runs.", "* Anh không chỉ vội vã, anh chạy."],

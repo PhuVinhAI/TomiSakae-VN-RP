@@ -496,6 +496,10 @@ describe("TomiSakae VN-RP preset families", () => {
       for (const prompt of preset.prompts) {
         if (typeof prompt.content !== "string" || !prompt.content) continue;
         const adapted = adaptFamilyPrompt(prompt.content, preset, settings);
+        if (family === "sola" && prompt.content.includes("- POV Check (Third Limited):")) {
+          expect(adapted).not.toContain("Third person, past tense, for all characters");
+          expect(adapted).toContain("past events with natural Vietnamese time cues");
+        }
         const macroTokens = (text: string) =>
           [...text.matchAll(/\{\{(?:setvar|getvar|random|roll)::([^}:]+)/g)].map((m) => m[0]);
         expect(macroTokens(adapted), prompt.name).toEqual(macroTokens(prompt.content));
@@ -516,6 +520,12 @@ describe("TomiSakae VN-RP preset families", () => {
         .join("\n");
       expect(text).not.toMatch(/\{\{(?:setvar|getvar|random|roll|trim)(?:::|\}\})/);
       if (family === "sola") {
+        expect(text).toContain(
+          "Dialect grain: regional pronunciation, colloquial omission, and natural disfluency in Vietnamese",
+        );
+        expect(text).not.toContain("phonetic drop-sounds, contractions");
+        expect(text).not.toContain("govern prose and sound effects");
+        expect(text).not.toContain("Third person, past tense, for all characters");
         expect(text).toContain("lồn, cặc, tinh dịch, đít, vú, đụ, rỉ nước");
         expect(text).toContain('"Cái chạm ấy thật ấm."');
         expect(text).toContain('"Vì sao chạy? Để sống sót."');
@@ -529,6 +539,8 @@ describe("TomiSakae VN-RP preset families", () => {
         expect(text).toContain("> TÌM THẤY 2 ĐIỆN VĂN CHƯA ĐỌC");
         expect(text).toContain("NEUTRAL");
       } else {
+        expect(text).toContain("without negation-based contrasts or vague implications");
+        expect(text).not.toContain("contractions or implicating");
         expect(text).toContain("Tinh dịch rỉ ra khỏi lồn Emilia");
         expect(text).toContain('"Địt mẹ, tao sẽ GIẾT mày!"');
         expect(text).toContain("* Tên: họ tên hoặc biệt danh");
