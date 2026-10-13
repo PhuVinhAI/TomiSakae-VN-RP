@@ -800,11 +800,16 @@ export function splitBeforeSceneHeader(input: string): { prefix: string; respons
   return { prefix: input.slice(0, index), response: input.slice(index) };
 }
 
+/** PocketRisu branch markers can be user or assistant messages without a flag. */
+export function isChatComment(message: Pick<ChatMessage, "content" | "isComment">): boolean {
+  return message.isComment === true || /^\s*\{\{specialcomment::/.test(message.content);
+}
+
 function messageDepths(messages: ChatMessage[]): Map<ChatMessage, number> {
   const history = messages.filter(
     (message) =>
       (message.role === "user" || message.role === "assistant") &&
-      message.isComment !== true &&
+      !isChatComment(message) &&
       !isPluginMemo(message.memo),
   );
   const depths = new Map<ChatMessage, number>();
@@ -816,7 +821,7 @@ function assistantResponseDepths(messages: ChatMessage[]): Map<ChatMessage, numb
   const depths = new Map<ChatMessage, number>();
   let assistantDepth = 0;
   for (const message of [...messages].reverse()) {
-    if (message.isComment === true) continue;
+    if (isChatComment(message)) continue;
     if (isPluginMemo(message.memo)) continue;
     if (message.role !== "user" && message.role !== "assistant") continue;
     depths.set(message, assistantDepth);
@@ -858,7 +863,11 @@ export function applyRequestFiltersToMessages(
   preset: FfPreset,
   settings: FfGlobalSettings,
 ): ChatMessage[] {
-  const regexed = applyPromptRegexToMessages(messages, preset, settings);
+  const regexed = applyPromptRegexToMessages(
+    messages.filter((message) => !isChatComment(message)),
+    preset,
+    settings,
+  );
   const depths = assistantResponseDepths(regexed);
   return regexed.map((message) => {
     const depth = depths.get(message);
@@ -895,7 +904,7 @@ export function applyPromptRegexToMessages(
   );
   const contextSaverDepths = assistantResponseDepths(messages);
   return messages.map((message) => {
-    if (message.isComment === true) return { ...message };
+    if (isChatComment(message)) return { ...message };
     const placement =
       message.role === "user"
         ? PLACEMENT_USER_INPUT

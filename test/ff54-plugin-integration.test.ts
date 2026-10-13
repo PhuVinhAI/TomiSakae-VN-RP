@@ -614,9 +614,15 @@ describe("Named presets in plugin UI and requests", () => {
 });
 
 describe("Internal-state history restoration", () => {
-  it.each([true, undefined])(
-    "restores two real AI responses after branching, ignoring the branch marker (isComment: %s)",
-    async (isComment) => {
+  it.each([
+    ["char", true],
+    ["char", undefined],
+    ["user", true],
+    ["user", undefined],
+    ["user", false],
+  ] as const)(
+    "restores two real AI responses after branching, ignoring the %s marker (isComment: %s)",
+    async (role, isComment) => {
       vi.useFakeTimers();
       const plugin = await startPlugin(undefined, false, undefined, true);
       try {
@@ -636,7 +642,7 @@ describe("Internal-state history restoration", () => {
 
         // PocketRisu copies message metadata, reissues IDs, and appends a comment.
         const marker: SavedMessage = {
-          role: "char",
+          role,
           data: "{{specialcomment::branchedfrom::chat-a::Original::ai-2::}}",
           chatId: "branch-marker",
           ...(isComment === undefined ? {} : { isComment }),
@@ -652,13 +658,11 @@ describe("Internal-state history restoration", () => {
             marker,
           ],
         };
-        const requestBeforeRestore: ChatMessage[] = branch.message
-          .filter((entry) => entry !== marker)
-          .map((entry) => ({
-            role: entry.role === "char" ? "assistant" : "user",
-            content: entry.data,
-            memo: entry.chatId,
-          }));
+        const requestBeforeRestore: ChatMessage[] = branch.message.map((entry) => ({
+          role: entry.role === "char" ? "assistant" : "user",
+          content: entry.data,
+          memo: entry.chatId,
+        }));
         requestBeforeRestore.push({ role: "user", content: "Tiếp tục." });
         plugin.chats.set("0:1", branch);
         plugin.selectChat(1);
@@ -676,6 +680,7 @@ describe("Internal-state history restoration", () => {
           expect(entry.data).toContain("[ 🕰️");
 
         const request = await plugin.request(requestBeforeRestore);
+        expect(request.some((entry) => entry.memo === marker.chatId)).toBe(false);
         const replies = request.filter(
           (entry) => entry.role === "assistant" && !entry.memo?.startsWith("ff54:"),
         );
@@ -784,9 +789,13 @@ describe("Sola saved-history restoration", () => {
     },
   );
 
-  it.each(["delete", "branch"] as const)(
-    "restores stored HUDs immediately after a %s, including partially trimmed trackers",
-    async (action) => {
+  it.each([
+    ["delete", "char"],
+    ["branch", "char"],
+    ["branch", "user"],
+  ] as const)(
+    "restores stored HUDs immediately after a %s with a %s marker, including partially trimmed trackers",
+    async (action, markerRole) => {
       vi.useFakeTimers();
       const plugin = await startPlugin(solaStore(), false, undefined, true);
       try {
@@ -799,7 +808,7 @@ describe("Sola saved-history restoration", () => {
         expect(oldest.solaHistory?.main?.removals.length).toBeGreaterThan(0);
         expect(restoreSolaHistoryContent(oldest.data, oldest.solaHistory?.main)).toBe(reply(0));
         const marker: SavedMessage = {
-          role: "char",
+          role: markerRole,
           data: "{{specialcomment::branchedfrom::chat-a::Original::sola-a-2::}}",
           chatId: "sola-branch-marker",
           disabled: true,
@@ -814,9 +823,7 @@ describe("Sola saved-history restoration", () => {
             ...(action === "branch" ? [marker] : []),
           ],
         };
-        const staleRequest = requestOf(shortened).filter(
-          (message) => message.memo !== marker.chatId,
-        );
+        const staleRequest = requestOf(shortened);
         const chatIndex = action === "branch" ? 1 : 0;
         plugin.chats.set(`0:${chatIndex}`, shortened);
         plugin.selectChat(chatIndex);
@@ -840,6 +847,7 @@ describe("Sola saved-history restoration", () => {
           ...staleRequest,
           { role: "user", content: "Tiếp tục." },
         ]);
+        expect(request.some((entry) => entry.memo === marker.chatId)).toBe(false);
         const responses = request.filter((message) => message.memo?.includes("sola-a-"));
         expect(responses).toHaveLength(3);
         expect(responses[0]!.content).not.toContain("<scene_header");

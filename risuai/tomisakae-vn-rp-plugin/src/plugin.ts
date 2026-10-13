@@ -7,6 +7,7 @@ import {
   expandHostMacros,
   PLACEMENT_AI_OUTPUT,
   applyPromptRegexToMessages,
+  isChatComment,
   extractInternalStateBlock,
   keepsInternalStateInHistory,
   splitBeforeSceneHeader,
@@ -836,7 +837,7 @@ function appendInternalState(content: string, state: string): string {
 }
 
 function isHistoryComment(message: HostChatMessage): boolean {
-  return message.isComment === true || /^\s*\{\{specialcomment::/.test(String(message.data ?? ""));
+  return isChatComment({ content: String(message.data ?? ""), isComment: message.isComment });
 }
 
 function savedHistorySignature(chat: HostChatSnapshot): string {

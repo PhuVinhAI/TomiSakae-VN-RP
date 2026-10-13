@@ -1,4 +1,4 @@
-import type { ChatMessage } from "./core.js";
+import { isChatComment, type ChatMessage } from "./core.js";
 import { isPluginMemo } from "./preset-family.js";
 
 const MEMORY_MEMOS = new Set(["supaMemory", "hypaMemory"]);
@@ -13,7 +13,7 @@ export function buildEditorReferenceMessages(
 ): ChatMessage[] {
   const messages = structuredClone(request).flatMap((message) => {
     if (MEMORY_MEMOS.has(String(message.memo ?? ""))) return [];
-    if (message.isComment === true || /^\s*\{\{specialcomment::/.test(message.content)) return [];
+    if (isChatComment(message)) return [];
     // The target is appended separately after trimming its reasoning prefix.
     if (responseId !== undefined && message.role === "assistant" && message.memo === responseId)
       return [];
