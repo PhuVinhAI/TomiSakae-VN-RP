@@ -75,7 +75,7 @@ describe("Plugin dashboard token estimates", () => {
     [true, true],
     [false, true],
   ])(
-    "matches the actual main prompt text with Vietnamese Output %s and Submodel %s",
+    "matches the actual injected prompt text with Vietnamese Output %s and Submodel %s",
     async (vietnamese, submodel) => {
       const preset = JSON.parse(
         await readFile("risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json", "utf8"),
@@ -109,7 +109,7 @@ describe("Plugin dashboard token estimates", () => {
         estimate.entries.filter((entry) => entry.identifier === "image-optimization"),
       ).toHaveLength(1);
       expect(estimate.entries.some((entry) => entry.identifier === "vietnamese-output")).toBe(
-        vietnamese && !submodel,
+        vietnamese,
       );
     },
   );

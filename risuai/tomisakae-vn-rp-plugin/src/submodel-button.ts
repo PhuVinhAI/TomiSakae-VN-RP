@@ -62,9 +62,9 @@ export async function createRewriteButton(
     if (!control) return;
     const rewriting = busy || current?.busy;
     const title = rewriting
-      ? "Ngắt chuyển sang tiếng Việt bằng Submodel"
+      ? "Ngắt biên tập bằng Submodel"
       : current?.available
-        ? "Chuyển sang tiếng Việt bằng Submodel"
+        ? "Viết lại tiếng Việt bằng Submodel"
         : "Hãy tạo phản hồi mới để plugin lấy đầy đủ context trước khi viết lại";
     // SafeElement listeners receive document-wide events without a target.
     // A native checkbox records activation until IPC reads it, preventing

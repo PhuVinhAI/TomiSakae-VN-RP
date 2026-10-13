@@ -7,12 +7,7 @@ import {
   type ChatMessage,
   type FfPreset,
 } from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
-import {
-  buildEditorReferenceMessages,
-  buildSubmodelTranslationMessages,
-  SUBMODEL_TRANSLATION_INSTRUCTION,
-} from "../risuai/tomisakae-vn-rp-plugin/src/submodel-context.js";
-import { VIETNAMESE_OUTPUT_PROMPT } from "../risuai/tomisakae-vn-rp-plugin/src/vietnamese.js";
+import { buildEditorReferenceMessages } from "../risuai/tomisakae-vn-rp-plugin/src/submodel-context.js";
 import {
   CONFIG_PRESETS_STORAGE_KEY,
   createConfigPreset,
@@ -475,7 +470,7 @@ describe("FF5.4 Submodel editor integration", () => {
     ).toBe(true);
   });
 
-  it("uses raw FF5.4 for main and translates with retained prompts and no editor system", async () => {
+  it("uses the selected submodel with retained prompts and no restored history", async () => {
     const plugin = await startPlugin();
     const built = await plugin.request();
     const snapshot = structuredClone(built);
@@ -493,26 +488,49 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(options.mode).toBe("submodel");
     expect(options.allowPlugins).toBe(false);
     expect(options).not.toHaveProperty("staticModel");
-    expect(snapshot.some((message) => message.memo === "ff54:vietnamese-output")).toBe(false);
-    const mainContent = snapshot.map((message) => message.content).join("\n");
-    expect(mainContent).toContain("Time HH:MM AM/PM");
-    expect(mainContent).not.toContain("Thời gian HH:MM SA/CH");
-    expect(mainContent).not.toContain("How will I apply `<vietnamese_output>`");
+    expect(snapshot.filter((message) => message.memo === "ff54:vietnamese-output")).toHaveLength(1);
+    expect(snapshot.map((message) => message.content).join("\n")).toContain(
+      "Thời gian HH:MM SA/CH",
+    );
+    const editorIndex = options.messages.findIndex(
+      (message) => message.memo === "ff54:submodel-editor",
+    );
+    const highRiskIndex = options.messages.findIndex(
+      (message) => message.memo === "ff54:jailbreak",
+    );
+    expect(editorIndex).toBeGreaterThan(-1);
+    expect(highRiskIndex).toBeGreaterThan(-1);
+    expect(editorIndex).toBeLessThan(highRiskIndex);
+    expect(options.messages[editorIndex]).toMatchObject({
+      role: "system",
+      content: expect.stringMatching(/^<vietnamese_editor>/),
+      memo: "ff54:submodel-editor",
+    });
+    expect(options.messages[editorIndex]!.content).toContain(
+      "- Style: Use manga, anime, and light-novel pacing.",
+    );
+    expect(options.messages[editorIndex]!.content).toContain(
+      "use comic timing when it suits the scene",
+    );
+    expect(options.messages[editorIndex]!.content).toContain(
+      "Translate or polish all free-text values without changing their meaning or underlying state.",
+    );
+    expect(options.messages[editorIndex]!.content).toContain(
+      "Correct personal pronouns and forms of address to natural contemporary Vietnamese that fit identity, viewpoint, relationship, and tone.",
+    );
+    expect(options.messages[editorIndex]!.content).not.toContain("- Scene Flow:");
+    expect(options.messages[editorIndex]!.content).not.toContain("- Display Text:");
+    expect(options.messages[editorIndex]!.content).not.toContain("Lock all state data:");
+    expect(options.messages[editorIndex]!.content).not.toContain("<anime_manga_light_novel_style>");
     expect(
-      options.messages.some((message) => message.content.includes("<vietnamese_editor>")),
-    ).toBe(false);
-    const language = options.messages.filter(
-      (message) => message.memo === "ff54:vietnamese-output",
-    );
-    expect(language).toEqual([
-      { role: "system", content: VIETNAMESE_OUTPUT_PROMPT, memo: "ff54:vietnamese-output" },
-    ]);
-    expect(options.messages.indexOf(language[0]!)).toBeLessThan(
-      options.messages.findIndex((message) => message.content === "Card, lore và memory."),
-    );
+      options.messages.filter((message) => message.memo === "ff54:anime-manga-light-novel-style"),
+    ).toHaveLength(0);
+    expect(
+      options.messages.filter((message) => message.memo === "ff54:vietnamese-natural-writing"),
+    ).toHaveLength(0);
     const references = options.messages
       .slice(0, -1)
-      .filter((message) => message.memo !== "ff54:vietnamese-output");
+      .filter((message) => message.memo !== "ff54:submodel-editor");
     expect(references).toEqual([
       ...snapshot,
       {
@@ -523,9 +541,11 @@ describe("FF5.4 Submodel editor integration", () => {
     ]);
     const editorTarget = options.messages.at(-1)!;
     expect(editorTarget.role).toBe("user");
-    expect(editorTarget.content).toBe(SUBMODEL_TRANSLATION_INSTRUCTION);
     expect(editorTarget.content).toBe(
-      "Rewrite the latest assistant response above into natural Vietnamese according to <vietnamese_output>.",
+      "Rewrite the latest assistant response above according to <vietnamese_editor>. Return only the rewritten response. Do not continue the roleplay, answer its dialogue, add a new event, or describe what happens next.",
+    );
+    expect(editorTarget.content).toContain(
+      "Do not continue the roleplay, answer its dialogue, add a new event, or describe what happens next.",
     );
     expect(editorTarget.content).not.toContain("[OOC]");
     expect(references.filter((message) => message.memo === "old-a")).toHaveLength(0);
@@ -540,9 +560,7 @@ describe("FF5.4 Submodel editor integration", () => {
       "An bước tới, nhẹ giọng chào bạn.",
     ]);
     expect(plugin.chats.get("0:0")!.message.at(-1)!.swipeId).toBe(1);
-    expect(plugin.api.alert).toHaveBeenCalledWith(
-      expect.stringContaining("Đã chuyển sang tiếng Việt"),
-    );
+    expect(plugin.api.alert).toHaveBeenCalledWith(expect.stringContaining("Đã biên tập"));
   });
 
   it("does not call submodel when the toggle is off", async () => {
@@ -552,7 +570,7 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(plugin.runModel).not.toHaveBeenCalled();
   });
 
-  it("sends only the current user input and raw reply with all prompts but no memory or older history", async () => {
+  it("sends two prior exchanges and the latest user input without memory or older history", async () => {
     const plugin = await startPlugin();
     const history: ChatMessage[] = [
       { role: "user", content: "Lượt cũ.", memo: "u0" },
@@ -587,7 +605,7 @@ describe("FF5.4 Submodel editor integration", () => {
     const messages = plugin.runModel.mock.calls[0]![0].messages;
     expect(
       messages.filter((message) => history.some((entry) => entry.memo === message.memo)),
-    ).toEqual(history.slice(-1));
+    ).toEqual(history.slice(2));
     expect(messages.some((message) => message.memo === "supaMemory")).toBe(false);
     expect(messages.some((message) => message.content.includes("Tóm tắt cũ."))).toBe(false);
     expect(messages.find((message) => message.memo === "host-prompt")?.content).toBe(
@@ -1089,12 +1107,6 @@ describe("Named presets in plugin UI and requests", () => {
     expect(reloaded.ui("config-preset").value).toBe(created.id);
     expect(
       (await reloaded.request()).some((message) => message.memo === "ff54:vietnamese-output"),
-    ).toBe(false);
-    expect(reloaded.toggle("vietnamese-output").checked).toBe(true);
-    reloaded.toggle("submodel-editor").checked = false;
-    await reloaded.uiEvent("save");
-    expect(
-      (await reloaded.request()).some((message) => message.memo === "ff54:vietnamese-output"),
     ).toBe(true);
     reloaded.selectCard(1);
     await reloaded.settingsUi();
@@ -1197,9 +1209,9 @@ describe("Named presets in plugin UI and requests", () => {
     expect(plugin.chats.get("1:0")!.message).toHaveLength(1);
     expect(
       plugin.runModel.mock.calls[0]![0].messages.find(
-        (message) => message.memo === "ff54:vietnamese-output",
+        (message) => message.memo === "ff54:submodel-editor",
       )!.content,
-    ).toBe(VIETNAMESE_OUTPUT_PROMPT);
+    ).toContain("Repair only existing malformed markup");
   });
 });
 
@@ -1244,7 +1256,7 @@ describe("Automatic Submodel editing", () => {
         expect(saved.swipeId).toBe(1);
         expect(saved.ff54InternalState).toBe(state);
         expect(plugin.api.alert).toHaveBeenCalledWith(
-          expect.stringContaining("Đã tự động chuyển sang tiếng Việt"),
+          expect.stringContaining("Đã tự động biên tập"),
         );
         expect(plugin.api.alertError).not.toHaveBeenCalled();
         expect(plugin.runModel).toHaveBeenCalledTimes(1);
@@ -1292,29 +1304,6 @@ describe("Automatic Submodel editing", () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
-  it("translates an English raw header, dialogue and internal state into a new swipe", async () => {
-    const plugin = await startPlugin(true, true);
-    await plugin.request();
-    const raw =
-      '[ 🕰️ Time 02:25 PM | 🗓️ Day 1 - Monday | 📍 University | ☀️ Sunny, 68°F ]\n<pink:whisper>"Hello."</pink:whisper>\n<!--GFX_START--><internal_states><b>Bond: 3</b><br>Agenda: Wait for you.</internal_states><!--GFX_END-->';
-    const translated =
-      '[ 🕰️ Thời gian 02:25 CH | 🗓️ Ngày 1 - Thứ Hai | 📍 Đại học | ☀️ Nắng, 68°F ]\n<pink:whisper>"Chào bạn."</pink:whisper>\n<!--GFX_START--><internal_states><b>GẮN KẾT: 3</b><br>Lịch trình: Chờ bạn.</internal_states><!--GFX_END-->';
-    plugin.runModel.mockResolvedValue({ type: "success", result: translated });
-    await plugin.complete(`<think>Raw reasoning.</think>\n${raw}`);
-    const request = plugin.runModel.mock.calls[0]![0].messages;
-    expect(request.find((message) => message.memo === "ff54:submodel-editor-source")!.content).toBe(
-      raw,
-    );
-    expect(request.some((message) => message.content.includes("Raw reasoning."))).toBe(false);
-    const saved = plugin.chats.get("0:0")!.message.at(-1)!;
-    expect(saved.swipes).toEqual([
-      `<think>Raw reasoning.</think>\n${raw}`,
-      `<think>Raw reasoning.</think>\n${translated}`,
-    ]);
-    expect(saved.swipeId).toBe(1);
-    await plugin.callbacks.unload!();
-  });
-
   it("rewrites completed eligible output automatically and notifies after verified saving", async () => {
     const plugin = await startPlugin(true, true);
     await plugin.request();
@@ -1337,9 +1326,7 @@ describe("Automatic Submodel editing", () => {
     ).toBe(true);
     expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(prefix + edited);
     expect(plugin.writes).toHaveBeenCalledTimes(1);
-    expect(plugin.api.alert).toHaveBeenCalledWith(
-      expect.stringContaining("Đã tự động chuyển sang tiếng Việt"),
-    );
+    expect(plugin.api.alert).toHaveBeenCalledWith(expect.stringContaining("Đã tự động biên tập"));
     expect(plugin.api.alertError).not.toHaveBeenCalled();
   });
 
@@ -1460,7 +1447,7 @@ describe("Automatic Submodel editing", () => {
     expect(plugin.writes).not.toHaveBeenCalled();
     expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe("Người dùng tự sửa.");
     expect(plugin.api.alert).not.toHaveBeenCalledWith(
-      expect.stringContaining("Đã tự động chuyển sang tiếng Việt"),
+      expect.stringContaining("Đã tự động biên tập"),
     );
   });
 
@@ -1624,50 +1611,6 @@ describe("FF5.4 completion sounds", () => {
 });
 
 describe("Submodel request context", () => {
-  it("keeps host prompts and examples in order while sending only the current exchange and one translation task", () => {
-    const request: ChatMessage[] = [
-      { role: "system", content: "FF main.", memo: "ff54:main" },
-      { role: "system", content: VIETNAMESE_OUTPUT_PROMPT, memo: "ff54:vietnamese-output" },
-      { role: "system", content: "Card and lore.", memo: "card" },
-      { role: "assistant", content: "Example.", name: "example_assistant" },
-      { role: "system", content: "Memory.", memo: "hypaMemory" },
-      { role: "user", content: "Old user.", memo: "old-user" },
-      { role: "assistant", content: "Old reply.", memo: "old-ai" },
-      { role: "user", content: "Current user.", memo: "user" },
-      { role: "assistant", content: "Stale target copy.", memo: "target" },
-      { role: "user", content: "Reasoning.", memo: "ff54:absolute:0:100:user" },
-      { role: "system", content: "Trailing.", memo: "ff54:jailbreak" },
-    ];
-    const snapshot = structuredClone(request);
-    const translated = buildSubmodelTranslationMessages(request, "Raw reply.", "target", [
-      "old-user",
-      "old-ai",
-      "user",
-      "target",
-    ]);
-    expect(translated.slice(0, -2)).toEqual([
-      request[0],
-      request[1],
-      request[2],
-      request[3],
-      request[7],
-      request[9],
-      request[10],
-    ]);
-    expect(translated.slice(-2)).toEqual([
-      { role: "assistant", content: "Raw reply.", memo: "ff54:submodel-editor-source" },
-      {
-        role: "user",
-        content: SUBMODEL_TRANSLATION_INSTRUCTION,
-        memo: "ff54:submodel-editor-target",
-      },
-    ]);
-    expect(translated.filter((message) => message.memo === "ff54:vietnamese-output")).toHaveLength(
-      1,
-    );
-    expect(request).toEqual(snapshot);
-  });
-
   it("removes marked memory while keeping prompt order and cloning retained messages", () => {
     const summary: ChatMessage = {
       role: "system",
@@ -1685,11 +1628,11 @@ describe("Submodel request context", () => {
     };
     const request = [card, summary, user, module, reply, end];
     const references = buildEditorReferenceMessages(request);
-    expect(references).toEqual([card, user, module, end]);
+    expect(references).toEqual([card, user, module, reply, end]);
     references[0]!.content = "Provider changed its copy";
     expect(request[0]!.content).toBe("Card và lore.");
     expect(request[1]!.content).toBe("Memory và summary do host chọn.");
-    expect(buildEditorReferenceMessages(request)).toEqual([card, user, module, end]);
+    expect(buildEditorReferenceMessages(request)).toEqual([card, user, module, reply, end]);
   });
 
   it("removes memory wrappers without deleting other text from a merged system message", () => {
@@ -1715,7 +1658,7 @@ describe("Submodel request context", () => {
     ]);
   });
 
-  it("excludes the target and older exchanges while keeping the current user, examples, and injections", () => {
+  it("excludes the target before selecting two prior AI responses and their user inputs", () => {
     const history: ChatMessage[] = [
       { role: "user", content: "Old user.", memo: "u0" },
       { role: "assistant", content: "Old response.", memo: "a0" },
@@ -1743,7 +1686,7 @@ describe("Submodel request context", () => {
         "target",
         history.map((message) => message.memo!),
       ),
-    ).toEqual([example, history[6], injection]);
+    ).toEqual([example, ...history.slice(2, -1), injection]);
     expect(request).toHaveLength(10);
   });
 
