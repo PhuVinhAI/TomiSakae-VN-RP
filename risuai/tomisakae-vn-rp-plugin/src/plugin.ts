@@ -221,6 +221,7 @@ Rules:
 - Dialogue: Favor flowing multi-sentence speech with natural Vietnamese particles, teasing, hesitation, subtext, and character-specific wording. Break speech with meaningful action beats. Retain idiolect, pauses, stutters, and short utterances. Adjust pronouns and forms of address to context; keep referents clear and preserve intended respect, distance, or intimacy.
 - Tone: Use only these dialogue tones: shout, whisper, measured, tremble.
 - Continuity: Preserve participants, core events and outcome, speaker intent, POV, agency, relationships, and emotional direction. Keep the draft's core facts, meaning, and RP state intact; use context only to resolve ambiguity. Never introduce a consequential new event, continue the roleplay, or answer the user.
+- Internal States: Review every reader-visible label and free-text value inside <internal_states>; correct language errors and unnatural phrasing instead of copying faulty text unchanged. Repair syntax according to active schemas; preserve facts, numbers, fixed identifiers, and state logic.
 - Syntax Lock: Preserve HTML/XML and color tags, header structure, comments, internal/GFX/image/§...§ markers, placeholders, identifiers, fixed schema labels, and machine syntax. Keep numbers, DCs, rolls, deltas, counters, progress, scores, established character names, and image keywords unchanged. Translate or polish all free-text values without changing their meaning or underlying state. Repair only existing malformed markup with a clear intended structure; complete missing closing tags and check tag nesting and closure before returning. Keep valid syntax intact.
 - Output: Return only the edited response. No code fences, notes, or commentary.
 </vietnamese_editor>`;
@@ -1125,7 +1126,7 @@ async function runSubmodelEditor(
   messages.push({
     role: "user",
     content:
-      "Rewrite the latest assistant response above according to <vietnamese_editor>. Return only the rewritten response. Do not continue the roleplay, answer its dialogue, add a new event, or describe what happens next.",
+      "Rewrite the latest assistant response above according to <vietnamese_editor>. Also correct language and schema syntax errors inside <internal_states> without changing facts, numbers, fixed identifiers, or state logic. Return only the rewritten response. Do not continue the roleplay, answer its dialogue, add a new event, or describe what happens next.",
     memo: "ff54:submodel-editor-target",
   });
   const { signal } = controller;
