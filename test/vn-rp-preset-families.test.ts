@@ -983,7 +983,7 @@ describe("TomiSakae VN-RP preset families", () => {
       ["Buổi chiều", "Nắng", "day", "#A8DADC"],
       ["Chạng vạng", "Yên tĩnh", "dusk", "#F4A261"],
       ["Ban đêm", "Lạnh", "night", "#8592E6"],
-      ["13:40", "Mưa lớn", "noir", "#7A8B99"],
+      ["13:40", "Mưa lớn", "noir", "#8FA4B2"],
     ]) {
       const input = `<scene_header location="Phòng" time="${time}" atmosphere="${atmosphere}" />`;
       const normalized = adaptSolaSceneHeaderForDisplay(input);

@@ -25,6 +25,7 @@ import {
   adaptSolaTrackerLabelsForDisplay,
 } from "./sola-vietnamese-regex.js";
 import { SOLA_HEADER_SAVER_ID } from "./sola-history.js";
+import { adaptSolaDisplayReplacement } from "./sola-display.js";
 
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
@@ -731,12 +732,16 @@ export function applyRegexScripts(
             settings.dialogueThemeEnabled !== false ? options.dialogueTheme : undefined,
           )
         : localized.replaceString;
+    const displayReplacement =
+      options.markdown && familyOf(preset) === "sola"
+        ? adaptSolaDisplayReplacement(themedReplacement, script.scriptName ?? "")
+        : themedReplacement;
     const replacement = options.markdown
-      ? themedReplacement.replace(
+      ? displayReplacement.replace(
           '<span style="color:$1;',
           '<span style="color:$1;--FontColorStandard:$1;--FontColorItalic:$1;--FontColorBold:$1;--FontColorItalicBold:$1;--FontColorQuote1:$1;--FontColorQuote2:$1;',
         )
-      : themedReplacement;
+      : displayReplacement;
     output = replaceWithSourceGroups(
       output,
       regex,
