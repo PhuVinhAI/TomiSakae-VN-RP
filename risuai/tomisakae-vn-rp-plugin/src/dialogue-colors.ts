@@ -147,14 +147,23 @@ export function adaptSolaDialogueColors(content: string, theme?: DialogueTheme):
   return content.replace(/#[\da-f]{6}\b/gi, (hex) => swatches.get(hex.toLowerCase()) ?? hex);
 }
 
-/** Apply the adjusted Sola swatches only to its voice-rendering scripts. */
+/** Apply the adjusted Sola swatches to renderer templates before captures are inserted. */
 export function adaptSolaDialogueReplacement(
   replacement: string,
   scriptName: string,
   theme?: DialogueTheme,
 ): string {
-  if (!scriptName.startsWith("Sola Voice:")) return replacement;
-  return adaptSolaDialogueColors(replacement, theme).replace(
+  const isSolaRenderer =
+    scriptName.startsWith("Sola Voice:") ||
+    scriptName.startsWith("Sola Gradient:") ||
+    scriptName.startsWith("Sola Gradient Mod:") ||
+    scriptName.startsWith("Sola Kinetic:");
+  if (!isSolaRenderer) return replacement;
+  let output = adaptSolaDialogueColors(replacement, theme);
+  // Theme-aware swatches are selected for readable text; don't dim them again.
+  if (theme && /^(?:Sola Voice|Sola Gradient Mod|Sola Kinetic):/.test(scriptName))
+    output = output.replace(/(^|;)\s*opacity\s*:[^;"']+/gi, "$1opacity:1");
+  return output.replace(
     /<font color="(#[\da-f]{6})">/gi,
     (_match, color: string) =>
       `<font color="${color}" style="color:${color};--FontColorStandard:${color};--FontColorItalic:${color};--FontColorBold:${color};--FontColorItalicBold:${color};--FontColorQuote1:${color};--FontColorQuote2:${color};">`,

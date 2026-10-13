@@ -2,11 +2,16 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { loadPresetSources } from "../scripts/build-tomisakae-vn-rp-plugin.js";
 import {
   applyRegexScripts,
+  composePresetPrompts,
   createDefaultSettings,
   PLACEMENT_AI_OUTPUT,
   type FfPreset,
 } from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
 import { adaptSolaSceneHeaderForDisplay } from "../risuai/tomisakae-vn-rp-plugin/src/sola-display.js";
+import {
+  adaptSolaDialogueColors,
+  textContrast,
+} from "../risuai/tomisakae-vn-rp-plugin/src/dialogue-colors.js";
 
 let preset: FfPreset;
 beforeAll(async () => {
@@ -99,5 +104,149 @@ describe("Sola message UI", () => {
         depth: 0,
       }),
     ).toBe(input);
+  });
+
+  it("synchronizes all six gradients with the prompt and preserves their effects in both themes", async () => {
+    const snapshot = JSON.stringify(preset);
+    const gradients = {
+      dusk: ["#F3B74B", "#8592E6"],
+      solstice: ["#F4A261", "#EE6C4D"],
+      eclipse: ["#A3948A", "#7A8B99"],
+      wildwood: ["#9AA87A", "#789E8A"],
+      hearth: ["#E07A5F", "#C06C54"],
+      mistveil: ["#B08EA2", "#98B9C7"],
+    };
+    for (const background of ["#282a36", "#f5f5f5", "#808080"]) {
+      const settings = createDefaultSettings(preset);
+      const theme = {
+        type: background === "#282a36" ? ("dark" as const) : ("light" as const),
+        background,
+      };
+      const gradientPrompts = preset.prompts.filter(
+        (prompt) =>
+          typeof prompt.content === "string" &&
+          /Curated Gradient Duos|Signature Gradient Assignment/.test(prompt.content),
+      );
+      expect(gradientPrompts).toHaveLength(2);
+      for (const prompt of gradientPrompts) settings.promptEnabled[prompt.identifier] = true;
+      const observed = new Map<string, string>();
+      await composePresetPrompts(
+        preset,
+        settings,
+        async (content) => content,
+        { dialogueTheme: theme },
+        (message, prompt) => observed.set(prompt.identifier, message.content),
+      );
+      for (const [name, colors] of Object.entries(gradients)) {
+        const pair = adaptSolaDialogueColors(colors.join(","), theme);
+        for (const prompt of gradientPrompts)
+          expect(observed.get(prompt.identifier)).toContain(`(${pair.replace(",", " ➔ ")})`);
+        for (const color of pair.split(","))
+          expect(textContrast(color, background)).toBeGreaterThanOrEqual(4.5);
+        const effects = [
+          "",
+          "whisper",
+          "tremble",
+          "bite",
+          "steady",
+          "heavy",
+          "stretch",
+          "echo",
+          "crush",
+          "fracture",
+          "tilt:6",
+        ];
+        const input = effects
+          .map((effect) => `<${name}${effect ? `:${effect}` : ""}>"Lời thoại."</${name}>`)
+          .join("\n");
+        const lines = applyRegexScripts(input, preset, settings, {
+          placement: PLACEMENT_AI_OUTPUT,
+          markdown: true,
+          depth: 0,
+          dialogueTheme: theme,
+        }).split("\n");
+        expect(lines).toHaveLength(effects.length);
+        for (const [index, effect] of effects.entries()) {
+          const displayed = lines[index]!;
+          expect(displayed).toContain(`linear-gradient(135deg,${pair})`);
+          expect(displayed).not.toMatch(/opacity:0\./);
+          expect(displayed).toContain('"Lời thoại."');
+          if (effect === "stretch") expect(displayed).toContain("letter-spacing:3.5px;");
+          if (effect === "tilt:6") expect(displayed).toContain("transform:rotate(6deg);");
+          if (effect === "crush") expect(displayed).toContain("transform:scaleY(0.92);");
+          if (effect === "fracture") expect(displayed).toContain("transform:skew(-5deg);");
+        }
+      }
+    }
+    expect(JSON.stringify(preset)).toBe(snapshot);
+  });
+
+  it("protects colored and standalone tone/kinetic text without changing effect spacing", () => {
+    const settings = createDefaultSettings(preset);
+    const input =
+      "<copper:whisper>Khẽ.</copper><indigo:tremble>Run.</indigo>" +
+      "<amber:stretch>Dài.</amber><denim:echo>Vọng.</denim><sage:crush>Nén.</sage>" +
+      "<whisper>Khẽ.</whisper><tremble>Run.</tremble><stretch>Dài.</stretch>" +
+      "<echo>Vọng.</echo><crush>Nén.</crush>";
+    for (const type of ["light", "dark"] as const) {
+      const displayed = applyRegexScripts(input, preset, settings, {
+        placement: PLACEMENT_AI_OUTPUT,
+        markdown: true,
+        depth: 0,
+        dialogueTheme: {
+          type,
+          background: type === "light" ? "#f5f5f5" : "#282a36",
+        },
+      });
+      expect([...displayed.matchAll(/opacity:1;/g)]).toHaveLength(10);
+      expect(displayed).toContain("letter-spacing:3.5px;");
+      expect(displayed).toContain("letter-spacing:1.2px;");
+      expect(displayed).toContain("transform:scaleY(0.92);");
+    }
+  });
+
+  it("keeps native gradients and opacity when theme adaptation is disabled or unavailable", () => {
+    const settings = createDefaultSettings(preset);
+    const input =
+      "<solstice:whisper>Khẽ.</solstice><dusk:echo>Vọng.</dusk>" +
+      "<copper:tremble>Run.</copper><echo>Vọng.</echo>";
+    const options = { placement: PLACEMENT_AI_OUTPUT, markdown: true, depth: 0 };
+    const native = applyRegexScripts(input, preset, settings, options);
+    expect(native).toContain("linear-gradient(135deg,#F4A261,#EE6C4D)");
+    expect(native).toContain("opacity:0.85;");
+    expect(native).toContain("opacity:0.65;");
+    expect(native).toContain("opacity:0.55;");
+    settings.dialogueThemeEnabled = false;
+    expect(
+      applyRegexScripts(input, preset, settings, {
+        ...options,
+        dialogueTheme: { type: "light", background: "#f5f5f5" },
+      }),
+    ).toBe(native);
+  });
+
+  it("leaves HUDs, headers and captured markup unaffected by dialogue theme adaptation", () => {
+    const settings = createDefaultSettings(preset);
+    const captured = '<span style="color:#F4A261;opacity:0.55;">Màu riêng.</span>';
+    const input =
+      '<scene_header sky="dusk" location="Phòng khách" time="18:45" />' +
+      `<sola_hud digest="Ngày 1"><story_notes>${captured}</story_notes></sola_hud>`;
+    const options = { placement: PLACEMENT_AI_OUTPUT, markdown: true, depth: 0 };
+    const native = applyRegexScripts(input, preset, settings, options);
+    expect(native).toContain(captured);
+    expect(
+      applyRegexScripts(input, preset, settings, {
+        ...options,
+        dialogueTheme: { type: "light", background: "#f5f5f5" },
+      }),
+    ).toBe(native);
+    expect(
+      applyRegexScripts("<solstice:whisper>Khẽ.</solstice>", preset, settings, {
+        placement: PLACEMENT_AI_OUTPUT,
+        prompt: true,
+        depth: 0,
+        dialogueTheme: { type: "light", background: "#f5f5f5" },
+      }),
+    ).toBe("<solstice:whisper>Khẽ.</solstice>");
   });
 });
