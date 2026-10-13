@@ -1837,11 +1837,11 @@ describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
     const state = '<sola_hud digest="Day 1"><date>Day: 1</date></sola_hud>';
     const messages: ChatMessage[] = [
       { role: "assistant", content: `Old scene. ${state}`, memo: "old-a" },
-      ...Array.from({ length: 6 }, (_, i) => ({
-        role: "user" as const,
-        content: `User ${i}`,
-        memo: `u${i}`,
-      })),
+      { role: "user", content: "First user.", memo: "u1" },
+      { role: "assistant", content: `Recent scene. ${state}`, memo: "recent-a" },
+      { role: "user", content: "Second user.", memo: "u2" },
+      { role: "assistant", content: `Latest scene. ${state}`, memo: "latest-a" },
+      { role: "user", content: "Next user.", memo: "u3" },
     ];
     plugin.chats.get("0:0")!.message = messages.map((message, index) => ({
       role: message.role === "assistant" ? "char" : "user",
@@ -1856,6 +1856,94 @@ describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
     expect(restoreSolaHistoryContent(saved.data, saved.solaHistory?.main)).toBe(
       `Old scene. ${state}`,
     );
+  });
+
+  it("retains the latest Sola wardrobe in the request with an extra OOC user injection", async () => {
+    const store = normalizePresetStore(preset, undefined);
+    store.presets[0]!.settings = switchPresetFamily(
+      store.presets[0]!.settings,
+      sources.sola.preset,
+    );
+    const plugin = await startPlugin(false, false, store);
+    const wardrobe = "<wardrobe>Áo đồng phục, váy xanh.</wardrobe>";
+    const inventory = "<inventory>Bút chì, tập bản thảo.</inventory>";
+    const hud = `<sola_hud digest="Ngày 1">${wardrobe}${inventory}<date>Ngày: 1</date></sola_hud>`;
+    const messages: ChatMessage[] = [
+      { role: "system", content: "[Start a new chat]" },
+      { role: "user", content: "Bắt đầu cảnh.", memo: "user-a" },
+      { role: "assistant", content: `Eriri đang vẽ. ${hud}`, memo: "reply-a" },
+      { role: "user", content: "Tôi lại gần cô.", memo: "user-b" },
+    ];
+    plugin.chats.get("0:0")!.message = messages.slice(1).map((message) => ({
+      role: message.role === "assistant" ? "char" : "user",
+      data: message.content,
+      chatId: message.memo!,
+    }));
+    const request = await plugin.request([
+      ...messages,
+      { role: "user", content: "{{DÙNG NHIỀU IMG KHÁC NHAU, CHỈ DÙNG TONE CÓ SẴN}}" },
+    ]);
+    expect(request.find((m) => m.memo === "reply-a")?.content).toContain(wardrobe);
+    expect(request.find((m) => m.memo === "reply-a")?.content).toContain(inventory);
+    expect(plugin.chats.get("0:0")!.message[1]!.data).toContain(hud);
+  });
+
+  it("restores an already archived latest wardrobe before requests and after branching/swiping", async () => {
+    vi.useFakeTimers();
+    const store = normalizePresetStore(preset, undefined);
+    store.presets[0]!.settings = switchPresetFamily(
+      store.presets[0]!.settings,
+      sources.sola.preset,
+    );
+    const plugin = await startPlugin(false, false, store, false, false, true);
+    const prefix =
+      '<scene_header location="Phòng" time="16:30" />\nEriri đang vẽ.\n<sola_hud digest="Ngày 1">';
+    const tail = "<date>Ngày: 1</date></sola_hud>";
+    const visible = prefix + tail;
+    const wardrobe = "<wardrobe>Áo đồng phục.</wardrobe><inventory>Bút chì.</inventory>";
+    const altWardrobe = "<wardrobe>Áo khoác.</wardrobe><inventory>Điện thoại.</inventory>";
+    const saved: SavedMessage = {
+      role: "char",
+      chatId: "reply-a",
+      data: visible,
+      swipes: [visible, visible],
+      swipeId: 0,
+      solaHistory: Object.fromEntries(
+        [wardrobe, altWardrobe].map((text, index) => [
+          `swipe:${index}`,
+          { visible, removals: [{ offset: prefix.length, text }] },
+        ]),
+      ),
+    };
+    plugin.chats.get("0:0")!.message = [
+      { role: "user", data: "Bắt đầu cảnh.", chatId: "user-a" },
+      saved,
+      { role: "user", data: "Tôi lại gần cô.", chatId: "user-b" },
+    ];
+    const request = await plugin.request([
+      { role: "user", content: "Bắt đầu cảnh.", memo: "user-a" },
+      { role: "assistant", content: visible, memo: "reply-a" },
+      { role: "user", content: "Tôi lại gần cô.", memo: "user-b" },
+      { role: "user", content: "OOC dùng nhiều ảnh." },
+    ]);
+    expect(request.find((m) => m.memo === "reply-a")?.content).toContain(wardrobe);
+    expect(plugin.chats.get("0:0")!.message[1]!.data).toBe(prefix + wardrobe + tail);
+
+    const archived = structuredClone(saved);
+    archived.swipeId = 1;
+    plugin.chats.set("0:1", {
+      id: "branch-chat",
+      message: [
+        { role: "user", data: "Bắt đầu cảnh.", chatId: "user-a" },
+        archived,
+        { role: "user", data: "{{specialcomment::Đã tạo nhánh}}", chatId: "branch" },
+      ],
+    });
+    plugin.selectChat(1);
+    await vi.advanceTimersByTimeAsync(250);
+    expect(plugin.chats.get("0:1")!.message[1]!.data).toBe(prefix + altWardrobe + tail);
+    expect(plugin.chats.get("0:0")!.message[1]!.data).toBe(prefix + wardrobe + tail);
+    await plugin.callbacks.unload!();
   });
 });
 

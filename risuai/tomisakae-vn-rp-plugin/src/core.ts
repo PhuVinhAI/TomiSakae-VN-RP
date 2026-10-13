@@ -841,6 +841,24 @@ function assistantResponseDepths(messages: ChatMessage[]): Map<ChatMessage, numb
   return depths;
 }
 
+/** Keep Sola's alternating-chat depths without aging state for extra user injections. */
+function solaSaverDepths(messages: ChatMessage[]): Map<ChatMessage, number> {
+  const depths = new Map<ChatMessage, number>();
+  let depth = 0;
+  let foundResponse = false;
+  for (const message of [...messages].reverse()) {
+    if (isChatComment(message) || isPluginMemo(message.memo)) continue;
+    if (message.role === "assistant") {
+      depths.set(message, depth);
+      depth += 2;
+      foundResponse = true;
+    } else if (message.role === "user" && !foundResponse) {
+      depth = 1;
+    }
+  }
+  return depths;
+}
+
 /**
  * Context Saver keeps the same state that would survive the normal prompt
  * cleanup at this response depth. This is shared with the history snapshot
@@ -914,6 +932,7 @@ export function applyPromptRegexToMessages(
     (script) => script.scriptName === "FF5 - Context Saver (Universal)",
   );
   const contextSaverDepths = assistantResponseDepths(messages);
+  const solaDepths = familyOf(preset) === "sola" ? solaSaverDepths(messages) : undefined;
   return messages.map((message) => {
     if (isChatComment(message)) return { ...message };
     const placement =
@@ -936,10 +955,14 @@ export function applyPromptRegexToMessages(
             }
           : {}),
         ...(depths.has(message) ? { depth: depths.get(message)! } : {}),
-        ...(contextSaver !== undefined && placement === PLACEMENT_AI_OUTPUT
+        ...((contextSaver !== undefined || solaDepths !== undefined) &&
+        placement === PLACEMENT_AI_OUTPUT
           ? {
-              depthForScript: (script: FfRegexScript) =>
-                script.id === contextSaver.id ? contextSaverDepths.get(message) : undefined,
+              depthForScript: (script: FfRegexScript) => {
+                if (solaDepths && script.scriptName?.startsWith("Sola Saver:"))
+                  return solaDepths.get(message);
+                return script.id === contextSaver?.id ? contextSaverDepths.get(message) : undefined;
+              },
             }
           : {}),
       }),

@@ -2,8 +2,10 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { loadPresetSources } from "../scripts/build-tomisakae-vn-rp-plugin.js";
 import {
   applyRegexScripts,
+  applyPromptRegexToMessages,
   createDefaultSettings,
   PLACEMENT_AI_OUTPUT,
+  type ChatMessage,
   type FfPreset,
 } from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
 import {
@@ -68,6 +70,58 @@ describe("Sola saved-history snapshots", () => {
     )!;
     settings.regexEnabled[wardrobe.id] = false;
     expect(applyRegexScripts(input, preset, settings, { ...options, depth: 2 })).toBe(input);
+  });
+
+  it("keeps the latest wardrobe with extra user messages while aging only on new AI responses", () => {
+    const settings = createDefaultSettings(preset);
+    const hud =
+      '<sola_hud digest="Ngày 1"><wardrobe>Áo khoác</wardrobe><inventory>Bút</inventory><date>Ngày: 1</date><scene_cast>An</scene_cast><story_notes>Ghi chú</story_notes></sola_hud>';
+    const response = (name: string): ChatMessage => ({
+      role: "assistant",
+      content: `${header}\n${name}\n${hud}`,
+    });
+    const history: ChatMessage[] = [
+      response("Cũ"),
+      { role: "user", content: "Lượt trước" },
+      response("Liền trước"),
+      { role: "user", content: "Lượt này" },
+      response("Mới nhất"),
+    ];
+    const afterResponse = applyPromptRegexToMessages(history, preset, settings);
+    expect(afterResponse[0]!.content).not.toContain("<sola_hud");
+    expect(afterResponse[2]!.content).not.toMatch(/<wardrobe|<inventory/);
+    expect(afterResponse[2]!.content).toContain("<date>");
+    expect(afterResponse[2]!.content).toContain("<scene_cast>");
+    expect(afterResponse[4]!.content).toBe(history[4]!.content);
+
+    for (const count of [1, 2, 6]) {
+      const messages = [
+        ...history,
+        ...Array.from({ length: count }, (_, index): ChatMessage => ({
+          role: "user",
+          content: index === 0 ? "Tôi lại gần cô." : "OOC dùng nhiều ảnh và tone có sẵn.",
+        })),
+      ];
+      const snapshot = structuredClone(messages);
+      for (const options of [{}, { history: true }]) {
+        const filtered = applyPromptRegexToMessages(messages, preset, settings, options);
+        expect(filtered[0]!.content).not.toContain("<sola_hud");
+        expect(filtered[2]!.content).not.toMatch(/<wardrobe|<inventory|<date|<scene_cast/);
+        expect(filtered[2]!.content).toContain("<story_notes>");
+        expect(filtered[4]!.content).toBe(messages[4]!.content);
+        expect(filtered.slice(5)).toEqual(messages.slice(5));
+      }
+      expect(messages).toEqual(snapshot);
+    }
+
+    const consecutiveResponses = applyPromptRegexToMessages(
+      [response("Cũ"), response("Liền trước"), response("Mới nhất")],
+      preset,
+      settings,
+    );
+    expect(consecutiveResponses[0]!.content).not.toContain("<sola_hud");
+    expect(consecutiveResponses[1]!.content).not.toMatch(/<wardrobe|<inventory/);
+    expect(consecutiveResponses[2]!.content).toContain(hud);
   });
 
   it.each([
