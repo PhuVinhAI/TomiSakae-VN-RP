@@ -486,6 +486,12 @@ describe("FF5.4 Submodel editor integration", () => {
     expect(normalizeSettings(preset, {}).submodelAutoRewriteEnabled).toBe(false);
     expect(
       normalizeSettings(preset, { submodelAutoRewriteEnabled: true }).submodelAutoRewriteEnabled,
+    ).toBe(false);
+    expect(
+      normalizeSettings(preset, {
+        submodelEditorEnabled: true,
+        submodelAutoRewriteEnabled: true,
+      }).submodelAutoRewriteEnabled,
     ).toBe(true);
   });
 

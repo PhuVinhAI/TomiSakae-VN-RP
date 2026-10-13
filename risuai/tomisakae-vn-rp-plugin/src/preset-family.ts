@@ -28,6 +28,8 @@ export const PRESET_FAMILIES = [
 ] as const;
 
 export type PresetFamilyId = (typeof PRESET_FAMILIES)[number]["id"];
+export const VOYAGE_AUTOMATIC_PBTA_ID = "f7855edd-a399-4f2c-a376-317368b545ee";
+export const VOYAGE_ABILITY_CHECK_VALUE_ID = "58b58785-f5e9-49c4-9cd5-a3bbe0297e74";
 export interface PresetSource {
   preset: FfPreset;
   sourceName: string;

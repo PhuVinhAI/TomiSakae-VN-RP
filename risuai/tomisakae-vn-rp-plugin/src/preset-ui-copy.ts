@@ -376,7 +376,7 @@ export const VOYAGE_PROMPT_COPY: Readonly<Record<string, UiCopy>> = {
   ),
   "f7855edd-a399-4f2c-a376-317368b545ee": copy(
     "Kiểm tra PbtA tự động",
-    "Khi hành động chưa rõ kết quả, dùng giá trị kiểm tra được cung cấp: thành công, thành công một phần hoặc thất bại để kể tiếp.",
+    "Plugin tạo kết quả mỗi lượt: 20% thành công, 60% thành công một phần, 20% thất bại theo preset gốc; GM dùng khi hành động chưa rõ kết quả.",
   ),
   "766bc4f9-b685-4412-bec2-b56be47b4f9a": copy(
     "Kiểm tra PbtA do người dùng tung",
@@ -476,7 +476,7 @@ export const VOYAGE_PROMPT_COPY: Readonly<Record<string, UiCopy>> = {
   ),
   "58b58785-f5e9-49c4-9cd5-a3bbe0297e74": copy(
     "🎲 Giá trị kiểm tra năng lực",
-    "Cung cấp kết quả ngẫu nhiên cho kiểm tra PbtA tự động; là module dữ liệu riêng, không tự bật khi chọn chế độ kiểm tra.",
+    "Plugin tự tạo và gửi kết quả ngẫu nhiên khi bật kiểm tra PbtA tự động; không cần bật riêng module dữ liệu này.",
   ),
   "713e9dd1-366f-4f2a-9e4b-5e28b6ee63a5": copy(
     "📌 Nhắc lại các luật sau lịch sử",

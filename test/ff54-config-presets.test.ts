@@ -102,7 +102,11 @@ describe("FF5.4 configuration presets", () => {
     const store = normalizePresetStore(source, {
       version: 1,
       presets: [
-        { id: "default", name: "Old name", settings: { submodelAutoRewriteEnabled: true } },
+        {
+          id: "default",
+          name: "Old name",
+          settings: { submodelEditorEnabled: true, submodelAutoRewriteEnabled: true },
+        },
         { id: "custom", name: "Tên riêng", settings: { enabled: false } },
         { id: "custom", name: "Duplicate", settings: {} },
         { id: "broken", name: "", settings: {} },

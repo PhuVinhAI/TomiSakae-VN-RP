@@ -1,5 +1,5 @@
 import type { FfGlobalSettings, FfPreset } from "./core.js";
-import { familyOf, presetOrder } from "./preset-family.js";
+import { familyOf, presetOrder, VOYAGE_ABILITY_CHECK_VALUE_ID } from "./preset-family.js";
 import { SOLA_SECTION_COPY, solaRegexUiCopy } from "./preset-ui-copy.js";
 import {
   EXCLUSIVE_PROMPT_GROUPS,
@@ -93,9 +93,9 @@ export function familyChoiceGroups(preset: FfPreset): readonly ExclusivePromptGr
         group(
           "ability-check",
           "Kiểm tra PbtA",
-          "Chọn cách xác định kết quả hành động chưa chắc chắn: dùng giá trị có sẵn hoặc chờ người dùng tung 2d6.",
+          "Chọn kết quả do plugin tạo tự động theo preset gốc hoặc chờ người dùng tung 2d6.",
           "Không kiểm tra PbtA",
-          "Không chèn luật kiểm tra tự động hoặc thủ công. Giá trị kiểm tra năng lực là module dữ liệu riêng.",
+          "Không chèn luật kiểm tra tự động hoặc thủ công, cũng không tạo giá trị kiểm tra năng lực.",
           (n) => n.includes("PbtA Ability Check"),
         ),
       ];
@@ -159,7 +159,10 @@ export function familyPromptSections(preset: FfPreset): PromptSection[] {
 
 export function familyHiddenPromptIds(preset: FfPreset): ReadonlySet<string> {
   if (familyOf(preset) === "ff54") return SOURCE_SEPARATOR_IDS;
-  return new Set(preset.prompts.filter((p) => p.name?.startsWith("━")).map((p) => p.identifier));
+  return new Set([
+    ...preset.prompts.filter((p) => p.name?.startsWith("━")).map((p) => p.identifier),
+    ...(familyOf(preset) === "voyage" ? [VOYAGE_ABILITY_CHECK_VALUE_ID] : []),
+  ]);
 }
 
 export function familyRegexGroups(preset: FfPreset): { label: string; ids: string[] }[] {
@@ -226,15 +229,13 @@ const VOYAGE_SECTIONS: readonly PromptSection[] = [
   },
   {
     id: "state",
-    label: "Hồ sơ ẩn & dữ liệu kiểm tra",
-    description:
-      "Ghi chú GM, hồ sơ nhân vật và địa điểm; dữ liệu kết quả cho kiểm tra PbtA tự động.",
+    label: "Hồ sơ ẩn",
+    description: "Ghi chú GM cùng hồ sơ nhân vật và địa điểm, lưu trong comment XML.",
     open: true,
     promptIds: [
       "905b9207-5d9b-4531-a5b5-35fa4c575388",
       "766e1812-cc15-416b-9145-8ffce5036892",
       "8e0ea0b9-a1f2-46a1-b5b6-8ffa3a82435c",
-      "58b58785-f5e9-49c4-9cd5-a3bbe0297e74",
     ],
   },
   {

@@ -3,11 +3,18 @@ import { runInNewContext } from "node:vm";
 import { build } from "esbuild";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { type ChatMessage, type FfPreset } from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
+import { loadPresetSources } from "../scripts/build-tomisakae-vn-rp-plugin.js";
+import {
+  VOYAGE_AUTOMATIC_PBTA_ID,
+  VOYAGE_ABILITY_CHECK_VALUE_ID,
+  type PresetSources,
+} from "../risuai/tomisakae-vn-rp-plugin/src/preset-family.js";
 import {
   CONFIG_PRESETS_STORAGE_KEY,
   createConfigPreset,
   normalizePresetStore,
   selectCardPreset,
+  switchPresetFamily,
 } from "../risuai/tomisakae-vn-rp-plugin/src/presets.js";
 
 interface SavedMessage {
@@ -37,6 +44,7 @@ interface OutputEvent {
 
 let bundled = "";
 let preset: FfPreset;
+let sources: PresetSources;
 
 beforeAll(async () => {
   const raw = await readFile(
@@ -44,6 +52,7 @@ beforeAll(async () => {
     "utf8",
   );
   preset = JSON.parse(raw) as FfPreset;
+  sources = await loadPresetSources();
   const result = await build({
     entryPoints: ["risuai/tomisakae-vn-rp-plugin/src/plugin.ts"],
     bundle: true,
@@ -53,6 +62,7 @@ beforeAll(async () => {
     target: "es2022",
     define: {
       __FF54_PRESET__: raw,
+      __PRESET_SOURCES__: JSON.stringify(sources),
       __FF54_SOURCE_NAME__: '"test-preset"',
       __FF54_SOURCE_SHA256__: '"test-digest"',
     },
@@ -102,6 +112,7 @@ async function startPlugin(
   interface UiNode {
     value: string;
     checked: boolean;
+    disabled: boolean;
     dataset: Record<string, string>;
     textContent: string;
     innerHTML: string;
@@ -114,6 +125,7 @@ async function startPlugin(
     const node: UiNode = {
       value: attributes.match(/value="([^"]*)"/)?.[1] ?? "",
       checked: /\bchecked\b/.test(attributes),
+      disabled: /\bdisabled\b/.test(attributes),
       dataset: Object.fromEntries(
         [...attributes.matchAll(/data-(\w+)="([^"]*)"/g)].map((match) => [match[1]!, match[2]!]),
       ),
@@ -147,9 +159,11 @@ async function startPlugin(
     getElementById: (id: string) => uiNodes.get(id),
     querySelectorAll: (selector: string) =>
       inputs.filter((node) =>
-        selector.includes('type="checkbox"')
-          ? !!node.dataset.kind && node.dataset.kind !== "choice"
-          : node.dataset.kind === "choice",
+        selector.includes("[data-family]")
+          ? node.dataset.family !== undefined
+          : selector.includes('type="checkbox"')
+            ? !!node.dataset.kind && node.dataset.kind !== "choice"
+            : node.dataset.kind === "choice",
       ),
     querySelector: (selector: string) => {
       const id = selector.match(/data-id="([^"]*)"/)?.[1];
@@ -292,6 +306,9 @@ async function startPlugin(
     toggle(id: string) {
       return inputs.find((node) => node.dataset.id === id)!;
     },
+    choice(group: string, value: string) {
+      return inputs.find((node) => node.dataset.group === group && node.value === value)!;
+    },
     async uiEvent(id: string, type = "click") {
       await uiNodes.get(id)!.handlers.get(type)!();
     },
@@ -338,6 +355,106 @@ async function startPlugin(
 }
 
 describe("Named presets in plugin UI and requests", () => {
+  it.each(["ff54", "sola", "voyage"] as const)(
+    "locks Auto Submodel to the editor toggle for %s and persists the dependency",
+    async (family) => {
+      const store = normalizePresetStore(preset, undefined, undefined, sources);
+      store.presets[0]!.settings = switchPresetFamily(
+        store.presets[0]!.settings,
+        sources[family].preset,
+      );
+      const plugin = await startPlugin(store);
+      try {
+        await plugin.settingsUi();
+        expect(plugin.toggle("submodel-auto-rewrite").disabled).toBe(true);
+        expect(plugin.toggle("submodel-auto-rewrite").checked).toBe(false);
+        plugin.toggle("submodel-editor").checked = true;
+        await plugin.toggle("submodel-editor").handlers.get("change")!();
+        expect(plugin.toggle("submodel-auto-rewrite").disabled).toBe(false);
+        plugin.toggle("submodel-auto-rewrite").checked = true;
+        await plugin.uiEvent("save");
+        const saved = normalizePresetStore(
+          preset,
+          plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY),
+          undefined,
+          sources,
+        );
+        expect(saved.presets[0]!.settings.submodelAutoRewriteEnabled).toBe(true);
+        await plugin.settingsUi();
+        expect(plugin.toggle("submodel-auto-rewrite").checked).toBe(true);
+        plugin.toggle("submodel-editor").checked = false;
+        await plugin.toggle("submodel-editor").handlers.get("change")!();
+        expect(plugin.toggle("submodel-auto-rewrite").checked).toBe(false);
+        expect(plugin.toggle("submodel-auto-rewrite").disabled).toBe(true);
+        // Saving also rejects a stale/programmatically checked disabled control.
+        plugin.toggle("submodel-auto-rewrite").checked = true;
+        await plugin.uiEvent("save");
+        const reloaded = await startPlugin(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
+        try {
+          await reloaded.settingsUi();
+          expect(reloaded.toggle("submodel-auto-rewrite").disabled).toBe(true);
+          expect(reloaded.toggle("submodel-auto-rewrite").checked).toBe(false);
+        } finally {
+          await reloaded.callbacks.unload!();
+        }
+      } finally {
+        await plugin.callbacks.unload!();
+      }
+    },
+  );
+
+  it("clears an old saved Auto Submodel toggle when the editor is disabled", async () => {
+    const plugin = await startPlugin(undefined, false, { submodelAutoRewriteEnabled: true });
+    try {
+      await plugin.settingsUi();
+      expect(plugin.toggle("submodel-auto-rewrite").checked).toBe(false);
+      expect(plugin.toggle("submodel-auto-rewrite").disabled).toBe(true);
+      await plugin.uiEvent("save");
+      expect(
+        normalizePresetStore(preset, plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY)).presets[0]!
+          .settings.submodelAutoRewriteEnabled,
+      ).toBe(false);
+    } finally {
+      await plugin.callbacks.unload!();
+    }
+  });
+
+  it("couples Voyage's PbtA data and token preview to its automatic choice", async () => {
+    const store = normalizePresetStore(preset, undefined, undefined, sources);
+    store.presets[0]!.settings = switchPresetFamily(
+      store.presets[0]!.settings,
+      sources.voyage.preset,
+    );
+    const plugin = await startPlugin(store);
+    try {
+      await plugin.settingsUi();
+      expect(plugin.toggle(VOYAGE_ABILITY_CHECK_VALUE_ID)).toBeUndefined();
+      const off = plugin.choice("ability-check", "");
+      const auto = plugin.choice("ability-check", VOYAGE_AUTOMATIC_PBTA_ID);
+      const manual = plugin.choice("ability-check", "766bc4f9-b685-4412-bec2-b56be47b4f9a");
+      off.checked = false;
+      auto.checked = true;
+      await auto.handlers.get("change")!();
+      expect(plugin.ui("token-estimate-panel").innerHTML).toContain("🎲 Giá trị kiểm tra năng lực");
+      await plugin.uiEvent("save");
+      expect((await plugin.request()).map((message) => message.content).join("\n")).toMatch(
+        /Ability check value is `(?:success|partial|miss)`/,
+      );
+      auto.checked = false;
+      manual.checked = true;
+      await manual.handlers.get("change")!();
+      expect(plugin.ui("token-estimate-panel").innerHTML).not.toContain(
+        "🎲 Giá trị kiểm tra năng lực",
+      );
+      await plugin.uiEvent("save");
+      expect((await plugin.request()).map((message) => message.content).join("\n")).not.toContain(
+        "Ability check value is",
+      );
+    } finally {
+      await plugin.callbacks.unload!();
+    }
+  });
+
   it("reads theme changes on each request and survives unavailable theme APIs", async () => {
     const plugin = await startPlugin();
     const api = plugin.api as typeof plugin.api & { getColorScheme?: () => Promise<unknown> };

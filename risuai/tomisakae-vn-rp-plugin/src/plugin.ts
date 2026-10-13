@@ -335,9 +335,10 @@ function checkbox(
   checked: boolean,
   label: string,
   detail: string,
+  disabled = false,
 ): string {
   return `<label class="toggle-row">
-    <input class="switch" type="checkbox" data-kind="${kind}" data-id="${escapeHtml(id)}" ${checked ? "checked" : ""}>
+    <input class="switch" type="checkbox" data-kind="${kind}" data-id="${escapeHtml(id)}" ${checked ? "checked" : ""} ${disabled ? "disabled" : ""}>
     <span class="toggle-copy"><strong>${escapeHtml(label)}</strong><small>${escapeHtml(detail)}</small></span>
   </label>`;
 }
@@ -569,9 +570,10 @@ async function showSettings(): Promise<void> {
     )}${checkbox(
       "plugin",
       "submodel-auto-rewrite",
-      settings.submodelAutoRewriteEnabled,
+      settings.submodelEditorEnabled && settings.submodelAutoRewriteEnabled,
       "🔄 Tự động biên tập bằng Submodel",
       "Cần bật Biên tập bằng Submodel. Tự sửa phản hồi mới sau khi tạo xong và hoàn chỉnh theo định dạng của bộ nền; thông báo khi đã lưu · Mặc định tắt",
+      !settings.submodelEditorEnabled,
     )}${checkbox(
       "plugin",
       "dialogue-theme",
@@ -589,7 +591,20 @@ async function showSettings(): Promise<void> {
   </main>`;
 
   const status = document.getElementById("status")!;
+  const editorToggle = document.querySelector<HTMLInputElement>(
+    'input[data-id="submodel-editor"]',
+  )!;
+  const autoRewriteToggle = document.querySelector<HTMLInputElement>(
+    'input[data-id="submodel-auto-rewrite"]',
+  )!;
+  const syncSubmodelToggles = () => {
+    autoRewriteToggle.disabled = !editorToggle.checked;
+    if (autoRewriteToggle.disabled) autoRewriteToggle.checked = false;
+  };
+  syncSubmodelToggles();
+  editorToggle.addEventListener("change", syncSubmodelToggles);
   const readUi = () => {
+    syncSubmodelToggles();
     settings.enabled = (document.getElementById("master") as HTMLInputElement).checked;
     for (const group of exclusiveGroups) {
       const node = document.querySelector<HTMLInputElement>(

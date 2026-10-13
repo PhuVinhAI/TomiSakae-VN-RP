@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { describe, expect, it, beforeAll } from "vitest";
+import { describe, expect, it, beforeAll, vi } from "vitest";
 import { loadPresetSources } from "../scripts/build-tomisakae-vn-rp-plugin.js";
 import {
   applyRegexScripts,
@@ -16,6 +16,8 @@ import {
   presetOrder,
   vietnameseOutputFor,
   adaptFamilyPrompt,
+  VOYAGE_AUTOMATIC_PBTA_ID,
+  VOYAGE_ABILITY_CHECK_VALUE_ID,
   type PresetSources,
 } from "../risuai/tomisakae-vn-rp-plugin/src/preset-family.js";
 import {
@@ -103,6 +105,129 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(recall).toBeGreaterThan(built.findIndex((m) => m.content === "Tôi vào phòng."));
   });
 
+  it.each([
+    [0, "success"],
+    [1, "partial"],
+    [2, "partial"],
+    [3, "partial"],
+    [4, "miss"],
+  ] as const)(
+    "generates Voyage's automatic PbtA result %s as %s in source order",
+    async (draw, outcome) => {
+      const preset = sources.voyage.preset;
+      const settings = createDefaultSettings(preset);
+      settings.promptEnabled[VOYAGE_AUTOMATIC_PBTA_ID] = true;
+      const snapshot = structuredClone({ preset, settings });
+      const rng = vi.fn(() => draw);
+      const built = await buildRequestMessages(
+        [{ role: "user", content: "Tôi thử mở khóa." }],
+        preset,
+        settings,
+        parse,
+        { randomInt: rng },
+      );
+      const text = built.map((message) => message.content).join("\n");
+      expect(rng).toHaveBeenCalledExactlyOnceWith(0, 4);
+      expect(text.match(/Ability check value is `(?:success|partial|miss)`\./g)).toEqual([
+        `Ability check value is \`${outcome}\`.`,
+      ]);
+      expect(text).not.toContain("{{random::");
+      const resultIndex = built.findIndex((message) =>
+        message.content.includes("Ability check value is"),
+      );
+      expect(built[resultIndex]?.role).toBe("system");
+      expect(resultIndex).toBeGreaterThan(
+        built.findIndex((message) => message.content === "Tôi thử mở khóa."),
+      );
+      expect(resultIndex).toBeLessThan(
+        built.findIndex((message) => message.content.includes("internally recall ALL")),
+      );
+      expect({ preset, settings }).toEqual(snapshot);
+
+      settings.promptEnabled[VOYAGE_ABILITY_CHECK_VALUE_ID] = true;
+      const rebuilt = await buildRequestMessages(built, preset, settings, parse, {
+        randomInt: () => draw,
+      });
+      expect(rebuilt).toEqual(built);
+    },
+  );
+
+  it.each(["manual", "off"])(
+    "sends no generated PbtA result in Voyage's %s mode, including legacy data toggles",
+    async (mode) => {
+      const preset = sources.voyage.preset;
+      const settings = createDefaultSettings(preset);
+      settings.promptEnabled["766bc4f9-b685-4412-bec2-b56be47b4f9a"] = mode === "manual";
+      settings.promptEnabled[VOYAGE_ABILITY_CHECK_VALUE_ID] = true;
+      const rng = vi.fn(() => 1);
+      const built = await buildRequestMessages(
+        [{ role: "user", content: "Tôi thử mở khóa." }],
+        preset,
+        settings,
+        parse,
+        { randomInt: rng },
+      );
+      expect(rng).not.toHaveBeenCalled();
+      const text = built.map((message) => message.content).join("\n");
+      expect(text).not.toContain("Ability check value is");
+      expect(text.includes("## Rule: Manual PbtA Ability Check")).toBe(mode === "manual");
+      if (mode === "manual") expect(text).toContain("2d6");
+    },
+  );
+
+  it("lets Voyage's Prose Format switch control formatting without a Global duplicate", async () => {
+    const preset = sources.voyage.preset;
+    const settings = createDefaultSettings(preset);
+    const formatId = "11600b2f-2ee0-4c23-8311-dbd9cba5276f";
+    for (const enabled of [true, false]) {
+      settings.promptEnabled[formatId] = enabled;
+      const built = await buildRequestMessages(
+        [{ role: "user", content: "Tiếp đi." }],
+        preset,
+        settings,
+        parse,
+      );
+      const output = built.find((message) => message.memo === "vn-rp:voyage:vietnamese-output")!;
+      expect(output.content).not.toMatch(
+        /Prose Format|plaintext narration|quoted dialogue|blockquoted documents|code blocks for terminals/,
+      );
+      expect(output.content).toContain("`§...§`");
+      const text = built.map((message) => message.content).join("\n");
+      expect(text.includes("## Rule: Prose Format")).toBe(enabled);
+      expect(text.includes("* double quotes for dialogue")).toBe(enabled);
+    }
+  });
+
+  it("estimates Voyage's automatic result without consuming randomness and matches request tokens", async () => {
+    const preset = sources.voyage.preset;
+    const settings = createDefaultSettings(preset);
+    settings.promptEnabled[VOYAGE_AUTOMATIC_PBTA_ID] = true;
+    settings.promptEnabled["11600b2f-2ee0-4c23-8311-dbd9cba5276f"] = false;
+    const rng = vi.spyOn(Math, "random");
+    try {
+      const estimate = await estimatePluginPromptTokens(preset, settings, host);
+      expect(rng).not.toHaveBeenCalled();
+      expect(
+        estimate.entries.filter((entry) => entry.identifier === VOYAGE_ABILITY_CHECK_VALUE_ID),
+      ).toHaveLength(1);
+      const built = await buildRequestMessages(
+        [{ role: "user", content: "Tiếp đi." }],
+        preset,
+        settings,
+        parse,
+        { randomInt: (min) => min },
+      );
+      const { countTokens } = await import("gpt-tokenizer/encoding/o200k_base");
+      const added = built.filter((message) => message.memo?.startsWith("vn-rp:voyage:"));
+      expect(estimate.contentTokens).toBe(
+        added.reduce((sum, message) => sum + countTokens(message.content), 0),
+      );
+      expect(estimate.messageCount).toBe(added.length);
+    } finally {
+      rng.mockRestore();
+    }
+  });
+
   it("expands Sola's module banks, dice/random macros, and depth injections", async () => {
     const preset = sources.sola.preset;
     const result = await composePresetPrompts(preset, createDefaultSettings(preset), parse, {
@@ -171,6 +296,7 @@ describe("TomiSakae VN-RP preset families", () => {
       const settings = createDefaultSettings(preset);
       settings.dialogueThemeEnabled = false;
       settings.vietnameseOutputEnabled = false;
+      settings.submodelEditorEnabled = true;
       settings.submodelAutoRewriteEnabled = true;
       const id = Object.keys(settings.promptEnabled)[0]!;
       settings.promptEnabled[id] = false;
@@ -359,7 +485,7 @@ describe("TomiSakae VN-RP preset families", () => {
   );
 
   it.each(["sola", "voyage"] as const)(
-    "localizes all %s controls and hides only source dividers",
+    "localizes all %s controls and hides source dividers and dependent data",
     (family) => {
       const preset = sources[family].preset;
       const sections = familyPromptSections(preset);
@@ -390,7 +516,9 @@ describe("TomiSakae VN-RP preset families", () => {
       const settings = createDefaultSettings(preset);
       for (const id of familyHiddenPromptIds(preset)) {
         expect(visible).not.toContain(id);
-        expect(settings.promptEnabled[id]).toBe(true);
+        expect(settings.promptEnabled[id]).toBe(
+          presetOrder(preset).find((entry) => entry.identifier === id)?.enabled !== false,
+        );
       }
     },
   );

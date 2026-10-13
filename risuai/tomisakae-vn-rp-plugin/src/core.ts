@@ -6,6 +6,8 @@ import {
   pluginMemoPrefix,
   presetOrder,
   vietnameseOutputFor,
+  VOYAGE_AUTOMATIC_PBTA_ID,
+  VOYAGE_ABILITY_CHECK_VALUE_ID,
   type PresetFamilyId,
 } from "./preset-family.js";
 import {
@@ -225,7 +227,8 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
     defaults.submodelEditorEnabled = record.submodelEditorEnabled;
   }
   if (typeof record.submodelAutoRewriteEnabled === "boolean") {
-    defaults.submodelAutoRewriteEnabled = record.submodelAutoRewriteEnabled;
+    defaults.submodelAutoRewriteEnabled =
+      defaults.submodelEditorEnabled && record.submodelAutoRewriteEnabled;
   }
   return defaults;
 }
@@ -445,8 +448,12 @@ export function composePresetPrompts(
 
     for (const entry of order) {
       if (entry.identifier === "chatHistory") afterHistory = true;
-      if (!settings.promptEnabled[entry.identifier] || MARKER_IDENTIFIERS.has(entry.identifier))
-        continue;
+      // Voyage's automatic rule owns its result; expand the native random macro in place.
+      const enabled =
+        familyOf(preset) === "voyage" && entry.identifier === VOYAGE_ABILITY_CHECK_VALUE_ID
+          ? settings.promptEnabled[VOYAGE_AUTOMATIC_PBTA_ID]
+          : settings.promptEnabled[entry.identifier];
+      if (!enabled || MARKER_IDENTIFIERS.has(entry.identifier)) continue;
       const prompt = map.get(entry.identifier);
       if (!prompt || prompt.marker || typeof prompt.content !== "string") continue;
       let sourceContent = adaptFamilyPrompt(prompt.content, preset, settings);
