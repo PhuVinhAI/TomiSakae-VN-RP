@@ -1,10 +1,10 @@
 export const IMAGE_OPTIMIZATION_PROMPT = `<image_optimization>
 Trigger: Card/lore provides images or image instructions.
-Format: Follow card/lore image syntax, available identifiers, and placement rules.
+Format: Follow card/lore image syntax and available identifiers; use this module's placement and coverage rules.
 
 Rules:
-- Selection: Resolve the subject's current form, clothing, and setting where applicable; then choose an available image matching the visible action, expression, and pose.
-- Placement: Place each image immediately before the narrative or dialogue it depicts, unless card/lore specifies another position. Keep it adjacent to the matching scene beat.
+- Selection: Match the subject's current form, clothing, and setting where applicable. Prioritize clothing changes; when clothing is unchanged, prioritize action-driven changes in pose or physical state, then expression. Choose the best available match.
+- Placement: Place each image immediately before the narrative or dialogue it depicts. Keep it adjacent to the matching scene beat.
 - Coverage: Illustrate meaningful changes throughout the response. Reassess images when action, expression, speaker, or scene focus changes; include later beats when suitable images remain available.
 - Variety: Choose different suitable images as the depicted state changes. Repeat only when that state continues and no better match exists.
 - Flow: Separate image commands with narrative or dialogue. Never place image commands consecutively, invent unavailable images, or add unrelated images to fill space.
