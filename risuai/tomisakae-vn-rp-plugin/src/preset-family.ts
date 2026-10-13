@@ -3,8 +3,8 @@ import {
   VIETNAMESE_OUTPUT_PROMPT,
   SOLA_VIETNAMESE_OUTPUT_PROMPT,
   VOYAGE_VIETNAMESE_OUTPUT_PROMPT,
-  SOLA_VIETNAMESE_REPLACEMENTS,
-  VOYAGE_VIETNAMESE_REPLACEMENTS,
+  adaptSolaPromptForVietnamese,
+  adaptVoyagePromptForVietnamese,
   adaptPromptForVietnamese,
 } from "./vietnamese.js";
 import { IMAGE_OPTIMIZATION_PROMPT, addImageReasoningGuidance } from "./image.js";
@@ -82,12 +82,7 @@ export function adaptFamilyPrompt(
   }
   if (familyOf(preset) === "sola") {
     if (settings.vietnameseOutputEnabled) {
-      for (const [source, replacement] of SOLA_VIETNAMESE_REPLACEMENTS)
-        content = content.replaceAll(source, replacement);
-      content = content.replace(
-        "- Voices: 3-Axis Audit (Diction, Cadence, Evasion).",
-        "- Voices: 3-Axis Audit (Diction, Cadence, Evasion) in natural Vietnamese.",
-      );
+      content = adaptSolaPromptForVietnamese(content);
     }
     if (settings.imageOptimizationEnabled) {
       content = content.replace(
@@ -97,16 +92,7 @@ export function adaptFamilyPrompt(
     }
   } else {
     if (settings.vietnameseOutputEnabled) {
-      for (const [source, replacement] of VOYAGE_VIETNAMESE_REPLACEMENTS)
-        content = content.replaceAll(source, replacement);
-      content = content.replace(
-        "* explore the goals, motivations and feelings of each NPC in the scene",
-        "* explore the goals, motivations and feelings of each NPC in the scene and their natural Vietnamese voice",
-      );
-      content = content.replace(
-        "4. reason what would be realistic for them to say",
-        "4. reason what would be realistic for them to say in natural Vietnamese",
-      );
+      content = adaptVoyagePromptForVietnamese(content);
     }
     if (settings.imageOptimizationEnabled) {
       content = content.replace(

@@ -15,6 +15,7 @@ import {
   pluginMemoPrefix,
   presetOrder,
   vietnameseOutputFor,
+  adaptFamilyPrompt,
   type PresetSources,
 } from "../risuai/tomisakae-vn-rp-plugin/src/preset-family.js";
 import {
@@ -40,6 +41,11 @@ import {
 import { promptUiCopy, regexUiCopy } from "../risuai/tomisakae-vn-rp-plugin/src/ui-vi.js";
 import { solaRegexUiCopy } from "../risuai/tomisakae-vn-rp-plugin/src/preset-ui-copy.js";
 import { adaptSolaSceneHeaderForDisplay } from "../risuai/tomisakae-vn-rp-plugin/src/sola-display.js";
+import {
+  SOLA_VIETNAMESE_REPLACEMENTS,
+  VOYAGE_VIETNAMESE_REPLACEMENTS,
+} from "../risuai/tomisakae-vn-rp-plugin/src/vietnamese.js";
+import { adaptSolaRegexForVietnamese } from "../risuai/tomisakae-vn-rp-plugin/src/sola-vietnamese-regex.js";
 import {
   adaptSolaDialogueColors,
   SOLA_DIALOGUE_COLORS,
@@ -286,7 +292,7 @@ describe("TomiSakae VN-RP preset families", () => {
       );
       expect(text).toContain("Vietnamese");
       expect(text).toContain("POV Check");
-      expect(text).toContain("interiority");
+      expect(text).toMatch(/interiority|unvoiced thoughts|thoughts must be inferred/);
     }
   });
 
@@ -472,5 +478,166 @@ describe("TomiSakae VN-RP preset families", () => {
         '<scene_header location="Đường" time="10:00" atmosphere="Mưa lớn" />',
       ),
     ).toContain('sky="noir"');
+  });
+
+  it.each(["sola", "voyage"] as const)(
+    "adapts %s examples in the entire module bank without changing the source or mechanics",
+    async (family) => {
+      const preset = sources[family].preset;
+      const snapshot = JSON.stringify(preset);
+      const settings = createDefaultSettings(preset);
+      settings.imageOptimizationEnabled = false;
+      settings.dialogueThemeEnabled = false;
+      const sourceText = preset.prompts.map((p) => p.content ?? "").join("\n");
+      const pairs =
+        family === "sola" ? SOLA_VIETNAMESE_REPLACEMENTS : VOYAGE_VIETNAMESE_REPLACEMENTS;
+      for (const [source] of pairs) expect(sourceText, source).toContain(source);
+
+      for (const prompt of preset.prompts) {
+        if (typeof prompt.content !== "string" || !prompt.content) continue;
+        const adapted = adaptFamilyPrompt(prompt.content, preset, settings);
+        const macroTokens = (text: string) =>
+          [...text.matchAll(/\{\{(?:setvar|getvar|random|roll)::([^}:]+)/g)].map((m) => m[0]);
+        expect(macroTokens(adapted), prompt.name).toEqual(macroTokens(prompt.content));
+        expect(
+          adaptFamilyPrompt(prompt.content, preset, {
+            ...settings,
+            vietnameseOutputEnabled: false,
+          }),
+          prompt.name,
+        ).toBe(prompt.content);
+        settings.promptEnabled[prompt.identifier] = true;
+      }
+      const composed = await composePresetPrompts(preset, settings, parse, {
+        randomInt: (min) => min,
+      });
+      const text = [...composed.leading, ...composed.absolute, ...composed.trailing]
+        .map((m) => m.content)
+        .join("\n");
+      expect(text).not.toMatch(/\{\{(?:setvar|getvar|random|roll|trim)(?:::|\}\})/);
+      if (family === "sola") {
+        expect(text).toContain("lồn, cặc, tinh dịch, đít, vú, đụ, rỉ nước");
+        expect(text).toContain('"Cái chạm ấy thật ấm."');
+        expect(text).toContain('"Vì sao chạy? Để sống sót."');
+        expect(text).toContain('<copper:whisper>"Đừng gây tiếng động."</copper>');
+        expect(text).toContain("T=[0-4] | F=[0-4] | D=[0-4] | Y=[0-4]");
+        expect(text).toContain("[Bullseye | Grazing Shot | Wind Drift]");
+        expect(text).toContain("Thay đổi: +Được tôn trọng dù còn miễn cưỡng");
+        expect(text).toContain("Lịch: [Mùa, tháng/năm");
+        expect(text).toContain("Xu hướng: [Xu hướng tình dục và tình cảm trong card");
+        expect(text).toContain('<notification app="Tin nhắn"');
+        expect(text).toContain("> TÌM THẤY 2 ĐIỆN VĂN CHƯA ĐỌC");
+        expect(text).toContain("NEUTRAL");
+      } else {
+        expect(text).toContain("Tinh dịch rỉ ra khỏi lồn Emilia");
+        expect(text).toContain('"Địt mẹ, tao sẽ GIẾT mày!"');
+        expect(text).toContain("* Tên: họ tên hoặc biệt danh");
+        expect(text).toContain("* Thể chất: đoạn mô tả");
+        expect(text).toContain("* Kevin Lynch: đoạn mô tả");
+        expect(text).toContain('`success` (10+): "Có"');
+        expect(text).toContain('`partial` (7-9): "Có, nhưng..."');
+        expect(text).toContain('`miss` (6-): "Không, nhưng..."');
+        expect(text).toContain("SpellLessWizard");
+        expect(text).not.toContain("_Click!_");
+        expect(text).not.toContain("_underscore_ for sounds");
+      }
+      expect(text).not.toContain("shout, whisper, measured, tremble");
+      expect(text).not.toContain("<internal_states>");
+      expect(text).not.toContain("manga, anime, and light-novel pacing");
+      expect(vietnameseOutputFor(preset)).toContain("`§...§`");
+      expect(JSON.stringify(preset)).toBe(snapshot);
+    },
+  );
+
+  it("uses standalone sound examples and keeps Sola vocalizations in dialogue", () => {
+    const preset = sources.sola.preset;
+    const settings = createDefaultSettings(preset);
+    for (const p of preset.prompts.filter((p) => typeof p.content === "string" && p.content)) {
+      const text = adaptFamilyPrompt(String(p.content), preset, settings);
+      for (const line of text
+        .split("\n")
+        .filter((line) => /§(?:Rắc|Rầm|Tích tắc|Thình thịch)/.test(line))) {
+        expect(line.trim(), p.name).toMatch(/^§[^§]+§$/);
+      }
+      expect(text).not.toMatch(/<(?:heavy|echo|fracture|hearth:echo)>\*?(?:SLAM|SNAP|Tick)/);
+    }
+    const vocal = preset.prompts.find((p) => p.name?.includes("Voice: Vocal Sounds"))!;
+    expect(adaptFamilyPrompt(String(vocal.content), preset, settings)).toContain('"Ưm~"');
+  });
+
+  it("renders both Sola tracker languages and preserves prompt saver depth and raw text", () => {
+    const preset = sources.sola.preset;
+    const settings = createDefaultSettings(preset);
+    const input =
+      '<sola_hud digest="Ngày 9 · DRIVE"><date>Ngày: 9\nThời gian: Bình minh</date>\n<bond>Cặp: An & TomiSakae\nThay đổi: +Tin tưởng hơn</bond>\n<fengine>Đức:\nT=2↑ | F=1 | D=0 | Y=3\nẨn ý: Giấu lo lắng\nSuy nghĩ: Phải đi thôi.</fengine>\n<arrow>Quỹ đạo: Bullseye</arrow>\n<inventory>Trong tay: Trống\nCất giấu: Không có</inventory>\n<story_notes>Mạch truyện: Đi tìm chìa khóa</story_notes></sola_hud>';
+    const options = { placement: PLACEMENT_AI_OUTPUT, markdown: true, depth: 0 };
+    const rendered = applyRegexScripts(input, preset, settings, options);
+    expect(rendered).not.toMatch(/<(?:sola_hud|date|bond|fengine|arrow|inventory|story_notes)\b/);
+    expect(rendered).toContain("HUD ĐIỀU PHỐI SOLA");
+    expect(rendered).toContain("Lịch & thời gian");
+    expect(rendered).toContain("Dịu dàng 2/4");
+    expect(rendered).toContain("TRÚNG ĐÍCH");
+    expect(rendered).toContain("🌅 Bình minh");
+    expect(rendered).toContain("Tin tưởng hơn");
+    expect(rendered).toContain(">Đức:</span>");
+    const english =
+      "<date>Day: 9\nTime: Dawn</date>\n<bond>Pair: An & TomiSakae\nShift: +More trust</bond>";
+    const originalRender = applyRegexScripts(english, preset, settings, options);
+    expect(originalRender).toContain("Thời gian:");
+    expect(originalRender).toContain("More trust");
+    const disabled = applyRegexScripts(
+      english,
+      preset,
+      { ...settings, vietnameseOutputEnabled: false },
+      options,
+    );
+    expect(disabled).toContain("Calendar & Chronology");
+    expect(disabled).not.toContain("Lịch & thời gian");
+    for (const script of preset.extensions!.regex_scripts!) {
+      const adapted = adaptSolaRegexForVietnamese(
+        script.findRegex!,
+        String(script.replaceString ?? ""),
+        script.scriptName!,
+      );
+      const end = adapted.findRegex.lastIndexOf("/");
+      expect(
+        () => new RegExp(adapted.findRegex.slice(1, end), adapted.findRegex.slice(end + 1)),
+        script.scriptName,
+      ).not.toThrow();
+      const captures = (text: string) => text.match(/\$\d+/g) ?? [];
+      expect(captures(adapted.replaceString)).toEqual(captures(String(script.replaceString ?? "")));
+      if (script.promptOnly) expect(adapted.findRegex).toBe(script.findRegex);
+    }
+    const saved = applyRegexScripts(input, preset, settings, {
+      placement: PLACEMENT_AI_OUTPUT,
+      prompt: true,
+      depth: 20,
+    });
+    expect(saved).not.toContain("<sola_hud");
+    expect(input).toContain("Thay đổi: +Tin tưởng hơn");
+  });
+
+  it("selects Vietnamese Sola skyboxes with working source override ordering", () => {
+    for (const [time, atmosphere, sky, color] of [
+      ["Bình minh", "Lặng gió", "dawn", "#F4845F"],
+      ["Buổi chiều", "Nắng", "day", "#A8DADC"],
+      ["Chạng vạng", "Yên tĩnh", "dusk", "#F4A261"],
+      ["Ban đêm", "Lạnh", "night", "#8592E6"],
+      ["13:40", "Mưa lớn", "noir", "#7A8B99"],
+    ]) {
+      const input = `<scene_header location="Phòng" time="${time}" atmosphere="${atmosphere}" />`;
+      const normalized = adaptSolaSceneHeaderForDisplay(input);
+      expect(normalized).toContain(`<scene_header sky="${sky}" location=`);
+      const rendered = applyRegexScripts(
+        normalized,
+        sources.sola.preset,
+        createDefaultSettings(sources.sola.preset),
+        { placement: PLACEMENT_AI_OUTPUT, markdown: true, depth: 0 },
+      );
+      expect(rendered).not.toContain("<scene_header");
+      expect(rendered).toContain(color!);
+      expect(rendered).toContain("HỒ SƠ ĐỊA ĐIỂM");
+      expect(rendered).toContain(atmosphere!);
+    }
   });
 });

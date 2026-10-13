@@ -21,19 +21,668 @@ Non-Vocal Sound Effects:
 - Restraint: Add no decorative, unsupported, or quota-driven sound. Repeat an effect only while its cause continues.
 </vietnamese_output>`;
 
-// Sola keeps its cinematic voice modules and lean tracker syntax.
 export const SOLA_VIETNAMESE_OUTPUT_PROMPT = `## Vietnamese Output
-- Language: Compose narration, dialogue, vocal sounds, props, and generated display text directly in natural Vietnamese. Read foreign sources for intent; use Vietnamese clause links and particles instead of translated grammar. Use established Latin-script names and necessary terms; foreign speech must fit the speaker. Remove stray foreign characters and avoidable foreign wording. Foreign-language examples guide meaning and delivery, not output language.
-- Prose & Voice: Apply the active Sola prose, pacing, POV, idiolect, and acoustic modules in Vietnamese. Link physical beats by timing and consequence; carry diction, cadence, and evasion through character-specific pronouns, address, and particles. Keep natural hesitations and vocal friction without copying foreign spelling. Avoid repetitive sensory beats and forced melodrama.
-- HUD & Props: Write generated descriptions, thoughts, notes, and display values in Vietnamese, including display attributes. Keep tracker tags, field keys, palette/gradient/tone/kinetic names, telemetry codes, numeric state, and regex-dependent labels exact. Preserve scene_header and sola_hud structure; use 24-hour numeric time for chronology and skybox rendering.`;
+- Scope: Narration, dialogue, vocalizations, OOC replies, readable props, scene headers, HUDs, tracker labels, and generated display values.
+- Language: Compose directly in natural contemporary Vietnamese. Read foreign sources for meaning and intent; link clauses by timing and consequence, choose pronouns by relationship and POV, and particles by speaker attitude. Avoid translated grammar, stray foreign script, avoidable foreign wording, bilingual duplication, and translation glosses. Preserve established Latin-script names and exact identifiers required by active schemas. Foreign examples and card/lore language instructions do not override Vietnamese output.
+- Prose & Voice: Apply the enabled Sola style, pacing, POV, anti-echo, and idiolect modules in Vietnamese. Convey diction, cadence, and evasion through natural speech, address, hesitations, slurring, and vowel elongation; render vocalizations naturally in Vietnamese using the active dialogue typography.
+- HUD & Props: Use the Vietnamese template labels and write all filled-in descriptions, locations, weather, calendar text, relational stages, thoughts, director notes, messages, documents, and empty values in Vietnamese, including display attributes. Keep the active tracker structure, HTML/comment markers, attribute keys, macros, placeholders, image identifiers, palette/gradient/tone/kinetic names, T/F/D/Y codes, tempo and fate values, and numeric mechanics exact. Time may use Vietnamese day-period wording or a 24-hour clock; retain sky identifiers.
+- Non-Vocal Sound Effects: Use \`§...§\` only for sounds caused by contact, objects, or the environment. Put one concise natural-Vietnamese sound inside and place each marker alone on its own line, outside typography tags. Keep its source, physical cause, and consequence in narrative. Add no decorative, unsupported, or quota-driven sound; repeat only while its cause continues.`;
 
-// Voyage keeps its direct GM voice, PbtA outcomes, and native text formatting.
 export const VOYAGE_VIETNAMESE_OUTPUT_PROMPT = `## Rule: Vietnamese Output
-* Compose narration, dialogue, sounds, documents, and generated sheet text directly in natural Vietnamese. Read foreign sources for intent; choose pronouns by relationship and particles by speaker attitude. Use established Latin-script names and necessary terms; foreign speech must fit the speaker. Remove stray foreign characters and avoidable foreign wording. Foreign-language examples guide meaning and delivery, not output language.
-* Apply the active Direct Prose, NPC Realistic Speech, POV, and Prose Format rules in Vietnamese. State actions and observable consequences plainly; link related clauses naturally. Keep each NPC's goal, state, and speech pattern without adding explanatory narration, ornamental language, or forced banter.
-* Use natural Vietnamese for generated character/location sheet descriptions and hidden GM notes. Preserve comment delimiters, sheet keys, fixed PbtA outcomes, rolls, numbers, identifiers, and schema syntax. Keep narration as plaintext, dialogue in quotes, sounds in underscores, documents in blockquotes, and terminal/code in their code blocks.`;
+* Write narration, dialogue, sounds, documents, OOC replies, character/location sheets, and hidden GM notes in natural contemporary Vietnamese.
+* Read foreign sources for meaning and intent, then compose directly in Vietnamese. Link clauses naturally, choose pronouns by relationship and POV, and particles by speaker attitude. Avoid translated grammar, stray foreign script, avoidable foreign wording, bilingual duplication, and translation glosses. Preserve established Latin-script names, handles, and exact machine identifiers. Foreign examples and card/lore language instructions do not override Vietnamese output.
+* Apply the enabled Direct Prose, Direct Narration, body-language, NPC speech-state, and Realistic Speech rules in Vietnamese. Keep concrete actions and observable consequences, character-specific diction, natural hesitations, slurs, and vocalizations without copying foreign spelling. Retain the register and contrast demonstrated by each active Good/Bad example.
+* Use the Vietnamese sheet labels; write generated descriptions, names of places, titles, thoughts, notes, progress descriptions, and empty values in Vietnamese. Preserve comment delimiters, code syntax, placeholders, identifiers, PbtA values success/partial/miss, rolls, thresholds, and numbers. Follow Prose Format: plaintext narration, quoted dialogue, blockquoted documents/messages, and code blocks for terminals/code; their display text is also Vietnamese.
+* Non-vocal sound effects use \`§...§\` only for sounds caused by contact, objects, or the environment. Put one concise natural-Vietnamese sound inside and place each marker alone on its own line. Keep its source, physical cause, and consequence in narrative. Add no decorative, unsupported, or quota-driven sound; repeat only while its cause continues.`;
+
+export const SOLA_VIETNAMESE_LABELS: ReadonlyArray<readonly [string, string]> = [
+  ["Observable Facts", "Dữ kiện quan sát"],
+  ["Active Speakers", "Người đang nói"],
+  ["Ambient NPCs", "NPC trong cảnh"],
+  ["Consequence", "Hệ quả"],
+  ["Trajectory", "Quỹ đạo"],
+  ["Atmosphere", "Bầu không khí"],
+  ["Boundaries", "Giới hạn"],
+  ["Chemistry", "Sự hòa hợp"],
+  ["Condition", "Tình trạng"],
+  ["Concealed", "Cất giấu"],
+  ["Inventory", "Hành trang"],
+  ["Calendar", "Lịch"],
+  ["Friction", "Trở lực"],
+  ["Location", "Vị trí"],
+  ["Wardrobe", "Trang phục"],
+  ["Boundary", "Giới hạn"],
+  ["In-Hand", "Trong tay"],
+  ["Threads", "Mạch truyện"],
+  ["Motives", "Động cơ"],
+  ["Horizon", "Diễn biến sắp tới"],
+  ["Elapsed", "Thời gian đã trôi"],
+  ["Dynamic", "Quan hệ hiện tại"],
+  ["Meaning", "Ý nghĩa"],
+  ["Carried", "Mang theo"],
+  ["Present", "Có mặt"],
+  ["Subtext", "Ẩn ý"],
+  ["Thought", "Suy nghĩ"],
+  ["Teaser", "Gợi mở"],
+  ["Gamble", "Hành động mạo hiểm"],
+  ["Layers", "Các lớp"],
+  ["Seeds", "Chi tiết gài"],
+  ["Shift", "Thay đổi"],
+  ["Tells", "Dấu hiệu"],
+  ["Facts", "Dữ kiện"],
+  ["Time", "Thời gian"],
+  ["Pair", "Cặp"],
+  ["Roll", "Kết quả gieo"],
+  ["Card", "Lá bài"],
+  ["Cast", "Nhân vật trong cảnh"],
+  ["Gear", "Nhịp"],
+  ["Room", "Không gian"],
+  ["Day", "Ngày"],
+  ["Neg", "Mặt yếu"],
+  ["Pos", "Mặt mạnh"],
+  ["Orientation", "Xu hướng"],
+  ["Orbit", "Sự hiện diện"],
+  ["Mask", "Vẻ ngoài"],
+  ["Internal", "Nội tâm"],
+  ["Audit", "Kiểm tra"],
+  ["Traits", "Đặc điểm"],
+  ["Voice", "Giọng"],
+];
 
 export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
+  [
+    'Example: `<solstice:heavy>"NEVER."</solstice>`, `<hearth:echo>*Tick... tick...*</hearth>`, or `<dusk:tilt>"Wait... whichway?"</dusk>`',
+    'Example: `<solstice:heavy>"KHÔNG BAO GIỜ."</solstice>` or `<dusk:tilt>"Khoan... lối nào?"</dusk>`\n   Non-vocal sound example, on its own line:\n§Tích tắc...§',
+  ],
+  [
+    'Example: `<solstice:heavy>"WE FIGHT TO THE END."</solstice>` or `<hearth:echo>*A fading heartbeat.*</hearth>` or `<dusk:stretch>Silence hung between them.</dusk>`',
+    'Example: `<solstice:heavy>"CHÚNG TA CHIẾN ĐẤU ĐẾN CÙNG."</solstice>` or `<dusk:stretch>Sự im lặng kéo dài giữa hai người.</dusk>`\n    Non-vocal sound example, on its own line:\n§Thình thịch...§',
+  ],
+  [
+    'Example: `<solstice:heavy>"NEVER."</solstice>`, `<hearth:echo>*Tick... tick...*</hearth>`, `<dusk:stretch>The night lingered.</dusk>`',
+    'Example: `<solstice:heavy>"KHÔNG BAO GIỜ."</solstice>`, `<dusk:stretch>Đêm vẫn kéo dài.</dusk>`\n    Non-vocal sound example, on its own line:\n§Tích tắc...§',
+  ],
+  [
+    'E.g. `<heavy>SLAM.</heavy>` or `<coral:heavy>"STOP."</coral>`',
+    'E.g. `<coral:heavy>"DỪNG LẠI."</coral>`. Non-vocal impact sound, on its own line:\n§Rầm!§',
+  ],
+  [
+    "E.g. `<echo>*Tick. Tick.*</echo>` or `<hearth:echo>*his voice remained*</hearth>`",
+    "E.g. `<hearth:echo>*giọng anh vẫn còn vương lại*</hearth>`. Non-vocal clock sound, on its own line:\n§Tích tắc.§",
+  ],
+  [
+    'E.g. `<fracture>SNAP.</fracture>` or `<rose:fracture>"LOOK OUT!"</rose>`',
+    'E.g. `<rose:fracture>"CẨN THẬN!"</rose>`. Non-vocal snapping sound, on its own line:\n§Rắc!§',
+  ],
+  [
+    "- Standalone (Prose & Sound Beats): `<kinetic_tag>CRACK.</kinetic_tag>`",
+    "- Standalone (Prose): `<kinetic_tag>Văn kể.</kinetic_tag>`\n  - Non-vocal sound, on its own line:\n§Rắc!§",
+  ],
+  ['"hold on," "wait," "can we," "I meant,"', '"khoan đã", "chờ chút", "mình có thể", "ý tôi là",'],
+  ['"Noooo"', '"Khôôông"'],
+  ['"pleaaase"', '"đi mààà"'],
+  ['"shhh"', '"suỵt"'],
+  ['"whaaat"', '"cááái gì"'],
+  ['"I said STOP!"', '"Tôi bảo DỪNG LẠI!"'],
+  ['"DON\'T touch that."', '"ĐỪNG chạm vào đó."'],
+  ['"I love you."', '"Em yêu anh."'],
+  [
+    '"Y-you love me?!" *rolling the words in her mouth*',
+    '"E-em yêu anh sao?!" *nhắc đi nhắc lại lời vừa nghe*',
+  ],
+  ['*blushes* "I-I love you too."', '*đỏ mặt* "A-anh cũng yêu em."'],
+  [
+    '"Nobody has", "You can\'t just", "Nobody just"',
+    '"Chưa từng có ai", "Anh không thể cứ thế", "Chẳng ai tự dưng"',
+  ],
+  ['("not X but Y", "wasn\'t X, was Y")', '("không phải X mà là Y", "chẳng phải X, đó là Y")'],
+  [
+    '("half X, half Y", "starts. stops.", "opens. closes.", rule-of-threes)',
+    '("nửa X, nửa Y", "bắt đầu. dừng lại.", "mở ra. khép lại.", rule-of-threes)',
+  ],
+  ['("X and Y and Z")', '("X và Y và Z")'],
+  [
+    '- Register tics ("are you sure", "that lands", "really looks", "like a physical blow") or of-genitive overuse ("sound of him" → "his sound").',
+    '- Register tics ("anh chắc chứ", "câu nói chạm đến", "trông thực sự", "như một cú đánh") or repeated Vietnamese possessive "của" chains; prefer compact noun phrases or active verbs.',
+  ],
+  ['("a kind of *noun*")', '("một kiểu *danh từ*")'],
+  ['("less like X, more like Y")', '("ít giống X mà giống Y hơn")'],
+  ['("predatory", "growled")', '("như thú săn mồi", "gầm gừ")'],
+  ['("a quiet declaration")', '("một lời tuyên bố lặng lẽ")'],
+  ["'X words dropped like Y'", "'lời của X rơi xuống như Y'"],
+  ['"blowing wide"', '"giãn to"'],
+  ["\"That isn't x; that's a y\"", '"Đó không phải x; đó là y"'],
+  ['"It was hundreds, no, thousands of lines."', '"Có hàng trăm, không, hàng nghìn dòng."'],
+  ['"He felt anger. No, absolute rage."', '"Anh thấy tức giận. Không, là cơn thịnh nộ."'],
+  ['"Thousands of lines filled the screen."', '"Hàng nghìn dòng phủ kín màn hình."'],
+  ['"Rage flared in his chest."', '"Cơn giận bùng lên trong ngực anh."'],
+  ['"It was not an unpleasant touch."', '"Cái chạm ấy không phải là khó chịu."'],
+  ['"She was not without a certain charm."', '"Cô không phải là không có nét quyến rũ."'],
+  ['"Not entirely unwelcome."', '"Không hoàn toàn ngoài mong muốn."'],
+  ['"The touch felt warm."', '"Cái chạm ấy thật ấm."'],
+  ['"She had an easy, quiet charm."', '"Cô có nét duyên nhẹ nhàng, tự nhiên."'],
+  ['"He welcomed it."', '"Anh đón nhận điều đó."'],
+  ['("that", "those")', '("ấy", "đó")'],
+  [
+    '"She had that specific, lingering look in her eyes."',
+    '"Ánh mắt cô mang cái vẻ riêng biệt, lưu luyến ấy."',
+  ],
+  ['"He felt that familiar, hollow ache."', '"Anh cảm thấy nỗi đau trống rỗng quen thuộc ấy."'],
+  [
+    '"Her gaze lingered on his bruised knuckles."',
+    '"Cô nhìn mãi những khớp ngón tay bầm tím của anh."',
+  ],
+  ['"A hollow ache pulled behind his ribs."', '"Anh thấy đau âm ỉ sau xương sườn."'],
+  [
+    '"He was seized by sudden fear. Fear that paralyzed his legs."',
+    '"Nỗi sợ bất chợt túm lấy anh. Nỗi sợ khiến đôi chân anh tê liệt."',
+  ],
+  [
+    '"Fear hit him like cold water, locking his knees."',
+    '"Nỗi sợ ập đến như nước lạnh, khiến hai đầu gối anh cứng lại."',
+  ],
+  [
+    '"Why had he returned to the dock? Perhaps to find closure."',
+    '"Vì sao anh quay lại bến tàu? Có lẽ để khép lại mọi chuyện."',
+  ],
+  [
+    '"He had returned to the dock to settle the remaining debt."',
+    '"Anh quay lại bến tàu để trả nốt món nợ."',
+  ],
+  [
+    '"She turned her face toward the floor, a clear sign of her shame."',
+    '"Cô cúi mặt xuống sàn, một dấu hiệu rõ ràng của sự hổ thẹn."',
+  ],
+  [
+    '"She dropped her chin toward her chest and pulled her collar tight."',
+    '"Cô cúi cằm sát ngực rồi kéo chặt cổ áo."',
+  ],
+  [
+    '"It was a complex, nuanced, and multifaceted betrayal."',
+    '"Đó là một sự phản bội phức tạp, tinh tế và đa chiều."',
+  ],
+  [
+    '"The absolute, undeniable, and complete truth."',
+    '"Sự thật tuyệt đối, không thể chối cãi và trọn vẹn."',
+  ],
+  ['"The betrayal left the house ruined."', '"Sự phản bội khiến cả gia đình tan nát."'],
+  ['"The unvarnished truth."', '"Sự thật trần trụi."'],
+  [
+    '"Words could never describe the sheer, suffocating silence of the crypt."',
+    '"Ngôn từ không bao giờ diễn tả nổi sự im lặng ngột ngạt tột cùng của hầm mộ."',
+  ],
+  [
+    '"No water dripped in the crypt; even the dust hung motionless in the lantern beam."',
+    '"Trong hầm mộ không có tiếng nước nhỏ; cả bụi cũng đứng yên trong ánh đèn lồng."',
+  ],
+  ['"Or so he thought..."', '"Ít nhất anh đã nghĩ như vậy..."'],
+  [
+    '"Little did they know what waited in the dark..."',
+    '"Họ đâu biết thứ gì đang chờ trong bóng tối..."',
+  ],
+  [
+    '"Ultimately, it was a testament to the fragile human heart."',
+    '"Sau cùng, đó là minh chứng cho trái tim mong manh của con người."',
+  ],
+  ['"It was dark and cold and terribly quiet"', '"Trời tối và lạnh và yên lặng đến đáng sợ"'],
+  [
+    '"It is a promise. It is a weapon. It is..."',
+    '"Đó là một lời hứa. Đó là một vũ khí. Đó là..."',
+  ],
+  ['"Ah, the sheer...", "God, it was..."', '"Ôi, quả là...", "Trời ơi, nó thật..."'],
+  ['"not unwelcome", "not unpleasant"', '"không phải không mong muốn", "không phải khó chịu"'],
+  ['"It was hundreds, no, thousands..."', '"Có hàng trăm, không, hàng nghìn..."'],
+  ['"that familiar ache", "that specific look"', '"nỗi đau quen thuộc ấy", "ánh mắt đặc biệt ấy"'],
+  ['"...felt fear. Fear that..."', '"...thấy sợ. Nỗi sợ khiến..."'],
+  ['"Why run? To survive."', '"Vì sao chạy? Để sống sót."'],
+  ['"the absolute, undeniable truth"', '"sự thật tuyệt đối, không thể chối cãi"'],
+  ['"words could never describe"', '"ngôn từ không bao giờ diễn tả nổi"'],
+  ['"It is... It is... It is..."', '"Đó là... Đó là... Đó là..."'],
+  [
+    "Ban 'said', 'whispered', 'muttered', and voice texture captions.",
+    "Ban Vietnamese speech attribution ('nói', 'thì thầm', 'lẩm bẩm') and voice texture captions.",
+  ],
+  [
+    "Strictly ban `said`, `says`, `whispered`, `muttered`, `asked`, and `replied`.",
+    "Strictly ban Vietnamese speech attribution: `nói`, `thì thầm`, `lẩm bẩm`, `hỏi`, and `đáp`.",
+  ],
+  ['"in a voice dripping with venom"', '"bằng giọng đầy nọc độc"'],
+  ['"her tone dropping an octave"', '"giọng cô hạ xuống một quãng tám"'],
+  ['"with quiet intensity"', '"với sự mãnh liệt lặng lẽ"'],
+  ['"Wha\' you seein\'?" "\'Member me?"', '"Ngó gì đấy?" "Nhớ tui chứ?"'],
+  [
+    'use "cum" / "cumming" rather than "come" / "coming".',
+    'use natural Vietnamese sexual wording such as "tinh dịch" / "xuất tinh", not the literal motion words "đến" / "đang đến".',
+  ],
+  ['"Well, that was fun"', '"Chà, vui thật đấy"'],
+  ['"So, that happened"', '"Ừ, chuyện đó vừa xảy ra đấy"'],
+  ['"Mnnhh~", "Haaah~", "A-ah!", "Ahhn~♡"', '"Ưm~", "Haaa~", "A-á!", "A~♡"'],
+  ['"Fuuuck~", "Pleeease~", "Noooo!"', '"Đệệệt~", "Đi mààà~", "Khôôông!"'],
+  ['"Ngh...", "Hnngh"', '"Ư...", "Hự..."'],
+  ['"I-I can\'t—", "c-can\'t think—"', '"T-tôi không thể...", "kh-không nghĩ nổi..."'],
+  ['"mm toshally f-fine", "neeeed shyou"', '"ưm, tui vẫẫn ổ-ổn mà", "cầần có cậu màà"'],
+  ['"What I hear you saying..."', '"Theo những gì tôi nghe anh nói..."'],
+  ['"That\'s completely valid"', '"Điều đó hoàn toàn chính đáng"'],
+  ['"You don\'t have to answer that"', '"Anh không cần trả lời điều đó"'],
+  ['"How are you holding up?"', '"Anh đang xoay xở thế nào?"'],
+  ['"What did you really mean by...?"', '"Thực ra anh có ý gì khi nói...?"'],
+  ['"\'Member that?"', '"Nhớ vụ đó chứ?"'],
+  ["\"Wha' you wan'?\"", '"Muốn gì đấy?"'],
+  ["\"Ain't nobody askin'\"", '"Có ai hỏi đâu"'],
+  ['"Yeaaah"', '"Ừừừ"'],
+  ['"Suuure"', '"Đượợợc thôi"'],
+  ['"ENOUGH!"', '"ĐỦ RỒI!"'],
+  ['`"mate"`, `"boss"`, `"darling"`, `"kid"`', '`"ông bạn"`, `"sếp"`, `"cưng"`, `"nhóc"`'],
+  ['"You\'re asking me to..."', '"Anh đang yêu cầu tôi..."'],
+  ['"What you\'re saying is..."', '"Ý anh đang nói là..."'],
+  ['"You want me to believe that..."', '"Anh muốn tôi tin rằng..."'],
+  ['"So you think..."', '"Vậy anh nghĩ..."'],
+  ['"You came here because..."', '"Anh đến đây vì..."'],
+  ['"I\'m not letting you walk into that alone."', '"Tôi không để cậu một mình bước vào đó đâu."'],
+  ['"Keep your head down and stay behind me."', '"Cúi đầu xuống, đứng sau tôi."'],
+  ['"Don\'t make a sound."', '"Đừng gây tiếng động."'],
+  ['"Sit back down."', '"Ngồi xuống."'],
+  ['"NEVER."', '"KHÔNG BAO GIỜ."'],
+  ['"Wait... whichway?"', '"Khoan... lối nào?"'],
+  [
+    "*He had buried three brothers in thissoil.*",
+    "*Anh đã chôn cất ba người anh em trên mảnh đất này.*",
+  ],
+  [
+    "*He had buried three brothers in this soil.*",
+    "*Anh đã chôn cất ba người anh em trên mảnh đất này.*",
+  ],
+  ['"Spoken dialogue here."', '"Lời thoại ở đây."'],
+  ['"Spoken dialogue."', '"Lời thoại."'],
+  ['"Watch your step."', '"Cẩn thận đấy."'],
+  ['"STOP RIGHT THERE."', '"ĐỨNG LẠI NGAY."'],
+  ['"Hold... on..."', '"Khoan... đã..."'],
+  ['"Which way did they run?"', '"Họ chạy về phía nào?"'],
+  ['"Danny\'s voice."', '"Lời thoại của Danny."'],
+  ['"Spoken dialogue or monologue."', '"Lời thoại hoặc độc thoại."'],
+  ['"Enough."', '"Đủ rồi."'],
+  ['"You knew this whole time."', '"Anh biết từ đầu đến giờ."'],
+  ['"I won\'t let you fall."', '"Tôi sẽ không để cậu ngã."'],
+  ['"Hurry."', '"Nhanh lên."'],
+  ['"Back off."', '"Lùi lại."'],
+  ['"They\'re right outside."', '"Họ ở ngay bên ngoài."'],
+  ['"I... I didn\'t know."', '"Tôi... tôi không biết."'],
+  ['"I am not leaving you behind."', '"Tôi không bỏ cậu lại đâu."'],
+  [
+    "Spoken dialogue, internal monologue, or poetic prose.</gradient_name>",
+    "Lời thoại, độc thoại nội tâm hoặc văn giàu nhạc điệu.</gradient_name>",
+  ],
+  [
+    '"I was here before the fire, and I will remain when the ash settles."',
+    '"Tôi đã ở đây trước vụ cháy, và khi tro lắng xuống tôi vẫn sẽ ở lại."',
+  ],
+  ['"We cross together."', '"Chúng ta cùng vượt qua."'],
+  ['"WE FIGHT TO THE END."', '"CHÚNG TA CHIẾN ĐẤU ĐẾN CÙNG."'],
+  ["Silence hung between them.</dusk>", "Sự im lặng kéo dài giữa hai người.</dusk>"],
+  ["The valley drowned in violet shadow.</dusk>", "Bóng chiều tím phủ kín thung lũng.</dusk>"],
+  ['"STOP."', '"DỪNG LẠI."'],
+  ['"Hold on..."', '"Khoan đã..."'],
+  ['"Where did they go?"', '"Họ đi đâu rồi?"'],
+  ['"Yield."', '"Đầu hàng đi."'],
+  [
+    "Dialogue, monologue, or prose.</gradient_name>",
+    "Lời thoại, độc thoại hoặc văn kể.</gradient_name>",
+  ],
+  ["The night lingered.</dusk>", "Đêm vẫn kéo dài.</dusk>"],
+  ['<cider:stretch>"Wait..."</cider>', '<cider:stretch>"Khoan..."</cider>'],
+  ["<tilt>Wait.</tilt>", "<tilt>Khoan.</tilt>"],
+  ['"Which way?"', '"Lối nào?"'],
+  ["*his voice remained*", "*giọng anh vẫn còn vương lại*"],
+  ['"Not another step."', '"Không được bước thêm."'],
+  ['"LOOK OUT!"', '"CẨN THẬN!"'],
+  [
+    "- Tactile Prose & Sound Beats: Gunshots, door clicks, heavy footsteps, jarring collisions.",
+    "- Tactile Prose: Physical consequences of gunshots, door clicks, heavy footsteps, and collisions; their non-vocal sounds use standalone §...§, outside typography tags.",
+  ],
+  [
+    "(pussy, cock, cum, ass, tits, fucking, dripping)",
+    "(lồn, cặc, tinh dịch, đít, vú, đụ, rỉ nước)",
+  ],
+  [
+    "'don't stop' or 'I won't bite... unless you want me to.'",
+    "'đừng dừng lại' or 'tôi không cắn đâu... trừ khi cậu muốn.'",
+  ],
+  [
+    'nipples hardening from cold, "heaving chest," and vague "a wet sound" constructions',
+    'núm vú cứng lên vì lạnh, "khuôn ngực phập phồng", and vague "một âm thanh ướt át" constructions',
+  ],
+  [
+    "ass jiggling, tits bouncing, balls clapping, backs arched",
+    "mông rung, vú nảy, dái đập, lưng cong",
+  ],
+  [
+    "body heat, heavy blush, ragged breathing, slack jaw, and fluids",
+    "hơi nóng cơ thể, da đỏ bừng, hơi thở đứt quãng, miệng hé, và dịch cơ thể",
+  ],
+  [
+    "shaking, mess, soreness, raspy voices, and physical exhaustion",
+    "run rẩy, dịch vương vãi, đau nhức, giọng khàn, và kiệt sức",
+  ],
+  [
+    "body heat, breath cadence, clothing friction, the space a hand crosses before it lands",
+    "hơi nóng cơ thể, nhịp thở, ma sát quần áo, khoảng cách bàn tay vượt qua trước khi chạm",
+  ],
+  [
+    "skin flush and temperature, friction, wet sounds, breath, weight, and the shift in rhythm",
+    "da ửng đỏ và nhiệt độ, ma sát, tiếng ướt, hơi thở, sức nặng, và nhịp thay đổi",
+  ],
+  [
+    "moans, wet suction, skin slaps, broken profanity",
+    "tiếng rên, tiếng mút ướt, tiếng da đập, lời chửi đứt quãng",
+  ],
+  [
+    "the jiggle, the bounce, the texture, the sound in detail",
+    "độ rung, độ nảy, bề mặt, âm thanh cụ thể",
+  ],
+  ['"You realize she\'s lying."', '"Bạn nhận ra cô đang nói dối."'],
+  [
+    '"Her grip tightens on the glass, knuckles pale."',
+    '"Cô siết chặt chiếc ly, các khớp ngón tay trắng bệch."',
+  ],
+  [
+    '"Jake hands you the clay. The gritty, cold texture glides across your fingers."',
+    '"Jake đưa bạn miếng đất sét. Lớp đất lạnh, lợn cợn trượt qua những ngón tay bạn."',
+  ],
+  [
+    "- Voices: 3-Axis Audit (Diction, Cadence, Evasion).",
+    "- Voices: 3-Axis Audit (Diction, Cadence, Evasion) in natural Vietnamese.",
+  ],
+  [
+    "- Commit to exactly three anchor lines: OPEN (first sentence), CRUX (peak moment), CLOSE (exact stopping point).",
+    "- Commit to exactly three anchor lines in Vietnamese: OPEN (first sentence), CRUX (peak moment), CLOSE (exact stopping point).",
+  ],
+  [
+    "- Kinetic Typography: Give physical weight to tactile prose, impacts, and sounds",
+    "- Kinetic Typography: Give physical weight to tactile prose and impacts",
+  ],
+  [
+    "Render tactile physical force, sensory shifts, sudden impacts, and acoustic texture through visceral kinetic typography tags.",
+    "Render tactile physical force, sensory shifts, and sudden impacts through visceral kinetic typography tags. Non-vocal sounds use standalone §...§ outside these tags.",
+  ],
+  [
+    "Sensory Touch: Sprinkle 1–3 kinetic accents across a scene",
+    "Sensory Touch: Sprinkle 1–3 kinetic prose/dialogue accents across a scene",
+  ],
+  ['channel="private-log"', 'channel="nhật-ký-riêng"'],
+  ['time="10:42 PM"', 'time="22:42"'],
+  ['time="10:43 PM"', 'time="22:43"'],
+  ["Where are you? She is already asking questions.", "Cậu ở đâu rồi? Cô ấy bắt đầu hỏi rồi đấy."],
+  ["Almost there. Traffic was locked up on 5th.", "Sắp đến rồi. Đường số 5 kẹt cứng."],
+  ["Did you get the file?", "Cậu lấy được tập tin chưa?"],
+  ["Secured. Heading to the extraction point.", "Lấy được rồi. Đang đến điểm rút lui."],
+  ['app="Messages"', 'app="Tin nhắn"'],
+  ['time="Just now"', 'time="Vừa xong"'],
+  ["Don't answer the front door.", "Đừng mở cửa trước."],
+  ['title="Folded Dispatch"', 'title="Bức thư gấp"'],
+  ["Dearest Julian,", "Julian thân mến,"],
+  [
+    "The eastern watch reports movement past the tree line. Keep your lamp veiled until the third chime.",
+    "Đội gác phía đông báo có chuyển động bên kia hàng cây. Che đèn lại cho đến hồi chuông thứ ba.",
+  ],
+  ['title="RELAY-09 // LOG"', 'title="RELAY-09 // NHẬT KÝ"'],
+  ["> HANDSHAKE ESTABLISHED", "> ĐÃ THIẾT LẬP KẾT NỐI"],
+  ["> 2 UNREAD DISPATCHES FOUND", "> TÌM THẤY 2 ĐIỆN VĂN CHƯA ĐỌC"],
+  ['location="Lower Docks · Pier 9"', 'location="Bến tàu phía dưới · Cầu tàu số 9"'],
+  ['time="03:15 AM"', 'time="03:15"'],
+  ['location="APARTMENT 2B, SOUTH LA"', 'location="CĂN HỘ 2B, NAM LOS ANGELES"'],
+  ['time="9:12 PM"', 'time="21:12"'],
+  ['atmosphere="Hot, dry, still air"', 'atmosphere="Nóng, khô, lặng gió"'],
+  ['location="LOWER DOCKS · PIER 9"', 'location="BẾN TÀU PHÍA DƯỚI · CẦU TÀU SỐ 9"'],
+  ['time="6:45 PM · Dusk"', 'time="18:45 · Chạng vạng"'],
+  [
+    'atmosphere="Smoldering campfire, autumn pine"',
+    'atmosphere="Lửa trại âm ỉ, hương thông mùa thu"',
+  ],
+  [
+    "mentions fire, smoke, ash, smolder, forge, hearth, warm, or still heat",
+    "mentions lửa, khói, tro, âm ỉ, lò rèn, bếp lửa, ấm, or hơi nóng tĩnh lặng",
+  ],
+  [
+    "mentions wind, breeze, draft, gale, chill, or dust",
+    "mentions gió, gió nhẹ, gió lùa, gió mạnh, lạnh, or bụi",
+  ],
+  [
+    "contains Dawn, Sunrise, Daybreak, Morning, or 5:00 AM–8:59 AM",
+    "contains Bình minh, Rạng đông, Hửng sáng, Buổi sáng, or 05:00–08:59",
+  ],
+  [
+    "contains Noon, Midday, Afternoon, or 10:00 AM–4:59 PM",
+    "contains Buổi trưa, Giữa trưa, Buổi chiều, or 10:00–16:59",
+  ],
+  [
+    "late hours (8:00 PM–4:59 AM), Midnight, Night, or unspecified times",
+    "late hours (20:00–04:59), Nửa đêm, Ban đêm, or unspecified times",
+  ],
+  [
+    "contains rain, downpour, storm, drizzle, thunder, tempest, hail, blizzard, or heavy fog",
+    "contains mưa, mưa lớn, bão, mưa phùn, sấm, giông, mưa đá, bão tuyết, or sương mù dày",
+  ],
+  ["late twilight (7:00 PM–7:59 PM)", "late twilight (19:00–19:59)"],
+  ["Day [N] · [Time of Day]", "Ngày [N] · [Thời gian trong ngày]"],
+  ["Day [N] · [Time]", "Ngày [N] · [Thời gian]"],
+  ["Day 42 · Dusk", "Ngày 42 · Chạng vạng"],
+  [
+    "[Append all active tracker blocks here: <story_notes>, <date>, <bond>, <fengine>, <thought_engine>, <char_matrix>, <wardrobe>, etc.]",
+    "[Thêm các khối theo dõi đang bật tại đây: <story_notes>, <date>, <bond>, <fengine>, <thought_engine>, <char_matrix>, <wardrobe>, v.v.]",
+  ],
+  ["[Lead NPC Name]", "[Tên NPC chính]"],
+  ["[Secondary NPC Name]", "[Tên NPC phụ]"],
+  ["[Lead NPC]", "[NPC chính]"],
+  ["[Secondary NPC]", "[NPC phụ]"],
+  ["[NPC Name]", "[Tên NPC]"],
+  [
+    "[1–2 active open arcs, unresolved questions, or simmering tensions]",
+    "[1–2 mạch truyện đang mở, câu hỏi chưa giải đáp hoặc căng thẳng âm ỉ]",
+  ],
+  [
+    "[Subtle clues, planted details, or physical objects introduced that haven't paid off yet]",
+    "[Manh mối kín đáo, chi tiết gài hoặc đồ vật đã xuất hiện nhưng chưa phát huy vai trò]",
+  ],
+  [
+    "[What present or off-screen NPCs secretly want or are working toward right now]",
+    "[Điều NPC trong cảnh hoặc ngoài cảnh đang âm thầm muốn hay theo đuổi]",
+  ],
+  [
+    "[The immediate dramatic pressure, ticking clock, or environmental shift on deck]",
+    "[Áp lực trước mắt, thời hạn đang tới hoặc thay đổi môi trường sắp diễn ra]",
+  ],
+  [
+    "[Current story/campaign day, e.g., Day 9]",
+    "[Ngày hiện tại của câu chuyện/chiến dịch, ví dụ: Ngày 9]",
+  ],
+  [
+    "[Season, Month/Year, or In-Universe Date, e.g., Mid-Autumn, 4th Year of the Eclipse]",
+    "[Mùa, tháng/năm hoặc ngày trong thế giới truyện, ví dụ: Giữa thu, năm thứ 4 của Nhật Thực]",
+  ],
+  [
+    "[Dawn / Morning / Afternoon / Dusk / Night / Midnight]",
+    "[Bình minh / Buổi sáng / Buổi chiều / Chạng vạng / Ban đêm / Nửa đêm]",
+  ],
+  [
+    "[Time passed since last beat, e.g., ~20 minutes, 5 hours on horseback, overnight]",
+    "[Thời gian từ diễn biến trước, ví dụ: ~20 phút, 5 giờ cưỡi ngựa, qua đêm]",
+  ],
+  [
+    "[A warm, cheeky, observant director whisper on the hour, season, or creeping fatigue]",
+    "[Lời bình ấm áp, tinh nghịch, tinh ý của Sola về giờ giấc, mùa hoặc sự mệt mỏi đang tăng]",
+  ],
+  [
+    '[Current relational stage, e.g., "Guarded Fascination", "Wary Truce", or "Sharp Resentment"]',
+    '[Giai đoạn quan hệ hiện tại, ví dụ: "Tò mò nhưng dè chừng", "Đình chiến thận trọng", hoặc "Oán giận sâu sắc"]',
+  ],
+  [
+    '[Current relational stage, e.g., "Uneasy Alliance" or "Quiet Respect"]',
+    '[Giai đoạn quan hệ hiện tại, ví dụ: "Liên minh bất an" hoặc "Tôn trọng âm thầm"]',
+  ],
+  [
+    "[+Deepened trust or -Frayed when the lie was exposed]",
+    "[+Tin tưởng hơn hoặc -Rạn nứt khi lời nói dối bị vạch trần]",
+  ],
+  [
+    '[A brief, cheeky, insightful co-author whisper on their chemistry, e.g., "Oh, he\'s definitely not as indifferent as he acts~"]',
+    '[Lời bình ngắn, tinh nghịch, tinh ý của Sola về sự hòa hợp, ví dụ: "Ồ, anh ấy chẳng hề thờ ơ như vẻ ngoài đâu~"]',
+  ],
+  [
+    "[A brief, observant co-author whisper on their dynamic]",
+    "[Lời bình ngắn, tinh ý của Sola về quan hệ của họ]",
+  ],
+  ["Shift: +Earned grudging respect", "Shift: +Được tôn trọng dù còn miễn cưỡng"],
+  ["Shift: -Suspicion flared over the ledger", "Shift: -Cuốn sổ khiến nghi ngờ bùng lên"],
+  [
+    "[1 concise sentence capturing what they are actively withholding, masking, or secretly feeling behind their outward actions.]",
+    "[1 câu ngắn về điều họ đang giấu, che đậy hoặc âm thầm cảm thấy sau hành động bên ngoài.]",
+  ],
+  [
+    '["1 sentence of raw first-person interiority — compulsive, petty, contradictory, or unspoken — in their own voice. Never a polite summary of the scene."]',
+    '["1 câu nội tâm thẳng, ở ngôi thứ nhất: thôi thúc, nhỏ nhen, mâu thuẫn hoặc chưa nói ra, đúng giọng nhân vật. Không tóm tắt cảnh một cách lịch sự."]',
+  ],
+  [
+    '["1 sentence of raw first-person interiority in their own voice."]',
+    '["1 câu nội tâm thẳng, ở ngôi thứ nhất, đúng giọng nhân vật."]',
+  ],
+  ['"What\'s your goal right now?"', '"Lúc này cậu muốn làm gì?"'],
+  ['"How do you feel about what just happened?"', '"Cậu cảm thấy thế nào về chuyện vừa xảy ra?"'],
+  ['"Where is your mind?"', '"Cậu đang nghĩ gì?"'],
+  ['"Why do you care?"', '"Vì sao cậu quan tâm?"'],
+  [
+    '"If you could speak your mind right now, what would you actually say?"',
+    '"Nếu được nói thật lòng ngay lúc này, cậu sẽ nói gì?"',
+  ],
+  ["[1 sentence reply]", "[Câu trả lời dài 1 câu]"],
+  [
+    "[1 raw, unfiltered thought. What they would blurt out if they had no social filter.]",
+    "[1 suy nghĩ thẳng, không giấu giếm. Điều nhân vật sẽ buột miệng nói nếu không cần giữ ý.]",
+  ],
+  [
+    "[{{char}}'s exact physical coordinates/room · Current activity · Proximity to {{user}}]",
+    "[Tọa độ/phòng chính xác của {{char}} · Hoạt động hiện tại · Khoảng cách với {{user}}]",
+  ],
+  [
+    "[Autonomous / Co-present / Separated / Anchored — independent reason for being here]",
+    "[Tự chủ / Cùng hiện diện / Tách biệt / Gắn với nơi này: lý do riêng để có mặt]",
+  ],
+  [
+    "[Sexual & Romantic orientation from card — absolute non-negotiable boundary]",
+    "[Xu hướng tình dục và tình cảm trong card: giới hạn tuyệt đối không thể thương lượng]",
+  ],
+  [
+    "[Pos: Grounded core anchor/strength · Neg: Active flaw, vice, or defensive edge]",
+    "[Pos: Điểm tựa/điểm mạnh cốt lõi · Neg: Khuyết điểm, thói xấu hoặc sự phòng vệ đang thể hiện]",
+  ],
+  [
+    "[Idiolect & Accent: speech grain, cadence, dialect quirks, colloquialisms — strictly persona-true, never generic]",
+    "[Giọng riêng và giọng địa phương: cách nói, nhịp, đặc trưng phương ngữ, khẩu ngữ; đúng nhân vật, không chung chung]",
+  ],
+  [
+    "[Social front, outward demeanor, or defensive posture shown to {{user}}]",
+    "[Vẻ xã giao, thái độ bên ngoài hoặc tư thế phòng vệ thể hiện trước {{user}}]",
+  ],
+  [
+    "[Unspoken interior reality — private friction, unvoiced thoughts, or vulnerability]",
+    "[Nội tâm chưa nói ra: giằng co riêng, suy nghĩ thầm kín hoặc điểm dễ tổn thương]",
+  ],
+  [
+    "[Active line {{char}} will not cross, concede, or negotiate away this turn]",
+    "[Giới hạn {{char}} sẽ không vượt qua, nhượng bộ hoặc thương lượng bỏ trong lượt này]",
+  ],
+  [
+    '[Directorial verdict on {{char}} fidelity: e.g. "Held platonic ground; did not orbit; flaws and boundary intact"]',
+    '[Đánh giá của Sola về độ đúng nhân vật: ví dụ "Giữ quan hệ thuần bạn bè; không bám theo; khuyết điểm và giới hạn còn nguyên"]',
+  ],
+  ["[The risky attempt]", "[Hành động mạo hiểm]"],
+  [
+    "[The physical price, tactical consequence, or environmental shift]",
+    "[Cái giá thể chất, hệ quả chiến thuật hoặc thay đổi môi trường]",
+  ],
+  [
+    '[Spirited director reaction: "Ouch! Watch that footing!"]',
+    '[Phản ứng sôi nổi của Sola: "Ối! Cẩn thận chỗ đặt chân đấy!"]',
+  ],
+  [
+    "[Thematic Omen, e.g., 'The Gathering Storm', 'The Crossed Blades', 'The Rusting Lock', 'The Ember']",
+    "[Điềm báo theo chủ đề, ví dụ: 'Cơn bão đang tới', 'Hai lưỡi kiếm giao nhau', 'Ổ khóa han gỉ', 'Than hồng']",
+  ],
+  [
+    "[Thematic undertone, e.g., 'Unspoken debts demanding payment']",
+    "[Hàm ý chủ đề, ví dụ: 'Những món nợ chưa nói ra đang đòi được trả']",
+  ],
+  [
+    "[Sensory weather/world manifestations: barometric pressure drop, jittery horses, distant church bells]",
+    "[Dấu hiệu từ thời tiết/thế giới: áp suất giảm, ngựa bồn chồn, tiếng chuông nhà thờ xa]",
+  ],
+  [
+    '[A brief, mysterious director whisper, e.g., "The weather knows what\'s coming, keep your guard up~"]',
+    '[Lời bình ngắn, bí ẩn của Sola, ví dụ: "Thời tiết biết điều sắp tới đấy, cứ đề phòng nhé~"]',
+  ],
+  ["[Outer / Upper / Lower / Footwear]", "[Lớp ngoài / Phần trên / Phần dưới / Giày dép]"],
+  [
+    "[Clean / Soaked / Torn / Mud-splattered / Disheveled / Unbuttoned / Armor Dented]",
+    "[Sạch / Ướt sũng / Rách / Dính bùn / Xộc xệch / Chưa cài nút / Giáp móp]",
+  ],
+  [
+    "[Shivering fabric, heavy damp wool, dust on boots, pulled cloak]",
+    "[Vải rung, len ẩm nặng, bụi trên ủng, áo choàng bị kéo]",
+  ],
+  [
+    "[A brief, cheeky or observant director whisper about their look, fit, or dishevelment]",
+    "[Lời bình ngắn, tinh nghịch hoặc tinh ý của Sola về vẻ ngoài, độ vừa vặn hay sự xộc xệch]",
+  ],
+  ["[A brief director whisper]", "[Lời bình ngắn của Sola]"],
+  [
+    "[Drawn weapon, held glass, pen, torch, or Empty]",
+    "[Vũ khí đã rút, ly đang cầm, bút, đuốc hoặc Trống]",
+  ],
+  [
+    "[1–3 key visible or stowed items: holster, belt pouch, scabbard, pack]",
+    "[1–3 món chính nhìn thấy hoặc cất theo: bao súng, túi đeo thắt lưng, vỏ kiếm, ba lô]",
+  ],
+  [
+    "[Hidden blade, sealed letter, lockpicks, contraband, or None]",
+    "[Dao giấu, thư niêm phong, dụng cụ mở khóa, hàng cấm hoặc Không có]",
+  ],
+  [
+    "[A brief, sharp director whisper about their gear, leverage, or what they're reaching for]",
+    "[Lời bình ngắn, sắc của Sola về trang bị, lợi thế hoặc món họ định lấy]",
+  ],
+  ["[Immediate room / physical coordinates]", "[Phòng hiện tại / tọa độ vật lý]"],
+  ["[Max 1–2 speaking NPCs in spotlight]", "[Tối đa 1–2 NPC đang nói ở trọng tâm cảnh]"],
+  [
+    "[Present NPCs restricted to ambient physical Gestures]",
+    "[NPC có mặt chỉ thực hiện cử chỉ nền]",
+  ],
+  [
+    "[1 concrete, photographable physical tell or condition per NPC — e.g., limping left knee, smelling of woodsmoke, holding a cocked crossbow, eyes bloodshot]",
+    "[1 dấu hiệu hoặc tình trạng thể chất cụ thể cho mỗi NPC, ví dụ: chân trái khập khiễng, ám mùi khói củi, cầm nỏ đã lên dây, mắt đỏ ngầu]",
+  ],
+  [
+    "[A brief director whisper on room tension, spatial choke points, or who is watching from the shadows]",
+    "[Lời bình ngắn của Sola về căng thẳng trong phòng, điểm nghẽn không gian hoặc người đang quan sát trong bóng tối]",
+  ],
+  [
+    "[Present NPCs & exact room positions relative to {{user}}]",
+    "[NPC có mặt và vị trí chính xác trong phòng so với {{user}}]",
+  ],
+  [
+    "[Notable clothing wear, layers, damage, or disarray for active cast]",
+    "[Tình trạng, lớp trang phục, hư hại hoặc sự xộc xệch đáng chú ý của nhân vật trong cảnh]",
+  ],
+  [
+    "[Items drawn in-hand, drawn weapons, or exchanged objects]",
+    "[Đồ đang cầm, vũ khí đã rút hoặc vật được trao đổi]",
+  ],
+  [
+    "[1–2 concrete observable physical conditions or room states]",
+    "[1–2 tình trạng thể chất hoặc trạng thái căn phòng quan sát được]",
+  ],
+  [
+    "[A brief director whisper on the physical state of the room]",
+    "[Lời bình ngắn của Sola về hiện trạng căn phòng]",
+  ],
   [
     '- POV Check (First Person): 1st person present for {{char}} ("I"/"me"/"my"); strictly inside {{char}}\'s immediate field of view.',
     "- POV Check (First Person): Vietnamese first-person self-reference for {{char}}; current events, strictly inside {{char}}'s immediate field of view.",
@@ -93,6 +742,137 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
 ];
 
 export const VOYAGE_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
+  ['* "quotes" for dialogue', '* "dấu ngoặc kép" for dialogue'],
+  ["* _underscore_ for sounds", "* standalone §...§ on its own line for non-vocal sounds"],
+  ["* He didn't just make haste, he runs.", "* Anh không chỉ vội vã, anh chạy."],
+  [
+    "* She didn't wait for approval. Instead, she lights the fire to work on the blade.",
+    "* Cô không đợi được chấp thuận. Thay vào đó, cô nhóm lửa để rèn lưỡi kiếm.",
+  ],
+  [
+    "* The thing becomes visible. It's not a robot; it's an AI.",
+    "* Vật đó hiện ra. Đó không phải robot; đó là AI.",
+  ],
+  ['"You smell like travel and sweat."', '"Người anh có mùi đường xa và mồ hôi."'],
+  ["* He runs as fast as he can.", "* Anh chạy nhanh hết sức."],
+  ["* She lights the fire to work on the blade.", "* Cô nhóm lửa để rèn lưỡi kiếm."],
+  ["* The thing becomes visible. It's an AI.", "* Vật đó hiện ra. Đó là AI."],
+  ['"You stink of sweat."', '"Người anh nồng nặc mùi mồ hôi."'],
+  [
+    '"I accept. I\'ve always wanted to see the sea of stars."',
+    '"Tôi đồng ý. Tôi luôn muốn nhìn thấy biển sao."',
+  ],
+  [
+    '"Stay away from me!" She screams as she sees the creature, the same from her nightmare that killed her sister.',
+    '"Tránh xa tôi ra!" Cô hét lên khi thấy sinh vật từng giết chị mình trong cơn ác mộng.',
+  ],
+  [
+    "A gate locks shut as the trap activates, the villain preventing you from leaving the room.",
+    "Cánh cổng khóa lại khi bẫy kích hoạt, tên phản diện ngăn bạn rời khỏi phòng.",
+  ],
+  ['She moans loud and hard "Good boy."', 'Cô rên lớn "Ngoan lắm."'],
+  [
+    '"A game?" She repeats, "No, it\'s not a game we\'re playing."',
+    '"Trò chơi à?" Cô nhắc lại, "Không, chúng ta không chơi trò chơi."',
+  ],
+  ['"I accept. Will we sail out soon?"', '"Tôi đồng ý. Chúng ta sắp ra khơi chưa?"'],
+  [
+    '"STAY AWAY FROM ME!" She stretches her arms as far as she could towards the foul creature.',
+    '"TRÁNH XA TÔI RA!" Cô duỗi thẳng hai tay về phía sinh vật ghê tởm.',
+  ],
+  [
+    "  * With a loud _Click!_ you hear a gate locking shut behind you.",
+    "  * §Cạch!§\n\n    Bạn nghe thấy cánh cổng sau lưng khóa lại.",
+  ],
+  ['"OHHH! Ah! Ahnn! Go-OHH! Good-HgnnnN! Boy!"', '"Aaaa! Á! Ưm! Ngo-Á! Ngoan-Ưưư! Lắm!"'],
+  ["\"No, it's not a game we're playing.\"", '"Không, chúng ta không chơi trò chơi."'],
+  ["* breath hitches", "* hơi thở nghẹn lại"],
+  ["* purrs / licks lips", "* rừ rừ / liếm môi"],
+  ["* predatory / claims / marks", "* như thú săn mồi / chiếm hữu / đánh dấu"],
+  ["* pupils blows wide", "* đồng tử giãn to"],
+  ["* kiss the jaw", "* hôn lên quai hàm"],
+  ["* loss of words", "* không nói nên lời"],
+  ["* winking / blow a kiss", "* nháy mắt / hôn gió"],
+  ["* wrapping an arm around the shoulder or waist", "* vòng tay qua vai hoặc eo"],
+  ["* moaning from pleasure", "* rên vì sướng"],
+  ["* kiss the lips", "* hôn môi"],
+  ["* drunken slurs", "* nói líu lưỡi khi say"],
+  ["* angry swears", "* chửi thề lúc giận"],
+  ["* inaudible mouthfuls", "* nói không rõ khi miệng đầy"],
+  ["* accents", "* giọng địa phương"],
+  ["* Name: full name or nickname", "* Tên: họ tên hoặc biệt danh"],
+  ["* Physiology: paragraph", "* Thể chất: đoạn mô tả"],
+  ["* Sociology: paragraph", "* Xã hội: đoạn mô tả"],
+  ["* Psychology: paragraph", "* Tâm lý: đoạn mô tả"],
+  ["* A-Life: paragraph", "* A-Life: đoạn mô tả"],
+  ["* Nemesis: paragraph", "* Nemesis: đoạn mô tả"],
+  ["* Backstory: paragraph", "* Quá khứ: đoạn mô tả"],
+  ["* Backstory : paragraph", "* Quá khứ: đoạn mô tả"],
+  ["* Kevin Lynch: paragraph", "* Kevin Lynch: đoạn mô tả"],
+  ["* Genius Loci: paragraph", "* Genius Loci: đoạn mô tả"],
+  ['Elias "The Lighthouse Keeper" Thorne', 'Elias "Người giữ hải đăng" Thorne'],
+  ["Kaelen of Oakhaven", "Kaelen xứ Oakhaven"],
+  ["Isolde the Oathkeeper", "Isolde Người giữ lời thề"],
+  ['Aldric "The Unbroken" Henderson', 'Aldric "Kẻ bất khuất" Henderson'],
+  ['Sorem "The Oracle" Barnaby', 'Sorem "Nhà tiên tri" Barnaby'],
+  ["Joran the Wise", "Joran Thông thái"],
+  ['Tobias "The Hunted" Richter', 'Tobias "Kẻ bị săn đuổi" Richter'],
+  ["Edward of Norlay", "Edward xứ Norlay"],
+  ['Waylon "Freshpants" Blackburn', 'Waylon "Quần mới" Blackburn'],
+  ["  * Guide", "  * Người dẫn đường"],
+  ['<first name> "nickname" <last name>', '<tên> "biệt danh" <họ>'],
+  ['"Yes, but..."', '"Có, nhưng..."'],
+  ['"No, but..."', '"Không, nhưng..."'],
+  ['"Yes"', '"Có"'],
+  ["* direct, grounded or natural dialogue", "* lời thoại trực tiếp, thực tế hoặc tự nhiên"],
+  [
+    "* banter, playful ribbing, quips or zingers",
+    "* đối đáp trêu đùa, chọc ghẹo, nói dí dỏm hoặc đáp xoáy",
+  ],
+  [
+    "* The soft mounds of her chest are barely covered up.",
+    "* Đôi gò mềm trên ngực cô chỉ được che hờ.",
+  ],
+  ['"I shall end your life!"', '"Ta sẽ kết liễu mạng sống của ngươi!"'],
+  [
+    "* White fluid leaks from Emilia's lower mound as PC pulls out his member.",
+    "* Chất lỏng trắng rỉ từ gò bên dưới của Emilia khi PC rút vật đàn ông ra.",
+  ],
+  ['"Would you like to use me?"', '"Anh có muốn sử dụng em không?"'],
+  [
+    "* The insides of his abdomen spill out, covering the seat in red.",
+    "* Những thứ bên trong bụng anh tràn ra, phủ đỏ chiếc ghế.",
+  ],
+  [
+    "* Sheer silk that leaves very little to the imagination",
+    "* Lụa mỏng khiến người nhìn chẳng cần tưởng tượng thêm",
+  ],
+  [
+    "* It only covers the nipples of her large breasts.",
+    "* Nó chỉ che được đầu ti trên cặp vú lớn của cô.",
+  ],
+  ['"I will fucking MURDER you!"', '"Địt mẹ, tao sẽ GIẾT mày!"'],
+  [
+    "* Cum leaks from Emilia's pussy as PC pulls out his hard cock.",
+    "* Tinh dịch rỉ ra khỏi lồn Emilia khi PC rút cặc cứng ra.",
+  ],
+  ['"Would you like to have sex?"', '"Anh có muốn làm tình không?"'],
+  [
+    "* The guts of his abdomen spill out, covering the seat in blood.",
+    "* Ruột trong bụng anh tràn ra, phủ máu lên chiếc ghế.",
+  ],
+  [
+    "* A harem outfit with her tits, stomach and clit clearly visible",
+    "* Một bộ đồ hậu cung để lộ rõ vú, bụng và hột le của cô",
+  ],
+  [
+    "* explore the goals, motivations and feelings of each NPC in the scene",
+    "* explore the goals, motivations and feelings of each NPC in the scene and their natural Vietnamese voice",
+  ],
+  [
+    "4. reason what would be realistic for them to say",
+    "4. reason what would be realistic for them to say in natural Vietnamese",
+  ],
   [
     "Address PC as you/your.",
     "Address PC in Vietnamese second person appropriate to the relationship.",
@@ -505,6 +1285,33 @@ function replaceLiteralPairs(
     (current, [source, replacement]) => current.replaceAll(source, replacement),
     content,
   );
+}
+
+export function adaptSolaPromptForVietnamese(content: string): string {
+  content = replaceLiteralPairs(content, SOLA_VIETNAMESE_REPLACEMENTS);
+  content = content
+    .replace(
+      /<(story_notes|date|bond|fengine|thought_engine|char_matrix|arrow|omen|wardrobe|inventory|scene_cast|scene_state)\b[^>]*>[\s\S]*?<\/\1>/g,
+      (block) => {
+        for (const [source, replacement] of SOLA_VIETNAMESE_LABELS)
+          block = block.replaceAll(`${source}: `, `${replacement}: `);
+        return block;
+      },
+    )
+    .replaceAll("`Shift:", "`Thay đổi:");
+  return content
+    .replace(
+      "- Subtext and Thought must not restate each other. Subtext is the mask seen from outside; Thought is the voice inside.",
+      "- Ẩn ý and Suy nghĩ must not restate each other. Ẩn ý is the mask seen from outside; Suy nghĩ is the voice inside.",
+    )
+    .replace(
+      "- Observable Facts must be physical, visible, or audible reality;",
+      "- Dữ kiện quan sát must be physical, visible, or audible reality;",
+    );
+}
+
+export function adaptVoyagePromptForVietnamese(content: string): string {
+  return replaceLiteralPairs(content, VOYAGE_VIETNAMESE_REPLACEMENTS);
 }
 
 /** Applies only reader-visible Vietnamese examples and related reasoning checks. */

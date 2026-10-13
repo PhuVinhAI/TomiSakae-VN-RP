@@ -15,6 +15,10 @@ import {
   adaptSolaDialogueReplacement,
   type DialogueTheme,
 } from "./dialogue-colors.js";
+import {
+  adaptSolaRegexForVietnamese,
+  adaptSolaTrackerLabelsForDisplay,
+} from "./sola-vietnamese-regex.js";
 
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
@@ -617,7 +621,10 @@ export function applyRegexScripts(
     dialogueTheme?: DialogueTheme;
   },
 ): string {
-  let output = input;
+  let output =
+    options.markdown && settings.vietnameseOutputEnabled && familyOf(preset) === "sola"
+      ? adaptSolaTrackerLabelsForDisplay(input)
+      : input;
   for (const script of preset.extensions?.regex_scripts ?? []) {
     if (!settings.regexEnabled[script.id] || !script.findRegex || !output) continue;
     const eligibleMode =
@@ -633,10 +640,18 @@ export function applyRegexScripts(
       continue;
     }
     if (options.prompt && script.scriptName === "FF5 - GFX Stripper") continue;
-    const localized =
-      settings.vietnameseOutputEnabled && familyOf(preset) === "ff54"
-        ? adaptRegexForVietnamese(script.findRegex, String(script.replaceString ?? ""))
-        : { findRegex: script.findRegex, replaceString: String(script.replaceString ?? "") };
+    const sourceReplacement = String(script.replaceString ?? "");
+    const localized = settings.vietnameseOutputEnabled
+      ? familyOf(preset) === "ff54"
+        ? adaptRegexForVietnamese(script.findRegex, sourceReplacement)
+        : familyOf(preset) === "sola"
+          ? adaptSolaRegexForVietnamese(
+              script.findRegex,
+              sourceReplacement,
+              script.scriptName ?? "",
+            )
+          : { findRegex: script.findRegex, replaceString: sourceReplacement }
+      : { findRegex: script.findRegex, replaceString: sourceReplacement };
     // Provider reasoning can exceed the source's 20,000-character cap.
     // Keep Hapuppy's closing-tag boundaries and toggle/depth rules intact.
     const findRegex =

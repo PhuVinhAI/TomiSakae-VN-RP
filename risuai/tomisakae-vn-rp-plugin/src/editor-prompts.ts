@@ -17,7 +17,7 @@ const EDITOR_LANGUAGE =
 const EDITOR_CONTINUITY =
   "Preserve core facts, events, sequence, causality, outcomes, POV, agency, relationships, and emotional direction. Do not continue RP or add consequential events.";
 const EDITOR_STATE =
-  "Rewrite free-text descriptions, thoughts, and notes in all active trackers and hidden state blocks into natural Vietnamese. Preserve their information, fixed keys, valid template labels, identifiers, enums, numbers, rolls, scores, counters, progress, and deltas. Keep absent, unknown, inapplicable, and empty values as they are; do not fill in or recalculate data.";
+  "Rewrite free-text descriptions, thoughts, and notes in all active trackers and hidden state blocks into natural Vietnamese; use the labels from active templates. Preserve their information, fixed keys, identifiers, enums, numbers, rolls, scores, counters, progress, and deltas. Keep absent, unknown, inapplicable, and empty values as they are; do not fill in or recalculate data.";
 const EDITOR_OUTPUT =
   "Preserve valid markup, attributes, comments, delimiters, placeholders, image identifiers, and active schemas. Repair existing syntax errors only as supported by those schemas. Return only the complete rewritten response, including its displays and state blocks; no reasoning, commentary, or added code fences.";
 
