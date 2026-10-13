@@ -35,7 +35,7 @@ export function editorSystemFor(preset: FfPreset): string {
 - ${EDITOR_LANGUAGE}
 - ${EDITOR_CONTINUITY}
 - Rewrite descriptions, thoughts, and notes in HUDs, trackers, and hidden state blocks in Vietnamese; use active template labels. Preserve information, keys, identifiers, fixed values, numbers, rolls, scores, counters, progress, and deltas. Keep absent, unknown, inapplicable, and empty values; do not fill in or recalculate data.
-- Preserve valid markup, attributes, markers, placeholders, image identifiers, and Sola effect names. Repair syntax errors under active schemas. Return only the complete rewritten response with its displays and state blocks; no reasoning, commentary, or added code fences.`;
+- Preserve valid markup, attributes, markers, placeholders, image identifiers, and Sola effect names. Keep chronology displays in the opening scene_header date/time attributes, outside the HUD and digest. Repair syntax errors under active schemas. Return only the complete rewritten response with its displays and state blocks; no reasoning, commentary, or added code fences.`;
     case "voyage":
       return `## Rule: Vietnamese Editor
 * Task: ${EDITOR_CONTEXT}

@@ -3,6 +3,20 @@ const SOLA_UI_FONT =
 const SOLA_SERIF_FONT = "Georgia,'Noto Serif','Times New Roman',serif";
 const SOLA_MONO_FONT = "ui-monospace,'SFMono-Regular',Consolas,'Liberation Mono',monospace";
 
+/** All skybox templates share the same outer two closing divs. */
+export function renderSolaHeaderDate(tag: string, rendered: string): string {
+  const date = tag.match(/\sdate="([^"]*)"/i)?.[1]?.trim();
+  if (!date) return rendered;
+  const escaped = date
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+  const badge = `<div data-sola-ui="header-date" style="font-family:${SOLA_UI_FONT};box-sizing:border-box;min-width:0;max-width:100%;overflow-wrap:anywhere;line-height:1.5;text-align:center;color:#FFF8EC;background:rgba(7,3,8,0.65);border:1px solid rgba(240,220,196,0.3);border-radius:10px;padding:6px 10px;font-size:0.85em;">📅 ${escaped}</div>`;
+  return rendered.replace(/<\/div><\/div>$/, () => `${badge}</div></div>`);
+}
+
 function setStyle(style: string, property: string, value: string): string {
   const declaration = new RegExp(`(^|;)\\s*${property}\\s*:[^;]*`, "i");
   return declaration.test(style)
@@ -17,6 +31,7 @@ export function adaptSolaDisplayReplacement(replacement: string, scriptName: str
   if (scriptName === "Sola Scene: Header - Dynamic Weather (Rain/Storm) Compact")
     replacement = replacement.replaceAll("$2", "$3");
   const header = scriptName.startsWith("Sola Scene: Header -");
+  const matrix = scriptName === "Sola Card: Character Matrix";
   let firstStyledElement = true;
   let output = replacement.replace(
     /(<(?:div|details|summary|span)\b[^>]*?\bstyle=")([^"]*)(")/gi,
@@ -28,7 +43,7 @@ export function adaptSolaDisplayReplacement(replacement: string, scriptName: str
         const stack =
           font === "monospace"
             ? SOLA_MONO_FONT
-            : !header && font === "serif"
+            : !header && !matrix && font === "serif"
               ? SOLA_SERIF_FONT
               : SOLA_UI_FONT;
         style = setStyle(style, "font-family", stack);
@@ -37,8 +52,8 @@ export function adaptSolaDisplayReplacement(replacement: string, scriptName: str
       style = setStyle(style, "box-sizing", "border-box");
       style = setStyle(style, "min-width", "0");
       style = setStyle(style, "overflow-wrap", "anywhere");
-      if (/(?:^|;)letter-spacing:/i.test(style))
-        style = setStyle(style, "letter-spacing", "0.02em");
+      if (matrix || /(?:^|;)letter-spacing:/i.test(style))
+        style = setStyle(style, "letter-spacing", matrix ? "normal" : "0.02em");
       if (!/(?:^|;)height:/i.test(sourceStyle)) style = setStyle(style, "line-height", "1.5");
       if (/^<span\b/i.test(opening)) style = setStyle(style, "max-width", "100%");
       if (/(?:^|;)display:flex(?:;|$)/i.test(style)) {

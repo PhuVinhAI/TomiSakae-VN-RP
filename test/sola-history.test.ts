@@ -20,7 +20,8 @@ beforeAll(async () => {
 });
 
 describe("Sola saved-history snapshots", () => {
-  const header = '<scene_header location="Phòng > cửa" time="13:40" atmosphere="Nắng" />';
+  const header =
+    '<scene_header location="Phòng > cửa" date="Ngày 9 · 13 tháng 10 năm 2030" time="13:40" atmosphere="Nắng" />';
 
   it("round-trips overlapping HUD savers and several inline HTML blocks without moving prose", () => {
     const separation = "Một đoạn kể nằm giữa tài liệu và HUD. ".repeat(8);

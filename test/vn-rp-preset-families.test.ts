@@ -51,6 +51,7 @@ import {
 import { promptUiCopy, regexUiCopy } from "../risuai/tomisakae-vn-rp-plugin/src/ui-vi.js";
 import { solaRegexUiCopy } from "../risuai/tomisakae-vn-rp-plugin/src/preset-ui-copy.js";
 import { adaptSolaSceneHeaderForDisplay } from "../risuai/tomisakae-vn-rp-plugin/src/sola-display.js";
+import { SOLA_CALENDAR_ID } from "../risuai/tomisakae-vn-rp-plugin/src/sola-calendar.js";
 import {
   SOLA_VIETNAMESE_REPLACEMENTS,
   VOYAGE_VIETNAMESE_REPLACEMENTS,
@@ -763,7 +764,11 @@ describe("TomiSakae VN-RP preset families", () => {
         }
         const macroTokens = (text: string) =>
           [...text.matchAll(/\{\{(?:setvar|getvar|random|roll)::([^}:]+)/g)].map((m) => m[0]);
-        expect(macroTokens(adapted), prompt.name).toEqual(macroTokens(prompt.content));
+        const sourceMacros = macroTokens(prompt.content).filter(
+          (token) =>
+            prompt.identifier !== SOLA_CALENDAR_ID || token !== "{{getvar::tracker_location",
+        );
+        expect(macroTokens(adapted), prompt.name).toEqual(sourceMacros);
         let expectedWithoutVietnamese =
           family === "voyage"
             ? prompt.content
@@ -778,12 +783,25 @@ describe("TomiSakae VN-RP preset families", () => {
           vietnameseOutputEnabled: false,
         });
         if (family === "sola" && prompt.identifier === "01a0c1ff-4ecf-701d-97b3-6626434ed938") {
-          // Header frequency is deliberately adapted for PocketRisu in both languages.
+          // Header frequency and calendar placement are deliberately adapted in both languages.
           expect(withoutVietnamese).toContain("Begin every response with <scene_header>");
           expect(withoutVietnamese).not.toContain("Do NOT repeat the header");
           const schemaAndEngine = (text: string) =>
             text.slice(text.indexOf("```html"), text.indexOf("### Rules"));
-          expect(schemaAndEngine(withoutVietnamese)).toBe(schemaAndEngine(prompt.content));
+          expect(schemaAndEngine(withoutVietnamese)).toBe(
+            schemaAndEngine(prompt.content)
+              .replace('time="9:12 PM"', 'date="[Story day · Calendar date]" time="9:12 PM"')
+              .replace(
+                "- `time`: Natural time of day or chronology",
+                "- `date`: Current story day and known calendar date, following Calendar & Chronology.\n- `time`: Natural time of day",
+              ),
+          );
+        } else if (
+          family === "sola" &&
+          [SOLA_CALENDAR_ID, "01a0c1ff-4ecf-701f-ae98-acfb7b26a41f"].includes(prompt.identifier)
+        ) {
+          expect(withoutVietnamese).not.toMatch(/<date>\n|Day \[N\] ·|Day 42 · Dusk/);
+          expect(withoutVietnamese).toContain("opening scene header");
         } else expect(withoutVietnamese, prompt.name).toBe(expectedWithoutVietnamese);
         settings.promptEnabled[prompt.identifier] = true;
       }
@@ -811,7 +829,7 @@ describe("TomiSakae VN-RP preset families", () => {
         expect(text).toContain("T=[0-4] | F=[0-4] | D=[0-4] | Y=[0-4]");
         expect(text).toContain("[Bullseye | Grazing Shot | Wind Drift]");
         expect(text).toContain("Thay đổi: +Được tôn trọng dù còn miễn cưỡng");
-        expect(text).toContain("Lịch: [Mùa, tháng/năm");
+        expect(text).toContain('date="[Ngày trong truyện · Ngày tháng năm]"');
         expect(text).toContain("Xu hướng: [Xu hướng tình dục và tình cảm trong card");
         expect(text).toContain('<notification app="Tin nhắn"');
         expect(text).toContain("> TÌM THẤY 2 ĐIỆN VĂN CHƯA ĐỌC");
@@ -840,6 +858,65 @@ describe("TomiSakae VN-RP preset families", () => {
       expect(text).not.toContain("manga, anime, and light-novel pacing");
       expect(vietnameseOutputFor(preset)).toContain("`§...§`");
       expect(JSON.stringify(preset)).toBe(snapshot);
+    },
+  );
+
+  it.each([true, false])(
+    "puts Sola chronology only in the opening header across module switches with Vietnamese=%s",
+    async (vietnamese) => {
+      const preset = sources.sola.preset;
+      const headerId = "01a0c1ff-4ecf-701d-97b3-6626434ed938";
+      const hudId = "01a0c1ff-4ecf-701f-ae98-acfb7b26a41f";
+      const forcedId = "01a0c1ff-4ecf-704a-82b3-0c9b9af52526";
+      const reviewId = "01a0c1ff-4ecf-704b-80c7-70e3c11b723f";
+      for (const headerEnabled of [true, false]) {
+        for (const calendarEnabled of [true, false]) {
+          for (const hudEnabled of [true, false]) {
+            const settings = createDefaultSettings(preset);
+            settings.vietnameseOutputEnabled = vietnamese;
+            settings.promptEnabled[headerId] = headerEnabled;
+            settings.promptEnabled[SOLA_CALENDAR_ID] = calendarEnabled;
+            settings.promptEnabled[hudId] = hudEnabled;
+            settings.promptEnabled[forcedId] = true;
+            settings.promptEnabled[reviewId] = true;
+            const reminderId = "01a0c1ff-4ecf-7049-99ca-b8289f911924";
+            settings.promptEnabled[reminderId] = true;
+            const expanded = new Map<string, string>();
+            const composed = await composePresetPrompts(
+              preset,
+              settings,
+              parse,
+              { randomInt: (min) => min },
+              (message, prompt) => expanded.set(prompt.identifier, message.content),
+            );
+            const messages = [...composed.leading, ...composed.absolute, ...composed.trailing];
+            const text = messages.map((message) => message.content).join("\n");
+            const dateSchema = vietnamese
+              ? 'date="[Ngày trong truyện · Ngày tháng năm]"'
+              : 'date="[Story day · Calendar date]"';
+            expect(text.includes(dateSchema)).toBe(calendarEnabled);
+            expect(text).not.toMatch(/<date>\n|(?:Day|Ngày) \[N\] ·/);
+            if (calendarEnabled) {
+              const calendar = expanded.get(SOLA_CALENDAR_ID)!;
+              expect(calendar).toContain("after any reasoning and before narration or dialogue");
+              expect(calendar).toContain(
+                "omit unknown calendar details rather than inventing them",
+              );
+              expect(calendar).toContain("Travel, labor, research, and rest consume real hours");
+              for (const id of [forcedId, reviewId, reminderId]) {
+                expect(expanded.get(id)).toContain("Chronology (<scene_header>)");
+              }
+            } else expect(text).not.toContain("Chronology (<scene_header>)");
+            if (hudEnabled) {
+              const hud = expanded.get(hudId)!;
+              expect(hud).toContain('digest="[GEAR] · [NPC 1]: T# F# D# Y#');
+              expect(hud).not.toContain("<date>");
+              expect(hud).not.toContain("Ngày 42");
+              expect(hud).not.toContain("Day 42");
+            }
+          }
+        }
+      }
     },
   );
 
