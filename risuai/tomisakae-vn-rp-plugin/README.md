@@ -14,7 +14,7 @@ Mở **TomiSakae VN-RP** trong menu chat. Bảng điều khiển đặt tính n�
 
 Cả ba bộ dùng tên module, mô tả chức năng và nhóm lựa chọn bằng tiếng Việt. Sola V2 Flame giữ cách nhóm nguồn, ẩn các dòng phân cách/khởi tạo biến và chia bộ lọc theo chức năng. Voyage-Universal-v5 chia module thành luật cốt lõi, thế giới, văn xuôi, hồ sơ ẩn, nội dung người lớn và suy luận. Các tên hiển thị trong bảng token cũng được Việt hóa; thay đổi UI không sửa prompt, regex hoặc cấu hình đã lưu.
 
-Preset cấu hình có tên riêng chứa lựa chọn Global, bộ nền đang dùng và cấu hình module của từng bộ. Đổi bộ nền giữ lựa chọn Global và khôi phục các lựa chọn module/regex đã lưu riêng cho bộ đó. Lần đầu chọn một bộ, plugin dùng mặc định của preset nguồn. Riêng Freaky Frankenstein 5.4 mặc định dùng Realism Mode; lựa chọn Freaky đã lưu vẫn được giữ.
+Preset cấu hình có tên riêng chứa lựa chọn Global, bộ nền đang dùng và cấu hình module của từng bộ. Đổi bộ nền giữ lựa chọn Global và khôi phục các lựa chọn module/regex đã lưu riêng cho bộ đó. Lần đầu chọn một bộ, plugin dùng mặc định của preset nguồn cùng các điều chỉnh mặc định của plugin. Freaky Frankenstein 5.4 mặc định dùng Realism Mode; Sola V2 Flame mặc định bật Phá rào Freaky và Tăng cường mô tả thân thể. Các lựa chọn đã lưu vẫn được giữ.
 
 Card chưa được gán preset dùng **Mặc định**. Chọn preset khác sẽ ghi nhớ cho mọi chat của card bằng `chaId`. **Tạo preset** sao chép cấu hình đang hiển thị; **Lưu preset** áp dụng cho mọi card đang dùng preset đó. Có thể đổi tên hoặc xóa preset tự tạo; Mặc định không thể đổi tên hoặc xóa. **Khôi phục** đưa cấu hình về mặc định của bộ nền đang chọn. Chọn bộ nền lưu cấu hình hiện tại trước khi chuyển; thay đổi các công tắc thông thường cần bấm Lưu preset.
 

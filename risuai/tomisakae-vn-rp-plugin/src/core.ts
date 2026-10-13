@@ -157,6 +157,10 @@ const MARKER_IDENTIFIERS = new Set([
 
 const REALISM_MODE_ID = "019f62e8-892f-700c-9795-53ecb3381d7d";
 const FREAKY_MODE_ID = "019f62e8-892f-700d-b070-4add983aeae1";
+const SOLA_PROMPT_DEFAULTS: Readonly<Record<string, boolean>> = {
+  "01a0c1ff-4ecf-7006-aa85-a9d7fd7ed074": true, // Freaky Jailbreak
+  "01a0c1ff-4ecf-702e-9a5f-c2003733ab34": true, // Body Description Enhancement
+};
 const VOYAGE_PROMPT_DEFAULTS: Readonly<Record<string, boolean>> = {
   "867a59b8-8216-4d9f-bc24-222490ed0051": false, // OOC
   "54e77eae-eba6-49f4-b594-4266aaf19ef0": false, // Game Over
@@ -171,7 +175,9 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
   const promptDefaults: Readonly<Record<string, boolean>> =
     familyOf(preset) === "voyage"
       ? VOYAGE_PROMPT_DEFAULTS
-      : { [REALISM_MODE_ID]: true, [FREAKY_MODE_ID]: false };
+      : familyOf(preset) === "sola"
+        ? SOLA_PROMPT_DEFAULTS
+        : { [REALISM_MODE_ID]: true, [FREAKY_MODE_ID]: false };
   const promptEnabled = Object.fromEntries(
     order.map((entry) => [
       entry.identifier,
