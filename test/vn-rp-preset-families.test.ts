@@ -13,6 +13,7 @@ import {
 import {
   PRESET_FAMILIES,
   familyPrompts,
+  familyRegexScripts,
   pluginMemoPrefix,
   presetOrder,
   vietnameseOutputFor,
@@ -656,7 +657,7 @@ describe("TomiSakae VN-RP preset families", () => {
 
   it("localizes and groups every Sola regex without losing or duplicating a filter", () => {
     const preset = sources.sola.preset;
-    const scripts = preset.extensions!.regex_scripts!;
+    const scripts = familyRegexScripts(preset);
     const groups = familyRegexGroups(preset);
     const ids = groups.flatMap((group) => group.ids);
     expect(ids).toHaveLength(scripts.length);

@@ -2,6 +2,7 @@ import type { FfGlobalSettings, FfPreset } from "./core.js";
 import {
   familyOf,
   familyPrompts,
+  familyRegexScripts,
   presetOrder,
   VOYAGE_ABILITY_CHECK_VALUE_ID,
   VOYAGE_FF54_JAILBREAK_ID,
@@ -173,7 +174,7 @@ export function familyHiddenPromptIds(preset: FfPreset): ReadonlySet<string> {
 
 export function familyRegexGroups(preset: FfPreset): { label: string; ids: string[] }[] {
   const groups = new Map<string, string[]>();
-  for (const script of preset.extensions?.regex_scripts ?? []) {
+  for (const script of familyRegexScripts(preset)) {
     const label =
       solaRegexUiCopy(script)?.group ??
       (script.promptOnly ? "Ngữ cảnh gửi model" : "Hiển thị & định dạng");

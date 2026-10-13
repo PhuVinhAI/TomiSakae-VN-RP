@@ -629,6 +629,7 @@ const SOLA_REGEX_SUBJECTS: Readonly<Record<string, string>> = {
   Tempo: "Nhịp diễn biến",
   "Immersive Props (HTML Blocks)": "Đồ vật trong cảnh, khối HTML",
   "Showrunner HUD": "HUD tổng hợp",
+  "Scene Header": "Header mở cảnh",
   "Master Telemetry (All Trackers)": "Tất cả bảng theo dõi",
 };
 
@@ -669,7 +670,7 @@ const SOLA_REGEX_CATEGORIES: Readonly<Record<string, UiCopy>> = {
   ),
   "Sola Saver": copy(
     "Tiết kiệm ngữ cảnh gửi model",
-    "Loại khối cũ tương ứng khỏi ngữ cảnh gửi model theo độ sâu, giữ nguyên nội dung hiển thị.",
+    "Lưu ẩn khối cũ theo độ sâu trong lịch sử và ngữ cảnh gửi model; khôi phục khi xóa tin, đổi swipe hoặc rẽ nhánh.",
   ),
 };
 
@@ -682,7 +683,10 @@ export function solaRegexUiCopy(script: FfRegexScript): (UiCopy & { group: strin
   const depth = script.minDepth == null ? "" : ` Áp dụng từ độ sâu ${script.minDepth}.`;
   return {
     name: `${prefix === "Sola Saver" ? "Loại khỏi ngữ cảnh" : prefix === "Sola Voice" ? "Lời thoại" : prefix === "Sola Gradient" || prefix === "Sola Gradient Mod" ? "Chuyển sắc" : prefix === "Sola Kinetic" ? "Hiệu ứng chữ" : "Hiển thị"}: ${name}`,
-    description: category.description + depth,
+    description:
+      (prefix === "Sola Saver" && subject === "Scene Header"
+        ? "Giữ header trong lịch sử, chỉ loại header cũ khỏi request gửi model."
+        : category.description) + depth,
     group:
       prefix === "Sola Scene" && subject?.startsWith("Header -") ? "Header mở cảnh" : category.name,
   };

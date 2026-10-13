@@ -20,6 +20,10 @@ import {
   normalizePresetStore,
   selectCardPreset,
 } from "../risuai/tomisakae-vn-rp-plugin/src/presets.js";
+import {
+  restoreSolaHistoryContent,
+  type SolaHistoryArchive,
+} from "../risuai/tomisakae-vn-rp-plugin/src/sola-history.js";
 
 interface SavedMessage {
   role: "user" | "char";
@@ -28,6 +32,7 @@ interface SavedMessage {
   swipes?: string[];
   swipeId?: number;
   ff54InternalState?: string;
+  solaHistory?: SolaHistoryArchive;
 }
 
 interface SavedChat {
@@ -1789,7 +1794,7 @@ describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
     expect(plugin.runModel).not.toHaveBeenCalled();
   });
 
-  it("keeps Sola state in saved history while trimming only the request copy", async () => {
+  it("removes old Sola state from saved history into metadata as well as the request", async () => {
     const store = normalizePresetStore(preset, undefined);
     store.presets[0]!.settings = switchPresetFamily(
       store.presets[0]!.settings,
@@ -1805,10 +1810,19 @@ describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
         memo: `u${i}`,
       })),
     ];
-    plugin.chats.get("0:0")!.message[0]!.data = `Old scene. ${state}`;
+    plugin.chats.get("0:0")!.message = messages.map((message, index) => ({
+      role: message.role === "assistant" ? "char" : "user",
+      data: message.content,
+      chatId: `saved-${index}`,
+    }));
     const request = await plugin.request(messages);
     expect(request.find((m) => m.memo === "old-a")?.content).not.toContain("<sola_hud");
-    expect(plugin.chats.get("0:0")!.message[0]!.data).toContain(state);
+    const saved = plugin.chats.get("0:0")!.message[0]!;
+    expect(saved.data).not.toContain("<sola_hud");
+    expect(saved.solaHistory?.main?.removals.length).toBeGreaterThan(0);
+    expect(restoreSolaHistoryContent(saved.data, saved.solaHistory?.main)).toBe(
+      `Old scene. ${state}`,
+    );
   });
 });
 

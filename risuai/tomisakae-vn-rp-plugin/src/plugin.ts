@@ -21,6 +21,7 @@ import { promptUiCopy, regexUiCopy, type ExclusivePromptGroup } from "./ui-vi.js
 import {
   PRESET_FAMILIES,
   familyPrompts,
+  familyRegexScripts,
   familyOf,
   normalizePresetFamily,
   presetOrder,
@@ -29,6 +30,12 @@ import {
   type PresetSources,
   type PresetFamilyId,
 } from "./preset-family.js";
+import {
+  restoreSolaHistoryContent,
+  solaHistorySwipeKey,
+  type SolaHistoryArchive,
+  type SolaHistoryRemoval,
+} from "./sola-history.js";
 import {
   familyChoiceGroups,
   familyPromptSections,
@@ -133,6 +140,7 @@ interface HostChatMessage {
   isComment?: boolean;
   /** Hidden snapshot kept so an older/branched history can restore its state. */
   ff54InternalState?: string;
+  solaHistory?: SolaHistoryArchive;
   [key: string]: unknown;
 }
 
@@ -511,9 +519,7 @@ async function showSettings(): Promise<void> {
       return `<details ${section.open ? "open" : ""}><summary><span class="summary-copy"><strong>${escapeHtml(section.label)}</strong><small>${escapeHtml(section.description)}</small></span></summary><div class="list">${rows}</div></details>`;
     })
     .join("");
-  const regexMap = new Map(
-    (preset.extensions?.regex_scripts ?? []).map((script) => [script.id, script]),
-  );
+  const regexMap = new Map(familyRegexScripts(preset).map((script) => [script.id, script]));
   const filterGroups = family.id === "ff54" ? REGEX_GROUPS : familyRegexGroups(preset);
   const regexGroups = filterGroups
     .map((group) => {
@@ -842,8 +848,9 @@ function savedHistorySignature(chat: HostChatSnapshot): string {
         entry.isComment ?? false,
         String(entry.data ?? ""),
         entry.swipeId ?? "",
-        entry.swipes?.length ?? 0,
+        JSON.stringify(entry.swipes ?? []),
         entry.ff54InternalState ?? "",
+        JSON.stringify(entry.solaHistory ?? {}),
       ].join("\u0001"),
     ),
   ].join("\u0002");
@@ -852,17 +859,50 @@ function savedHistorySignature(chat: HostChatSnapshot): string {
 function syncRestoredStatesToRequest(
   messages: ChatMessage[],
   chat: HostChatSnapshot,
+  preset: FfPreset,
+  settings: FfGlobalSettings,
 ): ChatMessage[] {
   const assistantHistory = (chat.message ?? []).filter(
     (entry) => entry.role === "char" && !isHistoryComment(entry),
   );
   const used = new Set<number>();
+  const comparisonSettings = {
+    ...settings,
+    regexEnabled: Object.fromEntries(
+      familyRegexScripts(preset).map((script) => [
+        script.id,
+        script.scriptName?.startsWith("Sola Saver:") === true,
+      ]),
+    ),
+  };
+  const solaBody = (content: string) =>
+    applyRegexScripts(content, preset, comparisonSettings, {
+      placement: PLACEMENT_AI_OUTPUT,
+      prompt: true,
+      history: true,
+      depth: Number.MAX_SAFE_INTEGER,
+    });
   return messages.map((message) => {
     if (message.role !== "assistant" || message.isComment === true || isPluginMemo(message.memo))
       return message;
     const matchIndex = assistantHistory.findIndex((entry, index) => {
       if (used.has(index)) return false;
       const data = String(entry.data ?? "");
+      if (familyOf(preset) === "sola") {
+        if (
+          message.memo !== undefined &&
+          message.memo === entry.chatId &&
+          solaBody(message.content) === solaBody(data)
+        )
+          return true;
+        const snapshot = entry.solaHistory?.[solaHistorySwipeKey(entry.swipeId)];
+        if (
+          snapshot &&
+          (message.content === snapshot.visible ||
+            message.content === restoreSolaHistoryContent(snapshot.visible, snapshot))
+        )
+          return true;
+      }
       if (data === message.content) return true;
       const state = extractInternalStateBlock(data);
       return state !== undefined && data.replace(state, "").trimEnd() === message.content.trimEnd();
@@ -881,7 +921,7 @@ async function cleanSavedHistory(
   skipStreaming = false,
 ): Promise<void> {
   const preset = sourceForSettings(settings);
-  if (familyOf(preset) !== "ff54") return; // Other families keep saved trackers; savers run on request copies.
+  if (familyOf(preset) === "voyage") return;
   const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
   if (!chat?.message?.length || (skipStreaming && chat.isStreaming)) return;
   const sourceSignature = savedHistorySignature(chat);
@@ -895,6 +935,13 @@ async function cleanSavedHistory(
   const restoredMessages = sourceMessages.map((source, index) => {
     const entry = chat.message![index]!;
     if (source.role !== "assistant" || source.isComment === true) return source;
+    if (familyOf(preset) === "sola") {
+      const restored = restoreSolaHistoryContent(
+        source.content,
+        entry.solaHistory?.[solaHistorySwipeKey(entry.swipeId)],
+      );
+      return restored === source.content ? source : { ...source, content: restored };
+    }
     const currentState = extractInternalStateBlock(source.content);
     const storedState =
       typeof entry.ff54InternalState === "string" && entry.ff54InternalState.trim()
@@ -910,9 +957,30 @@ async function cleanSavedHistory(
     const restored = appendInternalState(source.content, state);
     return restored === source.content ? source : { ...source, content: restored };
   });
-  const cleanedMessages = applyPromptRegexToMessages(restoredMessages, preset, settings);
+  const removals = new Map<ChatMessage, SolaHistoryRemoval[]>();
+  const cleanedMessages = applyPromptRegexToMessages(restoredMessages, preset, settings, {
+    history: true,
+    ...(familyOf(preset) === "sola"
+      ? {
+          onHistoryRemoval: (source: ChatMessage, offset: number, text: string) => {
+            const parts = removals.get(source) ?? [];
+            parts.push({ offset, text });
+            removals.set(source, parts);
+          },
+        }
+      : {}),
+  });
   const message = chat.message.map((entry, index) => {
     const content = cleanedMessages[index]?.content ?? String(entry.data ?? "");
+    const parts = removals.get(restoredMessages[index]!);
+    if (parts?.length) {
+      const snapshot = { visible: content, removals: parts };
+      const key = solaHistorySwipeKey(entry.swipeId);
+      if (JSON.stringify(entry.solaHistory?.[key]) !== JSON.stringify(snapshot)) {
+        entry.solaHistory = { ...entry.solaHistory, [key]: snapshot };
+        changed = true;
+      }
+    }
     if (content !== String(entry.data ?? "")) changed = true;
     return content === entry.data ? entry : { ...entry, data: content };
   });
@@ -1003,7 +1071,7 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
   await cleanSavedHistoryOnce(settings, characterIndex, chatIndex);
   const restoredChat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
   const requestMessages = restoredChat
-    ? syncRestoredStatesToRequest(messages, restoredChat)
+    ? syncRestoredStatesToRequest(messages, restoredChat, preset, settings)
     : messages;
   const macroContext = await getHostMacroContext(character);
   const built = await buildRequestMessages(
@@ -1379,6 +1447,7 @@ async function rewriteLatestResponse(
         })),
         preset,
         profile.settings,
+        { history: true },
       )[messageIndex]?.content ?? original;
     const result = await runSubmodelEditor(context, source.response, run.controller);
     if (run.controller.signal.aborted) return;

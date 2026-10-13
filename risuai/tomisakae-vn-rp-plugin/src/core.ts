@@ -1,6 +1,7 @@
 import {
   adaptFamilyPrompt,
   familyPrompts,
+  familyRegexScripts,
   familyOf,
   imageOptimizationFor,
   isPluginMemo,
@@ -23,6 +24,7 @@ import {
   adaptSolaRegexForVietnamese,
   adaptSolaTrackerLabelsForDisplay,
 } from "./sola-vietnamese-regex.js";
+import { SOLA_HEADER_SAVER_ID } from "./sola-history.js";
 
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
@@ -164,7 +166,7 @@ const VOYAGE_PROMPT_DEFAULTS: Readonly<Record<string, boolean>> = {
 
 export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
   const order = presetOrder(preset);
-  const regexScripts = preset.extensions?.regex_scripts ?? [];
+  const regexScripts = familyRegexScripts(preset);
   const promptDefaults: Readonly<Record<string, boolean>> =
     familyOf(preset) === "voyage"
       ? VOYAGE_PROMPT_DEFAULTS
@@ -657,6 +659,8 @@ export function applyRegexScripts(
     edit?: boolean;
     depth?: number;
     depthForScript?: (script: FfRegexScript) => number | undefined;
+    history?: boolean;
+    onHistoryRemoval?: (offset: number, text: string) => void;
     dialogueTheme?: DialogueTheme;
   },
 ): string {
@@ -664,8 +668,9 @@ export function applyRegexScripts(
     options.markdown && settings.vietnameseOutputEnabled && familyOf(preset) === "sola"
       ? adaptSolaTrackerLabelsForDisplay(input)
       : input;
-  for (const script of preset.extensions?.regex_scripts ?? []) {
+  for (const script of familyRegexScripts(preset)) {
     if (!settings.regexEnabled[script.id] || !script.findRegex || !output) continue;
+    if (options.history && script.id === SOLA_HEADER_SAVER_ID) continue;
     const eligibleMode =
       (script.markdownOnly && options.markdown) ||
       (script.promptOnly && options.prompt) ||
@@ -702,6 +707,20 @@ export function applyRegexScripts(
       options.markdown ? adaptDialogueColorRegex(findRegex) : findRegex,
     );
     if (!regex) continue;
+    if (
+      options.onHistoryRemoval &&
+      script.scriptName?.startsWith("Sola Saver:") &&
+      localized.replaceString === ""
+    ) {
+      let removedLength = 0;
+      output = output.replace(regex, (match: string, ...args: unknown[]) => {
+        const offset = Number(args.at(-2));
+        options.onHistoryRemoval!(offset - removedLength, match);
+        removedLength += match.length;
+        return "";
+      });
+      continue;
+    }
     // RisuAI gives nested quote/emphasis elements their own theme colors.
     // Scope those variables to the dialogue span so they keep the source color.
     const themedReplacement =
@@ -865,6 +884,10 @@ export function applyPromptRegexToMessages(
   messages: ChatMessage[],
   preset: FfPreset,
   settings: FfGlobalSettings,
+  options: {
+    history?: boolean;
+    onHistoryRemoval?: (message: ChatMessage, offset: number, text: string) => void;
+  } = {},
 ): ChatMessage[] {
   const depths = messageDepths(messages);
   const contextSaver = (preset.extensions?.regex_scripts ?? []).find(
@@ -885,6 +908,13 @@ export function applyPromptRegexToMessages(
       content: applyRegexScripts(message.content, preset, settings, {
         placement,
         prompt: true,
+        ...(options.history ? { history: true } : {}),
+        ...(options.onHistoryRemoval
+          ? {
+              onHistoryRemoval: (offset: number, text: string) =>
+                options.onHistoryRemoval!(message, offset, text),
+            }
+          : {}),
         ...(depths.has(message) ? { depth: depths.get(message)! } : {}),
         ...(contextSaver !== undefined && placement === PLACEMENT_AI_OUTPUT
           ? {

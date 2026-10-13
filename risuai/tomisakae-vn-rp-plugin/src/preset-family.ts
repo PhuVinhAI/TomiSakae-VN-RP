@@ -1,4 +1,5 @@
-import type { FfGlobalSettings, FfPreset, FfPrompt } from "./core.js";
+import type { FfGlobalSettings, FfPreset, FfPrompt, FfRegexScript } from "./core.js";
+import { SOLA_HEADER_SAVER } from "./sola-history.js";
 import {
   VIETNAMESE_OUTPUT_PROMPT,
   SOLA_VIETNAMESE_OUTPUT_PROMPT,
@@ -66,6 +67,11 @@ export function familyPrompts(preset: FfPreset): FfPrompt[] {
   return familyOf(preset) === "voyage"
     ? [...preset.prompts, VOYAGE_FF54_JAILBREAK_CONTROL]
     : preset.prompts;
+}
+
+export function familyRegexScripts(preset: FfPreset): FfRegexScript[] {
+  const scripts = preset.extensions?.regex_scripts ?? [];
+  return familyOf(preset) === "sola" ? [...scripts, SOLA_HEADER_SAVER] : scripts;
 }
 
 export { VOYAGE_FF54_JAILBREAK_ID };

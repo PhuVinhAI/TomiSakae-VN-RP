@@ -16,6 +16,11 @@ import {
   selectCardPreset,
   switchPresetFamily,
 } from "../risuai/tomisakae-vn-rp-plugin/src/presets.js";
+import {
+  restoreSolaHistoryContent,
+  SOLA_HEADER_SAVER_ID,
+  type SolaHistoryArchive,
+} from "../risuai/tomisakae-vn-rp-plugin/src/sola-history.js";
 
 interface SavedMessage {
   role: "user" | "char";
@@ -26,6 +31,7 @@ interface SavedMessage {
   isComment?: boolean;
   disabled?: boolean;
   ff54InternalState?: string;
+  solaHistory?: SolaHistoryArchive;
 }
 
 interface SavedChat {
@@ -688,6 +694,175 @@ describe("Internal-state history restoration", () => {
       expect(vi.getTimerCount()).toBe(0);
     },
   );
+});
+
+describe("Sola saved-history restoration", () => {
+  const header = '<scene_header location="Phòng khách" time="13:40" atmosphere="Nắng" />';
+  const reply = (index: number) =>
+    `${header}\nCảnh ${index}.\n<sola_hud digest="Ngày ${index}"><date>Ngày: ${index}</date><wardrobe>Áo ${index}</wardrobe><fengine>Cảm xúc ${index}</fengine></sola_hud>`;
+  const history = (count: number): SavedMessage[] =>
+    Array.from({ length: count }, (_, index) => [
+      { role: "user" as const, data: `Lượt ${index}`, chatId: `sola-u-${index}` },
+      { role: "char" as const, data: reply(index), chatId: `sola-a-${index}` },
+    ]).flat();
+  const requestOf = (chat: SavedChat): ChatMessage[] =>
+    chat.message.map((entry) => ({
+      role: entry.role === "char" ? "assistant" : "user",
+      content: entry.data,
+      memo: entry.chatId,
+    }));
+  const solaStore = () => {
+    const store = normalizePresetStore(preset, undefined, undefined, sources);
+    store.presets[0]!.settings = switchPresetFamily(
+      store.presets[0]!.settings,
+      sources.sola.preset,
+    );
+    return store;
+  };
+
+  it.each(["delete", "branch"] as const)(
+    "restores stored HUDs immediately after a %s, including partially trimmed trackers",
+    async (action) => {
+      vi.useFakeTimers();
+      const plugin = await startPlugin(solaStore(), false, undefined, true);
+      try {
+        plugin.chats.set("0:0", { id: "chat-a", message: history(5) });
+        await plugin.request(requestOf(plugin.chats.get("0:0")!));
+        const original = structuredClone(plugin.chats.get("0:0")!);
+        const oldest = original.message[1]!;
+        expect(oldest.data).toContain(header);
+        expect(oldest.data).not.toContain("<sola_hud");
+        expect(oldest.solaHistory?.main?.removals.length).toBeGreaterThan(0);
+        expect(restoreSolaHistoryContent(oldest.data, oldest.solaHistory?.main)).toBe(reply(0));
+        const marker: SavedMessage = {
+          role: "char",
+          data: "{{specialcomment::branchedfrom::chat-a::Original::sola-a-2::}}",
+          chatId: "sola-branch-marker",
+          disabled: true,
+        };
+        const shortened: SavedChat = {
+          id: action === "branch" ? "sola-branch" : "chat-a",
+          message: [
+            ...original.message.slice(0, 6).map((entry) => ({
+              ...entry,
+              chatId: action === "branch" ? `branch-${entry.chatId}` : entry.chatId,
+            })),
+            ...(action === "branch" ? [marker] : []),
+          ],
+        };
+        const staleRequest = requestOf(shortened).filter(
+          (message) => message.memo !== marker.chatId,
+        );
+        const chatIndex = action === "branch" ? 1 : 0;
+        plugin.chats.set(`0:${chatIndex}`, shortened);
+        plugin.selectChat(chatIndex);
+        await vi.advanceTimersByTimeAsync(250);
+        const restored = plugin.chats.get(`0:${chatIndex}`)!;
+        expect(restored.message[1]!.data).not.toContain("<sola_hud");
+        expect(restored.message[3]!.data).toContain("<sola_hud");
+        expect(restored.message[3]!.data).toContain("<date>Ngày: 1</date>");
+        expect(restored.message[3]!.data).not.toContain("<wardrobe>");
+        expect(restored.message[5]!.data).toBe(reply(2));
+        expect(restored.message[5]!.data.match(/<sola_hud/g)).toHaveLength(1);
+        for (const entry of restored.message.filter(
+          (entry) => entry.role === "char" && entry !== restored.message[6],
+        ))
+          expect(entry.data).toContain(header);
+        if (action === "branch") {
+          expect(restored.message[6]).toEqual(marker);
+          expect(plugin.chats.get("0:0")).toEqual(original);
+        }
+        const request = await plugin.request([
+          ...staleRequest,
+          { role: "user", content: "Tiếp tục." },
+        ]);
+        const responses = request.filter((message) => message.memo?.includes("sola-a-"));
+        expect(responses).toHaveLength(3);
+        expect(responses[0]!.content).not.toContain("<scene_header");
+        expect(responses[0]!.content).not.toContain("<sola_hud");
+        expect(responses[1]!.content).toContain("<sola_hud");
+        expect(responses[2]!.content).toBe(reply(2));
+        const writes = plugin.writes.mock.calls.length;
+        await vi.advanceTimersByTimeAsync(750);
+        expect(plugin.writes).toHaveBeenCalledTimes(writes);
+      } finally {
+        await plugin.callbacks.unload!();
+      }
+      expect(vi.getTimerCount()).toBe(0);
+    },
+  );
+
+  it("stores independent snapshots for swipes and reloads them with the saved chat", async () => {
+    const store = solaStore();
+    const plugin = await startPlugin(store);
+    const chat = { id: "chat-a", message: history(4) };
+    chat.message[1] = {
+      ...chat.message[1]!,
+      swipes: [reply(0), reply(20)],
+      swipeId: 0,
+    };
+    plugin.chats.set("0:0", chat);
+    await plugin.request(requestOf(chat));
+    const trimmed = plugin.chats.get("0:0")!;
+    expect(trimmed.message[1]!.data).not.toContain("<sola_hud");
+    expect(trimmed.message[1]!.solaHistory?.["swipe:0"]).toBeDefined();
+    trimmed.message[1]!.data = reply(20);
+    trimmed.message[1]!.swipeId = 1;
+    await plugin.request(requestOf(trimmed));
+    const otherSwipe = plugin.chats.get("0:0")!.message[1]!;
+    expect(otherSwipe.data).not.toContain("<sola_hud");
+    expect(restoreSolaHistoryContent(otherSwipe.data, otherSwipe.solaHistory?.["swipe:1"])).toBe(
+      reply(20),
+    );
+    expect(
+      restoreSolaHistoryContent(
+        otherSwipe.solaHistory!["swipe:0"]!.visible,
+        otherSwipe.solaHistory?.["swipe:0"],
+      ),
+    ).toBe(reply(0));
+
+    const reloaded = await startPlugin(store);
+    const saved = structuredClone(plugin.chats.get("0:0")!);
+    saved.message = saved.message.slice(0, 2);
+    reloaded.chats.set("0:0", saved);
+    const request = await reloaded.request(requestOf(saved));
+    expect(reloaded.chats.get("0:0")!.message[1]!.data).toBe(reply(20));
+    expect(request.find((message) => message.memo === "sola-a-0")?.content).toBe(reply(20));
+    const reverted = reloaded.chats.get("0:0")!;
+    reverted.message[1]!.swipeId = 0;
+    reverted.message[1]!.data = reverted.message[1]!.solaHistory!["swipe:0"]!.visible;
+    await reloaded.request(requestOf(reverted));
+    expect(reloaded.chats.get("0:0")!.message[1]!.data).toBe(reply(0));
+  });
+
+  it("preserves host changes to narration when syncing restored trackers into a request", async () => {
+    const plugin = await startPlugin(solaStore());
+    const chat = { id: "chat-a", message: history(4) };
+    plugin.chats.set("0:0", chat);
+    const request = requestOf(chat);
+    request[1]!.content = request[1]!.content.replace("Cảnh 0.", "Diễn biến đã được host sửa.");
+    const built = await plugin.request(request);
+    expect(built.find((message) => message.memo === "sola-a-0")?.content).toContain(
+      "Diễn biến đã được host sửa.",
+    );
+  });
+
+  it("restores a disabled saver while preserving headers in history and obeying its request toggle", async () => {
+    const store = solaStore();
+    const plugin = await startPlugin(store);
+    plugin.chats.set("0:0", { id: "chat-a", message: history(4) });
+    await plugin.request(requestOf(plugin.chats.get("0:0")!));
+    await plugin.settingsUi();
+    for (const script of sources.sola.preset.extensions!.regex_scripts!.filter(
+      (script) => script.promptOnly,
+    ))
+      plugin.toggle(script.id).checked = false;
+    plugin.toggle(SOLA_HEADER_SAVER_ID).checked = false;
+    await plugin.uiEvent("save");
+    const request = await plugin.request(requestOf(plugin.chats.get("0:0")!));
+    expect(plugin.chats.get("0:0")!.message[1]!.data).toBe(reply(0));
+    expect(request.find((message) => message.memo === "sola-a-0")?.content).toBe(reply(0));
+  });
 });
 
 describe("FF5.4 completion sounds", () => {
