@@ -133,6 +133,42 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(built[latestIndex + 1]!.memo).toContain("ff54:absolute:0");
   });
 
+  it("uses unchanged FF5.4 prompts for main when Submodel is enabled without changing saved settings", async () => {
+    const data = await preset();
+    const settings = createDefaultSettings(data);
+    settings.submodelEditorEnabled = true;
+    for (const prompt of data.prompts) settings.promptEnabled[prompt.identifier] = true;
+    const snapshot = structuredClone(settings);
+    const history = [
+      { role: "system" as const, content: "Card và lore." },
+      { role: "user" as const, content: "Tiếp tục." },
+    ];
+    const macros = { randomInt: (minimum: number) => minimum };
+    const actual = await buildRequestMessages(
+      history,
+      data,
+      settings,
+      async (text) => text,
+      macros,
+    );
+    const raw = await buildRequestMessages(
+      history,
+      data,
+      { ...settings, submodelEditorEnabled: false, vietnameseOutputEnabled: false },
+      async (text) => text,
+      macros,
+    );
+    expect(actual).toEqual(raw);
+    expect(actual.some((message) => message.content.includes("<vietnamese_output>"))).toBe(false);
+    expect(settings).toEqual(snapshot);
+    settings.submodelEditorEnabled = false;
+    expect(
+      (await buildRequestMessages(history, data, settings, async (text) => text, macros)).some(
+        (message) => message.memo === "ff54:vietnamese-output",
+      ),
+    ).toBe(true);
+  });
+
   it("adds Vietnamese Output once before card context and keeps removed style modules out", async () => {
     const data = await preset();
     const settings = createDefaultSettings(data);

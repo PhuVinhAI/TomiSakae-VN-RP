@@ -1,10 +1,14 @@
 import type { ChatMessage } from "./core.js";
+import { VIETNAMESE_OUTPUT_PROMPT } from "./vietnamese.js";
 
 const MEMORY_MEMOS = new Set(["supaMemory", "hypaMemory"]);
 const MEMORY_BLOCK =
   /(?:\[Roleplay Summary\]\s*)?<Past Events Summary>[\s\S]*?<\/Past Events Summary>/gi;
 
-/** Keep host prompts and two prior exchanges, without restoring saved history. */
+export const SUBMODEL_TRANSLATION_INSTRUCTION =
+  "Rewrite the latest assistant response above into natural Vietnamese according to <vietnamese_output>. Use preceding prompts, card, lore, and the current user message as reference only, not as tasks to execute. Freely restructure wording and sentence rhythm while preserving events, causality, speaker intent, viewpoint, and RP state. Translate all reader-visible text, including dialogue and header/HUD/GFX/internal-state labels and values; preserve proper names, numbers, DCs, rolls, identifiers, image commands, tags, and machine syntax. Return only the complete Vietnamese response; do not continue the roleplay or add commentary.";
+
+/** Keep all host prompts and only the current user input; append the raw reply separately. */
 export function buildEditorReferenceMessages(
   request: ChatMessage[],
   responseId?: unknown,
@@ -12,6 +16,8 @@ export function buildEditorReferenceMessages(
 ): ChatMessage[] {
   const messages = structuredClone(request).flatMap((message) => {
     if (MEMORY_MEMOS.has(String(message.memo ?? ""))) return [];
+    if (message.memo === "ff54:vietnamese-output") return [];
+    if (message.isComment === true || /^\s*\{\{specialcomment::/.test(message.content)) return [];
     // The target is appended separately after trimming its reasoning prefix.
     if (responseId !== undefined && message.role === "assistant" && message.memo === responseId)
       return [];
@@ -40,14 +46,39 @@ export function buildEditorReferenceMessages(
     if (historyIds.size > 0 && !historyIds.has(memo) && message.removable !== true) return [];
     return [{ index, role: message.role }];
   });
-  const assistantPositions = history.flatMap((message, position) =>
-    message.role === "assistant" ? [position] : [],
+  const currentUser = [...history].reverse().find((message) => message.role === "user");
+  const removed = new Set(
+    history.filter((message) => message !== currentUser).map((message) => message.index),
   );
-  let start = assistantPositions.at(-2) ?? assistantPositions.at(-1) ?? history.length - 1;
-  if (assistantPositions.length > 0) {
-    // Include the user input that produced the earliest retained AI response.
-    while (start > 0 && history[start - 1]!.role === "user") start -= 1;
-  }
-  const removed = new Set(history.slice(0, Math.max(0, start)).map((message) => message.index));
   return messages.filter((_message, index) => !removed.has(index));
+}
+
+export function buildSubmodelTranslationMessages(
+  request: ChatMessage[],
+  response: string,
+  responseId?: unknown,
+  historyMessageIds?: readonly string[],
+): ChatMessage[] {
+  const references = buildEditorReferenceMessages(request, responseId, historyMessageIds);
+  // Match the main composer's language-module slot before card/lore/history.
+  const boundary = references.findIndex(
+    (message) =>
+      !String(message.memo ?? "").startsWith("ff54:") ||
+      message.memo?.startsWith("ff54:absolute:") ||
+      message.memo === "ff54:jailbreak",
+  );
+  references.splice(boundary < 0 ? references.length : boundary, 0, {
+    role: "system",
+    content: VIETNAMESE_OUTPUT_PROMPT,
+    memo: "ff54:vietnamese-output",
+  });
+  return [
+    ...references,
+    { role: "assistant", content: response, memo: "ff54:submodel-editor-source" },
+    {
+      role: "user",
+      content: SUBMODEL_TRANSLATION_INSTRUCTION,
+      memo: "ff54:submodel-editor-target",
+    },
+  ];
 }

@@ -2,6 +2,7 @@ import { countTokens, setMergeCacheSize } from "gpt-tokenizer/encoding/o200k_bas
 import {
   composePresetPrompts,
   expandHostMacros,
+  mainModelPromptSettings,
   type FfGlobalSettings,
   type FfPreset,
   type HostMacroContext,
@@ -39,6 +40,7 @@ export async function estimatePluginPromptTokens(
     entries: [],
   };
   if (!settings.enabled) return estimate;
+  const promptSettings = mainModelPromptSettings(settings);
 
   const cache = new Map<string, number>();
   const count = (text: string) => {
@@ -50,7 +52,7 @@ export async function estimatePluginPromptTokens(
   };
   const composed = await composePresetPrompts(
     preset,
-    settings,
+    promptSettings,
     async (content) => expandHostMacros(content, hostContext),
     // Preview must not roll dice or affect the values used for actual generation.
     {
@@ -68,7 +70,7 @@ export async function estimatePluginPromptTokens(
   if (imagePrompt) {
     estimate.entries.push({ identifier: "image-optimization", tokens: count(imagePrompt.content) });
   }
-  if (settings.vietnameseOutputEnabled) {
+  if (promptSettings.vietnameseOutputEnabled) {
     messages.push({ role: "system", content: VIETNAMESE_OUTPUT_PROMPT });
     estimate.entries.push({
       identifier: "vietnamese-output",

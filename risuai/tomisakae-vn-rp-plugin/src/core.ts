@@ -70,6 +70,13 @@ export interface FfGlobalSettings {
   submodelAutoRewriteEnabled: boolean;
 }
 
+/** Vietnamese translation runs after raw main generation when Submodel is enabled. */
+export function mainModelPromptSettings(settings: FfGlobalSettings): FfGlobalSettings {
+  return settings.submodelEditorEnabled
+    ? { ...settings, vietnameseOutputEnabled: false }
+    : settings;
+}
+
 export interface MacroContext {
   randomInt?: (minimum: number, maximum: number) => number;
   dialogueTheme?: DialogueTheme;
@@ -595,9 +602,10 @@ export function applyRegexScripts(
       continue;
     }
     if (options.prompt && script.scriptName === "FF5 - GFX Stripper") continue;
-    const localized = settings.vietnameseOutputEnabled
-      ? adaptRegexForVietnamese(script.findRegex, String(script.replaceString ?? ""))
-      : { findRegex: script.findRegex, replaceString: String(script.replaceString ?? "") };
+    const localized =
+      settings.vietnameseOutputEnabled || settings.submodelEditorEnabled
+        ? adaptRegexForVietnamese(script.findRegex, String(script.replaceString ?? ""))
+        : { findRegex: script.findRegex, replaceString: String(script.replaceString ?? "") };
     // Provider reasoning can exceed the source's 20,000-character cap.
     // Keep Hapuppy's closing-tag boundaries and toggle/depth rules intact.
     const findRegex =
@@ -834,10 +842,16 @@ export async function buildRequestMessages(
     (message) => !String(message.memo ?? "").startsWith("ff54:"),
   );
   const requestHistory = applyRequestFiltersToMessages(hostMessages, preset, settings);
-  const composed = await composePresetPrompts(preset, settings, parseHostMacros, macroContext);
+  const promptSettings = mainModelPromptSettings(settings);
+  const composed = await composePresetPrompts(
+    preset,
+    promptSettings,
+    parseHostMacros,
+    macroContext,
+  );
   return [
     ...composed.leading,
-    ...(settings.vietnameseOutputEnabled
+    ...(promptSettings.vietnameseOutputEnabled
       ? [
           {
             role: "system" as const,

@@ -69,14 +69,20 @@ describe("Plugin dashboard token estimates", () => {
     }
   });
 
-  it.each([true, false])(
-    "matches the actual injected prompt text with Vietnamese Output %s",
-    async (vietnamese) => {
+  it.each([
+    [true, false],
+    [false, false],
+    [true, true],
+    [false, true],
+  ])(
+    "matches the actual main prompt text with Vietnamese Output %s and Submodel %s",
+    async (vietnamese, submodel) => {
       const preset = JSON.parse(
         await readFile("risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json", "utf8"),
       ) as FfPreset;
       const settings = createDefaultSettings(preset);
       settings.vietnameseOutputEnabled = vietnamese;
+      settings.submodelEditorEnabled = submodel;
       settings.imageOptimizationEnabled = true;
       const themedHost = {
         ...host,
@@ -103,7 +109,7 @@ describe("Plugin dashboard token estimates", () => {
         estimate.entries.filter((entry) => entry.identifier === "image-optimization"),
       ).toHaveLength(1);
       expect(estimate.entries.some((entry) => entry.identifier === "vietnamese-output")).toBe(
-        vietnamese,
+        vietnamese && !submodel,
       );
     },
   );
