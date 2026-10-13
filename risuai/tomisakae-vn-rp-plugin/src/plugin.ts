@@ -121,6 +121,7 @@ interface HostChatMessage {
   data?: string;
   swipes?: string[];
   swipeId?: number;
+  isComment?: boolean;
   /** Hidden snapshot kept so an older/branched history can restore its state. */
   ff54InternalState?: string;
   [key: string]: unknown;
@@ -792,12 +793,17 @@ function appendInternalState(content: string, state: string): string {
   return body ? `${body}\n${state}` : state;
 }
 
+function isHistoryComment(message: HostChatMessage): boolean {
+  return message.isComment === true || /^\s*\{\{specialcomment::/.test(String(message.data ?? ""));
+}
+
 function savedHistorySignature(chat: HostChatSnapshot): string {
   return [String(chat.id ?? ""), ...(chat.message ?? [])
     .map((entry) =>
       [
         entry.chatId ?? "",
         entry.role ?? "",
+        entry.isComment ?? false,
         String(entry.data ?? ""),
         entry.swipeId ?? "",
         entry.swipes?.length ?? 0,
@@ -810,10 +816,16 @@ function syncRestoredStatesToRequest(
   messages: ChatMessage[],
   chat: HostChatSnapshot,
 ): ChatMessage[] {
-  const assistantHistory = (chat.message ?? []).filter((entry) => entry.role === "char");
+  const assistantHistory = (chat.message ?? []).filter(
+    (entry) => entry.role === "char" && !isHistoryComment(entry),
+  );
   const used = new Set<number>();
   return messages.map((message) => {
-    if (message.role !== "assistant" || String(message.memo ?? "").startsWith("ff54:"))
+    if (
+      message.role !== "assistant" ||
+      message.isComment === true ||
+      String(message.memo ?? "").startsWith("ff54:")
+    )
       return message;
     const matchIndex = assistantHistory.findIndex((entry, index) => {
       if (used.has(index)) return false;
@@ -842,11 +854,12 @@ async function cleanSavedHistory(
   const sourceMessages: ChatMessage[] = chat.message.map((message) => ({
     role: message.role === "char" ? "assistant" : "user",
     content: String(message.data ?? ""),
+    isComment: isHistoryComment(message),
   }));
   let changed = false;
   const restoredMessages = sourceMessages.map((source, index) => {
     const entry = chat.message![index]!;
-    if (source.role !== "assistant") return source;
+    if (source.role !== "assistant" || source.isComment === true) return source;
     const currentState = extractInternalStateBlock(source.content);
     const storedState =
       typeof entry.ff54InternalState === "string" && entry.ff54InternalState.trim()

@@ -12,6 +12,7 @@ export interface ChatMessage {
   role: ChatRole;
   content: string;
   memo?: string;
+  isComment?: boolean;
   [key: string]: unknown;
 }
 
@@ -683,6 +684,7 @@ function messageDepths(messages: ChatMessage[]): Map<ChatMessage, number> {
   const history = messages.filter(
     (message) =>
       (message.role === "user" || message.role === "assistant") &&
+      message.isComment !== true &&
       !String(message.memo ?? "").startsWith("ff54:"),
   );
   const depths = new Map<ChatMessage, number>();
@@ -694,6 +696,7 @@ function assistantResponseDepths(messages: ChatMessage[]): Map<ChatMessage, numb
   const depths = new Map<ChatMessage, number>();
   let assistantDepth = 0;
   for (const message of [...messages].reverse()) {
+    if (message.isComment === true) continue;
     if (String(message.memo ?? "").startsWith("ff54:")) continue;
     if (message.role !== "user" && message.role !== "assistant") continue;
     depths.set(message, assistantDepth);
@@ -768,6 +771,7 @@ export function applyPromptRegexToMessages(
   );
   const contextSaverDepths = assistantResponseDepths(messages);
   return messages.map((message) => {
+    if (message.isComment === true) return { ...message };
     const placement =
       message.role === "user"
         ? PLACEMENT_USER_INPUT

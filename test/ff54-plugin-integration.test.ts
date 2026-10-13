@@ -16,6 +16,9 @@ interface SavedMessage {
   chatId: string;
   swipes?: string[];
   swipeId?: number;
+  isComment?: boolean;
+  disabled?: boolean;
+  ff54InternalState?: string;
 }
 
 interface SavedChat {
@@ -59,7 +62,12 @@ beforeAll(async () => {
 
 afterEach(() => vi.useRealTimers());
 
-async function startPlugin(savedPresets?: unknown, sound = false, legacySettings?: unknown) {
+async function startPlugin(
+  savedPresets?: unknown,
+  sound = false,
+  legacySettings?: unknown,
+  watchHistory = false,
+) {
   const callbacks = {
     beforeRequest: undefined as
       ((messages: ChatMessage[], type: string) => Promise<ChatMessage[]>) | undefined,
@@ -252,6 +260,7 @@ async function startPlugin(savedPresets?: unknown, sound = false, legacySettings
     TextDecoder,
     setTimeout,
     clearTimeout,
+    ...(watchHistory ? { setInterval, clearInterval } : {}),
     crypto: { randomUUID: () => `test-${storage.size}-${Math.random()}` },
     document: uiDocument,
     AudioContext: FakeAudioContext,
@@ -479,6 +488,89 @@ describe("Named presets in plugin UI and requests", () => {
       normalizePresetStore(preset, plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY)).presets,
     ).toHaveLength(2);
   });
+});
+
+describe("Internal-state history restoration", () => {
+  it.each([true, undefined])(
+    "restores two real AI responses after branching, ignoring the branch marker (isComment: %s)",
+    async (isComment) => {
+      vi.useFakeTimers();
+      const plugin = await startPlugin(undefined, false, undefined, true);
+      try {
+        const messages: SavedMessage[] = Array.from({ length: 5 }, (_, index) => [
+          { role: "user" as const, data: `Lượt ${index}`, chatId: `user-${index}` },
+          {
+            role: "char" as const,
+            data: `[ 🕰️ 14:25 | 🗓️ Ngày 1 | 📍 Đại học | Nắng ]\nPhản hồi ${index}.\n<internal_states>State ${index}</internal_states>`,
+            chatId: `ai-${index}`,
+          },
+        ]).flat();
+        plugin.chats.set("0:0", { id: "chat-a", message: messages });
+        await plugin.request();
+        const original = structuredClone(plugin.chats.get("0:0")!);
+        expect(original.message[3]!.data).not.toContain("<internal_states>");
+        expect(original.message[5]!.data).not.toContain("<internal_states>");
+
+        // PocketRisu copies message metadata, reissues IDs, and appends a comment.
+        const marker: SavedMessage = {
+          role: "char",
+          data: "{{specialcomment::branchedfrom::chat-a::Original::ai-2::}}",
+          chatId: "branch-marker",
+          ...(isComment === undefined ? {} : { isComment }),
+          disabled: true,
+        };
+        const branch: SavedChat = {
+          id: "chat-branch",
+          message: [
+            ...original.message.slice(0, 6).map((entry) => ({
+              ...entry,
+              chatId: `branch-${entry.chatId}`,
+            })),
+            marker,
+          ],
+        };
+        const requestBeforeRestore: ChatMessage[] = branch.message
+          .filter((entry) => entry !== marker)
+          .map((entry) => ({
+            role: entry.role === "char" ? "assistant" : "user",
+            content: entry.data,
+            memo: entry.chatId,
+          }));
+        requestBeforeRestore.push({ role: "user", content: "Tiếp tục." });
+        plugin.chats.set("0:1", branch);
+        plugin.selectChat(1);
+        await vi.advanceTimersByTimeAsync(250);
+
+        const restored = plugin.chats.get("0:1")!;
+        expect(restored.message[1]!.data).not.toContain("<internal_states>");
+        expect(restored.message[3]!.data).toContain("<internal_states>State 1</internal_states>");
+        expect(restored.message[5]!.data).toContain("<internal_states>State 2</internal_states>");
+        expect(restored.message[6]).toEqual(marker);
+        expect(plugin.chats.get("0:0")).toEqual(original);
+        for (const entry of restored.message.filter(
+          (entry) => entry.role === "char" && entry.chatId !== marker.chatId,
+        ))
+          expect(entry.data).toContain("[ 🕰️");
+
+        const request = await plugin.request(requestBeforeRestore);
+        const replies = request.filter(
+          (entry) => entry.role === "assistant" && !entry.memo?.startsWith("ff54:"),
+        );
+        expect(replies).toHaveLength(3);
+        expect(replies[0]!.content).not.toContain("<internal_states>");
+        expect(replies[0]!.content).not.toContain("[ 🕰️");
+        expect(replies[1]!.content).toContain("<internal_states>State 1</internal_states>");
+        expect(replies[2]!.content).toContain("<internal_states>State 2</internal_states>");
+        expect(plugin.chats.get("0:1")).toEqual(restored);
+        const writes = plugin.writes.mock.calls.length;
+        await vi.advanceTimersByTimeAsync(750);
+        expect(plugin.writes).toHaveBeenCalledTimes(writes);
+      } finally {
+        await plugin.callbacks.unload!();
+      }
+      expect(vi.getTimerCount()).toBe(0);
+    },
+  );
 });
 
 describe("FF5.4 completion sounds", () => {
