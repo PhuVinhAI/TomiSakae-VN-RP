@@ -487,6 +487,7 @@ async function showSettings(): Promise<void> {
     .map((group, index) => exclusiveGroup(group, prompts, index, settings, preset))
     .join("");
   const sections = familyPromptSections(preset);
+  const promptDefaults = createDefaultSettings(preset).promptEnabled;
   const promptSections = sections
     .map((section) => {
       const rows = section.promptIds
@@ -502,7 +503,7 @@ async function showSettings(): Promise<void> {
             identifier,
             settings.promptEnabled[identifier] === true,
             copy.name,
-            `${copy.description} · ${sourceState(entry?.enabled !== false)}`,
+            `${copy.description} · ${sourceState(entry?.enabled !== false)}${promptDefaults[identifier] !== (entry?.enabled !== false) ? ` · Plugin mặc định: ${promptDefaults[identifier] ? "bật" : "tắt"}` : ""}`,
           );
         })
         .join("");

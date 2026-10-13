@@ -103,6 +103,12 @@ export function adaptFamilyPrompt(
     content = content
       .replace("* > blockquote for documents and chat messages\n", "")
       .replace("* ```codeblock``` for terminal and code\n", "");
+    if (!settings.promptEnabled["54e77eae-eba6-49f4-b594-4266aaf19ef0"]) {
+      content = content.replace(
+        "GM is allowed to declare PC game over for any reason in any way at any time.\n",
+        "",
+      );
+    }
     if (settings.imageOptimizationEnabled) {
       content = content.replace(
         "* explore three to five different ways to take the story",

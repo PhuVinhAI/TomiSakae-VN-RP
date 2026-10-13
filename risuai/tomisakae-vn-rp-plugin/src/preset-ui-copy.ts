@@ -384,7 +384,7 @@ export const VOYAGE_PROMPT_COPY: Readonly<Record<string, UiCopy>> = {
   ),
   "43769028-2d80-4b27-b795-bbbdf7730a44": copy(
     "☠️ Tử vong & thương tích lâu dài",
-    "Bỏ bảo hộ cốt truyện; nhân vật có thể mắc bệnh, chịu thương tích vĩnh viễn hoặc chết, và GM có thể tuyên bố kết thúc lượt chơi.",
+    "Bỏ bảo hộ cốt truyện; nhân vật có thể mắc bệnh, chịu thương tích vĩnh viễn hoặc chết. GM được tuyên bố kết thúc lượt chơi khi bật Game Over.",
   ),
   "54e77eae-eba6-49f4-b594-4266aaf19ef0": copy(
     "🏁 Xử lý khi kết thúc lượt chơi",
