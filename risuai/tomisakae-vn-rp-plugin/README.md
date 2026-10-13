@@ -12,7 +12,7 @@ Các preset nguồn nằm trong `source/`; build không phụ thuộc thư mục
 
 Mở **TomiSakae VN-RP** trong menu chat. Bảng điều khiển đặt tính năng **Global** ở trên, sau đó là lựa chọn một trong ba bộ nền và các module/regex tương ứng.
 
-Cả ba bộ dùng tên module, mô tả chức năng và nhóm lựa chọn bằng tiếng Việt. Sola V2 Flame giữ cách nhóm nguồn, ẩn các dòng phân cách/khởi tạo biến và chia 149 bộ lọc theo chức năng. Voyage-Universal-v5 chia module thành luật cốt lõi, thế giới, văn xuôi, hồ sơ ẩn, nội dung người lớn và suy luận. Các tên hiển thị trong bảng token cũng được Việt hóa; thay đổi UI không sửa prompt, regex hoặc cấu hình đã lưu.
+Cả ba bộ dùng tên module, mô tả chức năng và nhóm lựa chọn bằng tiếng Việt. Sola V2 Flame giữ cách nhóm nguồn, ẩn các dòng phân cách/khởi tạo biến và chia bộ lọc theo chức năng. Voyage-Universal-v5 chia module thành luật cốt lõi, thế giới, văn xuôi, hồ sơ ẩn, nội dung người lớn và suy luận. Các tên hiển thị trong bảng token cũng được Việt hóa; thay đổi UI không sửa prompt, regex hoặc cấu hình đã lưu.
 
 Preset cấu hình có tên riêng chứa lựa chọn Global, bộ nền đang dùng và cấu hình module của từng bộ. Đổi bộ nền giữ lựa chọn Global và khôi phục các lựa chọn module/regex đã lưu riêng cho bộ đó. Lần đầu chọn một bộ, plugin dùng mặc định của preset nguồn. Riêng Freaky Frankenstein 5.4 mặc định dùng Realism Mode; lựa chọn Freaky đã lưu vẫn được giữ.
 
@@ -40,7 +40,9 @@ Freaky Frankenstein 5.4 thay giới hạn hai mệnh đề và lệnh cấm liê
 
 Context Saver của Freaky Frankenstein 5.4 lưu snapshot state ẩn trước khi dọn lịch sử. Xóa tin, đổi swipe hoặc tạo nhánh sẽ khôi phục đủ các state cần giữ theo độ sâu, cả ở lịch sử hiển thị và request. GFX của truyện như thư, biển báo, bản đồ và màn hình vẫn được giữ.
 
-Sola V2 Flame giữ module bank, depth injection, Story Review, palette/gradient/tone/kinetic và cú pháp tracker gốc. Nhắc POV trong cả module lẫn Story Review dùng đại từ tiếng Việt phù hợp khi bật tiếng Việt. Header với thời gian số hoặc thời tiết tiếng Việt được điều chỉnh trên bản hiển thị để regex chọn skybox. Saver chỉ dọn bản sao request; tracker trong lịch sử đã lưu luôn còn để quay lại hoặc tạo nhánh. Regex nguồn `disabled: true` mặc định tắt và chỉ chạy nếu người dùng chủ động bật.
+Sola V2 Flame giữ module bank, depth injection, Story Review, palette/gradient/tone/kinetic và cú pháp tracker gốc. Nhắc POV trong cả module lẫn Story Review dùng đại từ tiếng Việt phù hợp khi bật tiếng Việt. Khi bật module header, mọi phản hồi phải đặt header trên một dòng riêng sau suy luận và trước phần RP, kể cả trong cùng cảnh. Header với thời gian số hoặc thời tiết tiếng Việt được điều chỉnh trên bản hiển thị để regex chọn skybox.
+
+Bộ lọc suy luận của Sola bọc các khối như `<think>`/`<Thoughts>` thành UI thu gọn và xóa suy luận khỏi history thật cùng request. Suy luận không có thẻ chỉ được bắt khi có dấu hiệu lập kế hoạch trước `<scene_header>`. Các bộ lọc hiển thị và xóa có công tắc riêng, mặc định bật. Saver lưu ẩn tracker đã cắt theo từng message/swipe, khôi phục vào lịch sử và request khi xóa tin, đổi swipe hoặc rẽ nhánh. Tracker thiếu thẻ đóng được cắt đến ranh giới tracker/header kế tiếp hoặc cuối khối; phần bị cắt vẫn được lưu để khôi phục. Header được giữ trong lịch sử, chỉ cắt khỏi request theo độ sâu. Phạm vi, độ sâu và công tắc Saver gốc được giữ; regex nguồn `disabled: true` mặc định tắt.
 
 Voyage-Universal-v5 sử dụng `prompt_order` đang hoạt động thay vì thứ tự placeholder trong bản xuất. Giữ Direct Prose, NPC Realistic Speech, POV, PbtA và Prose Format: văn kể plaintext, thoại trong dấu nháy, âm thanh trong dấu gạch dưới, tài liệu blockquote và terminal/code trong code block. Sheet và ghi chú giữ comment ẩn và khóa gốc; nội dung mô tả được tạo bằng tiếng Việt. Preset nguồn không có regex thì plugin không bổ sung regex FF5.4.
 

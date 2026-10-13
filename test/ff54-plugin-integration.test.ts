@@ -721,6 +721,70 @@ describe("Sola saved-history restoration", () => {
   };
 
   it.each(["delete", "branch"] as const)(
+    "cleans reasoning and restores an unfinished HUD after %s",
+    async (action) => {
+      vi.useFakeTimers();
+      const plugin = await startPlugin(solaStore(), false, undefined, true);
+      const brokenReply = (index: number) =>
+        `${header}\nCảnh ${index}.\n<sola_hud digest="Ngày ${index}"><wardrobe>Áo ${index}`;
+      try {
+        const chat: SavedChat = {
+          id: "chat-a",
+          message: history(5).map((entry, index) =>
+            entry.role === "char"
+              ? {
+                  ...entry,
+                  data: `<think>Kế hoạch ${index}.</think>\n${brokenReply((index - 1) / 2)}`,
+                }
+              : entry,
+          ),
+        };
+        plugin.chats.set("0:0", chat);
+        const request = await plugin.request(requestOf(chat));
+        const cleaned = structuredClone(plugin.chats.get("0:0")!);
+        expect(cleaned.message[1]!.data.trimStart()).toBe(`${header}\nCảnh 0.\n`);
+        expect(
+          restoreSolaHistoryContent(
+            cleaned.message[1]!.data,
+            cleaned.message[1]!.solaHistory?.main,
+          ).trim(),
+        ).toBe(brokenReply(0));
+        expect(cleaned.message.every((entry) => !entry.data.includes("<think>"))).toBe(true);
+        expect(
+          request
+            .filter((message) => message.memo?.startsWith("sola-a-"))
+            .every((message) => !message.content.includes("Kế hoạch")),
+        ).toBe(true);
+        const displayed = await plugin.callbacks.display!(
+          `<Thoughts>Rà soát.</Thoughts>\n${reply(0)}`,
+        );
+        expect(displayed).toContain("💭 Suy luận");
+        expect(displayed).not.toContain("<Thoughts>");
+        const shortened = {
+          id: action === "branch" ? "branch-a" : "chat-a",
+          message: cleaned.message.slice(0, 6),
+        };
+        const chatIndex = action === "branch" ? 1 : 0;
+        const staleRequest = requestOf(shortened);
+        plugin.chats.set(`0:${chatIndex}`, shortened);
+        plugin.selectChat(chatIndex);
+        await vi.advanceTimersByTimeAsync(250);
+        expect(plugin.chats.get(`0:${chatIndex}`)!.message[5]!.data.trim()).toBe(brokenReply(2));
+        const restoredRequest = await plugin.request(staleRequest);
+        expect(restoredRequest.find((message) => message.memo === "sola-a-2")?.content.trim()).toBe(
+          brokenReply(2),
+        );
+        if (action === "branch") expect(plugin.chats.get("0:0")).toEqual(cleaned);
+        const writes = plugin.writes.mock.calls.length;
+        await vi.advanceTimersByTimeAsync(500);
+        expect(plugin.writes).toHaveBeenCalledTimes(writes);
+      } finally {
+        await plugin.callbacks.unload!();
+      }
+    },
+  );
+
+  it.each(["delete", "branch"] as const)(
     "restores stored HUDs immediately after a %s, including partially trimmed trackers",
     async (action) => {
       vi.useFakeTimers();

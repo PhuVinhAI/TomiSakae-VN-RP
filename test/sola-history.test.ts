@@ -57,18 +57,98 @@ describe("Sola saved-history snapshots", () => {
     expect(applyRegexScripts(header, preset, settings, options)).toBe(header);
   });
 
-  it("preserves incomplete trackers and follows each saver toggle and native depth", () => {
+  it("cleans incomplete trackers and follows each saver toggle and native depth", () => {
     const settings = createDefaultSettings(preset);
     const input = "Trước.<wardrobe>Áo khoác</wardrobe>Sau.<wardrobe>Chưa xong";
     const options = { placement: PLACEMENT_AI_OUTPUT, prompt: true, history: true };
     expect(applyRegexScripts(input, preset, settings, { ...options, depth: 1 })).toBe(input);
-    expect(applyRegexScripts(input, preset, settings, { ...options, depth: 2 })).toBe(
-      "Trước.Sau.<wardrobe>Chưa xong",
-    );
+    expect(applyRegexScripts(input, preset, settings, { ...options, depth: 2 })).toBe("Trước.Sau.");
     const wardrobe = preset.extensions!.regex_scripts!.find(
       (script) => script.scriptName === "Sola Saver: Wardrobe & Inventory",
     )!;
     settings.regexEnabled[wardrobe.id] = false;
     expect(applyRegexScripts(input, preset, settings, { ...options, depth: 2 })).toBe(input);
+  });
+
+  it.each([
+    ["Feeling Engine", "fengine"],
+    ["Thought Engine", "thought_engine"],
+    ["Wardrobe & Inventory", "wardrobe"],
+    ["Wardrobe & Inventory", "inventory"],
+    ["Scene Cast & Dossier", "scene_cast"],
+    ["Scene Cast & Dossier", "scene_state"],
+    ["Bond Radar", "bond"],
+    ["Calendar", "date"],
+    ["Director Notebook", "story_notes"],
+    ["Character Trait Ledger", "solatag"],
+    ["Character Matrix", "char_matrix"],
+    ["Tempo", "tempo"],
+    ["Showrunner HUD", "sola_hud"],
+  ])("archives an unfinished %s block without altering its original data", (saver, tag) => {
+    const settings = createDefaultSettings(preset);
+    const script = preset.extensions!.regex_scripts!.find(
+      (candidate) => candidate.scriptName === `Sola Saver: ${saver}`,
+    )!;
+    settings.regexEnabled = { [script.id]: true };
+    const input = `${header}\nĐoạn kể.\n<${tag} name="An > Bình">Dữ liệu chưa đóng`;
+    const removals: SolaHistoryRemoval[] = [];
+    const visible = applyRegexScripts(input, preset, settings, {
+      placement: PLACEMENT_AI_OUTPUT,
+      prompt: true,
+      history: true,
+      depth: script.minDepth!,
+      onHistoryRemoval: (offset, text) => removals.push({ offset, text }),
+    });
+    expect(visible).toBe(`${header}\nĐoạn kể.\n`);
+    expect(restoreSolaHistoryContent(visible, { visible, removals })).toBe(input);
+  });
+
+  it("stops an unfinished child before a retained sibling or HUD close", () => {
+    const settings = createDefaultSettings(preset);
+    const input = `${header}\nĐoạn kể.\n<sola_hud digest="Ngày 1"><wardrobe>Áo chưa đóng<date>Ngày: 1</date></sola_hud>\nĐoạn sau.`;
+    const removals: SolaHistoryRemoval[] = [];
+    const visible = applyRegexScripts(input, preset, settings, {
+      placement: PLACEMENT_AI_OUTPUT,
+      prompt: true,
+      history: true,
+      depth: 2,
+      onHistoryRemoval: (offset, text) => removals.push({ offset, text }),
+    });
+    expect(visible).toBe(
+      `${header}\nĐoạn kể.\n<sola_hud digest="Ngày 1"><date>Ngày: 1</date></sola_hud>\nĐoạn sau.`,
+    );
+    expect(restoreSolaHistoryContent(visible, { visible, removals })).toBe(input);
+  });
+
+  it("preserves prose after self-closing trackers and before a subsequent scene header", () => {
+    const settings = createDefaultSettings(preset);
+    const input = `Trước.<wardrobe />Sau.<sola_hud><date>Chưa đóng\n${header}\nCảnh mới.`;
+    const visible = applyRegexScripts(input, preset, settings, {
+      placement: PLACEMENT_AI_OUTPUT,
+      prompt: true,
+      history: true,
+      depth: 20,
+    });
+    expect(visible).toBe(`Trước.Sau.${header}\nCảnh mới.`);
+  });
+
+  it("archives unclosed prop markers without consuming a following HUD", () => {
+    const settings = createDefaultSettings(preset);
+    const saver = preset.extensions!.regex_scripts!.find(
+      (script) => script.scriptName === "Sola Saver: Immersive Props (HTML Blocks)",
+    )!;
+    settings.regexEnabled = { [saver.id]: true };
+    const hud = '<sola_hud digest="Ngày 1"><date>Ngày: 1</date></sola_hud>';
+    const input = `${header}\nĐoạn kể.\n<!-- HTML_START --><div>${"Nội dung thư. ".repeat(25)}</div>\n${hud}`;
+    const removals: SolaHistoryRemoval[] = [];
+    const visible = applyRegexScripts(input, preset, settings, {
+      placement: PLACEMENT_AI_OUTPUT,
+      prompt: true,
+      history: true,
+      depth: 2,
+      onHistoryRemoval: (offset, text) => removals.push({ offset, text }),
+    });
+    expect(visible).toBe(`${header}\nĐoạn kể.\n${hud}`);
+    expect(restoreSolaHistoryContent(visible, { visible, removals })).toBe(input);
   });
 });

@@ -44,6 +44,7 @@ import {
 } from "./family-ui.js";
 import { insertSubmodelEditorSystem, editorUserFor } from "./editor-prompts.js";
 import { adaptSolaSceneHeaderForDisplay } from "./sola-display.js";
+import { splitSolaReasoning } from "./sola-reasoning.js";
 import { SETTINGS_STYLES } from "./ui-style.js";
 import {
   createRewriteButton,
@@ -871,7 +872,10 @@ function syncRestoredStatesToRequest(
     regexEnabled: Object.fromEntries(
       familyRegexScripts(preset).map((script) => [
         script.id,
-        script.scriptName?.startsWith("Sola Saver:") === true,
+        script.scriptName?.startsWith("Sola Saver:") === true ||
+          (script.scriptName?.startsWith("Sola Reasoning:") === true &&
+            script.promptOnly === true &&
+            settings.regexEnabled[script.id] === true),
       ]),
     ),
   };
@@ -1195,7 +1199,8 @@ function splitEditorReasoning(text: string): { prefix: string; response: string 
   return { prefix, response: text.slice(prefix.length) };
 }
 
-function splitEditorResponse(text: string): { prefix: string; response: string } {
+function splitEditorResponse(text: string, preset: FfPreset): { prefix: string; response: string } {
+  if (familyOf(preset) === "sola") return splitSolaReasoning(text);
   const reasoning = splitEditorReasoning(text);
   const header = splitBeforeSceneHeader(reasoning.response);
   return { prefix: reasoning.prefix + header.prefix, response: header.response };
@@ -1309,7 +1314,7 @@ const submodelOutputListener = async ({
 
 function completeAutoRewriteResponse(text: string, preset: FfPreset): boolean {
   if (familyOf(preset) !== "ff54") {
-    const body = splitEditorReasoning(text).response.trim();
+    const body = splitEditorResponse(text, preset).response.trim();
     if (!body) return false;
     const tracked =
       /<(\/?)(sola_hud|fengine|thought_engine|bond|date|story_notes|wardrobe|inventory|scene_cast|scene_state|char_matrix|solatag|tempo|cabinet|arrow|omen)\b[^>]*>/gi;
@@ -1323,7 +1328,7 @@ function completeAutoRewriteResponse(text: string, preset: FfPreset): boolean {
     if (open.length) return false;
     return (body.match(/<!--/g)?.length ?? 0) === (body.match(/-->/g)?.length ?? 0);
   }
-  const { response } = splitEditorResponse(text);
+  const { response } = splitEditorResponse(text, preset);
   if (!hasCompleteSceneHeader(response)) return false;
   const state = response.match(/<internal_states>([\s\S]*?)<\/internal_states>/i);
   return Boolean(state?.[1]?.trim());
@@ -1435,7 +1440,7 @@ async function rewriteLatestResponse(
   };
   try {
     await editorButton?.refresh();
-    const source = splitEditorResponse(original);
+    const source = splitEditorResponse(original, preset);
     // The history watcher may clean the same reply while Submodel is running.
     // Accept that exact configured cleanup, while still rejecting real edits.
     const cleanedOriginal =
@@ -1454,7 +1459,7 @@ async function rewriteLatestResponse(
     if (!editorEnabled() || editorRequests.get(key) !== context) return;
     if (result === undefined)
       throw new Error("Submodel không trả về nội dung, giữ nguyên phản hồi gốc.");
-    const body = splitEditorResponse(result).response;
+    const body = splitEditorResponse(result, preset).response;
     if (!body.trim()) throw new Error("Submodel trả về nội dung trống, giữ nguyên phản hồi gốc.");
     if (!editorEnabled() || editorRequests.get(key) !== context) return;
     const latestChat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
@@ -1478,7 +1483,7 @@ async function rewriteLatestResponse(
       return;
     }
     // Do not reinsert reasoning that has already been removed from history.
-    const edited = splitEditorResponse(latestContent).prefix + body;
+    const edited = splitEditorResponse(latestContent, preset).prefix + body;
     const alternatives = Array.isArray(latestMessage.swipes) ? [...latestMessage.swipes] : [];
     if (!alternatives.includes(original)) alternatives.push(original);
     // Add the edit as a new PocketRisu swipe so the original remains selectable.

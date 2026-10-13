@@ -70,7 +70,7 @@ export const SOLA_PROMPT_COPY: Readonly<Record<string, UiCopy>> = {
   ),
   "01a0c1ff-4ecf-701d-97b3-6626434ed938": copy(
     "🎬 Header mở cảnh",
-    "Tạo header địa điểm, thời gian và bầu không khí khi mở cảnh hoặc chuyển cảnh lớn; không lặp lại trong cùng cảnh liên tục.",
+    "Đặt header địa điểm, thời gian và bầu không khí ở đầu mọi phản hồi, sau suy luận nếu có và trước phần RP, kể cả khi tiếp tục cùng cảnh.",
   ),
   "01a0c215-20df-7000-b7d6-060e6b7160a9": copy(
     "🎨 Tăng mạnh hiệu ứng phong cách",
@@ -676,6 +676,17 @@ const SOLA_REGEX_CATEGORIES: Readonly<Record<string, UiCopy>> = {
 
 export function solaRegexUiCopy(script: FfRegexScript): (UiCopy & { group: string }) | undefined {
   const [prefix, subject] = (script.scriptName ?? "").split(": ");
+  if (prefix === "Sola Reasoning") {
+    const tagged = subject?.endsWith("Tagged");
+    const deletion = subject?.startsWith("Delete");
+    return {
+      name: `${deletion ? "Xóa suy luận" : "Thu gọn suy luận"} ${tagged ? "có thẻ" : "không có thẻ"}`,
+      description: deletion
+        ? "Xóa suy luận khỏi nội dung lịch sử thật và request gửi model, giữ nguyên phần RP và tracker."
+        : "Bọc suy luận vào khối có thể mở và thu gọn trên UI, giữ nguyên nội dung phản hồi.",
+      group: "Suy luận",
+    };
+  }
   const category = SOLA_REGEX_CATEGORIES[prefix ?? ""];
   const key = (subject ?? "").replace(/^Kinetic /, "");
   const name = SOLA_REGEX_SUBJECTS[key];

@@ -1,5 +1,6 @@
 import type { FfGlobalSettings, FfPreset, FfPrompt, FfRegexScript } from "./core.js";
-import { SOLA_HEADER_SAVER } from "./sola-history.js";
+import { adaptSolaSaver, SOLA_HEADER_SAVER } from "./sola-history.js";
+import { SOLA_REASONING_SCRIPTS } from "./sola-reasoning.js";
 import {
   VIETNAMESE_OUTPUT_PROMPT,
   SOLA_VIETNAMESE_OUTPUT_PROMPT,
@@ -71,7 +72,9 @@ export function familyPrompts(preset: FfPreset): FfPrompt[] {
 
 export function familyRegexScripts(preset: FfPreset): FfRegexScript[] {
   const scripts = preset.extensions?.regex_scripts ?? [];
-  return familyOf(preset) === "sola" ? [...scripts, SOLA_HEADER_SAVER] : scripts;
+  return familyOf(preset) === "sola"
+    ? [...SOLA_REASONING_SCRIPTS, ...scripts.map(adaptSolaSaver), SOLA_HEADER_SAVER]
+    : scripts;
 }
 
 export { VOYAGE_FF54_JAILBREAK_ID };
@@ -106,6 +109,19 @@ export function adaptFamilyPrompt(
     return content;
   }
   if (familyOf(preset) === "sola") {
+    content = content
+      .replace(
+        "Use <scene_header> to establish opening locations, time skips, or major environment shifts.",
+        "Begin every response with <scene_header> on its own line, after any reasoning and before narration or dialogue.",
+      )
+      .replace(
+        "At the start of a scene, following a time skip, or upon arriving at a new location, place a panoramic cinematic header on its own line at the very top of your response:",
+        "Begin every response with a panoramic cinematic header on its own line, after any reasoning and before narration or dialogue:",
+      )
+      .replace(
+        "- Always start the roleplay with an establishing header on its own line at the very top of your first response.\n- Place on its own line BEFORE the opening paragraph of a new scene or after a major transition.\n- Do NOT repeat the header within the same continuous scene unless a significant time skip occurs.",
+        "- Include the current scene header at the start of every response, even within the same continuous scene.",
+      );
     if (settings.vietnameseOutputEnabled) {
       content = adaptSolaPromptForVietnamese(content);
     }

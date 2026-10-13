@@ -16,6 +16,7 @@ const DUSK_TRIGGERS: ReadonlyArray<readonly [string, string]> = [
 ];
 
 const DISPLAY_TEXT: ReadonlyArray<readonly [string, string]> = [
+  ["💭 Reasoning", "💭 Suy luận"],
   ["Co-Author Note", "Ghi chú đồng tác giả"],
   ["Feeling Engine Telemetry", "Chỉ số cảm xúc"],
   ["Bond & Chemistry Radar", "Quan hệ & sự hòa hợp"],

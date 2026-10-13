@@ -670,7 +670,8 @@ describe("TomiSakae VN-RP preset families", () => {
       expect(copy.name).not.toBe(script.scriptName);
       expect(copy.name).not.toContain("Sola ");
       expect(copy.description.length).toBeGreaterThan(30);
-      if (script.promptOnly) expect(copy.description).toContain(`độ sâu ${script.minDepth}`);
+      if (script.promptOnly && script.minDepth != null)
+        expect(copy.description).toContain(`độ sâu ${script.minDepth}`);
     }
     expect(familyRegexGroups(sources.voyage.preset)).toEqual([]);
   });
@@ -772,13 +773,18 @@ describe("TomiSakae VN-RP preset families", () => {
         if (family === "voyage" && prompt.identifier === VOYAGE_CHAIN_OF_THOUGHT_ID) {
           expectedWithoutVietnamese = `${expectedWithoutVietnamese.trimEnd()}\n${VOYAGE_JAILBREAK_REASONING_LINE}\n`;
         }
-        expect(
-          adaptFamilyPrompt(prompt.content, preset, {
-            ...settings,
-            vietnameseOutputEnabled: false,
-          }),
-          prompt.name,
-        ).toBe(expectedWithoutVietnamese);
+        const withoutVietnamese = adaptFamilyPrompt(prompt.content, preset, {
+          ...settings,
+          vietnameseOutputEnabled: false,
+        });
+        if (family === "sola" && prompt.identifier === "01a0c1ff-4ecf-701d-97b3-6626434ed938") {
+          // Header frequency is deliberately adapted for PocketRisu in both languages.
+          expect(withoutVietnamese).toContain("Begin every response with <scene_header>");
+          expect(withoutVietnamese).not.toContain("Do NOT repeat the header");
+          const schemaAndEngine = (text: string) =>
+            text.slice(text.indexOf("```html"), text.indexOf("### Rules"));
+          expect(schemaAndEngine(withoutVietnamese)).toBe(schemaAndEngine(prompt.content));
+        } else expect(withoutVietnamese, prompt.name).toBe(expectedWithoutVietnamese);
         settings.promptEnabled[prompt.identifier] = true;
       }
       const composed = await composePresetPrompts(preset, settings, parse, {
@@ -834,6 +840,42 @@ describe("TomiSakae VN-RP preset families", () => {
       expect(text).not.toContain("manga, anime, and light-novel pacing");
       expect(vietnameseOutputFor(preset)).toContain("`§...§`");
       expect(JSON.stringify(preset)).toBe(snapshot);
+    },
+  );
+
+  it.each([true, false])(
+    "requires Sola headers in the module and reasoning reminder with Vietnamese=%s",
+    async (vietnamese) => {
+      const preset = sources.sola.preset;
+      const settings = createDefaultSettings(preset);
+      settings.vietnameseOutputEnabled = vietnamese;
+      const headerId = "01a0c1ff-4ecf-701d-97b3-6626434ed938";
+      settings.promptEnabled[headerId] = true;
+      settings.promptEnabled["01a0c1ff-4ecf-704a-82b3-0c9b9af52526"] = true;
+      const composed = await composePresetPrompts(preset, settings, parse, {
+        randomInt: (min) => min,
+      });
+      const messages = [...composed.leading, ...composed.absolute, ...composed.trailing];
+      const headerModule = messages.find((message) => message.memo === `vn-rp:sola:${headerId}`)!;
+      expect(headerModule.content).toContain(
+        "after any reasoning and before narration or dialogue",
+      );
+      expect(headerModule.content).toContain("even within the same continuous scene");
+      expect(headerModule.content).not.toContain("Do NOT repeat the header");
+      const reasoning = messages.find(
+        (message) =>
+          message.content.includes("## NPC Check") || message.content.includes("## 1. NPC Check"),
+      )!;
+      expect(reasoning.content).toContain("Begin every response with <scene_header>");
+      settings.promptEnabled[headerId] = false;
+      const disabled = await composePresetPrompts(preset, settings, parse, {
+        randomInt: (min) => min,
+      });
+      expect(
+        [...disabled.leading, ...disabled.absolute, ...disabled.trailing]
+          .map((message) => message.content)
+          .join("\n"),
+      ).not.toContain("Begin every response with <scene_header>");
     },
   );
 
