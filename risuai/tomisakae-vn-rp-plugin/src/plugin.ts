@@ -1274,6 +1274,17 @@ async function rewriteLatestResponse(
   try {
     await editorButton?.refresh();
     const source = splitEditorResponse(original);
+    // The history watcher may clean the same reply while Submodel is running.
+    // Accept that exact configured cleanup, while still rejecting real edits.
+    const cleanedOriginal = applyPromptRegexToMessages(
+      chat.message!.map((message) => ({
+        role: message.role === "char" ? "assistant" : "user",
+        content: String(message.data ?? ""),
+        isComment: isHistoryComment(message),
+      })),
+      preset,
+      profile.settings,
+    )[messageIndex]?.content ?? original;
     const result = await runSubmodelEditor(context, source.response, run.controller);
     if (run.controller.signal.aborted) return;
     if (!editorEnabled() || editorRequests.get(key) !== context) return;
@@ -1282,9 +1293,9 @@ async function rewriteLatestResponse(
     const body = splitEditorResponse(result).response;
     if (!body.trim()) throw new Error("Submodel trả về nội dung trống, giữ nguyên phản hồi gốc.");
     if (!editorEnabled() || editorRequests.get(key) !== context) return;
-    const edited = source.prefix + body;
     const latestChat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
     const latestMessage = latestChat?.message?.[messageIndex];
+    const latestContent = String(latestMessage?.data ?? "");
     if (
       !latestChat ||
       latestChat.isStreaming ||
@@ -1294,7 +1305,7 @@ async function rewriteLatestResponse(
       latestMessage.role !== "char" ||
       latestMessage.chatId !== target.chatId ||
       latestMessage.swipeId !== target.swipeId ||
-      String(latestMessage.data ?? "") !== original
+      (latestContent !== original && latestContent !== cleanedOriginal)
     ) {
       notify(false);
       await Risuai.alert(
@@ -1302,6 +1313,8 @@ async function rewriteLatestResponse(
       );
       return;
     }
+    // Do not reinsert reasoning that has already been removed from history.
+    const edited = splitEditorResponse(latestContent).prefix + body;
     const alternatives = Array.isArray(latestMessage.swipes) ? [...latestMessage.swipes] : [];
     if (!alternatives.includes(original)) alternatives.push(original);
     // Add the edit as a new PocketRisu swipe so the original remains selectable.

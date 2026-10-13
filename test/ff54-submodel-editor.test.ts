@@ -26,6 +26,7 @@ interface SavedMessage {
   chatId: string;
   swipes?: string[];
   swipeId?: number;
+  ff54InternalState?: string;
 }
 
 interface SavedChat {
@@ -82,6 +83,7 @@ async function startPlugin(
   savedPresets?: unknown,
   pauseButtonInitialization = false,
   sound = false,
+  watchHistory = false,
 ) {
   const callbacks = {
     beforeRequest: undefined as
@@ -346,6 +348,7 @@ async function startPlugin(
     TextDecoder,
     setTimeout,
     clearTimeout,
+    ...(watchHistory ? { setInterval, clearInterval } : {}),
     crypto: { randomUUID: () => `test-${storage.size}-${Math.random()}` },
     document: uiDocument,
     AudioContext: FakeAudioContext,
@@ -521,7 +524,9 @@ describe("FF5.4 Submodel editor integration", () => {
     const editorTarget = options.messages.at(-1)!;
     expect(editorTarget.role).toBe("user");
     expect(editorTarget.content).toBe(SUBMODEL_TRANSLATION_INSTRUCTION);
-    expect(editorTarget.content).toContain("do not continue the roleplay");
+    expect(editorTarget.content).toBe(
+      "Rewrite the latest assistant response above into natural Vietnamese according to <vietnamese_output>.",
+    );
     expect(editorTarget.content).not.toContain("[OOC]");
     expect(references.filter((message) => message.memo === "old-a")).toHaveLength(0);
     expect(references.filter((message) => message.memo === "user-a")).toHaveLength(1);
@@ -1203,6 +1208,89 @@ describe("Automatic Submodel editing", () => {
   const state = "<!--GFX_START--><internal_states><b>Bond: 3</b></internal_states><!--GFX_END-->";
   const original = `${header}\nAn di chuyển tới.\n${state}`;
   const edited = `${header}\nAn bước tới.\n${state}`;
+
+  it.each([
+    "<think>Main reasoning.</think>\n",
+    "<Thoughts>Main reasoning.</Thoughts>\nUnwrapped planning.\n",
+  ])(
+    "saves the automatic swipe after the history watcher removes reasoning: %s",
+    async (prefix) => {
+      vi.useFakeTimers();
+      const plugin = await startPlugin(true, true, undefined, false, false, true);
+      try {
+        await plugin.request();
+        let resolveModel!: (value: unknown) => void;
+        const started = new Promise<void>((resolveStarted) => {
+          plugin.runModel.mockImplementation(() => {
+            resolveStarted();
+            return new Promise((resolve) => {
+              resolveModel = resolve;
+            });
+          });
+        });
+        const completing = plugin.complete(prefix + original);
+        await started;
+        await vi.advanceTimersByTimeAsync(250);
+        const cleaned = structuredClone(plugin.chats.get("0:0")!.message.at(-1)!);
+        expect(cleaned.data).not.toContain("Main reasoning.");
+        expect(cleaned.data).toContain(original);
+        const keptPrefix = cleaned.data.slice(0, cleaned.data.indexOf(header));
+        resolveModel({ type: "success", result: edited });
+        await completing;
+        const saved = plugin.chats.get("0:0")!.message.at(-1)!;
+        expect(saved.data).toBe(keptPrefix + edited);
+        expect(saved.data).not.toContain("Main reasoning.");
+        expect(saved.swipes).toEqual([prefix + original, keptPrefix + edited]);
+        expect(saved.swipeId).toBe(1);
+        expect(saved.ff54InternalState).toBe(state);
+        expect(plugin.api.alert).toHaveBeenCalledWith(
+          expect.stringContaining("Đã tự động chuyển sang tiếng Việt"),
+        );
+        expect(plugin.api.alertError).not.toHaveBeenCalled();
+        expect(plugin.runModel).toHaveBeenCalledTimes(1);
+      } finally {
+        await plugin.callbacks.unload!();
+      }
+      expect(vi.getTimerCount()).toBe(0);
+    },
+  );
+
+  it.each([
+    ["narrative", "An di chuyển tới.", "Người dùng sửa diễn biến."],
+    ["header", "Đại học", "Nhà riêng"],
+    ["internal state", "Bond: 3", "Bond: 5"],
+  ])("keeps actual %s edits even after automatic history cleanup", async (_kind, from, to) => {
+    vi.useFakeTimers();
+    const plugin = await startPlugin(true, true, undefined, false, false, true);
+    try {
+      await plugin.request();
+      let resolveModel!: (value: unknown) => void;
+      const started = new Promise<void>((resolveStarted) => {
+        plugin.runModel.mockImplementation(() => {
+          resolveStarted();
+          return new Promise((resolve) => {
+            resolveModel = resolve;
+          });
+        });
+      });
+      const completing = plugin.complete(`<think>Main reasoning.</think>\n${original}`);
+      await started;
+      await vi.advanceTimersByTimeAsync(250);
+      const current = plugin.chats.get("0:0")!.message.at(-1)!;
+      current.data = current.data.replace(from!, to!);
+      const changed = current.data;
+      const writes = plugin.writes.mock.calls.length;
+      resolveModel({ type: "success", result: edited });
+      await completing;
+      expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(changed);
+      expect(plugin.chats.get("0:0")!.message.at(-1)!.swipes).toBeUndefined();
+      expect(plugin.writes).toHaveBeenCalledTimes(writes);
+      expect(plugin.api.alert).toHaveBeenCalledWith(expect.stringContaining("đã thay đổi"));
+    } finally {
+      await plugin.callbacks.unload!();
+    }
+    expect(vi.getTimerCount()).toBe(0);
+  });
 
   it("translates an English raw header, dialogue and internal state into a new swipe", async () => {
     const plugin = await startPlugin(true, true);
