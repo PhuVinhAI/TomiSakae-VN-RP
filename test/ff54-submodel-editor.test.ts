@@ -507,19 +507,19 @@ describe("FF5.4 Submodel editor integration", () => {
       memo: "ff54:submodel-editor",
     });
     expect(options.messages[editorIndex]!.content).toContain(
-      "- Style: Use manga, anime, and light-novel pacing.",
+      "Freely rebuild sentences and paragraphs with manga, anime, and light-novel pacing.",
     );
     expect(options.messages[editorIndex]!.content).toContain(
-      "use comic timing when it suits the scene",
+      "use comic timing when appropriate",
     );
     expect(options.messages[editorIndex]!.content).toContain(
-      "Translate or polish all free-text values without changing their meaning or underlying state.",
+      "Rewrite free-text descriptions, thoughts, and notes inside <internal_states> into natural Vietnamese while preserving their information and meaning.",
     );
     expect(options.messages[editorIndex]!.content).toContain(
-      "- Internal States: Review every reader-visible label and free-text value inside <internal_states>; correct language errors and unnatural phrasing instead of copying faulty text unchanged. Repair syntax according to active schemas; preserve facts, numbers, fixed identifiers, and state logic.",
+      "Do not fill in, recalculate, or normalize data into defaults or zeros.",
     );
     expect(options.messages[editorIndex]!.content).toContain(
-      "Correct personal pronouns and forms of address to natural contemporary Vietnamese that fit identity, viewpoint, relationship, and tone.",
+      "Adjust pronouns and address to identity, relationship, and viewpoint; preserve intent, respect, intimacy, idiolect, and natural hesitations.",
     );
     expect(options.messages[editorIndex]!.content).not.toContain("- Scene Flow:");
     expect(options.messages[editorIndex]!.content).not.toContain("- Display Text:");
@@ -545,10 +545,10 @@ describe("FF5.4 Submodel editor integration", () => {
     const editorTarget = options.messages.at(-1)!;
     expect(editorTarget.role).toBe("user");
     expect(editorTarget.content).toBe(
-      "Rewrite the latest assistant response above according to <vietnamese_editor>. Also correct language and schema syntax errors inside <internal_states> without changing facts, numbers, fixed identifiers, or state logic. Return only the rewritten response. Do not continue the roleplay, answer its dialogue, add a new event, or describe what happens next.",
+      "Rewrite the latest assistant response according to <vietnamese_editor>, including descriptions, thoughts, and notes inside <internal_states>. Keep numeric and fixed state values unchanged; do not fill in data. Return only the complete response; do not continue RP.",
     );
     expect(editorTarget.content).toContain(
-      "Do not continue the roleplay, answer its dialogue, add a new event, or describe what happens next.",
+      "do not continue RP.",
     );
     expect(editorTarget.content).not.toContain("[OOC]");
     expect(references.filter((message) => message.memo === "old-a")).toHaveLength(0);
@@ -1214,7 +1214,7 @@ describe("Named presets in plugin UI and requests", () => {
       plugin.runModel.mock.calls[0]![0].messages.find(
         (message) => message.memo === "ff54:submodel-editor",
       )!.content,
-    ).toContain("Repair only existing malformed markup");
+    ).toContain("Repair existing syntax errors only as supported by active schemas.");
   });
 });
 
