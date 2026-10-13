@@ -133,7 +133,7 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ['*blushes* "I-I love you too."', '*đỏ mặt* "A-anh cũng yêu em."'],
   [
     '"Nobody has", "You can\'t just", "Nobody just"',
-    '"Chưa từng có ai", "Anh không thể cứ thế", "Chẳng ai tự dưng"',
+    '"Chưa từng có ai", "Không thể cứ thế", "Chẳng ai tự dưng"',
   ],
   ['("not X but Y", "wasn\'t X, was Y")', '("không phải X mà là Y", "chẳng phải X, đó là Y")'],
   [
@@ -257,7 +257,7 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ['"Well, that was fun"', '"Chà, vui thật đấy"'],
   ['"So, that happened"', '"Ừ, chuyện đó vừa xảy ra đấy"'],
   ['"Mnnhh~", "Haaah~", "A-ah!", "Ahhn~♡"', '"Ưm~", "Haaa~", "A-á!", "A~♡"'],
-  ['"Fuuuck~", "Pleeease~", "Noooo!"', '"Đệệệt~", "Đi mààà~", "Khôôông!"'],
+  ['"Fuuuck~", "Pleeease~", "Noooo!"', '"Đệchhh~", "Đi mààà~", "Khôôông!"'],
   ['"Ngh...", "Hnngh"', '"Ư...", "Hự..."'],
   ['"I-I can\'t—", "c-can\'t think—"', '"T-tôi không thể...", "kh-không nghĩ nổi..."'],
   ['"mm toshally f-fine", "neeeed shyou"', '"ưm, tui vẫẫn ổ-ổn mà", "cầần có cậu màà"'],
@@ -347,10 +347,7 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
     "- Tactile Prose & Sound Beats: Gunshots, door clicks, heavy footsteps, jarring collisions.",
     "- Tactile Prose: Physical consequences of gunshots, door clicks, heavy footsteps, and collisions; their non-vocal sounds use standalone §...§, outside typography tags.",
   ],
-  [
-    "(pussy, cock, cum, ass, tits, fucking, dripping)",
-    "(lồn, cặc, tinh dịch, đít, vú, đụ, rỉ nước)",
-  ],
+  ["(pussy, cock, cum, ass, tits, fucking, dripping)", "(lồn, cặc, tinh, đít, vú, đụ, rỉ nước)"],
   [
     "'don't stop' or 'I won't bite... unless you want me to.'",
     "'đừng dừng lại' or 'tôi không cắn đâu... trừ khi cậu muốn.'",
@@ -361,7 +358,7 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ],
   [
     "ass jiggling, tits bouncing, balls clapping, backs arched",
-    "mông rung, vú nảy, dái đập, lưng cong",
+    "mông rung, vú nảy, dái va đập, lưng cong",
   ],
   [
     "body heat, heavy blush, ragged breathing, slack jaw, and fluids",
@@ -834,7 +831,6 @@ export const VOYAGE_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, str
   ["Joran the Wise", "Joran Thông thái"],
   ['Tobias "The Hunted" Richter', 'Tobias "Kẻ bị săn đuổi" Richter'],
   ["Edward of Norlay", "Edward xứ Norlay"],
-  ['Waylon "Freshpants" Blackburn', 'Waylon "Quần mới" Blackburn'],
   ["  * Guide", "  * Người dẫn đường"],
   ['<first name> "nickname" <last name>', '<tên> "biệt danh" <họ>'],
   ['"Yes, but..."', '"Có, nhưng..."'],

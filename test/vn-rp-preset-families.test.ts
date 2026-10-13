@@ -526,7 +526,10 @@ describe("TomiSakae VN-RP preset families", () => {
         expect(text).not.toContain("phonetic drop-sounds, contractions");
         expect(text).not.toContain("govern prose and sound effects");
         expect(text).not.toContain("Third person, past tense, for all characters");
-        expect(text).toContain("lồn, cặc, tinh dịch, đít, vú, đụ, rỉ nước");
+        expect(text).toContain("lồn, cặc, tinh, đít, vú, đụ, rỉ nước");
+        expect(text).toContain('"Đệchhh~", "Đi mààà~", "Khôôông!"');
+        expect(text).toContain('"Chưa từng có ai", "Không thể cứ thế", "Chẳng ai tự dưng"');
+        expect(text).toContain("mông rung, vú nảy, dái va đập, lưng cong");
         expect(text).toContain('"Cái chạm ấy thật ấm."');
         expect(text).toContain('"Vì sao chạy? Để sống sót."');
         expect(text).toContain('<copper:whisper>"Đừng gây tiếng động."</copper>');
@@ -550,6 +553,8 @@ describe("TomiSakae VN-RP preset families", () => {
         expect(text).toContain('`partial` (7-9): "Có, nhưng..."');
         expect(text).toContain('`miss` (6-): "Không, nhưng..."');
         expect(text).toContain("SpellLessWizard");
+        expect(text).toContain('Waylon "Freshpants" Blackburn');
+        expect(text).not.toContain('Waylon "Quần mới" Blackburn');
         expect(text).not.toContain("_Click!_");
         expect(text).not.toContain("_underscore_ for sounds");
       }
