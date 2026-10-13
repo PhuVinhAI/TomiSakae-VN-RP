@@ -755,7 +755,7 @@ export const VOYAGE_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, str
     "GM states only what happens instead of contractions or implicating.",
     "GM states only what happens directly, without negation-based contrasts or vague implications.",
   ],
-  ['* "quotes" for dialogue', '* "dấu ngoặc kép" for dialogue'],
+  ['* "quotes" for dialogue', "* double quotes for dialogue"],
   ["* _underscore_ for sounds", "* standalone §...§ on its own line for non-vocal sounds"],
   ["* He didn't just make haste, he runs.", "* Anh không chỉ vội vã, anh chạy."],
   [

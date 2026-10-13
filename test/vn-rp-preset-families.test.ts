@@ -555,6 +555,8 @@ describe("TomiSakae VN-RP preset families", () => {
         expect(text).toContain("SpellLessWizard");
         expect(text).toContain('Waylon "Freshpants" Blackburn');
         expect(text).not.toContain('Waylon "Quần mới" Blackburn');
+        expect(text).toContain("* double quotes for dialogue");
+        expect(text).not.toContain('* "dấu ngoặc kép" for dialogue');
         expect(text).not.toContain("_Click!_");
         expect(text).not.toContain("_underscore_ for sounds");
       }
@@ -634,6 +636,36 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(input).toContain("Thay đổi: +Tin tưởng hơn");
   });
 
+  it("localizes standalone tempo values in the Sola HUD digest only on the display copy", () => {
+    const preset = sources.sola.preset;
+    const settings = createDefaultSettings(preset);
+    const options = { placement: PLACEMENT_AI_OUTPUT, markdown: true, depth: 0 };
+    for (const [gear, label] of [
+      ["NEUTRAL", "GIỮ NHỊP"],
+      ["STEADY", "ĐỀU NHỊP"],
+      ["DRIVE", "ĐẨY TIẾN"],
+    ]) {
+      const input = `<sola_hud digest="Ngày 42 · Chạng vạng · ${gear} · DRIVE: T1 F2 D3 Y2">Tên DRIVE trong truyện.</sola_hud>`;
+      const rendered = applyRegexScripts(input, preset, settings, options);
+      expect(rendered).toContain(`Ngày 42 · Chạng vạng · ${label} · DRIVE:`);
+      expect(rendered).toContain("Tên DRIVE trong truyện.");
+      expect(rendered).not.toContain(`· ${gear} ·`);
+      expect(input).toContain(`· ${gear} ·`);
+      expect(
+        applyRegexScripts(input, preset, { ...settings, vietnameseOutputEnabled: false }, options),
+      ).toContain(`· ${gear} ·`);
+      expect(
+        applyRegexScripts(input, preset, settings, {
+          placement: PLACEMENT_AI_OUTPUT,
+          prompt: true,
+          depth: 0,
+        }),
+      ).toBe(input);
+      const bracketed = `<sola_hud digest="Ngày 42 · [${gear}]"></sola_hud>`;
+      expect(applyRegexScripts(bracketed, preset, settings, options)).toContain(`[${label}]`);
+    }
+  });
+
   it("selects Vietnamese Sola skyboxes with working source override ordering", () => {
     for (const [time, atmosphere, sky, color] of [
       ["Bình minh", "Lặng gió", "dawn", "#F4845F"],
@@ -644,7 +676,8 @@ describe("TomiSakae VN-RP preset families", () => {
     ]) {
       const input = `<scene_header location="Phòng" time="${time}" atmosphere="${atmosphere}" />`;
       const normalized = adaptSolaSceneHeaderForDisplay(input);
-      expect(normalized).toContain(`<scene_header sky="${sky}" location=`);
+      if (sky === "dusk") expect(normalized).toBe(input);
+      else expect(normalized).toContain(`<scene_header sky="${sky}" location=`);
       const rendered = applyRegexScripts(
         normalized,
         sources.sola.preset,
@@ -656,5 +689,56 @@ describe("TomiSakae VN-RP preset families", () => {
       expect(rendered).toContain("HỒ SƠ ĐỊA ĐIỂM");
       expect(rendered).toContain(atmosphere!);
     }
+  });
+
+  it("selects native dusk particles for Vietnamese and English fire/wind triggers", () => {
+    const preset = sources.sola.preset;
+    const settings = createDefaultSettings(preset);
+    const render = (input: string) =>
+      applyRegexScripts(adaptSolaSceneHeaderForDisplay(input), preset, settings, {
+        placement: PLACEMENT_AI_OUTPUT,
+        markdown: true,
+        depth: 0,
+      });
+    const header = (time: string, atmosphere: string, sky = "") =>
+      `<scene_header ${sky ? `sky="${sky}" ` : ""}location="Phòng" time="${time}" atmosphere="${atmosphere}" />`;
+    const cases = [
+      ["Lửa", "fire"],
+      ["Khói", "smoke"],
+      ["Tro", "ash"],
+      ["Âm ỉ", "smolder"],
+      ["Lò rèn", "forge"],
+      ["Bếp lửa", "hearth"],
+      ["Ấm", "warm"],
+      ["Hơi nóng tĩnh lặng", "still heat"],
+      ["Gió nhẹ", "breeze"],
+      ["Gió lùa", "draft"],
+      ["Gió mạnh", "gale"],
+      ["Lạnh", "chill"],
+      ["Bụi", "dust"],
+      ["Gió, lửa", "wind, fire"],
+      ["Mưa, gió, lửa", "rain, wind, fire"],
+      ["Mùi nấm", "mushroom scent"],
+    ] as const;
+    for (const [vietnamese, english] of cases) {
+      const reference = render(header("6:45 PM", english));
+      expect(reference).not.toContain("<scene_header");
+      for (const time of ["Hoàng hôn", "Chiều tà", "Chạng vạng", "18:45", "6:45 CH"]) {
+        expect(render(header(time, vietnamese)), `${time}: ${vietnamese}`).toBe(
+          reference.replaceAll("6:45 PM", time).replaceAll(english, vietnamese),
+        );
+      }
+    }
+    expect(render(header("18:45", "Gió mạnh"))).toContain("radial-gradient(4px 4px at 620px 40px");
+    expect(render(header("18:45", "Lửa"))).toContain("radial-gradient(4px 4px at 480px 65px");
+    expect(render(header("18:45", "Mùi nấm"))).toContain("radial-gradient(4px 4px at 160px 50px");
+    expect(render(header("18:45", "Gió mạnh", "dusk"))).toContain(
+      "radial-gradient(4px 4px at 480px 65px",
+    );
+    const native = header("6:45 PM", "fire");
+    expect(adaptSolaSceneHeaderForDisplay(native)).toBe(native);
+    const timeFirst = '<scene_header time="18:45" location="Phòng" atmosphere="Gió" />';
+    expect(adaptSolaSceneHeaderForDisplay(timeFirst)).toContain('sky="dusk"');
+    expect(adaptSolaSceneHeaderForDisplay(header("18:45", "Gió"), false)).toContain('sky="dusk"');
   });
 });

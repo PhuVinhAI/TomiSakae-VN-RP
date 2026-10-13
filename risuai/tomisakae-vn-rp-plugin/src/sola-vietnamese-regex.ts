@@ -1,5 +1,20 @@
 import { SOLA_VIETNAMESE_LABELS } from "./vietnamese.js";
 
+const DUSK_TRIGGERS: ReadonlyArray<readonly [string, string]> = [
+  [
+    String.raw`dusk|sunset|twilight|sundown|evening|(?:0?[5-7]|1[7-9]):\d{2}\s*(?:pm|p\.m\.)`,
+    String.raw`chạng vạng|hoàng hôn|chiều tà|buổi tối|1[7-9]:[0-5]\d(?:\s*CH)?|0?[5-7]:[0-5]\d\s*CH`,
+  ],
+  [
+    "wind(?:y|s)?|gale|breeze|draft(?:y|s)?|gust(?:s|y)?|chill(?:y)?|dust(?:y)?|drift(?:ing|s)?",
+    "gió|lạnh|bụi",
+  ],
+  [
+    "fire|smoke|smoky|ash(?:es)?|smolder(?:ing)?|flame(?:s)?|forge|hearth|warm|heat|still|quiet|calm",
+    "lửa|khói|tro|âm ỉ|lò rèn|bếp lửa|ấm|nóng|tĩnh lặng|yên tĩnh|êm đềm",
+  ],
+];
+
 const DISPLAY_TEXT: ReadonlyArray<readonly [string, string]> = [
   ["Co-Author Note", "Ghi chú đồng tác giả"],
   ["Feeling Engine Telemetry", "Chỉ số cảm xúc"],
@@ -39,6 +54,19 @@ const DISPLAY_TEXT: ReadonlyArray<readonly [string, string]> = [
 
 /** Localize only known labels in tracker bodies on the render copy. */
 export function adaptSolaTrackerLabelsForDisplay(input: string): string {
+  input = input.replace(/<sola_hud\b[^>]*>/gi, (tag) =>
+    tag.replace(
+      /(\bdigest=")([^"]*)(")/i,
+      (_match, prefix: string, digest: string, suffix: string) =>
+        prefix +
+        digest.replace(
+          /(^|·)([ \t]*\[?)(NEUTRAL|STEADY|DRIVE)(\]?[ \t]*)(?=·|$)/g,
+          (_value, separator: string, before: string, gear: string, after: string) =>
+            separator + before + DISPLAY_TEXT.find(([source]) => source === gear)![1] + after,
+        ) +
+        suffix,
+    ),
+  );
   return input.replace(
     /<(story_notes|date|bond|fengine|thought_engine|char_matrix|arrow|omen|wardrobe|inventory|scene_cast|scene_state|cabinet|solatag)\b[^>]*>[\s\S]*?<\/\1>/gi,
     (block) =>
@@ -62,6 +90,18 @@ export function adaptSolaRegexForVietnamese(
   replaceString: string,
   scriptName: string,
 ): { findRegex: string; replaceString: string } {
+  if (scriptName.startsWith("Sola Scene: Header - Dynamic Dusk")) {
+    for (const [source, vietnamese] of DUSK_TRIGGERS) {
+      // JS word boundaries do not treat accented Vietnamese letters as word characters.
+      findRegex = findRegex.replace(
+        `\\b(?:${source})\\b`,
+        `(?<![\\p{L}\\p{N}_])(?:${source}|${vietnamese})(?![\\p{L}\\p{N}_])`,
+      );
+    }
+    findRegex = findRegex.replace(/\/([a-z]*)$/, (_match, flags: string) =>
+      flags.includes("u") ? `/${flags}` : `/${flags}u`,
+    );
+  }
   for (const [source, replacement] of SOLA_VIETNAMESE_LABELS) {
     findRegex = findRegex.replaceAll(`${source}:`, `(?:${source}|${replacement}):`);
   }

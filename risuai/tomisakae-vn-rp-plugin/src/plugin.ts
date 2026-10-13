@@ -1049,7 +1049,9 @@ const displayOutput = async (content: string): Promise<string> => {
   const preset = sourceForSettings(settings);
   const theme = settings.dialogueThemeEnabled !== false ? await getHostDialogueTheme() : undefined;
   const renderSource =
-    familyOf(preset) === "sola" ? adaptSolaSceneHeaderForDisplay(content) : content;
+    familyOf(preset) === "sola"
+      ? adaptSolaSceneHeaderForDisplay(content, settings.vietnameseOutputEnabled)
+      : content;
   const displayed = applyRegexScripts(renderSource, preset, settings, {
     placement: PLACEMENT_AI_OUTPUT,
     markdown: true,
