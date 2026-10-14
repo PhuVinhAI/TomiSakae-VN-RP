@@ -31,7 +31,17 @@ export function adaptSolaDisplayReplacement(replacement: string, scriptName: str
       /(<span\b[^>]*?\bstyle=")([^"]*)(")/gi,
       (_match, opening: string, style: string, closing: string) =>
         opening +
-        setStyle(setStyle(style, "font-family", SOLA_UI_FONT), "line-height", "1.5") +
+        // PocketRisu sets font-family on every element, including quote marks
+        // inserted inside this span after display regexes have run.
+        setStyle(
+          setStyle(
+            setStyle(style, "font-family", SOLA_UI_FONT),
+            "--risu-font-family",
+            SOLA_UI_FONT,
+          ),
+          "line-height",
+          "1.5",
+        ) +
         closing,
     );
   }

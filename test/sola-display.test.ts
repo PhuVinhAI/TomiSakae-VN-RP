@@ -225,6 +225,9 @@ describe("Sola message UI", () => {
             });
             expect(displayed).toContain(content);
             expect(displayed).toContain("font-family:system-ui");
+            expect(displayed).toContain(
+              "--risu-font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans',Arial,sans-serif;",
+            );
             expect(displayed).toContain("'Segoe UI',Roboto,'Noto Sans',Arial,sans-serif");
             expect(displayed).toContain("line-height:1.5;");
             expect(displayed).not.toContain(`<${tag}>`);
