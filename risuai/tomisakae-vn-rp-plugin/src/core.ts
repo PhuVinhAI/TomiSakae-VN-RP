@@ -28,6 +28,7 @@ import { SOLA_HEADER_SAVER_ID } from "./sola-history.js";
 import { adaptSolaDisplayReplacement } from "./sola-display.js";
 import { renderVoyageReasoning, VOYAGE_REASONING_DISPLAY_ID } from "./voyage-reasoning.js";
 import { GEMMA_FIX_PROMPT } from "./gemma-fix.js";
+import { cardImagePrompt, type CardImageCatalog } from "./card-images.js";
 
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
@@ -97,6 +98,7 @@ export interface FfGlobalSettings {
   regexEnabled: Record<string, boolean>;
   vietnameseOutputEnabled: boolean;
   imageOptimizationEnabled: boolean;
+  cardImageCatalogEnabled: boolean;
   soundNotificationsEnabled: boolean;
   submodelEditorEnabled: boolean;
   submodelAutoRewriteEnabled: boolean;
@@ -106,6 +108,7 @@ export interface FfGlobalSettings {
 export interface MacroContext {
   randomInt?: (minimum: number, maximum: number) => number;
   dialogueTheme?: DialogueTheme;
+  cardImageCatalog?: CardImageCatalog;
 }
 
 export interface HostMacroContext {
@@ -114,6 +117,7 @@ export interface HostMacroContext {
   maxResponse?: number;
   userName: string;
   dialogueTheme?: DialogueTheme;
+  cardImageCatalog?: CardImageCatalog;
 }
 
 export const PLACEMENT_USER_INPUT = 1;
@@ -197,6 +201,7 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
     ),
     vietnameseOutputEnabled: true,
     imageOptimizationEnabled: false,
+    cardImageCatalogEnabled: false,
     soundNotificationsEnabled: false,
     submodelEditorEnabled: false,
     submodelAutoRewriteEnabled: false,
@@ -245,6 +250,8 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
   if (typeof record.imageOptimizationEnabled === "boolean") {
     defaults.imageOptimizationEnabled = record.imageOptimizationEnabled;
   }
+  if (typeof record.cardImageCatalogEnabled === "boolean")
+    defaults.cardImageCatalogEnabled = record.cardImageCatalogEnabled;
   if (typeof record.soundNotificationsEnabled === "boolean") {
     defaults.soundNotificationsEnabled = record.soundNotificationsEnabled;
   }
@@ -1043,6 +1050,22 @@ export async function buildRequestMessages(
       break;
     }
   }
+  const historyWithPrompts = injectAbsoluteAtDepth(requestHistory, composed.absolute);
+  if (settings.cardImageCatalogEnabled) {
+    const content = cardImagePrompt(macroContext.cardImageCatalog);
+    if (content) {
+      for (let index = historyWithPrompts.length - 1; index >= 0; index -= 1) {
+        const message = historyWithPrompts[index]!;
+        if (message.role !== "user" || isPluginMemo(message.memo)) continue;
+        historyWithPrompts.splice(index + 1, 0, {
+          role: "user",
+          content,
+          memo: `${pluginMemoPrefix(preset)}card-image-catalog`,
+        });
+        break;
+      }
+    }
+  }
   return [
     ...composed.leading,
     ...(settings.vietnameseOutputEnabled
@@ -1054,7 +1077,7 @@ export async function buildRequestMessages(
           },
         ]
       : []),
-    ...injectAbsoluteAtDepth(requestHistory, composed.absolute),
+    ...historyWithPrompts,
     ...composed.trailing,
   ];
 }

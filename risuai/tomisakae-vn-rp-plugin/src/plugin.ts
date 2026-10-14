@@ -57,6 +57,7 @@ import {
 import { buildEditorReferenceMessages } from "./submodel-context.js";
 import { createCompletionMonitor } from "./completion-monitor.js";
 import { estimatePluginPromptTokens, type PluginTokenEstimate } from "./token-estimate.js";
+import { collectCardImages, type CardImageSource } from "./card-images.js";
 import {
   CONFIG_PRESETS_STORAGE_KEY,
   createConfigPreset,
@@ -185,7 +186,7 @@ interface NotificationAudioContext {
 
 type NotificationAudioContextConstructor = new () => NotificationAudioContext;
 
-interface HostCharacter {
+interface HostCharacter extends CardImageSource {
   chaId?: string;
   name?: string;
   nickname?: string;
@@ -371,16 +372,19 @@ function tokenEstimateHtml(estimate: PluginTokenEstimate, preset: FfPreset): str
           ? "🇻🇳 Đầu ra tiếng Việt"
           : entry.identifier === "image-optimization"
             ? "🖼️ Tối ưu hình ảnh theo card"
-            : entry.identifier === "gemma-fix"
-              ? "🛠️ Fix Gemma 4"
-              : prompt
-                ? promptUiCopy(prompt, familyOf(preset)).name
-                : entry.identifier;
+            : entry.identifier === "card-image-catalog"
+              ? "🖼️ Danh sách ảnh của card"
+              : entry.identifier === "gemma-fix"
+                ? "🛠️ Fix Gemma 4"
+                : prompt
+                  ? promptUiCopy(prompt, familyOf(preset)).name
+                  : entry.identifier;
       return `<div class="token-row"><span>${escapeHtml(name)}</span><strong>≈ ${number(entry.tokens)}</strong></div>`;
     })
     .join("");
   return `<div class="token-heading"><div><span class="index">Ước tính theo cấu hình đang chọn</span><h3>Token prompt chèn thêm</h3></div><strong class="token-total">≈ ${number(estimate.tokens)}</strong></div>
     <div class="token-metrics"><span>Nội dung prompt <b>${number(estimate.contentTokens)}</b></span><span>Khung message <b>≈ ${number(estimate.framingTokens)}</b></span><span>Số message <b>${number(estimate.messageCount)}</b></span></div>
+    ${estimate.cardImages ? `<p class="token-note">Ảnh card: <b>${number(estimate.cardImages.imageCount)}</b> · Từ khóa ảnh: <b>${number(estimate.cardImages.keywordCount)}</b> · Token danh sách: <b>≈ ${number(estimate.cardImages.tokens)}</b>${estimate.cardImages.unavailable ? " · Danh sách ảnh chưa tải đầy đủ, chưa gửi vào request." : ""}</p>` : ""}
     <p class="token-note">Dùng tokenizer o200k_base làm tham chiếu; số thực tế tùy model/API. Không tính card/lore, memory, lịch sử chat hay phản hồi AI. Cập nhật ngay khi đổi lựa chọn; bấm “Lưu preset” để áp dụng.</p>
     ${rows ? `<details><summary><span class="summary-copy"><strong>Chi tiết theo module</strong><small>Từ nhiều token đến ít. Nội dung phụ thuộc được tính ở prompt dùng nó; tổng có thể lệch nhẹ do gộp message.</small></span></summary><div class="token-rows">${rows}</div></details>` : '<p class="token-note">Plugin đang tắt nên không chèn prompt.</p>'}`;
 }
@@ -571,6 +575,12 @@ async function showSettings(): Promise<void> {
       "Chọn ảnh đúng trạng thái và trang phục theo card/lore; đặt sát đoạn phù hợp, đa dạng xuyên suốt phản hồi, không đặt hai ảnh liên tiếp · Mặc định tắt",
     )}${checkbox(
       "plugin",
+      "card-image-catalog",
+      settings.cardImageCatalogEnabled,
+      "🖼️ Danh sách ảnh của card",
+      "Đếm ảnh và token; gửi toàn bộ từ khóa ảnh bằng tin user riêng ngay sau tin user mới nhất · Mặc định tắt",
+    )}${checkbox(
+      "plugin",
       "gemma-fix",
       settings.gemmaFixEnabled,
       "🛠️ Fix Gemma 4",
@@ -642,6 +652,7 @@ async function showSettings(): Promise<void> {
       else if (id === "vietnamese-output") settings.vietnameseOutputEnabled = node.checked;
       else if (id === "dialogue-theme") settings.dialogueThemeEnabled = node.checked;
       else if (id === "image-optimization") settings.imageOptimizationEnabled = node.checked;
+      else if (id === "card-image-catalog") settings.cardImageCatalogEnabled = node.checked;
       else if (id === "gemma-fix") settings.gemmaFixEnabled = node.checked;
       else if (id === "sound-notifications") settings.soundNotificationsEnabled = node.checked;
       else if (id === "submodel-editor") settings.submodelEditorEnabled = node.checked;
@@ -652,6 +663,7 @@ async function showSettings(): Promise<void> {
   const tokenHostContext = await getHostMacroContext(character).catch(() => ({
     characterName: character?.nickname || character?.name || "Character",
     userName: "User",
+    cardImageCatalog: collectCardImages(character),
   }));
   let tokenPreviewVersion = 0;
   const refreshTokenEstimate = async () => {
@@ -697,6 +709,7 @@ async function showSettings(): Promise<void> {
       node.dataset.kind === "prompt" ||
       node.dataset.id === "vietnamese-output" ||
       node.dataset.id === "image-optimization" ||
+      node.dataset.id === "card-image-catalog" ||
       node.dataset.id === "gemma-fix" ||
       node.dataset.id === "dialogue-theme"
     )
@@ -836,6 +849,7 @@ async function getHostMacroContext(character: HostCharacter | null): Promise<Hos
     ...(database?.maxContext !== undefined ? { maxContext: database.maxContext } : {}),
     ...(database?.maxResponse !== undefined ? { maxResponse: database.maxResponse } : {}),
     userName,
+    cardImageCatalog: collectCardImages(character),
     ...(dialogueTheme ? { dialogueTheme } : {}),
   };
 }
@@ -1096,7 +1110,10 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
     preset,
     settings,
     async (content) => expandHostMacros(content, macroContext),
-    macroContext.dialogueTheme ? { dialogueTheme: macroContext.dialogueTheme } : {},
+    {
+      ...(macroContext.dialogueTheme ? { dialogueTheme: macroContext.dialogueTheme } : {}),
+      ...(macroContext.cardImageCatalog ? { cardImageCatalog: macroContext.cardImageCatalog } : {}),
+    },
   );
   if (editorListenerRegistered) {
     try {

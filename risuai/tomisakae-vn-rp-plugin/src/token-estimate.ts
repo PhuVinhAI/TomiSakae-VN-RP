@@ -8,6 +8,7 @@ import {
 } from "./core.js";
 import { vietnameseOutputFor } from "./preset-family.js";
 import { GEMMA_FIX_PROMPT } from "./gemma-fix.js";
+import { cardImageKeywordCount, cardImagePrompt } from "./card-images.js";
 
 // Literal tokenizer markers in a card or prompt are ordinary text here.
 const TEXT_OPTIONS = { allowedSpecial: new Set<string>(), disallowedSpecial: new Set<string>() };
@@ -24,6 +25,7 @@ export interface PluginTokenEstimate {
   framingTokens: number;
   messageCount: number;
   entries: PromptTokenEntry[];
+  cardImages?: { imageCount: number; keywordCount: number; tokens: number; unavailable: boolean };
 }
 
 /** Estimates only the prompts added by this plugin, using its real composer. */
@@ -84,6 +86,21 @@ export async function estimatePluginPromptTokens(
     const tokens = count(suffix);
     estimate.contentTokens += tokens;
     estimate.entries.push({ identifier: "gemma-fix", tokens });
+  }
+  if (settings.cardImageCatalogEnabled) {
+    const catalog = hostContext.cardImageCatalog;
+    const prompt = cardImagePrompt(catalog);
+    const tokens = prompt ? count(prompt) : 0;
+    estimate.cardImages = {
+      imageCount: catalog?.imageCount ?? 0,
+      keywordCount: catalog ? cardImageKeywordCount(catalog) : 0,
+      tokens,
+      unavailable: catalog?.unavailable ?? false,
+    };
+    if (prompt) {
+      messages.push({ role: "user", content: prompt });
+      estimate.entries.push({ identifier: "card-image-catalog", tokens });
+    }
   }
   for (const message of messages) {
     estimate.contentTokens += count(message.content);

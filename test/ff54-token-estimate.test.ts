@@ -8,6 +8,7 @@ import {
   type FfPreset,
 } from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
 import { estimatePluginPromptTokens } from "../risuai/tomisakae-vn-rp-plugin/src/token-estimate.js";
+import { collectCardImages } from "../risuai/tomisakae-vn-rp-plugin/src/card-images.js";
 
 const host = { characterName: "An", userName: "Tomi", maxContext: 32768, maxResponse: 8192 };
 const tokenCount = (text: string) => encode(text, { disallowedSpecial: new Set<string>() }).length;
@@ -85,9 +86,13 @@ describe("Plugin dashboard token estimates", () => {
       settings.submodelEditorEnabled = submodel;
       settings.imageOptimizationEnabled = true;
       settings.gemmaFixEnabled = true;
+      settings.cardImageCatalogEnabled = true;
       const themedHost = {
         ...host,
         dialogueTheme: { type: "light" as const, background: "#ffffff" },
+        cardImageCatalog: collectCardImages({
+          additionalAssets: [["outfit.smile.1.png", "assets/a.png", "png"]],
+        }),
       };
       const estimate = await estimatePluginPromptTokens(preset, settings, themedHost);
       const request = await buildRequestMessages(
@@ -99,7 +104,11 @@ describe("Plugin dashboard token estimates", () => {
         preset,
         settings,
         async (text) => expandHostMacros(text, host),
-        { randomInt: (minimum) => minimum, dialogueTheme: themedHost.dialogueTheme },
+        {
+          randomInt: (minimum) => minimum,
+          dialogueTheme: themedHost.dialogueTheme,
+          cardImageCatalog: themedHost.cardImageCatalog,
+        },
       );
       const added = request.filter((message) => message.memo?.startsWith("ff54:"));
       const suffix = request.find((message) => message.vnRpGemmaFixSuffix)?.vnRpGemmaFixSuffix;
@@ -109,6 +118,10 @@ describe("Plugin dashboard token estimates", () => {
           tokenCount(suffix!),
       );
       expect(estimate.messageCount).toBe(added.length);
+      expect(estimate.cardImages).toMatchObject({ imageCount: 1, keywordCount: 1 });
+      expect(estimate.cardImages!.tokens).toBe(
+        tokenCount(added.find((message) => message.memo === "ff54:card-image-catalog")!.content),
+      );
       expect(estimate.framingTokens).toBe(
         added.reduce((total, message) => total + 3 + tokenCount(message.role), 0),
       );

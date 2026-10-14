@@ -59,6 +59,10 @@ import {
 import { adaptSolaRegexForVietnamese } from "../risuai/tomisakae-vn-rp-plugin/src/sola-vietnamese-regex.js";
 import { GEMMA_FIX_PROMPT } from "../risuai/tomisakae-vn-rp-plugin/src/gemma-fix.js";
 import {
+  cardImagePrompt,
+  collectCardImages,
+} from "../risuai/tomisakae-vn-rp-plugin/src/card-images.js";
+import {
   adaptSolaDialogueColors,
   SOLA_DIALOGUE_COLORS,
   textContrast,
@@ -181,6 +185,63 @@ describe("TomiSakae VN-RP preset families", () => {
         estimate.entries.find((entry) => entry.identifier === "gemma-fix")?.tokens,
       );
       expect(messages).toEqual(snapshot);
+    },
+  );
+
+  it.each(["ff54", "sola", "voyage"] as const)(
+    "sends exact card image keywords immediately after the latest user for %s",
+    async (family) => {
+      const preset = sources[family].preset;
+      const settings = createDefaultSettings(preset);
+      expect(settings.cardImageCatalogEnabled).toBe(false);
+      settings.cardImageCatalogEnabled = true;
+      settings.gemmaFixEnabled = true;
+      const messages = [
+        { role: "user" as const, content: "Tin cũ.", memo: "old-user" },
+        { role: "assistant" as const, content: "Phản hồi cũ." },
+        { role: "user" as const, content: "Tiếp đi.", memo: "latest-user" },
+      ];
+      const snapshot = structuredClone(messages);
+      const catalog = collectCardImages({
+        additionalAssets: [["outfit.smile.1.png", "assets/a.png", "png"]],
+        emotionImages: [["happy", "assets/b.png"]],
+      });
+      const context = { randomInt: (minimum: number) => minimum, cardImageCatalog: catalog };
+      const built = await buildRequestMessages(messages, preset, settings, parse, context);
+      const memo = `${pluginMemoPrefix(preset)}card-image-catalog`;
+      const index = built.findIndex((message) => message.memo === "latest-user");
+      expect(built[index + 1]).toEqual({ role: "user", content: cardImagePrompt(catalog), memo });
+      expect(built[index]!.content).toContain(expandHostMacros(GEMMA_FIX_PROMPT, host));
+      expect(built.filter((message) => message.memo === memo)).toHaveLength(1);
+      expect(await buildRequestMessages(built, preset, settings, parse, context)).toEqual(built);
+      const estimate = await estimatePluginPromptTokens(preset, settings, {
+        ...host,
+        cardImageCatalog: catalog,
+      });
+      expect(estimate.cardImages).toMatchObject({
+        imageCount: 2,
+        keywordCount: 2,
+        unavailable: false,
+      });
+      expect(estimate.cardImages!.tokens).toBeGreaterThan(0);
+      settings.cardImageCatalogEnabled = false;
+      const disabled = await buildRequestMessages(built, preset, settings, parse, context);
+      expect(built.filter((message) => message.memo !== memo)).toEqual(disabled);
+      const noImages = await buildRequestMessages(
+        messages,
+        preset,
+        {
+          ...settings,
+          cardImageCatalogEnabled: true,
+        },
+        parse,
+        { ...context, cardImageCatalog: collectCardImages(null) },
+      );
+      expect(noImages).toEqual(disabled);
+      expect(messages).toEqual(snapshot);
+      expect(
+        normalizeSettings(preset, { cardImageCatalogEnabled: true }).cardImageCatalogEnabled,
+      ).toBe(true);
     },
   );
 

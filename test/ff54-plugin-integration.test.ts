@@ -21,6 +21,10 @@ import {
   SOLA_HEADER_SAVER_ID,
   type SolaHistoryArchive,
 } from "../risuai/tomisakae-vn-rp-plugin/src/sola-history.js";
+import {
+  cardImagePrompt,
+  collectCardImages,
+} from "../risuai/tomisakae-vn-rp-plugin/src/card-images.js";
 
 interface SavedMessage {
   role: "user" | "char";
@@ -551,6 +555,61 @@ describe("Named presets in plugin UI and requests", () => {
     expect(plugin.ui("token-estimate-panel").innerHTML).toContain('class="token-total">≈ 0');
     expect(plugin.ui("token-estimate-panel").innerHTML).toContain("Plugin đang tắt");
     await plugin.callbacks.unload!();
+  });
+
+  it("previews, persists and refreshes the current card's image keywords before each request", async () => {
+    const plugin = await startPlugin();
+    try {
+      const assets = {
+        additionalAssets: [
+          ["casual.smile.1.png", "assets/a.png", "png"],
+          ["casual.smile.1.png", "assets/b.png", "png"],
+          ["music.mp3", "assets/c.mp3", "mp3"],
+        ],
+        emotionImages: [["happy", "assets/d.png"]],
+      };
+      const originalGetCharacter = plugin.api.getCharacter;
+      plugin.api.getCharacter = async () => ({ ...(await originalGetCharacter()), ...assets });
+      await plugin.settingsUi();
+      const saved = structuredClone(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
+      const toggle = plugin.toggle("card-image-catalog");
+      expect(toggle.checked).toBe(false);
+      toggle.checked = true;
+      await toggle.handlers.get("change")!();
+      const panel = plugin.ui("token-estimate-panel").innerHTML;
+      expect(panel).toContain("Ảnh card: <b>3</b>");
+      expect(panel).toContain("Từ khóa ảnh: <b>2</b>");
+      expect(panel).toContain("Token danh sách:");
+      expect(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY)).toEqual(saved);
+      await plugin.uiEvent("save");
+      expect(
+        normalizePresetStore(preset, plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY)).presets[0]!
+          .settings.cardImageCatalogEnabled,
+      ).toBe(true);
+      const request = await plugin.request();
+      const index = request.findIndex((message) => message.memo === "user-a");
+      expect(request[index + 1]).toMatchObject({
+        role: "user",
+        content: cardImagePrompt(collectCardImages(assets)),
+        memo: "ff54:card-image-catalog",
+      });
+      expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe("Chào An.");
+      assets.additionalAssets = [["new.outfit.webp", "assets/e.webp", "webp"]];
+      assets.emotionImages = [];
+      plugin.selectCard(1);
+      const next = await plugin.request();
+      const prompt = next.find((message) => message.memo === "ff54:card-image-catalog")!.content;
+      expect(prompt).toContain("new.outfit.webp");
+      expect(prompt).not.toContain("casual.smile.1.png");
+      await plugin.settingsUi();
+      plugin.toggle("card-image-catalog").checked = false;
+      await plugin.uiEvent("save");
+      expect(
+        (await plugin.request()).some((message) => message.memo === "ff54:card-image-catalog"),
+      ).toBe(false);
+    } finally {
+      await plugin.callbacks.unload!();
+    }
   });
 
   it("creates and saves a named preset without changing Mặc định, then remembers it after reload", async () => {
