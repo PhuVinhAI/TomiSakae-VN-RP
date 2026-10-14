@@ -373,11 +373,9 @@ function tokenEstimateHtml(estimate: PluginTokenEstimate, preset: FfPreset): str
             ? "🖼️ Tối ưu hình ảnh theo card"
             : entry.identifier === "gemma-fix"
               ? "🛠️ Fix Gemma 4"
-              : entry.identifier === "gemma-intimacy-limit"
-                ? "⏳ Giới hạn nhịp thân mật"
-                : prompt
-                  ? promptUiCopy(prompt, familyOf(preset)).name
-                  : entry.identifier;
+              : prompt
+                ? promptUiCopy(prompt, familyOf(preset)).name
+                : entry.identifier;
       return `<div class="token-row"><span>${escapeHtml(name)}</span><strong>≈ ${number(entry.tokens)}</strong></div>`;
     })
     .join("");

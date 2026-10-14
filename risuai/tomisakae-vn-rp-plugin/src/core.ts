@@ -27,7 +27,7 @@ import {
 import { SOLA_HEADER_SAVER_ID } from "./sola-history.js";
 import { adaptSolaDisplayReplacement } from "./sola-display.js";
 import { renderVoyageReasoning, VOYAGE_REASONING_DISPLAY_ID } from "./voyage-reasoning.js";
-import { gemmaFixPromptFor, gemmaIntimacyLimitPromptFor } from "./gemma-fix.js";
+import { GEMMA_FIX_PROMPT } from "./gemma-fix.js";
 
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
@@ -1031,20 +1031,11 @@ export async function buildRequestMessages(
       }
     }
     if (latestUserIndex >= 0) {
-      requestHistoryWithGemmaFix.splice(
-        latestUserIndex + 1,
-        0,
-        {
-          role: "user",
-          content: gemmaFixPromptFor(familyOf(preset)),
-          memo: `${pluginMemoPrefix(preset)}gemma-fix`,
-        },
-        {
-          role: "user",
-          content: gemmaIntimacyLimitPromptFor(settings.vietnameseOutputEnabled),
-          memo: `${pluginMemoPrefix(preset)}gemma-intimacy-limit`,
-        },
-      );
+      requestHistoryWithGemmaFix.splice(latestUserIndex + 1, 0, {
+        role: "user",
+        content: await parseHostMacros(GEMMA_FIX_PROMPT, "user"),
+        memo: `${pluginMemoPrefix(preset)}gemma-fix`,
+      });
     }
   }
   return [

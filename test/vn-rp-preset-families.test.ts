@@ -57,13 +57,7 @@ import {
   VOYAGE_VIETNAMESE_REPLACEMENTS,
 } from "../risuai/tomisakae-vn-rp-plugin/src/vietnamese.js";
 import { adaptSolaRegexForVietnamese } from "../risuai/tomisakae-vn-rp-plugin/src/sola-vietnamese-regex.js";
-import {
-  GEMMA_FIX_PROMPT_FF54,
-  GEMMA_FIX_PROMPT_SOLA,
-  GEMMA_FIX_PROMPT_VOYAGE,
-  GEMMA_INTIMACY_LIMIT_PROMPT,
-  gemmaIntimacyLimitPromptFor,
-} from "../risuai/tomisakae-vn-rp-plugin/src/gemma-fix.js";
+import { GEMMA_FIX_PROMPT } from "../risuai/tomisakae-vn-rp-plugin/src/gemma-fix.js";
 import {
   adaptSolaDialogueColors,
   SOLA_DIALOGUE_COLORS,
@@ -122,13 +116,9 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(recall).toBeGreaterThan(built.findIndex((m) => m.content === "Tôi vào phòng."));
   });
 
-  it.each([
-    ["ff54", GEMMA_FIX_PROMPT_FF54],
-    ["sola", GEMMA_FIX_PROMPT_SOLA],
-    ["voyage", GEMMA_FIX_PROMPT_VOYAGE],
-  ] as const)(
-    "injects the %s Gemma fix as a user message immediately after the latest user",
-    async (family, prompt) => {
+  it.each(["ff54", "sola", "voyage"] as const)(
+    "injects the shared Gemma fix as one user message after the latest user for %s",
+    async (family) => {
       const preset = sources[family].preset;
       const settings = createDefaultSettings(preset);
       expect(settings.gemmaFixEnabled).toBe(false);
@@ -143,42 +133,30 @@ describe("TomiSakae VN-RP preset families", () => {
       const intimacyMemo = `${pluginMemoPrefix(preset)}gemma-intimacy-limit`;
       const index = built.findIndex((message) => message.memo === memo);
       expect(index).toBeGreaterThan(0);
-      expect(built[index]).toMatchObject({ role: "user", content: prompt });
-      expect(built[index + 1]).toMatchObject({
+      expect(built[index]).toMatchObject({
         role: "user",
-        memo: intimacyMemo,
-        content: gemmaIntimacyLimitPromptFor(settings.vietnameseOutputEnabled),
+        content: expandHostMacros(GEMMA_FIX_PROMPT, host),
       });
-      expect(
-        built
-          .slice(0, index)
-          .some((message) => message.role === "user" && message.content === "Tin user mới."),
-      ).toBe(true);
+      expect(built[index - 1]).toMatchObject({ role: "user", content: "Tin user mới." });
       expect(built.filter((message) => message.memo === memo)).toHaveLength(1);
-      expect(built.filter((message) => message.memo === intimacyMemo)).toHaveLength(1);
+      expect(built.filter((message) => message.memo === intimacyMemo)).toHaveLength(0);
+      expect(built.some((message) => message.content.includes("IntimacyLimitInstructions"))).toBe(
+        false,
+      );
 
       const estimate = await estimatePluginPromptTokens(preset, settings, host);
       expect(
         estimate.entries.find((entry) => entry.identifier === "gemma-fix")?.tokens,
       ).toBeGreaterThan(0);
-      expect(
-        estimate.entries.find((entry) => entry.identifier === "gemma-intimacy-limit")?.tokens,
-      ).toBeGreaterThan(0);
+      expect(estimate.entries.some((entry) => entry.identifier === "gemma-intimacy-limit")).toBe(
+        false,
+      );
+
+      settings.gemmaFixEnabled = false;
+      const disabled = await buildRequestMessages(messages, preset, settings, parse);
+      expect(disabled.some((message) => message.memo === memo)).toBe(false);
     },
   );
-
-  it("localizes only the sample dialogue when Vietnamese Output is enabled", () => {
-    expect(gemmaIntimacyLimitPromptFor(false)).toBe(GEMMA_INTIMACY_LIMIT_PROMPT);
-    const localized = gemmaIntimacyLimitPromptFor(true);
-    expect(localized).toContain("**Incorrect (Prioritizing Plot):**");
-    expect(localized).toContain("**Correct (Prioritizing Boundary):**");
-    expect(localized).toContain('Character A: "Bạn muốn ghé chỗ tôi uống gì không?"');
-    expect(localized).toContain('Character B: "Tôi tự gọi xe thì hơn. Mai gặp lại nhé."');
-    expect(localized).toContain("This moves the plot forward");
-    expect(localized).toContain('Character A: "Come back to my place for a drink?"');
-    expect(localized).toContain("### [CORE CONSTRAINT: NARRATIVE PACING & TRUST PROTOCOL]");
-    expect(localized).toContain("**Incorrect (Prioritizing Plot):**");
-  });
 
   it("keeps the selected FF5.4 jailbreak content and only gives it Voyage structure", () => {
     const stages = VOYAGE_FF54_JAILBREAK_STAGES.map((stage) => stage.prompt.content);

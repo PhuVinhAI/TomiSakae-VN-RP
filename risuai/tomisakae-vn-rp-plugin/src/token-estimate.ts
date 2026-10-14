@@ -6,8 +6,8 @@ import {
   type FfPreset,
   type HostMacroContext,
 } from "./core.js";
-import { familyOf, vietnameseOutputFor } from "./preset-family.js";
-import { gemmaFixPromptFor, gemmaIntimacyLimitPromptFor } from "./gemma-fix.js";
+import { vietnameseOutputFor } from "./preset-family.js";
+import { GEMMA_FIX_PROMPT } from "./gemma-fix.js";
 
 // Literal tokenizer markers in a card or prompt are ordinary text here.
 const TEXT_OPTIONS = { allowedSpecial: new Set<string>(), disallowedSpecial: new Set<string>() };
@@ -80,12 +80,9 @@ export async function estimatePluginPromptTokens(
     });
   }
   if (settings.gemmaFixEnabled) {
-    const prompt = gemmaFixPromptFor(familyOf(preset));
-    const intimacyPrompt = gemmaIntimacyLimitPromptFor(settings.vietnameseOutputEnabled);
+    const prompt = expandHostMacros(GEMMA_FIX_PROMPT, hostContext);
     messages.push({ role: "user", content: prompt });
-    messages.push({ role: "user", content: intimacyPrompt });
     estimate.entries.push({ identifier: "gemma-fix", tokens: count(prompt) });
-    estimate.entries.push({ identifier: "gemma-intimacy-limit", tokens: count(intimacyPrompt) });
   }
   for (const message of messages) {
     estimate.contentTokens += count(message.content);

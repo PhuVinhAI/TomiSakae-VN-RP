@@ -84,6 +84,7 @@ describe("Plugin dashboard token estimates", () => {
       settings.vietnameseOutputEnabled = vietnamese;
       settings.submodelEditorEnabled = submodel;
       settings.imageOptimizationEnabled = true;
+      settings.gemmaFixEnabled = true;
       const themedHost = {
         ...host,
         dialogueTheme: { type: "light" as const, background: "#ffffff" },
