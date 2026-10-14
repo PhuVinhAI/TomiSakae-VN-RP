@@ -26,17 +26,21 @@ export const PRESET_FAMILIES = [
   {
     id: "ff54",
     name: "Freaky Frankenstein 5.4",
-    description: "GM theo task, mô phỏng thế giới và internal states.",
+    status: "Ổn định",
+    description: "GM theo task, mô phỏng thế giới và internal states. Ổn định để dùng lâu dài.",
   },
   {
     id: "sola",
     name: "Sola V2 Flame",
-    description: "Nhịp điện ảnh, giọng NPC riêng, Story Review và Showrunner HUD.",
+    status: "Beta",
+    description:
+      "Nhịp điện ảnh, giọng NPC riêng, Story Review và Showrunner HUD. Đang phát triển và chỉnh sửa.",
   },
   {
     id: "voyage",
     name: "Voyage-Universal-v5",
-    description: "GM PbtA, văn trực tiếp, thế giới mở và ghi chú ẩn.",
+    status: "Beta",
+    description: "GM PbtA, văn trực tiếp, thế giới mở và ghi chú ẩn. Đang phát triển và chỉnh sửa.",
   },
 ] as const;
 

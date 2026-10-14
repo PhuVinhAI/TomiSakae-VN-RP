@@ -318,7 +318,7 @@ export async function buildPresetVietnameseReview(outputFile = DEFAULT_OUTPUT) {
     "2. Kiểm tra ví dụ GOOD/BAD, văn kể, thoại, đại từ/xưng hô, phát âm, từ vựng kể cả NSFW, readable props, nhãn HUD/sheet/notes và mô tả placeholder. Tìm chỗ còn ép đầu ra tiếng Anh/ngôn ngữ khác hoặc cách nói không tự nhiên trong tiếng Việt.",
     "3. So sánh đúng/sai, sắc thái, mức độ, agency, phạm vi và độ bắt buộc của mỗi luật. Phân biệt ví dụ BAD cố tình không tự nhiên với ví dụ GOOD. Kiểm tra đại từ theo ngôi kể, quan hệ và giọng nhân vật; không áp xưng hô của một card cho mọi card.",
     "4. Kiểm tra luật ngữ pháp tiếng Anh đã đổi tối thiểu cho tiếng Việt, tránh buộc chia thì động từ, dùng sở hữu kiểu tiếng Anh hoặc rút gọn phát âm tiếng Anh. Giữ phong cách, thứ tự, nhiệm vụ suy luận và cơ chế gốc của từng preset.",
-    "5. Giữ cú pháp/macro/định danh/enum và cơ chế số liệu. Hai preset phải dùng âm thanh phi giọng nói `§...§` trên dòng riêng; lời thốt/tiếng rên của nhân vật vẫn theo module thoại. Không mang tone/internal_states hoặc phong cách riêng FF5.4 vào Sola/Voyage nếu nguồn không có.",
+    "5. Giữ cú pháp/macro/định danh/enum và cơ chế số liệu. Sola dùng định dạng âm thanh gốc của các module; Voyage dùng âm thanh phi giọng nói `§...§` trên dòng riêng. Lời thốt/tiếng rên của nhân vật vẫn theo module thoại. Không mang tone/internal_states hoặc phong cách riêng FF5.4 vào Sola/Voyage nếu nguồn không có.",
     "6. Kiểm tra cả Vietnamese Output, system/user Submodel và tùy chọn Image Coverage. Tránh luật lặp, mâu thuẫn hoặc bổ sung không cần thiết. Nêu identifier, đoạn gốc, đoạn hiện tại, vấn đề và đề xuất sửa tối thiểu cho từng phát hiện; tách lỗi rõ ràng khỏi góp ý về gu văn.",
     "",
     "## Phạm vi và cách tạo bản đối chiếu",

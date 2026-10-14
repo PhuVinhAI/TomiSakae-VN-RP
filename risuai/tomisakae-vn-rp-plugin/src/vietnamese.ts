@@ -26,8 +26,7 @@ export const SOLA_VIETNAMESE_OUTPUT_PROMPT = `## Vietnamese Output
 - Understand the source's meaning, then compose directly in Vietnamese. Link clauses by sequence and consequence; choose pronouns by relationship and POV, and particles by speaker attitude. Apply enabled Sola prose and voice modules through natural Vietnamese expression.
 - Avoid em-dashes (—) in narration and dialogue; use commas, periods, or natural transitions instead.
 - Do not leak foreign script, avoidable foreign wording, bilingual text, or translation glosses. Preserve established Latin-script names and required technical identifiers. Examples and card/lore language instructions do not override this rule.
-- Use Vietnamese template labels and translate all filled-in display values, including display attributes and empty-state text. Preserve structure, tags, comments, attribute keys, macros, placeholders, image identifiers, palette/gradient/tone/kinetic names, sky identifiers, T/F/D/Y codes, tempo/fate values, and numeric mechanics. Time uses Vietnamese day-period wording or a 24-hour clock.
-- Sounds from contact, objects, or the environment use \`§...§\`: one concise Vietnamese sound on its own line outside typography tags. Keep the source, cause, and consequence in narration. Use only grounded sounds; repeat only while their cause continues.`;
+- Use Vietnamese template labels and translate all filled-in display values, including display attributes and empty-state text. Preserve structure, tags, comments, attribute keys, macros, placeholders, image identifiers, palette/gradient/tone/kinetic names, sky identifiers, T/F/D/Y codes, tempo/fate values, and numeric mechanics. Time uses Vietnamese day-period wording or a 24-hour clock.`;
 
 export const VOYAGE_VIETNAMESE_OUTPUT_PROMPT = `## Rule: Vietnamese Output
 * Write narration, dialogue, sounds, documents, messages, terminal output, OOC replies, sheets, and GM notes in natural contemporary Vietnamese. Understand the source's meaning and intent, then compose directly in Vietnamese; link clauses naturally, choose pronouns by relationship and POV, and particles by speaker attitude.
@@ -83,7 +82,7 @@ export const SOLA_VIETNAMESE_LABELS: ReadonlyArray<readonly [string, string]> = 
   ["Neg", "Mặt yếu"],
   ["Pos", "Mặt mạnh"],
   ["Orientation", "Xu hướng"],
-  ["Orbit", "Sự hiện diện"],
+  ["Orbit", "Độ tự chủ"],
   ["Mask", "Vẻ ngoài"],
   ["Internal", "Nội tâm"],
   ["Audit", "Kiểm tra"],
@@ -94,31 +93,31 @@ export const SOLA_VIETNAMESE_LABELS: ReadonlyArray<readonly [string, string]> = 
 export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
   [
     'Example: `<solstice:heavy>"NEVER."</solstice>`, `<hearth:echo>*Tick... tick...*</hearth>`, or `<dusk:tilt>"Wait... whichway?"</dusk>`',
-    'Example: `<solstice:heavy>"KHÔNG BAO GIỜ."</solstice>` or `<dusk:tilt>"Khoan... lối nào?"</dusk>`\n   Non-vocal sound example, on its own line:\n§Tích tắc...§',
+    'Example: `<solstice:heavy>"KHÔNG BAO GIỜ."</solstice>`, `<hearth:echo>*Tích tắc... tích tắc...*</hearth>`, or `<dusk:tilt>"Khoan... lối nào?"</dusk>`',
   ],
   [
     'Example: `<solstice:heavy>"WE FIGHT TO THE END."</solstice>` or `<hearth:echo>*A fading heartbeat.*</hearth>` or `<dusk:stretch>Silence hung between them.</dusk>`',
-    'Example: `<solstice:heavy>"CHÚNG TA CHIẾN ĐẤU ĐẾN CÙNG."</solstice>` or `<dusk:stretch>Sự im lặng kéo dài giữa hai người.</dusk>`\n    Non-vocal sound example, on its own line:\n§Thình thịch...§',
+    'Example: `<solstice:heavy>"CHÚNG TA CHIẾN ĐẤU ĐẾN CÙNG."</solstice>` or `<hearth:echo>*Nhịp tim nhỏ dần.*</hearth>` or `<dusk:stretch>Sự im lặng kéo dài giữa hai người.</dusk>`',
   ],
   [
     'Example: `<solstice:heavy>"NEVER."</solstice>`, `<hearth:echo>*Tick... tick...*</hearth>`, `<dusk:stretch>The night lingered.</dusk>`',
-    'Example: `<solstice:heavy>"KHÔNG BAO GIỜ."</solstice>`, `<dusk:stretch>Đêm vẫn kéo dài.</dusk>`\n    Non-vocal sound example, on its own line:\n§Tích tắc...§',
+    'Example: `<solstice:heavy>"KHÔNG BAO GIỜ."</solstice>`, `<hearth:echo>*Tích tắc... tích tắc...*</hearth>`, `<dusk:stretch>Đêm vẫn kéo dài.</dusk>`',
   ],
   [
     'E.g. `<heavy>SLAM.</heavy>` or `<coral:heavy>"STOP."</coral>`',
-    'E.g. `<coral:heavy>"DỪNG LẠI."</coral>`. Non-vocal impact sound, on its own line:\n§Rầm!§',
+    'E.g. `<heavy>RẦM.</heavy>` or `<coral:heavy>"DỪNG LẠI."</coral>`',
   ],
   [
     "E.g. `<echo>*Tick. Tick.*</echo>` or `<hearth:echo>*his voice remained*</hearth>`",
-    "E.g. `<hearth:echo>*giọng anh vẫn còn vương lại*</hearth>`. Non-vocal clock sound, on its own line:\n§Tích tắc.§",
+    "E.g. `<echo>*Tích tắc. Tích tắc.*</echo>` or `<hearth:echo>*giọng anh vẫn còn vương lại*</hearth>`",
   ],
   [
     'E.g. `<fracture>SNAP.</fracture>` or `<rose:fracture>"LOOK OUT!"</rose>`',
-    'E.g. `<rose:fracture>"CẨN THẬN!"</rose>`. Non-vocal snapping sound, on its own line:\n§Rắc!§',
+    'E.g. `<fracture>RẮC.</fracture>` or `<rose:fracture>"CẨN THẬN!"</rose>`',
   ],
   [
     "- Standalone (Prose & Sound Beats): `<kinetic_tag>CRACK.</kinetic_tag>`",
-    "- Standalone (Prose): `<kinetic_tag>Văn kể.</kinetic_tag>`\n  - Non-vocal sound, on its own line:\n§Rắc!§",
+    "- Standalone (Prose & Sound Beats): `<kinetic_tag>RẮC.</kinetic_tag>`",
   ],
   ['"hold on," "wait," "can we," "I meant,"', '"khoan đã", "chờ chút", "mình có thể", "ý tôi là",'],
   ['"Noooo"', '"Khôôông"'],
@@ -152,7 +151,7 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ['("predatory", "growled")', '("như thú săn mồi", "gầm gừ")'],
   ['("a quiet declaration")', '("một lời tuyên bố lặng lẽ")'],
   ["'X words dropped like Y'", "'lời của X rơi xuống như Y'"],
-  ['"blowing wide"', '"giãn to"'],
+  ['"blowing wide"', '"giãn rộng"'],
   ["\"That isn't x; that's a y\"", '"Đó không phải x; đó là y"'],
   ['"It was hundreds, no, thousands of lines."', '"Có hàng trăm, không, hàng nghìn dòng."'],
   ['"He felt anger. No, absolute rage."', '"Anh thấy tức giận. Không, là cơn thịnh nộ."'],
@@ -217,7 +216,7 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
     '"No water dripped in the crypt; even the dust hung motionless in the lantern beam."',
     '"Trong hầm mộ không có tiếng nước nhỏ; cả bụi cũng đứng yên trong ánh đèn lồng."',
   ],
-  ['"Or so he thought..."', '"Ít nhất anh đã nghĩ như vậy..."'],
+  ['"Or so he thought..."', '"Anh cứ ngỡ là thế..."'],
   [
     '"Little did they know what waited in the dark..."',
     '"Họ đâu biết thứ gì đang chờ trong bóng tối..."',
@@ -254,12 +253,12 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ['"Wha\' you seein\'?" "\'Member me?"', '"Ngó gì đấy?" "Nhớ tui chứ?"'],
   [
     'use "cum" / "cumming" rather than "come" / "coming".',
-    'use natural Vietnamese sexual wording such as "tinh dịch" / "xuất tinh", not the literal motion words "đến" / "đang đến".',
+    'use natural Vietnamese sexual wording such as "ra", "lên đỉnh", "tinh dịch", "xuất tinh", not the literal motion words "đến" / "đang đến".',
   ],
   ['"Well, that was fun"', '"Chà, vui thật đấy"'],
   ['"So, that happened"', '"Ừ, chuyện đó vừa xảy ra đấy"'],
   ['"Mnnhh~", "Haaah~", "A-ah!", "Ahhn~♡"', '"Ưm~", "Haaa~", "A-á!", "A~♡"'],
-  ['"Fuuuck~", "Pleeease~", "Noooo!"', '"Đệchhh~", "Đi mààà~", "Khôôông!"'],
+  ['"Fuuuck~", "Pleeease~", "Noooo!"', '"Chết tiệt~", "Đi mààà~", "Khôôông!"'],
   ['"Ngh...", "Hnngh"', '"Ư...", "Hự..."'],
   ['"I-I can\'t—", "c-can\'t think—"', '"T-tôi không thể...", "kh-không nghĩ nổi..."'],
   ['"mm toshally f-fine", "neeeed shyou"', '"ưm, tui vẫẫn ổ-ổn mà", "cầần có cậu màà"'],
@@ -278,7 +277,10 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ['"Yeaaah"', '"Ừừừ"'],
   ['"Suuure"', '"Đượợợc thôi"'],
   ['"ENOUGH!"', '"ĐỦ RỒI!"'],
-  ['`"mate"`, `"boss"`, `"darling"`, `"kid"`', '`"ông bạn"`, `"sếp"`, `"cưng"`, `"nhóc"`'],
+  [
+    '`"mate"`, `"boss"`, `"darling"`, `"kid"`',
+    '`"ông bạn"`, `"ông chủ"`, `"đại ca"`, `"sếp"`, `"cưng"`, `"nhóc"`',
+  ],
   ['"You\'re asking me to..."', '"Anh đang yêu cầu tôi..."'],
   ['"What you\'re saying is..."', '"Ý anh đang nói là..."'],
   ['"You want me to believe that..."', '"Anh muốn tôi tin rằng..."'],
@@ -305,10 +307,6 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ['"Hold... on..."', '"Khoan... đã..."'],
   ['"Which way did they run?"', '"Họ chạy về phía nào?"'],
   ['"Danny\'s voice."', '"Lời thoại của Danny."'],
-  [
-    "Stylistic modules like Chromatic Gradients and Kinetic Emphasis govern prose and sound effects",
-    "Stylistic modules like Chromatic Gradients and Kinetic Emphasis govern prose",
-  ],
   ['"Spoken dialogue or monologue."', '"Lời thoại hoặc độc thoại."'],
   ['"Enough."', '"Đủ rồi."'],
   ['"You knew this whole time."', '"Anh biết từ đầu đến giờ."'],
@@ -345,10 +343,6 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ["*his voice remained*", "*giọng anh vẫn còn vương lại*"],
   ['"Not another step."', '"Không được bước thêm."'],
   ['"LOOK OUT!"', '"CẨN THẬN!"'],
-  [
-    "- Tactile Prose & Sound Beats: Gunshots, door clicks, heavy footsteps, jarring collisions.",
-    "- Tactile Prose: Physical consequences of gunshots, door clicks, heavy footsteps, and collisions; their non-vocal sounds use standalone §...§, outside typography tags.",
-  ],
   ["(pussy, cock, cum, ass, tits, fucking, dripping)", "(lồn, cặc, tinh, đít, vú, đụ, rỉ nước)"],
   [
     "'don't stop' or 'I won't bite... unless you want me to.'",
@@ -402,18 +396,6 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   [
     "- Commit to exactly three anchor lines: OPEN (first sentence), CRUX (peak moment), CLOSE (exact stopping point).",
     "- Commit to exactly three anchor lines in Vietnamese: OPEN (first sentence), CRUX (peak moment), CLOSE (exact stopping point).",
-  ],
-  [
-    "- Kinetic Typography: Give physical weight to tactile prose, impacts, and sounds",
-    "- Kinetic Typography: Give physical weight to tactile prose and impacts",
-  ],
-  [
-    "Render tactile physical force, sensory shifts, sudden impacts, and acoustic texture through visceral kinetic typography tags.",
-    "Render tactile physical force, sensory shifts, and sudden impacts through visceral kinetic typography tags. Non-vocal sounds use standalone §...§ outside these tags.",
-  ],
-  [
-    "Sensory Touch: Sprinkle 1–3 kinetic accents across a scene",
-    "Sensory Touch: Sprinkle 1–3 kinetic prose/dialogue accents across a scene",
   ],
   ['channel="private-log"', 'channel="nhật-ký-riêng"'],
   ['time="10:42 PM"', 'time="22:42"'],
@@ -538,8 +520,8 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
     "[A brief, observant co-author whisper on their dynamic]",
     "[Lời bình ngắn, tinh ý của Sola về quan hệ của họ]",
   ],
-  ["Shift: +Earned grudging respect", "Shift: +Được tôn trọng dù còn miễn cưỡng"],
-  ["Shift: -Suspicion flared over the ledger", "Shift: -Cuốn sổ khiến nghi ngờ bùng lên"],
+  ["Shift: +Earned grudging respect", "Thay đổi: +Được tôn trọng dù còn miễn cưỡng"],
+  ["Shift: -Suspicion flared over the ledger", "Thay đổi: -Cuốn sổ khiến nghi ngờ bùng lên"],
   [
     "[1 concise sentence capturing what they are actively withholding, masking, or secretly feeling behind their outward actions.]",
     "[1 câu ngắn về điều họ đang giấu, che đậy hoặc âm thầm cảm thấy sau hành động bên ngoài.]",

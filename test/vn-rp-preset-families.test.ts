@@ -810,10 +810,10 @@ describe("TomiSakae VN-RP preset families", () => {
           "Dialect grain: regional pronunciation, colloquial omission, and natural disfluency in Vietnamese",
         );
         expect(text).not.toContain("phonetic drop-sounds, contractions");
-        expect(text).not.toContain("govern prose and sound effects");
+        expect(text).toContain("govern prose and sound effects");
         expect(text).not.toContain("Third person, past tense, for all characters");
         expect(text).toContain("lồn, cặc, tinh, đít, vú, đụ, rỉ nước");
-        expect(text).toContain('"Đệchhh~", "Đi mààà~", "Khôôông!"');
+        expect(text).toContain('"Chết tiệt~", "Đi mààà~", "Khôôông!"');
         expect(text).toContain('"Chưa từng có ai", "Không thể cứ thế", "Chẳng ai tự dưng"');
         expect(text).toContain("mông rung, vú nảy, dái va đập, lưng cong");
         expect(text).toContain('"Cái chạm ấy thật ấm."');
@@ -849,7 +849,10 @@ describe("TomiSakae VN-RP preset families", () => {
       expect(text).not.toContain("shout, whisper, measured, tremble");
       expect(text).not.toContain("<internal_states>");
       expect(text).not.toContain("manga, anime, and light-novel pacing");
-      expect(vietnameseOutputFor(preset)).toContain("`§...§`");
+      if (family === "sola") {
+        expect(text).not.toContain("§");
+        expect(vietnameseOutputFor(preset)).not.toContain("§");
+      } else expect(vietnameseOutputFor(preset)).toContain("`§...§`");
       expect(JSON.stringify(preset)).toBe(snapshot);
     },
   );
@@ -890,18 +893,44 @@ describe("TomiSakae VN-RP preset families", () => {
     },
   );
 
-  it("uses standalone sound examples and keeps Sola vocalizations in dialogue", () => {
+  it("preserves Sola's native sound typography with Vietnamese examples", () => {
     const preset = sources.sola.preset;
     const settings = createDefaultSettings(preset);
-    for (const p of preset.prompts.filter((p) => typeof p.content === "string" && p.content)) {
-      const text = adaptFamilyPrompt(String(p.content), preset, settings);
-      for (const line of text
-        .split("\n")
-        .filter((line) => /§(?:Rắc|Rầm|Tích tắc|Thình thịch)/.test(line))) {
-        expect(line.trim(), p.name).toMatch(/^§[^§]+§$/);
+    const prompts = preset.prompts.filter((p) => typeof p.content === "string" && p.content);
+    const nativeRules = [
+      "Stylistic modules like Chromatic Gradients and Kinetic Emphasis govern prose and sound effects",
+      "- Kinetic Typography: Give physical weight to tactile prose, impacts, and sounds",
+      "Render tactile physical force, sensory shifts, sudden impacts, and acoustic texture through visceral kinetic typography tags.",
+      "- Tactile Prose & Sound Beats: Gunshots, door clicks, heavy footsteps, jarring collisions.",
+      "Sensory Touch: Sprinkle 1–3 kinetic accents across a scene",
+    ];
+    const texts = prompts.map((p) => {
+      const source = String(p.content);
+      const text = adaptFamilyPrompt(source, preset, settings);
+      expect(text, p.name).not.toContain("§");
+      for (const rule of nativeRules) {
+        if (source.includes(rule)) expect(text, p.name).toContain(rule);
       }
-      expect(text).not.toMatch(/<(?:heavy|echo|fracture|hearth:echo)>\*?(?:SLAM|SNAP|Tick)/);
-    }
+      return text;
+    });
+    const text = texts.join("\n");
+    for (const example of [
+      "<hearth:echo>*Tích tắc... tích tắc...*</hearth>",
+      "<hearth:echo>*Nhịp tim nhỏ dần.*</hearth>",
+      "<heavy>RẦM.</heavy>",
+      "<echo>*Tích tắc. Tích tắc.*</echo>",
+      "<fracture>RẮC.</fracture>",
+      "- Standalone (Prose & Sound Beats): `<kinetic_tag>RẮC.</kinetic_tag>`",
+    ])
+      expect(text).toContain(example);
+    const sounds = "<heavy>RẦM.</heavy>\n<echo>*Tích tắc.*</echo>\n<fracture>RẮC.</fracture>";
+    const rendered = applyRegexScripts(sounds, preset, settings, {
+      placement: PLACEMENT_AI_OUTPUT,
+      markdown: true,
+      depth: 0,
+    });
+    expect(rendered).not.toMatch(/<\/?(?:heavy|echo|fracture)>/);
+    for (const sound of ["RẦM.", "Tích tắc.", "RẮC."]) expect(rendered).toContain(sound);
     const vocal = preset.prompts.find((p) => p.name?.includes("Voice: Vocal Sounds"))!;
     expect(adaptFamilyPrompt(String(vocal.content), preset, settings)).toContain('"Ưm~"');
   });
