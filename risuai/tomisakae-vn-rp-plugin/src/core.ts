@@ -1072,7 +1072,7 @@ export async function buildRequestMessages(
       ? [
           {
             role: "system" as const,
-            content: vietnameseOutputFor(preset),
+            content: vietnameseOutputFor(preset, settings),
             memo: `${pluginMemoPrefix(preset)}vietnamese-output`,
           },
         ]

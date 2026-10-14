@@ -94,10 +94,52 @@ export function isPluginMemo(memo: unknown): boolean {
   return /^(?:ff54:|vn-rp:)/.test(String(memo ?? ""));
 }
 
-export function vietnameseOutputFor(preset: FfPreset): string {
+function activeSolaModules(preset: FfPreset, settings: FfGlobalSettings): Set<string> {
+  const enabled = new Set(
+    presetOrder(preset)
+      .filter((entry) => settings.promptEnabled[entry.identifier])
+      .map((entry) => entry.identifier),
+  );
+  const modules = new Set<string>();
+  for (const prompt of preset.prompts) {
+    if (!enabled.has(prompt.identifier) || prompt.marker || typeof prompt.content !== "string")
+      continue;
+    // Empty fragments in Sola's reset prompt do not enable a module.
+    for (const match of prompt.content.matchAll(/\{\{setvar::(mod_[a-z_]+)::(?!\}\})/g))
+      modules.add(match[1]!);
+  }
+  return modules;
+}
+
+function solaTrackersEnabled(modules: ReadonlySet<string>): boolean {
+  return [...modules].some(
+    (name) => name.startsWith("mod_track_") || name === "mod_solahud" || name === "mod_tempo",
+  );
+}
+
+export function vietnameseOutputFor(preset: FfPreset, settings?: FfGlobalSettings): string {
   switch (familyOf(preset)) {
-    case "sola":
-      return SOLA_VIETNAMESE_OUTPUT_PROMPT;
+    case "sola": {
+      if (!settings) return SOLA_VIETNAMESE_OUTPUT_PROMPT;
+      const modules = activeSolaModules(preset, settings);
+      let content = SOLA_VIETNAMESE_OUTPUT_PROMPT;
+      if (!modules.has("mod_solahud")) content = content.replace("HUDs, ", "");
+      if (![...modules].some((name) => name.startsWith("mod_track_") || name === "mod_tempo"))
+        content = content.replace("trackers, ", "");
+      content = content.replace("headers, and props", "headers and props");
+      if (!modules.has("mod_track_fengine") && !modules.has("mod_solahud"))
+        content = content.replace("T/F/D/Y codes, ", "");
+      const values = [
+        ...(modules.has("mod_tempo") ? ["tempo"] : []),
+        ...(modules.has("mod_track_arrow") ? ["fate"] : []),
+      ];
+      content = content.replace(
+        "tempo/fate values, ",
+        values.length ? `${values.join("/")} values, ` : "",
+      );
+      if (!solaTrackersEnabled(modules)) content = content.replace(", and numeric mechanics", "");
+      return content;
+    }
     case "voyage":
       return VOYAGE_VIETNAMESE_OUTPUT_PROMPT;
     default:
@@ -116,6 +158,10 @@ export function adaptFamilyPrompt(
     return content;
   }
   if (familyOf(preset) === "sola") {
+    const modules = activeSolaModules(preset, settings);
+    if (!solaTrackersEnabled(modules))
+      content = content.replaceAll(" Trackers do not count towards word count.", "");
+    if (!modules.has("mod_solahud")) content = content.replace("`<sola_hud>`, ", "");
     content = content
       .replace(
         "Use <scene_header> to establish opening locations, time skips, or major environment shifts.",

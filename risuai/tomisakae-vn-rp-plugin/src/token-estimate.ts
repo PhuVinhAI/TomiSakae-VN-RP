@@ -74,7 +74,7 @@ export async function estimatePluginPromptTokens(
     estimate.entries.push({ identifier: "image-optimization", tokens: count(imagePrompt.content) });
   }
   if (settings.vietnameseOutputEnabled) {
-    const outputPrompt = vietnameseOutputFor(preset);
+    const outputPrompt = vietnameseOutputFor(preset, settings);
     messages.push({ role: "system", content: outputPrompt });
     estimate.entries.push({
       identifier: "vietnamese-output",

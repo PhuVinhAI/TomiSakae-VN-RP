@@ -717,7 +717,7 @@ describe("TomiSakae VN-RP preset families", () => {
         { randomInt: (min) => min },
       );
       const all = built.map((m) => m.content).join("\n");
-      expect(all).toContain(vietnameseOutputFor(preset));
+      expect(all).toContain(vietnameseOutputFor(preset, settings));
       expect(all).toContain(family === "sola" ? "## Image Coverage" : "## Rule: Image Coverage");
       expect(all).not.toContain("<vietnamese_output>");
       expect(all).not.toContain("<image_optimization>");
@@ -986,6 +986,76 @@ describe("TomiSakae VN-RP preset families", () => {
       expect(JSON.stringify(preset)).toBe(snapshot);
     },
   );
+
+  it.each([true, false])(
+    "removes Sola's unused HUD references with all trackers off and Vietnamese=%s",
+    async (vietnamese) => {
+      const preset = sources.sola.preset;
+      const settings = createDefaultSettings(preset);
+      settings.vietnameseOutputEnabled = vietnamese;
+      for (const prompt of preset.prompts) {
+        if (/^\[Module\] (?:Tracker:|Roleplay System:)/.test(prompt.name ?? ""))
+          settings.promptEnabled[prompt.identifier] = false;
+      }
+      // Both normal and expansive length rules must drop the tracker exception.
+      for (const expansive of [false, true]) {
+        settings.promptEnabled["01a0c1ff-4ecf-7009-9668-cadfeda511c3"] = expansive;
+        const built = await buildRequestMessages(
+          [{ role: "user", content: "Tiếp đi." }],
+          preset,
+          settings,
+          parse,
+          { randomInt: (min) => min },
+        );
+        const all = built.map((message) => message.content).join("\n");
+        expect(all).not.toMatch(/HUD|tracker|T\/F\/D\/Y|tempo\/fate|numeric mechanics/i);
+        expect(all).toContain("Begin every response with <scene_header>");
+        expect(all).toContain("## Immersive Props & Diegetic Artifacts");
+        expect(all).toContain(expansive ? "~700–900 words" : "~400–500 words");
+        if (vietnamese) expect(all).toContain("readable content in headers and props");
+      }
+      if (vietnamese) {
+        const estimate = await estimatePluginPromptTokens(preset, settings, host);
+        const full = await estimatePluginPromptTokens(preset, createDefaultSettings(preset), host);
+        expect(
+          estimate.entries.find((entry) => entry.identifier === "vietnamese-output")!.tokens,
+        ).toBeLessThan(
+          full.entries.find((entry) => entry.identifier === "vietnamese-output")!.tokens,
+        );
+      }
+    },
+  );
+
+  it.each([
+    ["01a0c1ff-4ecf-7025-b750-acb802f5a3ef", "wardrobe", false, ""],
+    ["01a0c1ff-4ecf-7029-a1b8-8b3b57754b2b", "fengine", true, ""],
+    ["01a0c1ff-4ecf-7008-a4dc-cfe495078cac", "tempo", false, "tempo values"],
+    ["01a0c1ff-4ecf-7023-8754-7e215d4a4eac", "arrow", false, "fate values"],
+  ])("retains Sola's standalone %s tracker without the HUD", async (id, tag, tfdy, values) => {
+    const preset = sources.sola.preset;
+    const settings = createDefaultSettings(preset);
+    for (const prompt of preset.prompts) {
+      if (/^\[Module\] (?:Tracker:|Roleplay System:)/.test(prompt.name ?? ""))
+        settings.promptEnabled[prompt.identifier] = false;
+    }
+    settings.promptEnabled[id as string] = true;
+    const built = await buildRequestMessages(
+      [{ role: "user", content: "Tiếp đi." }],
+      preset,
+      settings,
+      parse,
+      { randomInt: (min) => min },
+    );
+    const all = built.map((message) => message.content).join("\n");
+    const output = vietnameseOutputFor(preset, settings);
+    expect(all).not.toMatch(/HUD|sola_hud/i);
+    expect(all).toContain(`<${tag}>`);
+    expect(all).toContain("Trackers do not count towards word count.");
+    expect(output).toContain("headers, trackers, and props");
+    expect(output.includes("T/F/D/Y codes")).toBe(tfdy);
+    if (values) expect(output).toContain(values);
+    else expect(output).not.toMatch(/tempo values|fate values|tempo\/fate values/);
+  });
 
   it.each([true, false])(
     "requires Sola headers in the module and reasoning reminder with Vietnamese=%s",
