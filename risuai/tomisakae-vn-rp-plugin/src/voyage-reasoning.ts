@@ -1,10 +1,12 @@
 import type { FfRegexScript } from "./core.js";
 
 const GM_MARKER = String.raw`<!--\s*GM\s*-->`;
+const PROTECTED_COMMENT = String.raw`<!--(?!\s*GM\s*-->)`;
 const TAGGED_REASONING = String.raw`(?:<\s{0,8}(think|thinking|thought|thoughts|reasoning|internal_monologue|internal\s+monologue)\b[^>]*>([\s\S]*?)<\s{0,8}\/\s{0,8}\1\s{0,8}>|###\s{0,8}(?:Internal Monologue|Reasoning|Thoughts?|Thinking)\s{0,8}\n?([\s\S]*?)###\s{0,8}(?:Response|Output|Narrative|Final Answer)\s{0,8})`;
-// Only the opening before the exact GM marker is reasoning. Never consume
-// XML comments: Voyage stores character/location sheets and GM notes there.
-const REASONING = String.raw`(?:^\s*((?!<!--)\S(?:(?!<!--)[\s\S])*?)\s*(?=${GM_MARKER})|${TAGGED_REASONING.replaceAll("\\1", "\\2")}|(<!--[\s\S]*?-->))`;
+const REASONING_END = String.raw`(?:<\s{0,8}\/\s{0,8}(?:think|thinking|thought|thoughts|reasoning|internal_monologue|internal\s+monologue)\s{0,8}>|###\s{0,8}(?:Response|Output|Narrative|Final Answer)\s{0,8})`;
+// Match through repeated GM markers in reasoning to the last boundary.
+// Other XML comments remain protected character/location sheets and GM notes.
+const REASONING = String.raw`(?:^\s*((?!${PROTECTED_COMMENT})\S(?:(?!${PROTECTED_COMMENT})[\s\S])*)\s*(?=${GM_MARKER})(?!(?:(?!${PROTECTED_COMMENT})[\s\S])*${REASONING_END})|${TAGGED_REASONING.replaceAll("\\1", "\\2")}|(<!--[\s\S]*?-->))`;
 
 export const VOYAGE_REASONING_DISPLAY_ID = "vn-rp-voyage-reasoning-display";
 export const VOYAGE_REASONING_DELETE_ID = "vn-rp-voyage-reasoning-delete";
@@ -47,7 +49,7 @@ export const VOYAGE_REASONING_SCRIPTS: FfRegexScript[] = [
 ];
 
 export function renderVoyageReasoning(text: string, vietnamese: boolean): string {
-  if (text.startsWith("<!--")) return text;
+  if (/^<!--(?:(?!-->)[\s\S])*-->$/.test(text)) return text;
   const body = text
     .replace(new RegExp(TAGGED_REASONING, "gi"), "$2$3")
     .trim()

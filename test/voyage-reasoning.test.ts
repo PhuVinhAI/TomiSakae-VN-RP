@@ -114,6 +114,57 @@ describe("Voyage reasoning and defaults", () => {
     expect(splitVoyageReasoning(input).response).toBe(response);
   });
 
+  it.each([
+    "I must start with `<!-- GM -->`, then write the reply. Finish planning.",
+    "Task 0: Check the scene.\n<!--GM-->\nTask 1: Still planning.\n<!-- GM -->\nFinal check.",
+    "<!--GM-->\nStill planning before the final marker.",
+    "<think>Use <!-- GM --> after reasoning.\n<!--GM-->\nFinish planning.</think>",
+    "<Thoughts>Use <!--GM--> after reasoning; the closing tag is missing.",
+    "### Reasoning\nUse <!-- GM --> after planning.\n### Response",
+  ])("uses the last GM marker when reasoning contains markers: %s", (planning) => {
+    const input = `${planning}\n${response}`;
+    expect(clean(input)).toBe(response);
+    expect(clean(clean(input))).toBe(response);
+    const split = splitVoyageReasoning(input);
+    expect(split.response).toBe(response);
+    expect(split.prefix).toBe(`${planning}\n`);
+    expect(split.prefix + split.response).toBe(input);
+    const displayed = applyRegexScripts(input, preset, createDefaultSettings(preset), {
+      placement: PLACEMENT_AI_OUTPUT,
+      markdown: true,
+      depth: 0,
+    });
+    expect(displayed.match(/<summary\b/g)).toHaveLength(1);
+    expect(displayed.slice(displayed.indexOf("</details>") + "</details>".length).trimStart()).toBe(
+      response,
+    );
+    expect(displayed).toContain("&lt;!--");
+  });
+
+  it("keeps GM marker mentions inside hidden sheets from becoming reasoning boundaries", () => {
+    const notes = "<!--\n* Tên: An\n* Ghi chú: Giữ `<!-- GM -->` trong ví dụ.\n-->";
+    const body = `${marker}\nAn mở cửa.\n${notes}`;
+    const input = `Use \`<!--GM-->\` after planning.\n${body}`;
+    expect(clean(input)).toBe(body);
+    expect(clean(body)).toBe(body);
+    expect(splitVoyageReasoning(input).response).toBe(body);
+    const displayed = applyRegexScripts(input, preset, createDefaultSettings(preset), {
+      placement: PLACEMENT_AI_OUTPUT,
+      markdown: true,
+      depth: 0,
+    });
+    expect(displayed.slice(displayed.indexOf("</details>") + "</details>".length).trimStart()).toBe(
+      body,
+    );
+  });
+
+  it("does not use a marker inside closed reasoning when the RP has no GM marker", () => {
+    const body = `An mở cửa.\n${sheets}`;
+    const input = `<think>Use <!-- GM --> after reasoning.</think>\n${body}`;
+    expect(clean(input).trimStart()).toBe(body);
+    expect(splitVoyageReasoning(input).response).toBe(body);
+  });
+
   it("handles consecutive and Markdown reasoning without consuming comments", () => {
     const input = `<think>Plan.</think>\n<Thoughts>Check.</Thoughts>\n### Reasoning\nAudit.\n### Response\n${response}`;
     expect(clean(input).trim()).toBe(response);

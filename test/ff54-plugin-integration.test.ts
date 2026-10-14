@@ -369,7 +369,7 @@ describe("Voyage reasoning in saved history", () => {
     );
     const plugin = await startPlugin(store);
     const response = "<!-- GM -->\nAn mở cửa.\n<!--\n* Tên: An\n* Ghi chú: Giữ bí mật.\n-->";
-    const input = `Suy luận trước khi viết.\n${response}`;
+    const input = `Suy luận trước khi viết. Dùng \`<!-- GM -->\` sau suy luận.\n<!--GM-->\nTiếp tục kiểm tra nhân vật.\n${response}`;
     try {
       const chat: SavedChat = {
         id: "chat-a",
@@ -392,7 +392,11 @@ describe("Voyage reasoning in saved history", () => {
       const displayed = await plugin.callbacks.display!(input);
       expect(displayed).toContain("💭 Suy luận");
       expect(displayed).toContain("Suy luận trước khi viết.");
+      expect(displayed).toContain("Tiếp tục kiểm tra nhân vật.");
       expect(displayed).toContain(response);
+      expect(
+        displayed.slice(displayed.indexOf("</details>") + "</details>".length).trimStart(),
+      ).toBe(response);
       await plugin.settingsUi();
       expect(plugin.toggle("vn-rp-voyage-reasoning-delete").checked).toBe(true);
       expect(plugin.toggle("vn-rp-voyage-reasoning-display").checked).toBe(true);

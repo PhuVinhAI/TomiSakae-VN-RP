@@ -1640,6 +1640,42 @@ describe("FF5.4 completion sounds", () => {
 });
 
 describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
+  it("uses the final Voyage GM marker for auto rewrite and the saved swipe", async () => {
+    vi.useFakeTimers();
+    const store = normalizePresetStore(preset, undefined, {
+      submodelEditorEnabled: true,
+      submodelAutoRewriteEnabled: true,
+    });
+    store.presets[0]!.settings = switchPresetFamily(
+      store.presets[0]!.settings,
+      sources.voyage.preset,
+    );
+    const plugin = await startPlugin(true, true, store, false, false, true);
+    const raw = '<!-- GM -->\n"Come in."\n<!-- * Name: An; A-Life: waiting in the hall -->';
+    const original = `Use \`<!-- GM -->\` after reasoning.\n<!--GM-->\nFinish planning.\n${raw}`;
+    const edited = raw.replace("Come in.", "Vào đi.");
+    try {
+      await plugin.request();
+      plugin.runModel.mockImplementation(async () => {
+        await vi.advanceTimersByTimeAsync(250);
+        return {
+          type: "success",
+          result: `Use \`<!--GM-->\` after editing.\nFinish checking.\n${edited}`,
+        };
+      });
+      await plugin.complete(original);
+      expect(plugin.runModel).toHaveBeenCalledOnce();
+      expect(plugin.runModel.mock.calls[0]![0].messages.at(-2)?.content).toBe(raw);
+      const saved = plugin.chats.get("0:0")!.message.at(-1)!;
+      expect(saved.data).toBe(edited);
+      expect(saved.swipes).toEqual([original, edited]);
+      expect(saved.swipeId).toBe(1);
+      expect(plugin.api.alertError).not.toHaveBeenCalled();
+    } finally {
+      await plugin.callbacks.unload!();
+    }
+  });
+
   it("keeps Sola auto rewrite swipes valid when the watcher removes reasoning during editing", async () => {
     vi.useFakeTimers();
     const store = normalizePresetStore(preset, undefined, {
