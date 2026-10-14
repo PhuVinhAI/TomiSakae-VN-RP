@@ -117,7 +117,7 @@ describe("TomiSakae VN-RP preset families", () => {
   });
 
   it.each(["ff54", "sola", "voyage"] as const)(
-    "injects the shared Gemma fix as one user message after the latest user for %s",
+    "appends the shared Gemma fix inside the latest user message for %s",
     async (family) => {
       const preset = sources[family].preset;
       const settings = createDefaultSettings(preset);
@@ -126,19 +126,21 @@ describe("TomiSakae VN-RP preset families", () => {
       const messages = [
         { role: "user" as const, content: "Tin user cũ." },
         { role: "assistant" as const, content: "Phản hồi trước." },
-        { role: "user" as const, content: "Tin user mới." },
+        { role: "user" as const, content: "Tin user mới.", memo: "latest-user", removable: true },
       ];
-      const built = await buildRequestMessages(messages, preset, settings, parse);
+      const snapshot = structuredClone(messages);
+      const macroContext = { randomInt: (minimum: number) => minimum };
+      const built = await buildRequestMessages(messages, preset, settings, parse, macroContext);
       const memo = `${pluginMemoPrefix(preset)}gemma-fix`;
       const intimacyMemo = `${pluginMemoPrefix(preset)}gemma-intimacy-limit`;
-      const index = built.findIndex((message) => message.memo === memo);
-      expect(index).toBeGreaterThan(0);
+      const index = built.findIndex((message) => message.memo === "latest-user");
+      expect(index).toBeGreaterThanOrEqual(0);
       expect(built[index]).toMatchObject({
         role: "user",
-        content: expandHostMacros(GEMMA_FIX_PROMPT, host),
+        content: `Tin user mới.\n\n${expandHostMacros(GEMMA_FIX_PROMPT, host)}`,
+        removable: true,
       });
-      expect(built[index - 1]).toMatchObject({ role: "user", content: "Tin user mới." });
-      expect(built.filter((message) => message.memo === memo)).toHaveLength(1);
+      expect(built.filter((message) => message.memo === memo)).toHaveLength(0);
       expect(built.filter((message) => message.memo === intimacyMemo)).toHaveLength(0);
       expect(built.some((message) => message.content.includes("IntimacyLimitInstructions"))).toBe(
         false,
@@ -152,9 +154,33 @@ describe("TomiSakae VN-RP preset families", () => {
         false,
       );
 
+      const retried = await buildRequestMessages(
+        structuredClone(built),
+        preset,
+        settings,
+        parse,
+        macroContext,
+      );
+      expect(retried).toEqual(built);
+
       settings.gemmaFixEnabled = false;
-      const disabled = await buildRequestMessages(messages, preset, settings, parse);
+      const disabled = await buildRequestMessages(messages, preset, settings, parse, macroContext);
       expect(disabled.some((message) => message.memo === memo)).toBe(false);
+      expect(built).toHaveLength(disabled.length);
+      expect(built.filter((_message, position) => position !== index)).toEqual(
+        disabled.filter((_message, position) => position !== index),
+      );
+      expect(disabled[index]).toEqual(messages.at(-1));
+      expect(await buildRequestMessages(built, preset, settings, parse, macroContext)).toEqual(
+        disabled,
+      );
+      const disabledEstimate = await estimatePluginPromptTokens(preset, settings, host);
+      expect(estimate.messageCount).toBe(disabledEstimate.messageCount);
+      expect(estimate.framingTokens).toBe(disabledEstimate.framingTokens);
+      expect(estimate.contentTokens - disabledEstimate.contentTokens).toBe(
+        estimate.entries.find((entry) => entry.identifier === "gemma-fix")?.tokens,
+      );
+      expect(messages).toEqual(snapshot);
     },
   );
 

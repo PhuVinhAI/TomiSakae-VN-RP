@@ -102,10 +102,16 @@ describe("Plugin dashboard token estimates", () => {
         { randomInt: (minimum) => minimum, dialogueTheme: themedHost.dialogueTheme },
       );
       const added = request.filter((message) => message.memo?.startsWith("ff54:"));
+      const suffix = request.find((message) => message.vnRpGemmaFixSuffix)?.vnRpGemmaFixSuffix;
+      expect(suffix).toBeDefined();
       expect(estimate.contentTokens).toBe(
-        added.reduce((total, message) => total + tokenCount(message.content), 0),
+        added.reduce((total, message) => total + tokenCount(message.content), 0) +
+          tokenCount(suffix!),
       );
       expect(estimate.messageCount).toBe(added.length);
+      expect(estimate.framingTokens).toBe(
+        added.reduce((total, message) => total + 3 + tokenCount(message.role), 0),
+      );
       expect(
         estimate.entries.filter((entry) => entry.identifier === "image-optimization"),
       ).toHaveLength(1);

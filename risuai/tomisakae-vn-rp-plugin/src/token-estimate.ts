@@ -80,9 +80,10 @@ export async function estimatePluginPromptTokens(
     });
   }
   if (settings.gemmaFixEnabled) {
-    const prompt = expandHostMacros(GEMMA_FIX_PROMPT, hostContext);
-    messages.push({ role: "user", content: prompt });
-    estimate.entries.push({ identifier: "gemma-fix", tokens: count(prompt) });
+    const suffix = `\n\n${expandHostMacros(GEMMA_FIX_PROMPT, hostContext)}`;
+    const tokens = count(suffix);
+    estimate.contentTokens += tokens;
+    estimate.entries.push({ identifier: "gemma-fix", tokens });
   }
   for (const message of messages) {
     estimate.contentTokens += count(message.content);

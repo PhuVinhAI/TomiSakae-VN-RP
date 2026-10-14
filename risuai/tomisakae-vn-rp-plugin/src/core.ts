@@ -36,6 +36,7 @@ export interface ChatMessage {
   content: string;
   memo?: string;
   isComment?: boolean;
+  vnRpGemmaFixSuffix?: string;
   [key: string]: unknown;
 }
 
@@ -1018,24 +1019,28 @@ export async function buildRequestMessages(
   macroContext: MacroContext = {},
 ): Promise<ChatMessage[]> {
   if (!settings.enabled) return messages;
-  const hostMessages = messages.filter((message) => !isPluginMemo(message.memo));
+  const hostMessages = messages
+    .filter((message) => !isPluginMemo(message.memo))
+    .map((message) => {
+      // Remove only a suffix added by this plugin when rebuilding a request.
+      const { vnRpGemmaFixSuffix: suffix, ...hostMessage } = message;
+      if (typeof suffix === "string" && hostMessage.content.endsWith(suffix))
+        hostMessage.content = hostMessage.content.slice(0, -suffix.length);
+      return hostMessage;
+    });
   const requestHistory = applyRequestFiltersToMessages(hostMessages, preset, settings);
   const composed = await composePresetPrompts(preset, settings, parseHostMacros, macroContext);
-  const requestHistoryWithGemmaFix = [...requestHistory];
   if (settings.gemmaFixEnabled) {
-    let latestUserIndex = -1;
-    for (let index = requestHistoryWithGemmaFix.length - 1; index >= 0; index -= 1) {
-      if (requestHistoryWithGemmaFix[index]?.role === "user") {
-        latestUserIndex = index;
-        break;
-      }
-    }
-    if (latestUserIndex >= 0) {
-      requestHistoryWithGemmaFix.splice(latestUserIndex + 1, 0, {
-        role: "user",
-        content: await parseHostMacros(GEMMA_FIX_PROMPT, "user"),
-        memo: `${pluginMemoPrefix(preset)}gemma-fix`,
-      });
+    for (let index = requestHistory.length - 1; index >= 0; index -= 1) {
+      const message = requestHistory[index]!;
+      if (message.role !== "user") continue;
+      const suffix = `\n\n${await parseHostMacros(GEMMA_FIX_PROMPT, "user")}`;
+      requestHistory[index] = {
+        ...message,
+        content: `${message.content}${suffix}`,
+        vnRpGemmaFixSuffix: suffix,
+      };
+      break;
     }
   }
   return [
@@ -1049,7 +1054,7 @@ export async function buildRequestMessages(
           },
         ]
       : []),
-    ...injectAbsoluteAtDepth(requestHistoryWithGemmaFix, composed.absolute),
+    ...injectAbsoluteAtDepth(requestHistory, composed.absolute),
     ...composed.trailing,
   ];
 }
