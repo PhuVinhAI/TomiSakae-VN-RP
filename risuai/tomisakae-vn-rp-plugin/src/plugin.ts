@@ -371,9 +371,13 @@ function tokenEstimateHtml(estimate: PluginTokenEstimate, preset: FfPreset): str
           ? "🇻🇳 Đầu ra tiếng Việt"
           : entry.identifier === "image-optimization"
             ? "🖼️ Tối ưu hình ảnh theo card"
-            : prompt
-              ? promptUiCopy(prompt, familyOf(preset)).name
-              : entry.identifier;
+            : entry.identifier === "gemma-fix"
+              ? "🛠️ Fix Gemma 4"
+              : entry.identifier === "gemma-intimacy-limit"
+                ? "⏳ Giới hạn nhịp thân mật"
+                : prompt
+                  ? promptUiCopy(prompt, familyOf(preset)).name
+                  : entry.identifier;
       return `<div class="token-row"><span>${escapeHtml(name)}</span><strong>≈ ${number(entry.tokens)}</strong></div>`;
     })
     .join("");
@@ -569,6 +573,12 @@ async function showSettings(): Promise<void> {
       "Chọn ảnh đúng trạng thái và trang phục theo card/lore; đặt sát đoạn phù hợp, đa dạng xuyên suốt phản hồi, không đặt hai ảnh liên tiếp · Mặc định tắt",
     )}${checkbox(
       "plugin",
+      "gemma-fix",
+      settings.gemmaFixEnabled,
+      "🛠️ Fix Gemma 4",
+      "Ép đầu ra tiếng Việt, dùng ảnh có sẵn và giữ nhịp NSFW; không tự tình dục hóa nhân vật hoặc nhảy thẳng sang ERP · Mặc định tắt",
+    )}${checkbox(
+      "plugin",
       "sound-notifications",
       settings.soundNotificationsEnabled,
       "🔔 Âm báo hoàn tất",
@@ -634,6 +644,7 @@ async function showSettings(): Promise<void> {
       else if (id === "vietnamese-output") settings.vietnameseOutputEnabled = node.checked;
       else if (id === "dialogue-theme") settings.dialogueThemeEnabled = node.checked;
       else if (id === "image-optimization") settings.imageOptimizationEnabled = node.checked;
+      else if (id === "gemma-fix") settings.gemmaFixEnabled = node.checked;
       else if (id === "sound-notifications") settings.soundNotificationsEnabled = node.checked;
       else if (id === "submodel-editor") settings.submodelEditorEnabled = node.checked;
       else if (id === "submodel-auto-rewrite") settings.submodelAutoRewriteEnabled = node.checked;
@@ -688,6 +699,7 @@ async function showSettings(): Promise<void> {
       node.dataset.kind === "prompt" ||
       node.dataset.id === "vietnamese-output" ||
       node.dataset.id === "image-optimization" ||
+      node.dataset.id === "gemma-fix" ||
       node.dataset.id === "dialogue-theme"
     )
       node.addEventListener("change", refreshTokenEstimateFromUi);

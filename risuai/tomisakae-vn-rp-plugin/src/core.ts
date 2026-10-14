@@ -27,6 +27,7 @@ import {
 import { SOLA_HEADER_SAVER_ID } from "./sola-history.js";
 import { adaptSolaDisplayReplacement } from "./sola-display.js";
 import { renderVoyageReasoning, VOYAGE_REASONING_DISPLAY_ID } from "./voyage-reasoning.js";
+import { gemmaFixPromptFor, gemmaIntimacyLimitPromptFor } from "./gemma-fix.js";
 
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
@@ -98,6 +99,7 @@ export interface FfGlobalSettings {
   soundNotificationsEnabled: boolean;
   submodelEditorEnabled: boolean;
   submodelAutoRewriteEnabled: boolean;
+  gemmaFixEnabled: boolean;
 }
 
 export interface MacroContext {
@@ -197,6 +199,7 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
     soundNotificationsEnabled: false,
     submodelEditorEnabled: false,
     submodelAutoRewriteEnabled: false,
+    gemmaFixEnabled: false,
     ...(familyOf(preset) !== "ff54" ? { presetFamily: familyOf(preset) } : {}),
   };
 }
@@ -251,6 +254,8 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
     defaults.submodelAutoRewriteEnabled =
       defaults.submodelEditorEnabled && record.submodelAutoRewriteEnabled;
   }
+  if (typeof record.gemmaFixEnabled === "boolean")
+    defaults.gemmaFixEnabled = record.gemmaFixEnabled;
   return defaults;
 }
 
@@ -1016,6 +1021,32 @@ export async function buildRequestMessages(
   const hostMessages = messages.filter((message) => !isPluginMemo(message.memo));
   const requestHistory = applyRequestFiltersToMessages(hostMessages, preset, settings);
   const composed = await composePresetPrompts(preset, settings, parseHostMacros, macroContext);
+  const requestHistoryWithGemmaFix = [...requestHistory];
+  if (settings.gemmaFixEnabled) {
+    let latestUserIndex = -1;
+    for (let index = requestHistoryWithGemmaFix.length - 1; index >= 0; index -= 1) {
+      if (requestHistoryWithGemmaFix[index]?.role === "user") {
+        latestUserIndex = index;
+        break;
+      }
+    }
+    if (latestUserIndex >= 0) {
+      requestHistoryWithGemmaFix.splice(
+        latestUserIndex + 1,
+        0,
+        {
+          role: "user",
+          content: gemmaFixPromptFor(familyOf(preset)),
+          memo: `${pluginMemoPrefix(preset)}gemma-fix`,
+        },
+        {
+          role: "user",
+          content: gemmaIntimacyLimitPromptFor(settings.vietnameseOutputEnabled),
+          memo: `${pluginMemoPrefix(preset)}gemma-intimacy-limit`,
+        },
+      );
+    }
+  }
   return [
     ...composed.leading,
     ...(settings.vietnameseOutputEnabled
@@ -1027,7 +1058,7 @@ export async function buildRequestMessages(
           },
         ]
       : []),
-    ...injectAbsoluteAtDepth(requestHistory, composed.absolute),
+    ...injectAbsoluteAtDepth(requestHistoryWithGemmaFix, composed.absolute),
     ...composed.trailing,
   ];
 }

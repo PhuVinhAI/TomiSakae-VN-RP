@@ -58,6 +58,13 @@ import {
 } from "../risuai/tomisakae-vn-rp-plugin/src/vietnamese.js";
 import { adaptSolaRegexForVietnamese } from "../risuai/tomisakae-vn-rp-plugin/src/sola-vietnamese-regex.js";
 import {
+  GEMMA_FIX_PROMPT_FF54,
+  GEMMA_FIX_PROMPT_SOLA,
+  GEMMA_FIX_PROMPT_VOYAGE,
+  GEMMA_INTIMACY_LIMIT_PROMPT,
+  gemmaIntimacyLimitPromptFor,
+} from "../risuai/tomisakae-vn-rp-plugin/src/gemma-fix.js";
+import {
   adaptSolaDialogueColors,
   SOLA_DIALOGUE_COLORS,
   textContrast,
@@ -113,6 +120,64 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(text).not.toContain("<internal_states>");
     const recall = built.findIndex((m) => m.content.includes("internally recall ALL"));
     expect(recall).toBeGreaterThan(built.findIndex((m) => m.content === "Tôi vào phòng."));
+  });
+
+  it.each([
+    ["ff54", GEMMA_FIX_PROMPT_FF54],
+    ["sola", GEMMA_FIX_PROMPT_SOLA],
+    ["voyage", GEMMA_FIX_PROMPT_VOYAGE],
+  ] as const)(
+    "injects the %s Gemma fix as a user message immediately after the latest user",
+    async (family, prompt) => {
+      const preset = sources[family].preset;
+      const settings = createDefaultSettings(preset);
+      expect(settings.gemmaFixEnabled).toBe(false);
+      settings.gemmaFixEnabled = true;
+      const messages = [
+        { role: "user" as const, content: "Tin user cũ." },
+        { role: "assistant" as const, content: "Phản hồi trước." },
+        { role: "user" as const, content: "Tin user mới." },
+      ];
+      const built = await buildRequestMessages(messages, preset, settings, parse);
+      const memo = `${pluginMemoPrefix(preset)}gemma-fix`;
+      const intimacyMemo = `${pluginMemoPrefix(preset)}gemma-intimacy-limit`;
+      const index = built.findIndex((message) => message.memo === memo);
+      expect(index).toBeGreaterThan(0);
+      expect(built[index]).toMatchObject({ role: "user", content: prompt });
+      expect(built[index + 1]).toMatchObject({
+        role: "user",
+        memo: intimacyMemo,
+        content: gemmaIntimacyLimitPromptFor(settings.vietnameseOutputEnabled),
+      });
+      expect(
+        built
+          .slice(0, index)
+          .some((message) => message.role === "user" && message.content === "Tin user mới."),
+      ).toBe(true);
+      expect(built.filter((message) => message.memo === memo)).toHaveLength(1);
+      expect(built.filter((message) => message.memo === intimacyMemo)).toHaveLength(1);
+
+      const estimate = await estimatePluginPromptTokens(preset, settings, host);
+      expect(
+        estimate.entries.find((entry) => entry.identifier === "gemma-fix")?.tokens,
+      ).toBeGreaterThan(0);
+      expect(
+        estimate.entries.find((entry) => entry.identifier === "gemma-intimacy-limit")?.tokens,
+      ).toBeGreaterThan(0);
+    },
+  );
+
+  it("localizes only the sample dialogue when Vietnamese Output is enabled", () => {
+    expect(gemmaIntimacyLimitPromptFor(false)).toBe(GEMMA_INTIMACY_LIMIT_PROMPT);
+    const localized = gemmaIntimacyLimitPromptFor(true);
+    expect(localized).toContain("**Incorrect (Prioritizing Plot):**");
+    expect(localized).toContain("**Correct (Prioritizing Boundary):**");
+    expect(localized).toContain('Character A: "Bạn muốn ghé chỗ tôi uống gì không?"');
+    expect(localized).toContain('Character B: "Tôi tự gọi xe thì hơn. Mai gặp lại nhé."');
+    expect(localized).toContain("This moves the plot forward");
+    expect(localized).toContain('Character A: "Come back to my place for a drink?"');
+    expect(localized).toContain("### [CORE CONSTRAINT: NARRATIVE PACING & TRUST PROTOCOL]");
+    expect(localized).toContain("**Incorrect (Prioritizing Plot):**");
   });
 
   it("keeps the selected FF5.4 jailbreak content and only gives it Voyage structure", () => {
