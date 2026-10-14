@@ -1714,7 +1714,9 @@ describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
     expect(plugin.settingsHtml()).toContain("Kiểm tra PbtA do người dùng tung");
     expect(plugin.settingsHtml()).not.toContain("[V][R]");
     expect(plugin.settingsHtml()).not.toContain("Preset gốc không có chú thích");
-    expect(plugin.settingsHtml()).toContain("Bộ preset này không có bộ lọc kỹ thuật riêng.");
+    expect(plugin.settingsHtml()).toContain("Xem 2 bộ lọc");
+    expect(plugin.settingsHtml()).toContain("Xóa suy luận");
+    expect(plugin.settingsHtml()).toContain("Thu gọn suy luận");
     expect(plugin.settingsHtml()).not.toContain("Xem 0 bộ lọc");
   });
 
@@ -1761,7 +1763,7 @@ describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
           message.memo ===
           (family === "sola"
             ? "vn-rp:sola:jailbreak"
-            : "vn-rp:voyage:vn-rp-voyage-ff54-jailbreak:post-history"),
+            : "vn-rp:voyage:713e9dd1-366f-4f2a-9e4b-5e28b6ee63a5"),
       );
       expect(editorIndex).toBeGreaterThan(-1);
       expect(editorIndex + 1).toBe(postHistoryIndex);

@@ -360,6 +360,48 @@ async function startPlugin(
   };
 }
 
+describe("Voyage reasoning in saved history", () => {
+  it("removes reasoning from real history and requests while retaining GM comments and sheets", async () => {
+    const store = normalizePresetStore(preset, undefined, undefined, sources);
+    store.presets[0]!.settings = switchPresetFamily(
+      store.presets[0]!.settings,
+      sources.voyage.preset,
+    );
+    const plugin = await startPlugin(store);
+    const response = "<!-- GM -->\nAn mở cửa.\n<!--\n* Tên: An\n* Ghi chú: Giữ bí mật.\n-->";
+    const input = `Suy luận trước khi viết.\n${response}`;
+    try {
+      const chat: SavedChat = {
+        id: "chat-a",
+        message: [
+          { role: "user", data: "Chào An.", chatId: "user-a" },
+          { role: "char", data: input, chatId: "reply-a" },
+          { role: "user", data: "Tiếp đi.", chatId: "user-b" },
+        ],
+      };
+      plugin.chats.set("0:0", chat);
+      const built = await plugin.request(
+        chat.message.map((entry) => ({
+          role: entry.role === "char" ? "assistant" : "user",
+          content: entry.data,
+          memo: entry.chatId,
+        })),
+      );
+      expect(plugin.chats.get("0:0")!.message[1]!.data).toBe(response);
+      expect(built.find((message) => message.memo === "reply-a")?.content).toBe(response);
+      const displayed = await plugin.callbacks.display!(input);
+      expect(displayed).toContain("💭 Suy luận");
+      expect(displayed).toContain("Suy luận trước khi viết.");
+      expect(displayed).toContain(response);
+      await plugin.settingsUi();
+      expect(plugin.toggle("vn-rp-voyage-reasoning-delete").checked).toBe(true);
+      expect(plugin.toggle("vn-rp-voyage-reasoning-display").checked).toBe(true);
+    } finally {
+      await plugin.callbacks.unload!();
+    }
+  });
+});
+
 describe("Named presets in plugin UI and requests", () => {
   it.each(["ff54", "sola", "voyage"] as const)(
     "locks Auto Submodel to the editor toggle for %s and persists the dependency",

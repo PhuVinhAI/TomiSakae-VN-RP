@@ -364,7 +364,7 @@ export const VOYAGE_PROMPT_COPY: Readonly<Record<string, UiCopy>> = {
   ),
   "2c0a0577-b4c5-4a82-b6ad-6c524a1e7678": copy(
     "Ngôi thứ hai",
-    "Gọi nhân vật người chơi trực tiếp bằng ngôi thứ hai; khi bật tiếng Việt, cách xưng hô theo quan hệ và bối cảnh.",
+    "Gọi nhân vật người chơi là “bạn/của bạn” trong lời kể.",
   ),
   "2e8f70a4-f5b6-455b-9f62-e9a3d50665b6": copy(
     "Ngôi thứ ba",
@@ -700,5 +700,17 @@ export function solaRegexUiCopy(script: FfRegexScript): (UiCopy & { group: strin
         : category.description) + depth,
     group:
       prefix === "Sola Scene" && subject?.startsWith("Header -") ? "Header mở cảnh" : category.name,
+  };
+}
+
+export function voyageRegexUiCopy(script: FfRegexScript): (UiCopy & { group: string }) | undefined {
+  if (!script.scriptName?.startsWith("Voyage Reasoning:")) return undefined;
+  const deletion = script.promptOnly === true;
+  return {
+    name: deletion ? "Xóa suy luận" : "Thu gọn suy luận",
+    description: deletion
+      ? "Xóa suy luận trước comment <!-- GM --> hoặc trong thẻ suy luận khỏi lịch sử thật và request; giữ RP cùng hồ sơ, ghi chú ẩn."
+      : "Bọc suy luận trước comment <!-- GM --> hoặc trong thẻ suy luận thành khối có thể mở và thu gọn trên UI.",
+    group: "Suy luận",
   };
 }

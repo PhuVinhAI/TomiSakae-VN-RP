@@ -46,6 +46,7 @@ import {
 import { insertSubmodelEditorSystem, editorUserFor } from "./editor-prompts.js";
 import { adaptSolaSceneHeaderForDisplay } from "./sola-display.js";
 import { splitSolaReasoning } from "./sola-reasoning.js";
+import { splitVoyageReasoning } from "./voyage-reasoning.js";
 import { SETTINGS_STYLES } from "./ui-style.js";
 import {
   createRewriteButton,
@@ -926,7 +927,6 @@ async function cleanSavedHistory(
   skipStreaming = false,
 ): Promise<void> {
   const preset = sourceForSettings(settings);
-  if (familyOf(preset) === "voyage") return;
   const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
   if (!chat?.message?.length || (skipStreaming && chat.isStreaming)) return;
   const sourceSignature = savedHistorySignature(chat);
@@ -947,6 +947,7 @@ async function cleanSavedHistory(
       );
       return restored === source.content ? source : { ...source, content: restored };
     }
+    if (familyOf(preset) === "voyage") return source;
     const currentState = extractInternalStateBlock(source.content);
     const storedState =
       typeof entry.ff54InternalState === "string" && entry.ff54InternalState.trim()
@@ -1202,6 +1203,7 @@ function splitEditorReasoning(text: string): { prefix: string; response: string 
 
 function splitEditorResponse(text: string, preset: FfPreset): { prefix: string; response: string } {
   if (familyOf(preset) === "sola") return splitSolaReasoning(text);
+  if (familyOf(preset) === "voyage") return splitVoyageReasoning(text);
   const reasoning = splitEditorReasoning(text);
   const header = splitBeforeSceneHeader(reasoning.response);
   return { prefix: reasoning.prefix + header.prefix, response: header.response };

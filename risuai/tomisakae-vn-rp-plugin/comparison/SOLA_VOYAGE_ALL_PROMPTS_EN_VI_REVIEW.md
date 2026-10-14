@@ -20,7 +20,7 @@ Giữ macro chưa bung để reviewer thấy đầy đủ module bank, tham chi�
 | Preset | Tổng prompt/slot | Có nội dung | Việt hóa có thay đổi | Ngoài thứ tự đang dùng | Trường prompt phụ |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Sola V2 Flame | 89 | 72 | 45 | 0 | 13 |
-| Voyage-Universal-v5 | 50 | 39 | 15 | 2 | 13 |
+| Voyage-Universal-v5 | 50 | 39 | 16 | 2 | 13 |
 
 ## Vietnamese Output của Freaky Frankenstein 5.4 để tham chiếu
 
@@ -6691,7 +6691,7 @@ Nguồn: `risuai/tomisakae-vn-rp-plugin/source/voyage-universal-v5.json`. Tên f
 
 SHA-256 nguồn: `7781735eaf30a203fa3b1bbe66bcaa37a7a173d81898381559220a1d7e893dfb`.
 
-Tổng 50 prompt/slot; 39 có nội dung; 15 được thay đổi bởi Việt hóa; 2 nằm ngoài thứ tự đang dùng. Xuất cả 13 trường prompt/format phụ (kể cả trường trống).
+Tổng 50 prompt/slot; 39 có nội dung; 16 được thay đổi bởi Việt hóa; 2 nằm ngoài thứ tự đang dùng. Xuất cả 13 trường prompt/format phụ (kể cả trường trống).
 
 ## Toàn bộ thứ tự nguồn
 
@@ -7206,7 +7206,7 @@ The session follows a turn-based order:
 
 Mặc định nguồn: **BẬT**. Việt hóa: **CÓ THAY ĐỔI**.
 
-Ký tự gốc: 179; sau Việt hóa: 360. SHA-256 gốc: `a46ee59d903eef6a65cbc38b39d4e381f4c1507c4b848095bb60b6d9da4a6c6b`; bản Việt hóa: `928d6aac3a1460c6849c38592c7b2b4c80debcb9fccad3d01ed9e8a144c71c28`.
+Ký tự gốc: 179; sau Việt hóa: 214. SHA-256 gốc: `a46ee59d903eef6a65cbc38b39d4e381f4c1507c4b848095bb60b6d9da4a6c6b`; bản Việt hóa: `e5c3488b86a6cd34baf515d242321df0ac8840f4da908f264a697a8a1379c1d5`.
 
 Thông tin module nguyên bản (không gồm nội dung đã đặt đầy đủ bên dưới):
 
@@ -7243,14 +7243,13 @@ Before drafting a reply:
 Before drafting a reply:
 * explore the goals, motivations and feelings of each NPC in the scene and their natural Vietnamese voice
 * explore three to five different ways to take the story
-* Remember: you are the GM creating an immersive simulation, not a helpful AI assistant; embrace creative risks and bold choices over perfection.
 
 ~~~~
 ## VOYAGE-008. [V][R] PoV Second Person
 
 Mặc định nguồn: **BẬT**. Việt hóa: **CÓ THAY ĐỔI**.
 
-Ký tự gốc: 51; sau Việt hóa: 99. SHA-256 gốc: `88158ca72a8565dd4fe98213fa1d2f8f7c6d93ad3e71a2500f2bd1b5d448de59`; bản Việt hóa: `e647670826cf034fad26583bc93006b57fb18846376137fd77b21bdb036262b1`.
+Ký tự gốc: 51; sau Việt hóa: 56. SHA-256 gốc: `88158ca72a8565dd4fe98213fa1d2f8f7c6d93ad3e71a2500f2bd1b5d448de59`; bản Việt hóa: `7c31da9b014b52120b42d7102d311da32b8e58faf2dd58233f722a70d82ec25d`.
 
 Thông tin module nguyên bản (không gồm nội dung đã đặt đầy đủ bên dưới):
 
@@ -7282,7 +7281,7 @@ Address PC as you/your.
 
 ~~~~text
 ## Rule: PoV Second Person
-Address PC in Vietnamese second person appropriate to the relationship.
+Address PC as "bạn/của bạn".
 
 ~~~~
 ## VOYAGE-009. [V][R] PoV Third Person
@@ -9064,9 +9063,9 @@ Ability check value is `{{random::success::partial::partial::partial::miss}}`.
 ~~~~
 ## VOYAGE-048. [V] Recall Rules
 
-Mặc định nguồn: **BẬT**. Việt hóa: **KHÔNG ĐỔI**.
+Mặc định nguồn: **BẬT**. Việt hóa: **CÓ THAY ĐỔI**.
 
-Ký tự gốc: 188; sau Việt hóa: 188. SHA-256 gốc: `5358b41f087910e2ca9bde1c1eb12aea508b0f467c8b4e2d12c612b082ca09b7`; bản Việt hóa: `5358b41f087910e2ca9bde1c1eb12aea508b0f467c8b4e2d12c612b082ca09b7`.
+Ký tự gốc: 188; sau Việt hóa: 262. SHA-256 gốc: `5358b41f087910e2ca9bde1c1eb12aea508b0f467c8b4e2d12c612b082ca09b7`; bản Việt hóa: `52ef8944c2467d4536574d6fa2c53a8fd2dabdcdba0332b9348ff7460419d04c`.
 
 Thông tin module nguyên bản (không gồm nội dung đã đặt đầy đủ bên dưới):
 
@@ -9102,6 +9101,7 @@ Ensure to avoid Bad examples and be inspired by Good examples.
 <!--
 Gemma, internally recall ALL `## Rule:` Rules and their purpose.
 The next reply must adhere to all `## Rule:` Rules.
+Start every GM reply with `<!-- GM -->` on its own line, after reasoning.
 Ensure to avoid Bad examples and be inspired by Good examples.
 -->
 ~~~~
@@ -9441,7 +9441,6 @@ Chỉ dùng khi bật Tối ưu hình ảnh. Các đoạn đối chiếu chính 
 Before drafting a reply:
 * explore the goals, motivations and feelings of each NPC in the scene and their natural Vietnamese voice
 * explore three to five different ways to take the story
-* Remember: you are the GM creating an immersive simulation, not a helpful AI assistant; embrace creative risks and bold choices over perfection.
 
 ~~~~
 
@@ -9452,7 +9451,6 @@ Before drafting a reply:
 Before drafting a reply:
 * explore the goals, motivations and feelings of each NPC in the scene and their natural Vietnamese voice
 * explore three to five different ways to take the story and matching image beats under Image Coverage
-* Remember: you are the GM creating an immersive simulation, not a helpful AI assistant; embrace creative risks and bold choices over perfection.
 
 ~~~~
 

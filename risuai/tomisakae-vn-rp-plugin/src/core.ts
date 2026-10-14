@@ -26,6 +26,7 @@ import {
 } from "./sola-vietnamese-regex.js";
 import { SOLA_HEADER_SAVER_ID } from "./sola-history.js";
 import { adaptSolaDisplayReplacement } from "./sola-display.js";
+import { renderVoyageReasoning, VOYAGE_REASONING_DISPLAY_ID } from "./voyage-reasoning.js";
 
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
@@ -165,8 +166,8 @@ const VOYAGE_PROMPT_DEFAULTS: Readonly<Record<string, boolean>> = {
   "867a59b8-8216-4d9f-bc24-222490ed0051": false, // OOC
   "54e77eae-eba6-49f4-b594-4266aaf19ef0": false, // Game Over
   "43769028-2d80-4b27-b795-bbbdf7730a44": true, // Mortality
-  "216aa279-7af9-401b-8d51-fea7cc725a43": true, // Adult Topics
-  "ee7a5f53-672d-4b32-a607-c976db5f32eb": true, // Adult Language
+  "216aa279-7af9-401b-8d51-fea7cc725a43": false, // Adult Topics
+  "ee7a5f53-672d-4b32-a607-c976db5f32eb": false, // Adult Language
 };
 
 export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
@@ -184,7 +185,7 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
       promptDefaults[entry.identifier] ?? entry.enabled !== false,
     ]),
   );
-  if (familyOf(preset) === "voyage") promptEnabled[VOYAGE_FF54_JAILBREAK_ID] = true;
+  if (familyOf(preset) === "voyage") promptEnabled[VOYAGE_FF54_JAILBREAK_ID] = false;
   return {
     enabled: true,
     promptEnabled,
@@ -714,6 +715,12 @@ export function applyRegexScripts(
       options.markdown ? adaptDialogueColorRegex(findRegex) : findRegex,
     );
     if (!regex) continue;
+    if (options.markdown && script.id === VOYAGE_REASONING_DISPLAY_ID) {
+      output = output.replace(regex, (match) =>
+        renderVoyageReasoning(match, settings.vietnameseOutputEnabled),
+      );
+      continue;
+    }
     if (
       options.onHistoryRemoval &&
       script.scriptName?.startsWith("Sola Saver:") &&

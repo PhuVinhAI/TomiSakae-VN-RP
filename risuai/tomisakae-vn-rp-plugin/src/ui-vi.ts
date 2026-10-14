@@ -4,6 +4,7 @@ import {
   SOLA_SECTION_COPY,
   VOYAGE_PROMPT_COPY,
   solaRegexUiCopy,
+  voyageRegexUiCopy,
   type UiCopy,
 } from "./preset-ui-copy.js";
 
@@ -396,12 +397,19 @@ export function promptUiCopy(
 }
 
 export function regexUiName(script: FfRegexScript): string {
-  return solaRegexUiCopy(script)?.name ?? REGEX_NAMES[script.id] ?? script.scriptName ?? script.id;
+  return (
+    solaRegexUiCopy(script)?.name ??
+    voyageRegexUiCopy(script)?.name ??
+    REGEX_NAMES[script.id] ??
+    script.scriptName ??
+    script.id
+  );
 }
 
 export function regexUiCopy(script: FfRegexScript): UiCopy {
   return (
-    solaRegexUiCopy(script) ?? {
+    solaRegexUiCopy(script) ??
+    voyageRegexUiCopy(script) ?? {
       name: regexUiName(script),
       description: "Quy tắc kỹ thuật của preset gốc",
     }

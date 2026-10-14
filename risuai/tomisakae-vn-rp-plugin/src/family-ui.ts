@@ -177,6 +177,7 @@ export function familyRegexGroups(preset: FfPreset): { label: string; ids: strin
   for (const script of familyRegexScripts(preset)) {
     const label =
       solaRegexUiCopy(script)?.group ??
+      (script.scriptName?.startsWith("Voyage Reasoning:") ? "Suy luận" : undefined) ??
       (script.promptOnly ? "Ngữ cảnh gửi model" : "Hiển thị & định dạng");
     const ids = groups.get(label) ?? [];
     ids.push(script.id);

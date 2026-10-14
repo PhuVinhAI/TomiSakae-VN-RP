@@ -887,10 +887,7 @@ export const VOYAGE_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, str
     "4. reason what would be realistic for them to say",
     "4. reason what would be realistic for them to say in natural Vietnamese",
   ],
-  [
-    "Address PC as you/your.",
-    "Address PC in Vietnamese second person appropriate to the relationship.",
-  ],
+  ["Address PC as you/your.", 'Address PC as "bạn/của bạn".'],
 ];
 
 export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [

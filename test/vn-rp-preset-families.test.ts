@@ -50,6 +50,7 @@ import {
 } from "../risuai/tomisakae-vn-rp-plugin/src/family-ui.js";
 import { promptUiCopy, regexUiCopy } from "../risuai/tomisakae-vn-rp-plugin/src/ui-vi.js";
 import { solaRegexUiCopy } from "../risuai/tomisakae-vn-rp-plugin/src/preset-ui-copy.js";
+import { VOYAGE_GM_START_RULE } from "../risuai/tomisakae-vn-rp-plugin/src/voyage-reasoning.js";
 import { adaptSolaSceneHeaderForDisplay } from "../risuai/tomisakae-vn-rp-plugin/src/sola-display.js";
 import {
   SOLA_VIETNAMESE_REPLACEMENTS,
@@ -98,7 +99,7 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(presetOrder(preset)).toHaveLength(48);
     const settings = createDefaultSettings(preset);
     expect(Object.keys(settings.promptEnabled)).toHaveLength(49);
-    expect(settings.promptEnabled[VOYAGE_FF54_JAILBREAK_ID]).toBe(true);
+    expect(settings.promptEnabled[VOYAGE_FF54_JAILBREAK_ID]).toBe(false);
     const built = await buildRequestMessages(
       [{ role: "user", content: "Tôi vào phòng." }],
       preset,
@@ -137,6 +138,7 @@ describe("TomiSakae VN-RP preset families", () => {
   it("places all three Voyage jailbreak stages in FF5.4 order behind one switch", async () => {
     const preset = sources.voyage.preset;
     const settings = createDefaultSettings(preset);
+    settings.promptEnabled[VOYAGE_FF54_JAILBREAK_ID] = true;
     const built = await buildRequestMessages(
       [{ role: "user", content: "Tiếp tục." }],
       preset,
@@ -192,6 +194,7 @@ describe("TomiSakae VN-RP preset families", () => {
   it("reports Voyage's three jailbreak stages as one combined token entry", async () => {
     const preset = sources.voyage.preset;
     const settings = createDefaultSettings(preset);
+    settings.promptEnabled[VOYAGE_FF54_JAILBREAK_ID] = true;
     const estimate = await estimatePluginPromptTokens(preset, settings, host);
     expect(
       estimate.entries.filter((entry) => entry.identifier === VOYAGE_FF54_JAILBREAK_ID),
@@ -673,7 +676,12 @@ describe("TomiSakae VN-RP preset families", () => {
       if (script.promptOnly && script.minDepth != null)
         expect(copy.description).toContain(`độ sâu ${script.minDepth}`);
     }
-    expect(familyRegexGroups(sources.voyage.preset)).toEqual([]);
+    expect(familyRegexGroups(sources.voyage.preset)).toEqual([
+      {
+        label: "Suy luận",
+        ids: ["vn-rp-voyage-reasoning-delete", "vn-rp-voyage-reasoning-display"],
+      },
+    ]);
   });
 
   it.each(["sola", "voyage"] as const)(
@@ -770,8 +778,11 @@ describe("TomiSakae VN-RP preset families", () => {
                 .replace("* > blockquote for documents and chat messages\n", "")
                 .replace("* ```codeblock``` for terminal and code\n", "")
             : prompt.content;
-        if (family === "voyage" && prompt.identifier === VOYAGE_CHAIN_OF_THOUGHT_ID) {
-          expectedWithoutVietnamese = `${expectedWithoutVietnamese.trimEnd()}\n${VOYAGE_JAILBREAK_REASONING_LINE}\n`;
+        if (family === "voyage") {
+          expectedWithoutVietnamese = expectedWithoutVietnamese.replace(
+            "The next reply must adhere to all `## Rule:` Rules.",
+            `The next reply must adhere to all \`## Rule:\` Rules.\n${VOYAGE_GM_START_RULE}`,
+          );
         }
         const withoutVietnamese = adaptFamilyPrompt(prompt.content, preset, {
           ...settings,

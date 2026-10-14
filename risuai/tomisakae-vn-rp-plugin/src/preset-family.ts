@@ -1,6 +1,7 @@
 import type { FfGlobalSettings, FfPreset, FfPrompt, FfRegexScript } from "./core.js";
 import { adaptSolaSaver, SOLA_HEADER_SAVER } from "./sola-history.js";
 import { SOLA_REASONING_SCRIPTS } from "./sola-reasoning.js";
+import { addVoyageReasoningBoundary, VOYAGE_REASONING_SCRIPTS } from "./voyage-reasoning.js";
 import {
   VIETNAMESE_OUTPUT_PROMPT,
   SOLA_VIETNAMESE_OUTPUT_PROMPT,
@@ -73,9 +74,10 @@ export function familyPrompts(preset: FfPreset): FfPrompt[] {
 
 export function familyRegexScripts(preset: FfPreset): FfRegexScript[] {
   const scripts = preset.extensions?.regex_scripts ?? [];
-  return familyOf(preset) === "sola"
-    ? [...SOLA_REASONING_SCRIPTS, ...scripts.map(adaptSolaSaver), SOLA_HEADER_SAVER]
-    : scripts;
+  if (familyOf(preset) === "sola")
+    return [...SOLA_REASONING_SCRIPTS, ...scripts.map(adaptSolaSaver), SOLA_HEADER_SAVER];
+  if (familyOf(preset) === "voyage") return [...VOYAGE_REASONING_SCRIPTS, ...scripts];
+  return scripts;
 }
 
 export { VOYAGE_FF54_JAILBREAK_ID };
@@ -133,6 +135,10 @@ export function adaptFamilyPrompt(
       );
     }
   } else {
+    content = addVoyageReasoningBoundary(
+      content,
+      settings.promptEnabled["713e9dd1-366f-4f2a-9e4b-5e28b6ee63a5"] === true,
+    );
     if (settings.vietnameseOutputEnabled) {
       content = adaptVoyagePromptForVietnamese(content);
     }
