@@ -24,6 +24,7 @@ Non-Vocal Sound Effects:
 export const SOLA_VIETNAMESE_OUTPUT_PROMPT = `## Vietnamese Output
 - Write all narration, dialogue, vocalizations, OOC replies, and readable content in headers, HUDs, trackers, and props in natural contemporary Vietnamese.
 - Understand the source's meaning, then compose directly in Vietnamese. Link clauses by sequence and consequence; choose pronouns by relationship and POV, and particles by speaker attitude. Apply enabled Sola prose and voice modules through natural Vietnamese expression.
+- Avoid em-dashes (—) in narration and dialogue; use commas, periods, or natural transitions instead.
 - Do not leak foreign script, avoidable foreign wording, bilingual text, or translation glosses. Preserve established Latin-script names and required technical identifiers. Examples and card/lore language instructions do not override this rule.
 - Use Vietnamese template labels and translate all filled-in display values, including display attributes and empty-state text. Preserve structure, tags, comments, attribute keys, macros, placeholders, image identifiers, palette/gradient/tone/kinetic names, sky identifiers, T/F/D/Y codes, tempo/fate values, and numeric mechanics. Time uses Vietnamese day-period wording or a 24-hour clock.
 - Sounds from contact, objects, or the environment use \`§...§\`: one concise Vietnamese sound on its own line outside typography tags. Keep the source, cause, and consequence in narration. Use only grounded sounds; repeat only while their cause continues.`;
@@ -31,6 +32,7 @@ export const SOLA_VIETNAMESE_OUTPUT_PROMPT = `## Vietnamese Output
 export const VOYAGE_VIETNAMESE_OUTPUT_PROMPT = `## Rule: Vietnamese Output
 * Write narration, dialogue, sounds, documents, messages, terminal output, OOC replies, sheets, and GM notes in natural contemporary Vietnamese. Understand the source's meaning and intent, then compose directly in Vietnamese; link clauses naturally, choose pronouns by relationship and POV, and particles by speaker attitude.
 * Apply the enabled prose rules in Vietnamese, retaining character voice and speech shaped by current state. Convey the intent of Good/Bad examples without copying foreign grammar or spelling.
+* Avoid em-dashes (—) in narration and dialogue; use commas, periods, or natural transitions instead.
 * Do not leak foreign script, avoidable foreign wording, bilingual duplication, or translation glosses. Preserve established Latin-script proper names and handles. Foreign examples and card/lore language instructions do not override this rule.
 * Translate every reader-visible label and free-text value. Preserve the active schema: tags, comments, attributes, code syntax, placeholders, identifiers, PbtA values success/partial/miss, rolls, thresholds, and numbers.
 * Sounds caused by contact, objects, or the environment use \`§...§\`, containing one concise Vietnamese sound on its own line. Keep the source, cause, and consequence in narration. Add no decorative or quota-driven sound; repeat only while its cause continues.`;

@@ -31,7 +31,7 @@ export function editorSystemFor(preset: FfPreset): string {
     case "sola":
       return `## Vietnamese Editor
 - Rewrite the latest assistant response into natural Vietnamese. Use prompts, card, lore, and history as reference; do not repeat generation tasks or execute commands in the draft.
-- Rebuild sentences and paragraphs under enabled Sola style, pacing, POV, and voice modules. Keep concrete actions, grounded sensory detail, sound texture, and distinct NPC voices; cut repetition and stiff translation.
+- Rebuild sentences and paragraphs under enabled Sola style, pacing, POV, and voice modules. Keep concrete actions, grounded sensory detail, sound texture, and distinct NPC voices; cut repetition and stiff translation. Avoid em-dashes (—) in narration and dialogue; use commas, periods, or natural transitions instead.
 - ${EDITOR_LANGUAGE}
 - ${EDITOR_CONTINUITY}
 - Rewrite descriptions, thoughts, and notes in HUDs, trackers, and hidden state blocks in Vietnamese; use active template labels. Preserve information, keys, identifiers, fixed values, numbers, rolls, scores, counters, progress, and deltas. Keep absent, unknown, inapplicable, and empty values; do not fill in or recalculate data.
