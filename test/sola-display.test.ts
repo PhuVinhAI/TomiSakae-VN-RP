@@ -198,6 +198,64 @@ describe("Sola message UI", () => {
     }
   });
 
+  it.each(["heavy", "crush"])(
+    "gives %s dialogue a Vietnamese font and room for accents across colors, gradients and standalone effects",
+    (effect) => {
+      const snapshot = JSON.stringify(preset);
+      const text =
+        effect === "crush"
+          ? '"KHÔNG CÓ CHUYỆN ĐÓ! TUYỆT ĐỐI KHÔNG! Xé luôn cái kế hoạch ấy ra rồi ném vào lò sưởi cho tôi!"'
+          : '"Ngồi yên đó. Trong tầm mắt tôi. Cậu mà há miệng nhắc lại chuyện đó thêm một từ, tôi mở cửa và vứt cậu ra giữa đường cao tốc, nghe rõ chưa."';
+      for (const vietnameseOutputEnabled of [true, false]) {
+        const settings = createDefaultSettings(preset);
+        settings.vietnameseOutputEnabled = vietnameseOutputEnabled;
+        settings.dialogueThemeEnabled = false;
+        for (const content of [text, text.normalize("NFD")]) {
+          for (const tag of [
+            `marigold:${effect}`,
+            `solstice:${effect}`,
+            effect,
+            `kinetic:${effect}`,
+          ]) {
+            const input = `<${tag}>${content}</${tag}>`;
+            const displayed = applyRegexScripts(input, preset, settings, {
+              placement: PLACEMENT_AI_OUTPUT,
+              markdown: true,
+              depth: 0,
+            });
+            expect(displayed).toContain(content);
+            expect(displayed).toContain("font-family:system-ui");
+            expect(displayed).toContain("'Segoe UI',Roboto,'Noto Sans',Arial,sans-serif");
+            expect(displayed).toContain("line-height:1.5;");
+            expect(displayed).not.toContain(`<${tag}>`);
+            expect(displayed).not.toContain(`</${tag}>`);
+            if (effect === "heavy") {
+              expect(displayed).toContain("font-size:1.16em;");
+              expect(displayed).toContain("font-weight:900;");
+              expect(displayed).toContain("letter-spacing:0.5px;");
+            } else {
+              expect(displayed).toContain("font-weight:800;");
+              expect(displayed).toContain("transform:scaleY(0.92);");
+              expect(displayed).toContain("letter-spacing:-0.8px;");
+              expect(displayed).toContain("opacity:0.95;");
+            }
+            if (tag.startsWith("marigold:")) expect(displayed).toContain("color:#F4A261;");
+            if (tag.startsWith("solstice:"))
+              expect(displayed).toContain("linear-gradient(135deg,#F4A261,#EE6C4D)");
+            expect(
+              applyRegexScripts(input, preset, settings, {
+                placement: PLACEMENT_AI_OUTPUT,
+                prompt: true,
+                depth: 0,
+              }),
+            ).toBe(input);
+          }
+        }
+      }
+      expect(JSON.stringify(preset)).toBe(snapshot);
+    },
+  );
+
   it("synchronizes all six gradients with the prompt and preserves their effects in both themes", async () => {
     const snapshot = JSON.stringify(preset);
     const gradients = {

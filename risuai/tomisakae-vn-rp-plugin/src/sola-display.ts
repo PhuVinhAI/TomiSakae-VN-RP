@@ -26,6 +26,15 @@ function setStyle(style: string, property: string, value: string): string {
 
 /** Adapt only plugin UI templates before captures are inserted; leave RP and source data intact. */
 export function adaptSolaDisplayReplacement(replacement: string, scriptName: string): string {
+  if (/^Sola (?:Voice: Kinetic |Gradient Mod: |Kinetic: )(?:Heavy|Crush)$/.test(scriptName)) {
+    return replacement.replace(
+      /(<span\b[^>]*?\bstyle=")([^"]*)(")/gi,
+      (_match, opening: string, style: string, closing: string) =>
+        opening +
+        setStyle(setStyle(style, "font-family", SOLA_UI_FONT), "line-height", "1.5") +
+        closing,
+    );
+  }
   if (!/^Sola (?:Scene|Card|HUD|Note|Chip|Reasoning):/.test(scriptName)) return replacement;
   // This compact source regex captures atmosphere before time.
   if (scriptName === "Sola Scene: Header - Dynamic Weather (Rain/Storm) Compact")
