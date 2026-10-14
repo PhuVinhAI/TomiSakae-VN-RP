@@ -1,7 +1,6 @@
 import type { FfGlobalSettings, FfPreset, FfPrompt, FfRegexScript } from "./core.js";
 import { adaptSolaSaver, SOLA_HEADER_SAVER } from "./sola-history.js";
 import { SOLA_REASONING_SCRIPTS } from "./sola-reasoning.js";
-import { adaptSolaCalendarPrompt, SOLA_CALENDAR_ID } from "./sola-calendar.js";
 import {
   VIETNAMESE_OUTPUT_PROMPT,
   SOLA_VIETNAMESE_OUTPUT_PROMPT,
@@ -127,11 +126,6 @@ export function adaptFamilyPrompt(
     if (settings.vietnameseOutputEnabled) {
       content = adaptSolaPromptForVietnamese(content);
     }
-    content = adaptSolaCalendarPrompt(
-      content,
-      settings.promptEnabled[SOLA_CALENDAR_ID] === true,
-      settings.vietnameseOutputEnabled,
-    );
     if (settings.imageOptimizationEnabled) {
       content = content.replace(
         "- Map physical contact, displacement, or reflexive reaction.",

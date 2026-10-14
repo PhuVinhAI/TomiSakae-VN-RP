@@ -3,20 +3,6 @@ const SOLA_UI_FONT =
 const SOLA_SERIF_FONT = "Georgia,'Noto Serif','Times New Roman',serif";
 const SOLA_MONO_FONT = "ui-monospace,'SFMono-Regular',Consolas,'Liberation Mono',monospace";
 
-/** All skybox templates share the same outer two closing divs. */
-export function renderSolaHeaderDate(tag: string, rendered: string): string {
-  const date = tag.match(/\sdate="([^"]*)"/i)?.[1]?.trim();
-  if (!date) return rendered;
-  const escaped = date
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-  const badge = `<div data-sola-ui="header-date" style="font-family:${SOLA_UI_FONT};box-sizing:border-box;min-width:0;max-width:100%;overflow-wrap:anywhere;line-height:1.5;text-align:center;color:#FFF8EC;background:rgba(7,3,8,0.65);border:1px solid rgba(240,220,196,0.3);border-radius:10px;padding:6px 10px;font-size:0.85em;">📅 ${escaped}</div>`;
-  return rendered.replace(/<\/div><\/div>$/, () => `${badge}</div></div>`);
-}
-
 function setStyle(style: string, property: string, value: string): string {
   const declaration = new RegExp(`(^|;)\\s*${property}\\s*:[^;]*`, "i");
   return declaration.test(style)

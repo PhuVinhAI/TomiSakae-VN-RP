@@ -70,7 +70,7 @@ export const SOLA_PROMPT_COPY: Readonly<Record<string, UiCopy>> = {
   ),
   "01a0c1ff-4ecf-701d-97b3-6626434ed938": copy(
     "🎬 Header mở cảnh",
-    "Đặt header địa điểm, giờ và bầu không khí ở đầu mọi phản hồi; khi bật Lịch, thêm ngày tháng năm. Header nằm sau suy luận nếu có và trước phần RP, kể cả khi tiếp tục cùng cảnh.",
+    "Đặt header địa điểm, thời gian và bầu không khí ở đầu mọi phản hồi, sau suy luận nếu có và trước phần RP, kể cả khi tiếp tục cùng cảnh.",
   ),
   "01a0c215-20df-7000-b7d6-060e6b7160a9": copy(
     "🎨 Tăng mạnh hiệu ứng phong cách",
@@ -198,7 +198,7 @@ export const SOLA_PROMPT_COPY: Readonly<Record<string, UiCopy>> = {
   ),
   "01a0c1ff-4ecf-701f-ae98-acfb7b26a41f": copy(
     "🎛️ HUD tổng hợp trạng thái",
-    "Gom các bảng trạng thái đang bật vào HUD cuối phản hồi; ngày tháng năm và giờ nằm trên header. Dòng tóm tắt giữ nhịp và chỉ số; không xuất HUD nếu trạng thái không thay đổi.",
+    "Gom các bảng theo dõi đang bật vào một HUD cuối phản hồi, có dòng tóm tắt; không xuất HUD nếu trạng thái không thay đổi.",
   ),
   "01a0c1ff-4ecf-7008-a4dc-cfe495078cac": copy(
     "⏩ Điều tiết đà diễn biến",
@@ -210,7 +210,7 @@ export const SOLA_PROMPT_COPY: Readonly<Record<string, UiCopy>> = {
   ),
   "01a0c1ff-4ecf-7021-a569-56ddfda40b76": copy(
     "🕰️ Lịch & tiến trình thời gian",
-    "Ghi ngày trong truyện và ngày tháng năm hoặc lịch thế giới lên header đầu phản hồi, bỏ bảng lịch khỏi HUD cuối. Giữ mùa và thời gian di chuyển, lao động, nghỉ ngơi hợp lý; không tự bịa phần lịch chưa biết.",
+    "Ghi ngày, mùa hoặc lịch thế giới, buổi trong ngày và thời lượng đã trôi; giữ thời gian di chuyển, lao động và nghỉ ngơi hợp lý.",
   ),
   "01a0c1ff-4ecf-7022-a1e1-8ae89eb7ee88": copy(
     "💞 Quan hệ & sức hút",

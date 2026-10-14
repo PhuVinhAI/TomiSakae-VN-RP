@@ -25,7 +25,7 @@ import {
   adaptSolaTrackerLabelsForDisplay,
 } from "./sola-vietnamese-regex.js";
 import { SOLA_HEADER_SAVER_ID } from "./sola-history.js";
-import { adaptSolaDisplayReplacement, renderSolaHeaderDate } from "./sola-display.js";
+import { adaptSolaDisplayReplacement } from "./sola-display.js";
 
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
@@ -635,7 +635,6 @@ function replaceWithSourceGroups(
   regex: RegExp,
   replacement: string,
   trimStrings: string[],
-  renderMatch?: (match: string, rendered: string) => string,
 ): string {
   return input.replace(regex, (...args: unknown[]) => {
     const match = String(args[0] ?? "");
@@ -644,7 +643,7 @@ function replaceWithSourceGroups(
       possibleGroups && typeof possibleGroups === "object"
         ? (possibleGroups as Record<string, string>)
         : undefined;
-    const rendered = replacement
+    return replacement
       .replace(/\{\{match\}\}/gi, match)
       .replace(/\$(\d+)|\$<([^>]+)>/g, (_token, number, groupName) => {
         let value = "";
@@ -653,7 +652,6 @@ function replaceWithSourceGroups(
         for (const trimString of trimStrings) value = value.replaceAll(trimString, "");
         return value;
       });
-    return renderMatch ? renderMatch(match, rendered) : rendered;
   });
 }
 
@@ -755,11 +753,6 @@ export function applyRegexScripts(
       regex,
       replacement.replace(/\\n/g, "\n"),
       script.trimStrings ?? [],
-      options.markdown &&
-        familyOf(preset) === "sola" &&
-        script.scriptName?.startsWith("Sola Scene: Header -")
-        ? renderSolaHeaderDate
-        : undefined,
     );
   }
   return output;

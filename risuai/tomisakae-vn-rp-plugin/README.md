@@ -42,8 +42,6 @@ Context Saver của Freaky Frankenstein 5.4 lưu snapshot state ẩn trước kh
 
 Sola V2 Flame giữ module bank, depth injection, Story Review, palette/gradient/tone/kinetic và cú pháp tracker gốc. Nhắc POV trong cả module lẫn Story Review dùng đại từ tiếng Việt phù hợp khi bật tiếng Việt. Khi bật module header, mọi phản hồi phải đặt header trên một dòng riêng sau suy luận và trước phần RP, kể cả trong cùng cảnh. Header với thời gian số hoặc thời tiết tiếng Việt được điều chỉnh trên bản hiển thị để regex chọn skybox.
 
-Module Lịch & tiến trình thời gian đưa ngày trong truyện và ngày/tháng/năm hoặc lịch thế giới vào thuộc tính `date` của `<scene_header>` đầu phản hồi; giờ nằm trong `time`. Module này vẫn xuất header khi tắt module Header mở cảnh. HUD cuối và dòng digest chỉ giữ trạng thái, nhịp và chỉ số, không lặp lịch. Các luật tiến thời gian và mùa vẫn áp dụng; phần lịch chưa biết được bỏ qua. Ngày tháng trên header được lưu cùng lịch sử và tuân theo Saver của header, hỗ trợ xóa tin và rẽ nhánh. Khối `<date>` cũ vẫn hiển thị và khôi phục được trong các chat trước đây.
-
 UI trong tin nhắn Sola dùng font hỗ trợ dấu tiếng Việt; header co giãn theo nội dung và xuống dòng khi màn hình hẹp, thay cho chiều cao cố định. HUD, tracker và các khung thông tin cũng hỗ trợ ngắt dòng dài. Các sửa đổi nằm trong template hiển thị, giữ skybox, màu sắc và hiệu ứng lời thoại; không sửa nội dung đã lưu hay prompt gửi model.
 
 Hiệu ứng thoại `heavy` và `crush` dùng font hệ thống hỗ trợ tiếng Việt và khoảng cách dòng đủ cho dấu, áp dụng cả thẻ màu, chuyển sắc và hiệu ứng riêng. Biến `--risu-font-family` được đặt trong phạm vi hiệu ứng để các thẻ lời thoại do PocketRisu chèn thêm cũng dùng cùng font. Giữ nguyên cỡ chữ, độ đậm, giãn chữ và biến dạng của từng hiệu ứng.

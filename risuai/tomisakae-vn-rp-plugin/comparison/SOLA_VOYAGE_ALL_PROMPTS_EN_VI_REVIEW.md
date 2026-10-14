@@ -1549,7 +1549,7 @@ When cutting to a new location, advancing chronology, or shifting scene atmosphe
 
 Mặc định nguồn: **BẬT**. Việt hóa: **CÓ THAY ĐỔI**.
 
-Ký tự gốc: 3059; sau Việt hóa: 2974. SHA-256 gốc: `81925e8047219370e22ad29eed352081524d2c5a9dd8be40f1aa8d8a0a1ece24`; bản Việt hóa: `a75522fb2f820936ef0aac3b1d9cd66352068e3bb8a2fb81794f527029f32183`.
+Ký tự gốc: 3059; sau Việt hóa: 2858. SHA-256 gốc: `81925e8047219370e22ad29eed352081524d2c5a9dd8be40f1aa8d8a0a1ece24`; bản Việt hóa: `5b5fa6f03a10ee79444691e4a12a120118816ff3fc7838e4756e79821d0b0d5e`.
 
 Thông tin module nguyên bản (không gồm nội dung đã đặt đầy đủ bên dưới):
 
@@ -1617,7 +1617,7 @@ Begin every response with <scene_header> on its own line, after any reasoning an
 Begin every response with a panoramic cinematic header on its own line, after any reasoning and before narration or dialogue:
 
 ```html
-<scene_header location="CĂN HỘ 2B, NAM LOS ANGELES" date="[Ngày trong truyện · Ngày tháng năm]" time="21:12" atmosphere="Nóng, khô, lặng gió" />
+<scene_header location="CĂN HỘ 2B, NAM LOS ANGELES" time="21:12" atmosphere="Nóng, khô, lặng gió" />
 ```
 
 ### Dynamic Auto-Skybox & Ember Mote Engine
@@ -1633,8 +1633,7 @@ The panoramic visual skybox automatically detects and shifts its visual atmosphe
 
 ### Attributes
 - `location`: The physical setting or room (e.g. `location="BẾN TÀU PHÍA DƯỚI · CẦU TÀU SỐ 9"`).
-- `date`: Current story day and known calendar date, following Calendar & Chronology.
-- `time`: Natural time of day (e.g. `time="18:45 · Chạng vạng"`, `time="03:15"`).
+- `time`: Natural time of day or chronology (e.g. `time="18:45 · Chạng vạng"`, `time="03:15"`).
 - `atmosphere`: (Optional) 3–5 sensory words describing ambient weather, room smell, temperature, or tactile reality (e.g. `atmosphere="Lửa trại âm ỉ, hương thông mùa thu"`).
 - `sky`: (Optional manual override: `night`, `dusk`, `dawn`, `day`, `noir`).
 
@@ -3912,7 +3911,7 @@ Thông tin module nguyên bản (không gồm nội dung đã đặt đầy đ�
 
 Mặc định nguồn: **BẬT**. Việt hóa: **CÓ THAY ĐỔI**.
 
-Ký tự gốc: 1738; sau Việt hóa: 1765. SHA-256 gốc: `77ea8a1f455259d2847a05865dac4b0b09ebb75e63d8467335cbe8cbe7fc3f6a`; bản Việt hóa: `4b349242ed29fe302df2d04db111a71d81f36e7d61143171a88ea5449ca251ac`.
+Ký tự gốc: 1738; sau Việt hóa: 1765. SHA-256 gốc: `77ea8a1f455259d2847a05865dac4b0b09ebb75e63d8467335cbe8cbe7fc3f6a`; bản Việt hóa: `5e980fd4431a0bff86632b5f30a04d073872e914eacb52e82d1e2c1f251c3050`.
 
 Thông tin module nguyên bản (không gồm nội dung đã đặt đầy đủ bên dưới):
 
@@ -3967,30 +3966,30 @@ put gear selection inside the HUD digest attribute (e.g. digest="Day [N] · [Tim
 {{// Consolidates active telemetry and state trackers into a unified obsidian & warm amber showrunner console.}}
 {{trim}}
 {{setvar::mod_solahud::
-Ensure you encapsulate all state trackers within the HUD; chronology belongs in the opening scene header.}}
+Ensure you encapsulate all trackers within the hud.}}
 ## Showrunner Master HUD
-Wrap all active state tracker blocks, excluding chronology, at the end of your response inside a single, unified HUD container:
+Wrap all active tracker blocks at the end of your response inside a single, unified HUD container:
 
 ```html
-<sola_hud digest="[GEAR] · [NPC 1]: T# F# D# Y# · [NPC 2]: T# F# D# Y#">
-[Thêm các khối theo dõi đang bật tại đây: <story_notes>, <bond>, <fengine>, <thought_engine>, <char_matrix>, <wardrobe>, v.v.]
+<sola_hud digest="Ngày [N] · [Thời gian trong ngày] · [GEAR] · [NPC 1]: T# F# D# Y# · [NPC 2]: T# F# D# Y#">
+[Thêm các khối theo dõi đang bật tại đây: <story_notes>, <date>, <bond>, <fengine>, <thought_engine>, <char_matrix>, <wardrobe>, v.v.]
 </sola_hud>
 ```
 
 Rules:
 - Append at the end of the response, after all narrative prose.
-- Consolidate all active state trackers inside the single `<sola_hud>` container; keep calendar and time in the opening header.
+- Consolidate all active trackers inside the single `<sola_hud>` container.
 - If no state changed, omit the block entirely.
 - Showrunner Naming Invariant: Always replace template placeholders like `[NPC chính]`, `[NPC phụ]`, or `{{char}}` with the character's actual in-world name (e.g. `Kami:`, `Charles:`, `Jessica:`).
 - NEVER wrap `<sola_hud>` in `<!-- HTML_START -->` or `<!-- HTML_END -->` markers. Prose and HUD remain outside prop markers.
-- Inside the `digest="..."` attribute, provide one glanceable summary line — active tempo gear and telemetry scores written as `T# F# D# Y#` (no `=`, no extra pipes; keep under ~25 words):
-  - Single Active NPC: `digest="T1 F2 D3 Y2"`
+- Inside the `digest="..."` attribute, provide one glanceable summary line — in-world day and time, followed by active telemetry scores written as `T# F# D# Y#` (no `=`, no extra pipes; keep under ~25 words):
+  - Single Active NPC: `digest="Ngày 42 · Chạng vạng · T1 F2 D3 Y2"`
   - Multiple Active NPCs: Name each active NPC with their TFDY, separated by middle dots:
-    `digest="Charles: T1 F2 D3 Y2 · Jessica: T0 F2 D1 Y1"`
+    `digest="Ngày 42 · Chạng vạng · Charles: T1 F2 D3 Y2 · Jessica: T0 F2 D1 Y1"`
 
 {{setvar::tracker_location::inside of '<sola_hud>' tags}}{{trim}}
 {{setvar::tempo_log::
-put gear selection inside the HUD digest attribute (e.g. digest="[GEAR] · ...")}}{{trim}}
+put gear selection inside the HUD digest attribute (e.g. digest="Ngày [N] · [Thời gian] · [GEAR] · ...")}}{{trim}}
 ~~~~
 ## SOLA-067. [Module] Tracker: Tempo Agitator
 
@@ -4114,7 +4113,7 @@ Rules:
 
 Mặc định nguồn: **BẬT**. Việt hóa: **CÓ THAY ĐỔI**.
 
-Ký tự gốc: 1002; sau Việt hóa: 1119. SHA-256 gốc: `b34f98e758c7f364f84905c02c44ed0bf7fc0a039e047e879e376e65370f00b3`; bản Việt hóa: `8920a3ed67d170752f4c87e5e9e652343a9d45773f87117e693ec02c9419e0d4`.
+Ký tự gốc: 1002; sau Việt hóa: 1046. SHA-256 gốc: `b34f98e758c7f364f84905c02c44ed0bf7fc0a039e047e879e376e65370f00b3`; bản Việt hóa: `540a8ff1d95fc6d4f28dc6f5192a2bc4814718eec63bdce5676ce1b3ad4212a8`.
 
 Thông tin module nguyên bản (không gồm nội dung đã đặt đầy đủ bên dưới):
 
@@ -4157,20 +4156,24 @@ Rules:
 ### Prompt sau áp dụng Việt hóa đầy đủ
 
 ~~~~text
-{{// Tracks calendar date, elapsed time, and seasonal progression in the opening scene header.}}
+{{// Tracks macro calendar date, time of day, elapsed hours, and seasonal progression inside <date> tags. Prevents temporal compression over long roleplays.}}
 {{trim}}
 {{setvar::mod_track_date::
-- Chronology (<scene_header>): Track story day and calendar date in date, time of day in time; advance by elapsed duration.}}
+- Telemetry (<date>): Track day, calendar/season, time of day, & elapsed duration}}
 ## Calendar & Chronology Tracker
-At the start of every response, after any reasoning and before narration or dialogue, include the current chronology in the scene header:
-<scene_header location="[Địa điểm trong cảnh]" date="[Ngày trong truyện · Ngày tháng năm]" time="[Giờ hoặc buổi trong ngày]" />
+Located {{getvar::tracker_location}}, append:
+<date>
+Ngày: [Ngày hiện tại của câu chuyện/chiến dịch, ví dụ: Ngày 9]
+Lịch: [Mùa, tháng/năm hoặc ngày trong thế giới truyện, ví dụ: Giữa thu, năm thứ 4 của Nhật Thực]
+Thời gian: [Bình minh / Buổi sáng / Buổi chiều / Chạng vạng / Ban đêm / Nửa đêm]
+Thời gian đã trôi: [Thời gian từ diễn biến trước, ví dụ: ~20 phút, 5 giờ cưỡi ngựa, qua đêm]
+Sola: *[Lời bình ấm áp, tinh nghịch, tinh ý của Sola về giờ giấc, mùa hoặc sự mệt mỏi đang tăng]*
+</date>
 
 Rules:
-- date: Include the story/campaign day and known weekday, day, month, year, or in-universe calendar. Retain known seasonal context; omit unknown calendar details rather than inventing them.
 - Advance time logically. Travel, labor, research, and rest consume real hours.
 - Short verbal exchanges take minutes; journeys and rests advance hours or days.
 - Ground season, temperature, and lighting in the current calendar date.
-- Keep calendar and time in the opening header, outside the trailing HUD and its digest; do not append a separate <date> tracker.
 ~~~~
 ## SOLA-070. [Module] Tracker: Sola's Bond & Chemistry Radar 💞
 
@@ -5966,7 +5969,7 @@ Chỉ dùng cho request Submodel. Nằm trước các chỉ dẫn relative sau l
 - Correct grammar, collocations, stray characters, and accidental foreign wording. Preserve established names and necessary terms; foreign speech must be credible for the speaker. Adjust pronouns and address to identity, relationships, POV, respect, intimacy, and idiolect.
 - Preserve core facts, events, sequence, causality, outcomes, POV, agency, relationships, and emotional direction. Do not continue RP or add consequential events.
 - Rewrite descriptions, thoughts, and notes in HUDs, trackers, and hidden state blocks in Vietnamese; use active template labels. Preserve information, keys, identifiers, fixed values, numbers, rolls, scores, counters, progress, and deltas. Keep absent, unknown, inapplicable, and empty values; do not fill in or recalculate data.
-- Preserve valid markup, attributes, markers, placeholders, image identifiers, and Sola effect names. Keep chronology displays in the opening scene_header date/time attributes, outside the HUD and digest. Repair syntax errors under active schemas. Return only the complete rewritten response with its displays and state blocks; no reasoning, commentary, or added code fences.
+- Preserve valid markup, attributes, markers, placeholders, image identifiers, and Sola effect names. Repair syntax errors under active schemas. Return only the complete rewritten response with its displays and state blocks; no reasoning, commentary, or added code fences.
 ~~~~
 ## Sola V2 Flame: Vietnamese Editor (user)
 
