@@ -586,7 +586,7 @@ async function showSettings(): Promise<void> {
       settings.gemmaFixEnabled,
       "🛠️ Fix Gemma 4",
       "Tiếng Việt, ảnh có sẵn và kiểm soát NSFW theo mức đã chọn · Mặc định tắt",
-    )}<div class="gemma-level"><div class="gemma-level-heading"><label id="gemma-nsfw-label" for="gemma-nsfw-level">Kiểm soát NSFW</label><output id="gemma-nsfw-value" for="gemma-nsfw-level">${settings.gemmaFixNsfwLevel}</output></div><input id="gemma-nsfw-level" type="range" min="0" max="2" step="1" value="${settings.gemmaFixNsfwLevel}" aria-labelledby="gemma-nsfw-label gemma-nsfw-value" ${settings.gemmaFixEnabled ? "" : "disabled"}><div class="gemma-level-ticks" aria-hidden="true"><span>0 · Bỏ</span><span>1 · Nhẹ</span><span>2 · Mạnh</span></div></div>${checkbox(
+    )}<div class="gemma-level"><div class="gemma-level-heading"><label id="gemma-nsfw-label" for="gemma-nsfw-level">Kiểm soát NSFW</label><output id="gemma-nsfw-value" for="gemma-nsfw-level">${settings.gemmaFixNsfwLevel}</output></div><input id="gemma-nsfw-level" type="range" min="0" max="3" step="1" value="${settings.gemmaFixNsfwLevel}" aria-labelledby="gemma-nsfw-label gemma-nsfw-value" ${settings.gemmaFixEnabled ? "" : "disabled"}><div class="gemma-level-ticks" aria-hidden="true"><span>0 · Bỏ</span><span>1 · Nhẹ</span><span>2 · Mạnh</span><span>3 · Cao nhất</span></div></div>${checkbox(
       "plugin",
       "sound-notifications",
       settings.soundNotificationsEnabled,
@@ -640,7 +640,7 @@ async function showSettings(): Promise<void> {
     gemmaNsfwSlider.disabled = !gemmaFixToggle.checked;
     const level = normalizeGemmaNsfwLevel(Number(gemmaNsfwSlider.value));
     document.getElementById("gemma-nsfw-value")!.textContent =
-      `${level} · ${["Bỏ", "Nhẹ", "Mạnh"][level]}`;
+      `${level} · ${["Bỏ", "Nhẹ", "Mạnh", "Cao nhất"][level]}`;
   };
   syncGemmaNsfwSlider();
   gemmaFixToggle.addEventListener("change", syncGemmaNsfwSlider);

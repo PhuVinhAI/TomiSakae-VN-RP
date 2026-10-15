@@ -125,7 +125,7 @@ describe("TomiSakae VN-RP preset families", () => {
 
   it.each(
     (["ff54", "sola", "voyage"] as const).flatMap((family) =>
-      ([0, 1, 2] as const).map((level) => [family, level] as const),
+      ([0, 1, 2, 3] as const).map((level) => [family, level] as const),
     ),
   )(
     "appends the shared Gemma fix inside the latest user message for %s at level %s",
@@ -212,10 +212,24 @@ describe("TomiSakae VN-RP preset families", () => {
     const suffix = GEMMA_FIX_PROMPT.slice(GEMMA_FIX_PROMPT.indexOf("write all visible text"));
     expect(gemmaFixPromptFor(0)).toBe(`{{ ${suffix}`);
     expect(gemmaFixPromptFor(1)).toBe(
-      `{{ {{char}} should not offer sex or readily accept offers of sex; never invent lustful traits absent from the card/lore, ${suffix}`,
+      `{{ {{char}} should not offer sex or readily accept offers of sex; never invent lustful, submissive, dependent, or infatuated traits absent from the card/lore, ${suffix}`,
     );
     expect(gemmaFixPromptFor(2)).toBe(GEMMA_FIX_PROMPT);
-    for (const level of [0, 1, 2]) {
+    const strongPrefix = GEMMA_FIX_PROMPT.slice(
+      0,
+      GEMMA_FIX_PROMPT.indexOf(", write all visible text"),
+    );
+    expect(gemmaFixPromptFor(3).startsWith(`${strongPrefix}; personality and boundaries`)).toBe(
+      true,
+    );
+    expect(gemmaFixPromptFor(3)).toContain(
+      "defined by card/lore MUST remain consistent across turns",
+    );
+    expect(gemmaFixPromptFor(3)).toContain(
+      "NEVER erase unresolved conflict or reward coercion with intimacy",
+    );
+    for (const level of [0, 1, 2, 3]) {
+      expect(gemmaFixPromptFor(level).endsWith(suffix)).toBe(true);
       expect(gemmaFixPromptFor(level)).toContain("every NSFW action that occurs");
       expect(gemmaFixPromptFor(level)).toContain("exact image-tag syntax");
     }
@@ -226,10 +240,10 @@ describe("TomiSakae VN-RP preset families", () => {
     (family) => {
       const preset = sources[family].preset;
       expect(normalizeSettings(preset, { gemmaFixEnabled: true }).gemmaFixNsfwLevel).toBe(2);
-      for (const value of [-1, 3, 0.5, "0", null, undefined]) {
+      for (const value of [-1, 4, 0.5, "0", null, undefined]) {
         expect(normalizeSettings(preset, { gemmaFixNsfwLevel: value }).gemmaFixNsfwLevel).toBe(2);
       }
-      for (const level of [0, 1, 2] as const) {
+      for (const level of [0, 1, 2, 3] as const) {
         const settings = normalizeSettings(preset, {
           gemmaFixEnabled: true,
           gemmaFixNsfwLevel: level,
