@@ -71,13 +71,13 @@ describe("Plugin dashboard token estimates", () => {
   });
 
   it.each([
-    [true, false],
-    [false, false],
-    [true, true],
-    [false, true],
-  ])(
-    "matches the actual injected prompt text with Vietnamese Output %s and Submodel %s",
-    async (vietnamese, submodel) => {
+    [true, false, 2],
+    [false, false, 1],
+    [true, true, 0],
+    [false, true, 2],
+  ] as const)(
+    "matches the actual injected prompt text with Vietnamese Output %s, Submodel %s and Gemma level %s",
+    async (vietnamese, submodel, level) => {
       const preset = JSON.parse(
         await readFile("risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json", "utf8"),
       ) as FfPreset;
@@ -86,6 +86,7 @@ describe("Plugin dashboard token estimates", () => {
       settings.submodelEditorEnabled = submodel;
       settings.imageOptimizationEnabled = true;
       settings.gemmaFixEnabled = true;
+      settings.gemmaFixNsfwLevel = level;
       settings.cardImageCatalogEnabled = true;
       const themedHost = {
         ...host,

@@ -58,6 +58,7 @@ import { buildEditorReferenceMessages } from "./submodel-context.js";
 import { createCompletionMonitor } from "./completion-monitor.js";
 import { estimatePluginPromptTokens, type PluginTokenEstimate } from "./token-estimate.js";
 import { collectCardImages, type CardImageSource } from "./card-images.js";
+import { normalizeGemmaNsfwLevel } from "./gemma-fix.js";
 import {
   CONFIG_PRESETS_STORAGE_KEY,
   createConfigPreset,
@@ -584,8 +585,8 @@ async function showSettings(): Promise<void> {
       "gemma-fix",
       settings.gemmaFixEnabled,
       "🛠️ Fix Gemma 4",
-      "Ép đầu ra tiếng Việt, dùng ảnh có sẵn và giữ nhịp NSFW; không tự tình dục hóa nhân vật hoặc nhảy thẳng sang ERP · Mặc định tắt",
-    )}${checkbox(
+      "Tiếng Việt, ảnh có sẵn và kiểm soát NSFW theo mức đã chọn · Mặc định tắt",
+    )}<div class="gemma-level"><div class="gemma-level-heading"><label id="gemma-nsfw-label" for="gemma-nsfw-level">Kiểm soát NSFW</label><output id="gemma-nsfw-value" for="gemma-nsfw-level">${settings.gemmaFixNsfwLevel}</output></div><input id="gemma-nsfw-level" type="range" min="0" max="2" step="1" value="${settings.gemmaFixNsfwLevel}" aria-labelledby="gemma-nsfw-label gemma-nsfw-value" ${settings.gemmaFixEnabled ? "" : "disabled"}><div class="gemma-level-ticks" aria-hidden="true"><span>0 · Bỏ</span><span>1 · Nhẹ</span><span>2 · Mạnh</span></div></div>${checkbox(
       "plugin",
       "sound-notifications",
       settings.soundNotificationsEnabled,
@@ -633,8 +634,20 @@ async function showSettings(): Promise<void> {
   };
   syncSubmodelToggles();
   editorToggle.addEventListener("change", syncSubmodelToggles);
+  const gemmaFixToggle = document.querySelector<HTMLInputElement>('input[data-id="gemma-fix"]')!;
+  const gemmaNsfwSlider = document.getElementById("gemma-nsfw-level") as HTMLInputElement;
+  const syncGemmaNsfwSlider = () => {
+    gemmaNsfwSlider.disabled = !gemmaFixToggle.checked;
+    const level = normalizeGemmaNsfwLevel(Number(gemmaNsfwSlider.value));
+    document.getElementById("gemma-nsfw-value")!.textContent =
+      `${level} · ${["Bỏ", "Nhẹ", "Mạnh"][level]}`;
+  };
+  syncGemmaNsfwSlider();
+  gemmaFixToggle.addEventListener("change", syncGemmaNsfwSlider);
   const readUi = () => {
     syncSubmodelToggles();
+    syncGemmaNsfwSlider();
+    settings.gemmaFixNsfwLevel = normalizeGemmaNsfwLevel(Number(gemmaNsfwSlider.value));
     settings.enabled = (document.getElementById("master") as HTMLInputElement).checked;
     for (const group of exclusiveGroups) {
       const node = document.querySelector<HTMLInputElement>(
@@ -692,6 +705,7 @@ async function showSettings(): Promise<void> {
     readUi();
     await refreshTokenEstimate();
   };
+  gemmaNsfwSlider.addEventListener("input", refreshTokenEstimateFromUi);
   for (const node of document.querySelectorAll<HTMLInputElement>('input[data-kind="choice"]')) {
     node.addEventListener("change", async () => {
       const detail = document.querySelector<HTMLElement>(

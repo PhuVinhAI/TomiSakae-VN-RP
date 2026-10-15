@@ -7,7 +7,7 @@ import {
   type HostMacroContext,
 } from "./core.js";
 import { vietnameseOutputFor } from "./preset-family.js";
-import { GEMMA_FIX_PROMPT } from "./gemma-fix.js";
+import { gemmaFixPromptFor } from "./gemma-fix.js";
 import { cardImageKeywordCount, cardImagePrompt } from "./card-images.js";
 
 // Literal tokenizer markers in a card or prompt are ordinary text here.
@@ -82,7 +82,7 @@ export async function estimatePluginPromptTokens(
     });
   }
   if (settings.gemmaFixEnabled) {
-    const suffix = `\n\n${expandHostMacros(GEMMA_FIX_PROMPT, hostContext)}`;
+    const suffix = `\n\n${expandHostMacros(gemmaFixPromptFor(settings.gemmaFixNsfwLevel), hostContext)}`;
     const tokens = count(suffix);
     estimate.contentTokens += tokens;
     estimate.entries.push({ identifier: "gemma-fix", tokens });

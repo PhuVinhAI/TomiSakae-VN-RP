@@ -57,7 +57,10 @@ import {
   VOYAGE_VIETNAMESE_REPLACEMENTS,
 } from "../risuai/tomisakae-vn-rp-plugin/src/vietnamese.js";
 import { adaptSolaRegexForVietnamese } from "../risuai/tomisakae-vn-rp-plugin/src/sola-vietnamese-regex.js";
-import { GEMMA_FIX_PROMPT } from "../risuai/tomisakae-vn-rp-plugin/src/gemma-fix.js";
+import {
+  GEMMA_FIX_PROMPT,
+  gemmaFixPromptFor,
+} from "../risuai/tomisakae-vn-rp-plugin/src/gemma-fix.js";
 import {
   cardImagePrompt,
   collectCardImages,
@@ -120,13 +123,19 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(recall).toBeGreaterThan(built.findIndex((m) => m.content === "Tôi vào phòng."));
   });
 
-  it.each(["ff54", "sola", "voyage"] as const)(
-    "appends the shared Gemma fix inside the latest user message for %s",
-    async (family) => {
+  it.each(
+    (["ff54", "sola", "voyage"] as const).flatMap((family) =>
+      ([0, 1, 2] as const).map((level) => [family, level] as const),
+    ),
+  )(
+    "appends the shared Gemma fix inside the latest user message for %s at level %s",
+    async (family, level) => {
       const preset = sources[family].preset;
       const settings = createDefaultSettings(preset);
       expect(settings.gemmaFixEnabled).toBe(false);
+      expect(settings.gemmaFixNsfwLevel).toBe(2);
       settings.gemmaFixEnabled = true;
+      settings.gemmaFixNsfwLevel = level;
       const messages = [
         { role: "user" as const, content: "Tin user cũ." },
         { role: "assistant" as const, content: "Phản hồi trước." },
@@ -141,7 +150,7 @@ describe("TomiSakae VN-RP preset families", () => {
       expect(index).toBeGreaterThanOrEqual(0);
       expect(built[index]).toMatchObject({
         role: "user",
-        content: `Tin user mới.\n\n${expandHostMacros(GEMMA_FIX_PROMPT, host)}`,
+        content: `Tin user mới.\n\n${expandHostMacros(gemmaFixPromptFor(level), host)}`,
         removable: true,
       });
       expect(built.filter((message) => message.memo === memo)).toHaveLength(0);
@@ -167,6 +176,17 @@ describe("TomiSakae VN-RP preset families", () => {
       );
       expect(retried).toEqual(built);
 
+      const changed = await buildRequestMessages(
+        retried,
+        preset,
+        { ...settings, gemmaFixNsfwLevel: level === 2 ? 0 : 2 },
+        parse,
+        macroContext,
+      );
+      expect(changed[index]!.content).toBe(
+        `Tin user mới.\n\n${expandHostMacros(gemmaFixPromptFor(level === 2 ? 0 : 2), host)}`,
+      );
+
       settings.gemmaFixEnabled = false;
       const disabled = await buildRequestMessages(messages, preset, settings, parse, macroContext);
       expect(disabled.some((message) => message.memo === memo)).toBe(false);
@@ -185,6 +205,46 @@ describe("TomiSakae VN-RP preset families", () => {
         estimate.entries.find((entry) => entry.identifier === "gemma-fix")?.tokens,
       );
       expect(messages).toEqual(snapshot);
+    },
+  );
+
+  it("changes only the Gemma NSFW prefix while preserving Vietnamese and image rules", () => {
+    const suffix = GEMMA_FIX_PROMPT.slice(GEMMA_FIX_PROMPT.indexOf("write all visible text"));
+    expect(gemmaFixPromptFor(0)).toBe(`{{ ${suffix}`);
+    expect(gemmaFixPromptFor(1)).toBe(
+      `{{ {{char}} should not offer sex or readily accept offers of sex; never invent lustful traits absent from the card/lore, ${suffix}`,
+    );
+    expect(gemmaFixPromptFor(2)).toBe(GEMMA_FIX_PROMPT);
+    for (const level of [0, 1, 2]) {
+      expect(gemmaFixPromptFor(level)).toContain("every NSFW action that occurs");
+      expect(gemmaFixPromptFor(level)).toContain("exact image-tag syntax");
+    }
+  });
+
+  it.each(["ff54", "sola", "voyage"] as const)(
+    "migrates and persists the Gemma NSFW level as a global setting for %s",
+    (family) => {
+      const preset = sources[family].preset;
+      expect(normalizeSettings(preset, { gemmaFixEnabled: true }).gemmaFixNsfwLevel).toBe(2);
+      for (const value of [-1, 3, 0.5, "0", null, undefined]) {
+        expect(normalizeSettings(preset, { gemmaFixNsfwLevel: value }).gemmaFixNsfwLevel).toBe(2);
+      }
+      for (const level of [0, 1, 2] as const) {
+        const settings = normalizeSettings(preset, {
+          gemmaFixEnabled: true,
+          gemmaFixNsfwLevel: level,
+        });
+        const switched = switchPresetFamily(settings, sources.sola.preset);
+        expect(switched.gemmaFixNsfwLevel).toBe(level);
+        const store = normalizePresetStore(preset, undefined, switched, sources);
+        const reloaded = normalizePresetStore(
+          preset,
+          JSON.parse(JSON.stringify(store)),
+          undefined,
+          sources,
+        );
+        expect(reloaded.presets[0]!.settings.gemmaFixNsfwLevel).toBe(level);
+      }
     },
   );
 

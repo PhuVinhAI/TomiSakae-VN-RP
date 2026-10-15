@@ -160,7 +160,7 @@ async function startPlugin(
           const id = attributes.match(/\bid="([^"]*)"/)?.[1] ?? `input-${inputs.length}`;
           inputs.push(makeNode(id, attributes));
         }
-        for (const match of html.matchAll(/<(?:button|div)\b[^>]*\bid="([^"]*)"/g))
+        for (const match of html.matchAll(/<(?:button|div|output)\b[^>]*\bid="([^"]*)"/g))
           makeNode(match[1]!);
         const selected = html.match(/<option value="([^"]*)" selected/);
         makeNode("config-preset").value = selected?.[1] ?? "";
@@ -411,6 +411,53 @@ describe("Voyage reasoning in saved history", () => {
 });
 
 describe("Named presets in plugin UI and requests", () => {
+  it("previews, saves and reloads all three Gemma NSFW slider levels", async () => {
+    const plugin = await startPlugin();
+    try {
+      await plugin.settingsUi();
+      expect(plugin.ui("gemma-nsfw-level").value).toBe("2");
+      expect(plugin.ui("gemma-nsfw-level").disabled).toBe(true);
+      plugin.toggle("gemma-fix").checked = true;
+      await plugin.toggle("gemma-fix").handlers.get("change")!();
+      expect(plugin.ui("gemma-nsfw-level").disabled).toBe(false);
+      const saved = structuredClone(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
+      const previews = new Set<string>();
+      for (const level of [0, 1, 2]) {
+        plugin.ui("gemma-nsfw-level").value = String(level);
+        await plugin.uiEvent("gemma-nsfw-level", "input");
+        expect(plugin.ui("gemma-nsfw-value").textContent).toBe(
+          `${level} · ${["Bỏ", "Nhẹ", "Mạnh"][level]}`,
+        );
+        previews.add(plugin.ui("token-estimate-panel").innerHTML);
+        expect(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY)).toEqual(saved);
+      }
+      expect(previews.size).toBe(3);
+      plugin.ui("gemma-nsfw-level").value = "1";
+      await plugin.uiEvent("save");
+      const reloaded = await startPlugin(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
+      try {
+        await reloaded.settingsUi();
+        expect(reloaded.ui("gemma-nsfw-level").value).toBe("1");
+        const request = await reloaded.request();
+        const user = request.find((message) => message.memo === "user-a")!.content;
+        expect(user).toContain("should not offer sex or readily accept offers of sex");
+        expect(user).not.toContain("MUST NOT offer sex");
+        reloaded.toggle("gemma-fix").checked = false;
+        await reloaded.toggle("gemma-fix").handlers.get("change")!();
+        expect(reloaded.ui("gemma-nsfw-level").disabled).toBe(true);
+        expect(reloaded.ui("gemma-nsfw-level").value).toBe("1");
+        await reloaded.uiEvent("save");
+        expect(
+          (await reloaded.request()).find((message) => message.memo === "user-a")!.content,
+        ).toBe("Chào An.");
+      } finally {
+        await reloaded.callbacks.unload!();
+      }
+    } finally {
+      await plugin.callbacks.unload!();
+    }
+  });
+
   it.each(["ff54", "sola", "voyage"] as const)(
     "locks Auto Submodel to the editor toggle for %s and persists the dependency",
     async (family) => {
