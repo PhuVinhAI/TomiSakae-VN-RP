@@ -119,19 +119,15 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
     "- Standalone (Prose & Sound Beats): `<kinetic_tag>CRACK.</kinetic_tag>`",
     "- Standalone (Prose & Sound Beats): `<kinetic_tag>RẮC.</kinetic_tag>`",
   ],
-  ['"hold on," "wait," "can we," "I meant,"', '"khoan đã", "chờ chút", "mình có thể", "ý tôi là",'],
   ['"Noooo"', '"Khôôông"'],
   ['"pleaaase"', '"đi mààà"'],
-  ['"shhh"', '"suỵt"'],
+  ['"shhh"', '"suỵttt"'],
   ['"whaaat"', '"cááái gì"'],
   ['"I said STOP!"', '"Tôi bảo DỪNG LẠI!"'],
   ['"DON\'T touch that."', '"ĐỪNG chạm vào đó."'],
   ['"I love you."', '"Em yêu anh."'],
-  [
-    '"Y-you love me?!" *rolling the words in her mouth*',
-    '"E-em yêu anh sao?!" *nhắc đi nhắc lại lời vừa nghe*',
-  ],
-  ['*blushes* "I-I love you too."', '*đỏ mặt* "A-anh cũng yêu em."'],
+  ['"Y-you love me?!"', '"E-em yêu anh sao?!"'],
+  ['"I-I love you too."', '"A-anh cũng yêu em."'],
   [
     '"Nobody has", "You can\'t just", "Nobody just"',
     '"Chưa từng có ai", "Không thể cứ thế", "Chẳng ai tự dưng"',
@@ -146,7 +142,7 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
     '- Register tics ("are you sure", "that lands", "really looks", "like a physical blow") or of-genitive overuse ("sound of him" → "his sound").',
     '- Register tics ("anh chắc chứ", "câu nói chạm đến", "trông thực sự", "như một cú đánh") or repeated Vietnamese possessive "của" chains; prefer compact noun phrases or active verbs.',
   ],
-  ['("a kind of *noun*")', '("một kiểu *danh từ*")'],
+  ['("a kind of *noun*")', '("một kiểu *noun*")'],
   ['("less like X, more like Y")', '("ít giống X mà giống Y hơn")'],
   ['("predatory", "growled")', '("như thú săn mồi", "gầm gừ")'],
   ['("a quiet declaration")', '("một lời tuyên bố lặng lẽ")'],
@@ -253,15 +249,15 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ['"Wha\' you seein\'?" "\'Member me?"', '"Ngó gì đấy?" "Nhớ tui chứ?"'],
   [
     'use "cum" / "cumming" rather than "come" / "coming".',
-    'use natural Vietnamese sexual wording such as "ra", "lên đỉnh", "tinh dịch", "xuất tinh", not the literal motion words "đến" / "đang đến".',
+    'use natural Vietnamese wording such as "ra", "lên đỉnh", "tinh dịch", or "xuất tinh" rather than "đến" / "đang đến".',
   ],
   ['"Well, that was fun"', '"Chà, vui thật đấy"'],
   ['"So, that happened"', '"Ừ, chuyện đó vừa xảy ra đấy"'],
-  ['"Mnnhh~", "Haaah~", "A-ah!", "Ahhn~♡"', '"Ưm~", "Haaa~", "A-á!", "A~♡"'],
-  ['"Fuuuck~", "Pleeease~", "Noooo!"', '"Chết tiệt~", "Đi mààà~", "Khôôông!"'],
-  ['"Ngh...", "Hnngh"', '"Ư...", "Hự..."'],
+  ['"Mnnhh~", "Haaah~", "A-ah!", "Ahhn~♡"', '"Ưm~", "Haa~", "A... a!", "Ahn~♡"'],
+  ['"Fuuuck~", "Pleeease~", "Noooo!"', '"Mẹ kiếp~", "Làm ơơơn~", "Khôôông!"'],
+  ['"Ngh...", "Hnngh"', '"Ư...", "Ư-hng..."'],
   ['"I-I can\'t—", "c-can\'t think—"', '"T-tôi không thể...", "kh-không nghĩ nổi..."'],
-  ['"mm toshally f-fine", "neeeed shyou"', '"ưm, tui vẫẫn ổ-ổn mà", "cầần có cậu màà"'],
+  ['"mm toshally f-fine", "neeeed shyou"', '"ưm, tui dẫẫn ổ-ổn mừ", "cầần cậuuu màà"'],
   ['"What I hear you saying..."', '"Theo những gì tôi nghe anh nói..."'],
   ['"That\'s completely valid"', '"Điều đó hoàn toàn chính đáng"'],
   ['"You don\'t have to answer that"', '"Anh không cần trả lời điều đó"'],
@@ -271,15 +267,15 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
     "Dialect grain: phonetic drop-sounds, contractions, and natural disfluency",
     "Dialect grain: regional pronunciation, colloquial omission, and natural disfluency in Vietnamese",
   ],
-  ['"\'Member that?"', '"Nhớ vụ đó chứ?"'],
-  ["\"Wha' you wan'?\"", '"Muốn gì đấy?"'],
-  ["\"Ain't nobody askin'\"", '"Có ai hỏi đâu"'],
-  ['"Yeaaah"', '"Ừừừ"'],
-  ['"Suuure"', '"Đượợợc thôi"'],
+  ['"\'Member that?"', '"Nhớ vụ đó hông?"'],
+  ["\"Wha' you wan'?\"", '"Muốn giề?"'],
+  ["\"Ain't nobody askin'\"", '"Cóc ai hỏi"'],
+  ['"Yeaaah"', '"Ờờờ"'],
+  ['"Suuure"', '"Được thôiii"'],
   ['"ENOUGH!"', '"ĐỦ RỒI!"'],
   [
     '`"mate"`, `"boss"`, `"darling"`, `"kid"`',
-    '`"ông bạn"`, `"ông chủ"`, `"đại ca"`, `"sếp"`, `"cưng"`, `"nhóc"`',
+    '`"ông bạn"`, `"người anh em"`, `"đại ca"`, `"sếp"`, `"cưng"`, `"nhóc"`',
   ],
   ['"You\'re asking me to..."', '"Anh đang yêu cầu tôi..."'],
   ['"What you\'re saying is..."', '"Ý anh đang nói là..."'],
@@ -300,14 +296,10 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
     "*He had buried three brothers in this soil.*",
     "*Anh đã chôn cất ba người anh em trên mảnh đất này.*",
   ],
-  ['"Spoken dialogue here."', '"Lời thoại ở đây."'],
-  ['"Spoken dialogue."', '"Lời thoại."'],
   ['"Watch your step."', '"Cẩn thận đấy."'],
   ['"STOP RIGHT THERE."', '"ĐỨNG LẠI NGAY."'],
   ['"Hold... on..."', '"Khoan... đã..."'],
   ['"Which way did they run?"', '"Họ chạy về phía nào?"'],
-  ['"Danny\'s voice."', '"Lời thoại của Danny."'],
-  ['"Spoken dialogue or monologue."', '"Lời thoại hoặc độc thoại."'],
   ['"Enough."', '"Đủ rồi."'],
   ['"You knew this whole time."', '"Anh biết từ đầu đến giờ."'],
   ['"I won\'t let you fall."', '"Tôi sẽ không để cậu ngã."'],
@@ -316,10 +308,6 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ['"They\'re right outside."', '"Họ ở ngay bên ngoài."'],
   ['"I... I didn\'t know."', '"Tôi... tôi không biết."'],
   ['"I am not leaving you behind."', '"Tôi không bỏ cậu lại đâu."'],
-  [
-    "Spoken dialogue, internal monologue, or poetic prose.</gradient_name>",
-    "Lời thoại, độc thoại nội tâm hoặc văn giàu nhạc điệu.</gradient_name>",
-  ],
   [
     '"I was here before the fire, and I will remain when the ash settles."',
     '"Tôi đã ở đây trước vụ cháy, và khi tro lắng xuống tôi vẫn sẽ ở lại."',
@@ -332,10 +320,6 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ['"Hold on..."', '"Khoan đã..."'],
   ['"Where did they go?"', '"Họ đi đâu rồi?"'],
   ['"Yield."', '"Đầu hàng đi."'],
-  [
-    "Dialogue, monologue, or prose.</gradient_name>",
-    "Lời thoại, độc thoại hoặc văn kể.</gradient_name>",
-  ],
   ["The night lingered.</dusk>", "Đêm vẫn kéo dài.</dusk>"],
   ['<cider:stretch>"Wait..."</cider>', '<cider:stretch>"Khoan..."</cider>'],
   ["<tilt>Wait.</tilt>", "<tilt>Khoan.</tilt>"],
@@ -343,42 +327,17 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ["*his voice remained*", "*giọng anh vẫn còn vương lại*"],
   ['"Not another step."', '"Không được bước thêm."'],
   ['"LOOK OUT!"', '"CẨN THẬN!"'],
-  ["(pussy, cock, cum, ass, tits, fucking, dripping)", "(lồn, cặc, tinh, đít, vú, đụ, rỉ nước)"],
+  [
+    "(pussy, cock, cum, ass, tits, fucking, dripping)",
+    "(lồn, cặc, buồi, tinh, đít, vú, đụ, địt, ướt nhẹp, chảy nước)",
+  ],
   [
     "'don't stop' or 'I won't bite... unless you want me to.'",
     "'đừng dừng lại' or 'tôi không cắn đâu... trừ khi cậu muốn.'",
   ],
   [
     'nipples hardening from cold, "heaving chest," and vague "a wet sound" constructions',
-    'núm vú cứng lên vì lạnh, "khuôn ngực phập phồng", and vague "một âm thanh ướt át" constructions',
-  ],
-  [
-    "ass jiggling, tits bouncing, balls clapping, backs arched",
-    "mông rung, vú nảy, dái va đập, lưng cong",
-  ],
-  [
-    "body heat, heavy blush, ragged breathing, slack jaw, and fluids",
-    "hơi nóng cơ thể, da đỏ bừng, hơi thở đứt quãng, miệng hé, và dịch cơ thể",
-  ],
-  [
-    "shaking, mess, soreness, raspy voices, and physical exhaustion",
-    "run rẩy, dịch vương vãi, đau nhức, giọng khàn, và kiệt sức",
-  ],
-  [
-    "body heat, breath cadence, clothing friction, the space a hand crosses before it lands",
-    "hơi nóng cơ thể, nhịp thở, ma sát quần áo, khoảng cách bàn tay vượt qua trước khi chạm",
-  ],
-  [
-    "skin flush and temperature, friction, wet sounds, breath, weight, and the shift in rhythm",
-    "da ửng đỏ và nhiệt độ, ma sát, tiếng ướt, hơi thở, sức nặng, và nhịp thay đổi",
-  ],
-  [
-    "moans, wet suction, skin slaps, broken profanity",
-    "tiếng rên, tiếng mút ướt, tiếng da đập, lời chửi đứt quãng",
-  ],
-  [
-    "the jiggle, the bounce, the texture, the sound in detail",
-    "độ rung, độ nảy, bề mặt, âm thanh cụ thể",
+    'đầu ngực/núm vú cứng lên vì lạnh, "khuôn ngực phập phồng", and vague "một âm thanh ướt át" constructions',
   ],
   ['"You realize she\'s lying."', '"Bạn nhận ra cô đang nói dối."'],
   [
@@ -387,7 +346,7 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ],
   [
     '"Jake hands you the clay. The gritty, cold texture glides across your fingers."',
-    '"Jake đưa bạn miếng đất sét. Lớp đất lạnh, lợn cợn trượt qua những ngón tay bạn."',
+    '"Jake đưa bạn miếng đất sét. Lớp đất lạnh, lợn cợn trượt qua từng ngón tay."',
   ],
   [
     "- Voices: 3-Axis Audit (Diction, Cadence, Evasion).",
@@ -452,41 +411,13 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
     "contains mưa, mưa lớn, bão, mưa phùn, sấm, giông, mưa đá, bão tuyết, or sương mù dày",
   ],
   ["late twilight (7:00 PM–7:59 PM)", "late twilight (19:00–19:59)"],
-  ["Day [N] · [Time of Day]", "Ngày [N] · [Thời gian trong ngày]"],
-  ["Day [N] · [Time]", "Ngày [N] · [Thời gian]"],
+  ["Day [N] · [Time of Day]", "Ngày [N] · [Time of Day]"],
+  ["Day [N] · [Time]", "Ngày [N] · [Time]"],
   ["Day 42 · Dusk", "Ngày 42 · Chạng vạng"],
-  [
-    "[Append all active tracker blocks here: <story_notes>, <date>, <bond>, <fengine>, <thought_engine>, <char_matrix>, <wardrobe>, etc.]",
-    "[Thêm các khối theo dõi đang bật tại đây: <story_notes>, <date>, <bond>, <fengine>, <thought_engine>, <char_matrix>, <wardrobe>, v.v.]",
-  ],
-  ["[Lead NPC Name]", "[Tên NPC chính]"],
-  ["[Secondary NPC Name]", "[Tên NPC phụ]"],
-  ["[Lead NPC]", "[NPC chính]"],
-  ["[Secondary NPC]", "[NPC phụ]"],
-  ["[NPC Name]", "[Tên NPC]"],
-  [
-    "[1–2 active open arcs, unresolved questions, or simmering tensions]",
-    "[1–2 mạch truyện đang mở, câu hỏi chưa giải đáp hoặc căng thẳng âm ỉ]",
-  ],
-  [
-    "[Subtle clues, planted details, or physical objects introduced that haven't paid off yet]",
-    "[Manh mối kín đáo, chi tiết gài hoặc đồ vật đã xuất hiện nhưng chưa phát huy vai trò]",
-  ],
-  [
-    "[What present or off-screen NPCs secretly want or are working toward right now]",
-    "[Điều NPC trong cảnh hoặc ngoài cảnh đang âm thầm muốn hay theo đuổi]",
-  ],
-  [
-    "[The immediate dramatic pressure, ticking clock, or environmental shift on deck]",
-    "[Áp lực trước mắt, thời hạn đang tới hoặc thay đổi môi trường sắp diễn ra]",
-  ],
-  [
-    "[Current story/campaign day, e.g., Day 9]",
-    "[Ngày hiện tại của câu chuyện/chiến dịch, ví dụ: Ngày 9]",
-  ],
+  ["[Current story/campaign day, e.g., Day 9]", "[Current story/campaign day, e.g., Ngày 9]"],
   [
     "[Season, Month/Year, or In-Universe Date, e.g., Mid-Autumn, 4th Year of the Eclipse]",
-    "[Mùa, tháng/năm hoặc ngày trong thế giới truyện, ví dụ: Giữa thu, năm thứ 4 của Nhật Thực]",
+    "[Season, Month/Year, or In-Universe Date, e.g., Giữa thu, năm thứ 4 của Nhật Thực]",
   ],
   [
     "[Dawn / Morning / Afternoon / Dusk / Night / Midnight]",
@@ -494,19 +425,15 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ],
   [
     "[Time passed since last beat, e.g., ~20 minutes, 5 hours on horseback, overnight]",
-    "[Thời gian từ diễn biến trước, ví dụ: ~20 phút, 5 giờ cưỡi ngựa, qua đêm]",
-  ],
-  [
-    "[A warm, cheeky, observant director whisper on the hour, season, or creeping fatigue]",
-    "[Lời bình ấm áp, tinh nghịch, tinh ý của Sola về giờ giấc, mùa hoặc sự mệt mỏi đang tăng]",
+    "[Time passed since last beat, e.g., ~20 phút, 5 giờ cưỡi ngựa, qua đêm]",
   ],
   [
     '[Current relational stage, e.g., "Guarded Fascination", "Wary Truce", or "Sharp Resentment"]',
-    '[Giai đoạn quan hệ hiện tại, ví dụ: "Tò mò nhưng dè chừng", "Đình chiến thận trọng", hoặc "Oán giận sâu sắc"]',
+    '[Current relational stage, e.g., "Tò mò nhưng dè chừng", "Đình chiến thận trọng", or "Oán giận sâu sắc"]',
   ],
   [
     '[Current relational stage, e.g., "Uneasy Alliance" or "Quiet Respect"]',
-    '[Giai đoạn quan hệ hiện tại, ví dụ: "Liên minh bất an" hoặc "Tôn trọng âm thầm"]',
+    '[Current relational stage, e.g., "Liên minh bất an" or "Tôn trọng âm thầm"]',
   ],
   [
     "[+Deepened trust or -Frayed when the lie was exposed]",
@@ -514,26 +441,10 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ],
   [
     '[A brief, cheeky, insightful co-author whisper on their chemistry, e.g., "Oh, he\'s definitely not as indifferent as he acts~"]',
-    '[Lời bình ngắn, tinh nghịch, tinh ý của Sola về sự hòa hợp, ví dụ: "Ồ, anh ấy chẳng hề thờ ơ như vẻ ngoài đâu~"]',
-  ],
-  [
-    "[A brief, observant co-author whisper on their dynamic]",
-    "[Lời bình ngắn, tinh ý của Sola về quan hệ của họ]",
+    '[A brief, cheeky, insightful co-author whisper on their chemistry, e.g., "Ồ, anh ấy chẳng hề thờ ơ như vẻ ngoài đâu~"]',
   ],
   ["Shift: +Earned grudging respect", "Thay đổi: +Được tôn trọng dù còn miễn cưỡng"],
   ["Shift: -Suspicion flared over the ledger", "Thay đổi: -Cuốn sổ khiến nghi ngờ bùng lên"],
-  [
-    "[1 concise sentence capturing what they are actively withholding, masking, or secretly feeling behind their outward actions.]",
-    "[1 câu ngắn về điều họ đang giấu, che đậy hoặc âm thầm cảm thấy sau hành động bên ngoài.]",
-  ],
-  [
-    '["1 sentence of raw first-person interiority — compulsive, petty, contradictory, or unspoken — in their own voice. Never a polite summary of the scene."]',
-    '["1 câu nội tâm thẳng, ở ngôi thứ nhất: thôi thúc, nhỏ nhen, mâu thuẫn hoặc chưa nói ra, đúng giọng nhân vật. Không tóm tắt cảnh một cách lịch sự."]',
-  ],
-  [
-    '["1 sentence of raw first-person interiority in their own voice."]',
-    '["1 câu nội tâm thẳng, ở ngôi thứ nhất, đúng giọng nhân vật."]',
-  ],
   ['"What\'s your goal right now?"', '"Lúc này cậu muốn làm gì?"'],
   ['"How do you feel about what just happened?"', '"Cậu cảm thấy thế nào về chuyện vừa xảy ra?"'],
   ['"Where is your mind?"', '"Cậu đang nghĩ gì?"'],
@@ -542,71 +453,33 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
     '"If you could speak your mind right now, what would you actually say?"',
     '"Nếu được nói thật lòng ngay lúc này, cậu sẽ nói gì?"',
   ],
-  ["[1 sentence reply]", "[Câu trả lời dài 1 câu]"],
-  [
-    "[1 raw, unfiltered thought. What they would blurt out if they had no social filter.]",
-    "[1 suy nghĩ thẳng, không giấu giếm. Điều nhân vật sẽ buột miệng nói nếu không cần giữ ý.]",
-  ],
-  [
-    "[{{char}}'s exact physical coordinates/room · Current activity · Proximity to {{user}}]",
-    "[Tọa độ/phòng chính xác của {{char}} · Hoạt động hiện tại · Khoảng cách với {{user}}]",
-  ],
   [
     "[Autonomous / Co-present / Separated / Anchored — independent reason for being here]",
-    "[Tự chủ / Cùng hiện diện / Tách biệt / Gắn với nơi này: lý do riêng để có mặt]",
-  ],
-  [
-    "[Sexual & Romantic orientation from card — absolute non-negotiable boundary]",
-    "[Xu hướng tình dục và tình cảm trong card: giới hạn tuyệt đối không thể thương lượng]",
-  ],
-  [
-    "[Pos: Grounded core anchor/strength · Neg: Active flaw, vice, or defensive edge]",
-    "[Pos: Điểm tựa/điểm mạnh cốt lõi · Neg: Khuyết điểm, thói xấu hoặc sự phòng vệ đang thể hiện]",
-  ],
-  [
-    "[Idiolect & Accent: speech grain, cadence, dialect quirks, colloquialisms — strictly persona-true, never generic]",
-    "[Giọng riêng và giọng địa phương: cách nói, nhịp, đặc trưng phương ngữ, khẩu ngữ; đúng nhân vật, không chung chung]",
-  ],
-  [
-    "[Social front, outward demeanor, or defensive posture shown to {{user}}]",
-    "[Vẻ xã giao, thái độ bên ngoài hoặc tư thế phòng vệ thể hiện trước {{user}}]",
-  ],
-  [
-    "[Unspoken interior reality — private friction, unvoiced thoughts, or vulnerability]",
-    "[Nội tâm chưa nói ra: giằng co riêng, suy nghĩ thầm kín hoặc điểm dễ tổn thương]",
-  ],
-  [
-    "[Active line {{char}} will not cross, concede, or negotiate away this turn]",
-    "[Giới hạn {{char}} sẽ không vượt qua, nhượng bộ hoặc thương lượng bỏ trong lượt này]",
+    "[Tự chủ / Cùng hiện diện / Tách biệt / Gắn với nơi này — independent reason for being here]",
   ],
   [
     '[Directorial verdict on {{char}} fidelity: e.g. "Held platonic ground; did not orbit; flaws and boundary intact"]',
-    '[Đánh giá của Sola về độ đúng nhân vật: ví dụ "Giữ quan hệ thuần bạn bè; không bám theo; khuyết điểm và giới hạn còn nguyên"]',
-  ],
-  ["[The risky attempt]", "[Hành động mạo hiểm]"],
-  [
-    "[The physical price, tactical consequence, or environmental shift]",
-    "[Cái giá thể chất, hệ quả chiến thuật hoặc thay đổi môi trường]",
+    '[Directorial verdict on {{char}} fidelity: e.g. "Giữ quan hệ thuần bạn bè; không bám theo; khuyết điểm và giới hạn còn nguyên"]',
   ],
   [
     '[Spirited director reaction: "Ouch! Watch that footing!"]',
-    '[Phản ứng sôi nổi của Sola: "Ối! Cẩn thận chỗ đặt chân đấy!"]',
+    '[Spirited director reaction: "Ối! Cẩn thận chỗ đặt chân đấy!"]',
   ],
   [
     "[Thematic Omen, e.g., 'The Gathering Storm', 'The Crossed Blades', 'The Rusting Lock', 'The Ember']",
-    "[Điềm báo theo chủ đề, ví dụ: 'Cơn bão đang tới', 'Hai lưỡi kiếm giao nhau', 'Ổ khóa han gỉ', 'Than hồng']",
+    "[Thematic Omen, e.g., 'Cơn bão đang tới', 'Hai lưỡi kiếm giao nhau', 'Ổ khóa han gỉ', 'Than hồng']",
   ],
   [
     "[Thematic undertone, e.g., 'Unspoken debts demanding payment']",
-    "[Hàm ý chủ đề, ví dụ: 'Những món nợ chưa nói ra đang đòi được trả']",
+    "[Thematic undertone, e.g., 'Những món nợ chưa nói ra đang đòi được trả']",
   ],
   [
     "[Sensory weather/world manifestations: barometric pressure drop, jittery horses, distant church bells]",
-    "[Dấu hiệu từ thời tiết/thế giới: áp suất giảm, ngựa bồn chồn, tiếng chuông nhà thờ xa]",
+    "[Sensory weather/world manifestations: áp suất giảm, ngựa bồn chồn, tiếng chuông nhà thờ xa]",
   ],
   [
     '[A brief, mysterious director whisper, e.g., "The weather knows what\'s coming, keep your guard up~"]',
-    '[Lời bình ngắn, bí ẩn của Sola, ví dụ: "Thời tiết biết điều sắp tới đấy, cứ đề phòng nhé~"]',
+    '[A brief, mysterious director whisper, e.g., "Thời tiết biết điều sắp tới đấy, cứ đề phòng nhé~"]',
   ],
   ["[Outer / Upper / Lower / Footwear]", "[Lớp ngoài / Phần trên / Phần dưới / Giày dép]"],
   [
@@ -618,59 +491,20 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
     "[Vải rung, len ẩm nặng, bụi trên ủng, áo choàng bị kéo]",
   ],
   [
-    "[A brief, cheeky or observant director whisper about their look, fit, or dishevelment]",
-    "[Lời bình ngắn, tinh nghịch hoặc tinh ý của Sola về vẻ ngoài, độ vừa vặn hay sự xộc xệch]",
-  ],
-  ["[A brief director whisper]", "[Lời bình ngắn của Sola]"],
-  [
     "[Drawn weapon, held glass, pen, torch, or Empty]",
     "[Vũ khí đã rút, ly đang cầm, bút, đuốc hoặc Trống]",
   ],
   [
     "[1–3 key visible or stowed items: holster, belt pouch, scabbard, pack]",
-    "[1–3 món chính nhìn thấy hoặc cất theo: bao súng, túi đeo thắt lưng, vỏ kiếm, ba lô]",
+    "[1–3 key visible or stowed items: bao súng, túi đeo thắt lưng, vỏ kiếm, ba lô]",
   ],
   [
     "[Hidden blade, sealed letter, lockpicks, contraband, or None]",
     "[Dao giấu, thư niêm phong, dụng cụ mở khóa, hàng cấm hoặc Không có]",
   ],
   [
-    "[A brief, sharp director whisper about their gear, leverage, or what they're reaching for]",
-    "[Lời bình ngắn, sắc của Sola về trang bị, lợi thế hoặc món họ định lấy]",
-  ],
-  ["[Immediate room / physical coordinates]", "[Phòng hiện tại / tọa độ vật lý]"],
-  ["[Max 1–2 speaking NPCs in spotlight]", "[Tối đa 1–2 NPC đang nói ở trọng tâm cảnh]"],
-  [
-    "[Present NPCs restricted to ambient physical Gestures]",
-    "[NPC có mặt chỉ thực hiện cử chỉ nền]",
-  ],
-  [
     "[1 concrete, photographable physical tell or condition per NPC — e.g., limping left knee, smelling of woodsmoke, holding a cocked crossbow, eyes bloodshot]",
-    "[1 dấu hiệu hoặc tình trạng thể chất cụ thể cho mỗi NPC, ví dụ: chân trái khập khiễng, ám mùi khói củi, cầm nỏ đã lên dây, mắt đỏ ngầu]",
-  ],
-  [
-    "[A brief director whisper on room tension, spatial choke points, or who is watching from the shadows]",
-    "[Lời bình ngắn của Sola về căng thẳng trong phòng, điểm nghẽn không gian hoặc người đang quan sát trong bóng tối]",
-  ],
-  [
-    "[Present NPCs & exact room positions relative to {{user}}]",
-    "[NPC có mặt và vị trí chính xác trong phòng so với {{user}}]",
-  ],
-  [
-    "[Notable clothing wear, layers, damage, or disarray for active cast]",
-    "[Tình trạng, lớp trang phục, hư hại hoặc sự xộc xệch đáng chú ý của nhân vật trong cảnh]",
-  ],
-  [
-    "[Items drawn in-hand, drawn weapons, or exchanged objects]",
-    "[Đồ đang cầm, vũ khí đã rút hoặc vật được trao đổi]",
-  ],
-  [
-    "[1–2 concrete observable physical conditions or room states]",
-    "[1–2 tình trạng thể chất hoặc trạng thái căn phòng quan sát được]",
-  ],
-  [
-    "[A brief director whisper on the physical state of the room]",
-    "[Lời bình ngắn của Sola về hiện trạng căn phòng]",
+    "[1 concrete, photographable physical tell or condition per NPC — e.g., chân trái khập khiễng, ám mùi khói củi, cầm nỏ đã lên dây, mắt đỏ ngầu]",
   ],
   [
     '- POV Check (First Person): 1st person present for {{char}} ("I"/"me"/"my"); strictly inside {{char}}\'s immediate field of view.',

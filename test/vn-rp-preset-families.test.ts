@@ -942,18 +942,18 @@ describe("TomiSakae VN-RP preset families", () => {
         expect(text).not.toContain("phonetic drop-sounds, contractions");
         expect(text).toContain("govern prose and sound effects");
         expect(text).not.toContain("Third person, past tense, for all characters");
-        expect(text).toContain("lồn, cặc, tinh, đít, vú, đụ, rỉ nước");
-        expect(text).toContain('"Chết tiệt~", "Đi mààà~", "Khôôông!"');
+        expect(text).toContain("lồn, cặc, buồi, tinh, đít, vú, đụ, địt, ướt nhẹp, chảy nước");
+        expect(text).toContain('"Mẹ kiếp~", "Làm ơơơn~", "Khôôông!"');
         expect(text).toContain('"Chưa từng có ai", "Không thể cứ thế", "Chẳng ai tự dưng"');
-        expect(text).toContain("mông rung, vú nảy, dái va đập, lưng cong");
+        expect(text).toContain("ass jiggling, tits bouncing, balls clapping, backs arched");
         expect(text).toContain('"Cái chạm ấy thật ấm."');
         expect(text).toContain('"Vì sao chạy? Để sống sót."');
         expect(text).toContain('<copper:whisper>"Đừng gây tiếng động."</copper>');
         expect(text).toContain("T=[0-4] | F=[0-4] | D=[0-4] | Y=[0-4]");
         expect(text).toContain("[Bullseye | Grazing Shot | Wind Drift]");
         expect(text).toContain("Thay đổi: +Được tôn trọng dù còn miễn cưỡng");
-        expect(text).toContain("Lịch: [Mùa, tháng/năm");
-        expect(text).toContain("Xu hướng: [Xu hướng tình dục và tình cảm trong card");
+        expect(text).toContain("Lịch: [Season, Month/Year");
+        expect(text).toContain("Xu hướng: [Sexual & Romantic orientation from card");
         expect(text).toContain('<notification app="Tin nhắn"');
         expect(text).toContain("> TÌM THẤY 2 ĐIỆN VĂN CHƯA ĐỌC");
         expect(text).toContain("NEUTRAL");
@@ -986,6 +986,62 @@ describe("TomiSakae VN-RP preset families", () => {
       expect(JSON.stringify(preset)).toBe(snapshot);
     },
   );
+
+  it("keeps Sola annotations and template instructions in English while localizing output", () => {
+    const preset = sources.sola.preset;
+    const settings = createDefaultSettings(preset);
+    const adapted = new Map(
+      preset.prompts.map((prompt) => [
+        prompt.identifier,
+        adaptFamilyPrompt(
+          typeof prompt.content === "string" ? prompt.content : "",
+          preset,
+          settings,
+        ),
+      ]),
+    );
+    const all = [...adapted.values()].join("\n");
+    expect(all).toContain('"E-em yêu anh sao?!" *rolling the words in her mouth* BAD X');
+    expect(all).toContain('*blushes* "A-anh cũng yêu em." APPROVED');
+    expect(all).not.toContain("nhắc đi nhắc lại lời vừa nghe");
+    expect(all).toContain('("một kiểu *noun*")');
+    expect(all).toContain('"hold on," "wait," "can we," "I meant,"');
+    expect(all).toContain('<palette_name>"Spoken dialogue here."</palette_name>');
+    expect(all).toContain("[Append all active tracker blocks here:");
+    expect(all).toContain('Sola: "Lúc này cậu muốn làm gì?"');
+    expect(all).toContain('{{char}}: "[1 sentence reply]"');
+    expect(all).toContain("Ẩn ý: [1 concise sentence capturing");
+    expect(all).toContain("Xu hướng: [Sexual & Romantic orientation from card");
+    expect(all).toContain('[Current relational stage, e.g., "Tò mò nhưng dè chừng"');
+    expect(all).toContain(
+      '[A brief, cheeky, insightful co-author whisper on their chemistry, e.g., "Ồ,',
+    );
+    expect(all).toContain("Lịch: [Season, Month/Year, or In-Universe Date, e.g., Giữa thu,");
+
+    for (const prompt of preset.prompts) {
+      const source = typeof prompt.content === "string" ? prompt.content : "";
+      for (const comment of source.matchAll(/\{\{\/\/[\s\S]*?\}\}/g))
+        expect(adapted.get(prompt.identifier), prompt.name).toContain(comment[0]);
+    }
+    for (const name of [
+      "[Module] Intimacy: Sensory Pacing & Tension",
+      "[Module] Intimacy: Visceral Gooner Mode",
+    ]) {
+      const prompt = preset.prompts.find((prompt) => prompt.name === name)!;
+      expect(adapted.get(prompt.identifier)).toBe(prompt.content);
+    }
+    const explicit = preset.prompts.find(
+      (prompt) => prompt.name === "[Module] Intimacy: Explicit Register",
+    )!;
+    const instructions = adapted.get(explicit.identifier)!;
+    expect(instructions).toContain("skin flush and temperature, friction, wet sounds, breath");
+    expect(instructions).toContain("moans, wet suction, skin slaps, broken profanity");
+    expect(instructions).toContain("the jiggle, the bounce, the texture, the sound in detail");
+    expect(instructions).toContain("(lồn, cặc, buồi, tinh, đít, vú, đụ, địt, ướt nhẹp, chảy nước)");
+    expect(instructions).toContain(
+      'đầu ngực/núm vú cứng lên vì lạnh, "khuôn ngực phập phồng", and vague "một âm thanh ướt át"',
+    );
+  });
 
   it.each([true, false])(
     "removes Sola's unused HUD references with all trackers off and Vietnamese=%s",
