@@ -1243,6 +1243,38 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(input).toContain("Thay đổi: +Tin tưởng hơn");
   });
 
+  it.each([
+    ["char_matrix", "Mask", "Vẻ ngoài", "Vỏ bọc", "Giấu sự lo lắng."],
+    ["scene_cast", "Ambient NPCs", "NPC trong cảnh", "NPC làm nền", "An đang lau ly."],
+    ["arrow", "Friction", "Trở lực", "Hệ quả", "Đánh rơi chìa khóa."],
+    ["date", "Elapsed", "Thời gian đã trôi", "Đã trôi qua", "~20 phút"],
+  ])(
+    "renders current and historical Sola %s labels without rewriting request text",
+    (tag, english, legacy, current, value) => {
+      const preset = sources.sola.preset;
+      const settings = createDefaultSettings(preset);
+      const options = { placement: PLACEMENT_AI_OUTPUT, markdown: true, depth: 0 };
+      const makeInput = (label: string) =>
+        `Trong truyện vẫn giữ từ ${legacy}.\n<${tag}>${label}: ${value}</${tag}>`;
+      const expected = applyRegexScripts(makeInput(current), preset, settings, options);
+      expect(expected).not.toContain(`<${tag}>`);
+      expect(expected).toContain(`>${current}:</span>`);
+      expect(expected).toContain(value);
+      expect(expected).toContain(`Trong truyện vẫn giữ từ ${legacy}.`);
+      for (const label of [english, legacy, current]) {
+        const input = makeInput(label);
+        expect(applyRegexScripts(input, preset, settings, options)).toBe(expected);
+        expect(
+          applyRegexScripts(input, preset, settings, {
+            placement: PLACEMENT_AI_OUTPUT,
+            prompt: true,
+            depth: 0,
+          }),
+        ).toBe(input);
+      }
+    },
+  );
+
   it("localizes standalone tempo values in the Sola HUD digest only on the display copy", () => {
     const preset = sources.sola.preset;
     const settings = createDefaultSettings(preset);

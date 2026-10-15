@@ -1,5 +1,13 @@
 import { SOLA_VIETNAMESE_LABELS } from "./vietnamese.js";
 
+const LEGACY_TRACKER_LABELS: ReadonlyArray<readonly [string, string]> = [
+  ["NPC trong cảnh", "NPC làm nền"],
+  ["Trở lực", "Hệ quả"],
+  ["Thời gian đã trôi", "Đã trôi qua"],
+  ["Vẻ ngoài", "Vỏ bọc"],
+];
+const TRACKER_DISPLAY_LABELS = [...SOLA_VIETNAMESE_LABELS, ...LEGACY_TRACKER_LABELS];
+
 const DUSK_TRIGGERS: ReadonlyArray<readonly [string, string]> = [
   [
     String.raw`dusk|sunset|twilight|sundown|evening|(?:0?[5-7]|1[7-9]):\d{2}\s*(?:pm|p\.m\.)`,
@@ -77,7 +85,7 @@ export function adaptSolaTrackerLabelsForDisplay(input: string): string {
           /(^|\n)([^\n:=<>]+)([ \t]*[:=])/g,
           (match, start: string, label: string, delimiter: string) => {
             const trimmed = label.trim();
-            const translated = SOLA_VIETNAMESE_LABELS.find(([source]) => source === trimmed)?.[1];
+            const translated = TRACKER_DISPLAY_LABELS.find(([source]) => source === trimmed)?.[1];
             return translated
               ? `${start}${label.slice(0, label.length - label.trimStart().length)}${translated}${delimiter}`
               : match;
@@ -104,10 +112,21 @@ export function adaptSolaRegexForVietnamese(
     );
   }
   for (const [source, replacement] of SOLA_VIETNAMESE_LABELS) {
-    findRegex = findRegex.replaceAll(`${source}:`, `(?:${source}|${replacement}):`);
+    const legacy = LEGACY_TRACKER_LABELS.filter(([, label]) => label === replacement).map(
+      ([label]) => label,
+    );
+    findRegex = findRegex.replaceAll(
+      `${source}:`,
+      `(?:${[source, replacement, ...legacy].join("|")}):`,
+    );
   }
   if (scriptName === "Sola Meta: Field Label") {
-    const labels = [...new Set(SOLA_VIETNAMESE_LABELS.map(([, label]) => label))];
+    const labels = [
+      ...new Set([
+        ...SOLA_VIETNAMESE_LABELS.map(([, label]) => label),
+        ...LEGACY_TRACKER_LABELS.map(([label]) => label),
+      ]),
+    ];
     findRegex = findRegex.replace("(Observable Facts|", `(${labels.join("|")}|Observable Facts|`);
   }
   if (scriptName === "Sola Meta: Subject Line") {
