@@ -1,11 +1,6 @@
-coverage
-dist
-generated
-node_modules
+coverage/
+dist/
+node_modules/
+comparison/
+source/
 pnpm-lock.yaml
-prompts/*.md
-profile-modules/**/*.md
-bundles/**/*.md
-standalone/*.md
-memory-prompts/**/*.md
-risuai/**/*.md

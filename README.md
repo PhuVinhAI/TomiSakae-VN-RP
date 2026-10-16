@@ -1,314 +1,208 @@
-# Trình biên dịch prompt nhập vai tiếng Việt
+<div align="center">
 
-Dự án Node.js + TypeScript để quản lý prompt theo mô-đun và biên dịch sáu profile dùng chung một
-pipeline. Mỗi profile chỉ chọn những module cần thiết, nên phần trạng thái, cá nhân hóa, ảnh và
-tiếng Việt có một nguồn duy nhất thay vì ba bản prompt sao chép rồi lệch nhau.
+# TomiSakae VN-RP
 
-| Profile                   | Mục đích                                                                 | Thư mục sử dụng                    |
-| ------------------------- | ------------------------------------------------------------------------ | ---------------------------------- |
-| `nsfw`                    | Bản đầy đủ hiện tại, gồm toàn bộ ASMR, cơ học, cảnh nhóm và 109 ví dụ    | `bundles/nsfw/`                    |
-| `sfw`                     | Tập trung cốt truyện, thế giới và nhân vật; bỏ module chuyên sâu NSFW    | `bundles/sfw/`                     |
-| `nsfw-lite`               | Bản NSFW 1-on-1 cho model nhỏ, giữ lõi cần thiết và không nạp ví dụ/nhóm | `bundles/nsfw-lite/`               |
-| `nsfw-lite-en`            | Lõi điều khiển tiếng Anh tối ưu cho Gemma 4; cảnh vẫn xuất tiếng Việt    | `bundles/nsfw-lite-en/`            |
-| `nsfw-lite-gemini3-en`    | Bản tiếng Anh rút gọn cho Gemini 3.x; cảnh vẫn xuất tiếng Việt           | `bundles/nsfw-lite-gemini3-en/`    |
-| `nsfw-lite-mimo25-pro-en` | Bản tiếng Anh gọn cho MiMo 2.5 Pro; đầu ra tiếng Việt độ dài trung bình  | `bundles/nsfw-lite-mimo25-pro-en/` |
+**Plugin nhập vai tiếng Việt cho RisuAI và PocketRisu**
 
-`sfw` không phải bộ lọc nội dung. Nó không chủ động mang cơ chế NSFW vào mọi cảnh, nhưng nếu
-character, world và diễn biến hiện tại đi theo hướng đó thì model vẫn tiếp tục theo nguồn, không từ
-chối hoặc bẻ hướng. Sắc thái tôn thờ, phục tùng, tàn nhẫn hay dịu dàng cũng do character/world và
-quan hệ quyết định trong mọi profile.
+Freaky Frankenstein 5.4 · Sola V2 Flame
 
-Ba bundle cũ chứa ba tên file: `MASTER_PROMPT.md`, `RESPONSE_INSTRUCTION.md` và
-`ROLEPLAY_CHANGE_ROUTE.md`; bundle `nsfw-lite-en` chỉ chứa `MASTER_PROMPT.md` và
-`RESPONSE_INSTRUCTION.md`. Ba profile cũ dùng nguyên văn `prompts/00-risuai-system-prefix.md` và giữ
-chung response shell từ bản NSFW. `nsfw-lite-en` dùng system prefix và response instruction riêng
-bằng tiếng Anh; hợp đồng đầu ra của nó bắt buộc cảnh nhập vai tiếng Việt. Bản `nsfw-lite-gemini3-en`
-cũng chỉ có master và response instruction, nhưng được rút gọn riêng cho Gemini 3.x.
-`nsfw-lite-mimo25-pro-en` cũng không có ảnh hoặc route, đồng thời ưu tiên state vật lý và nhịp viết
-trung bình để giảm lỗi continuity và lan man.
+[![Phiên bản 2.0.1](https://img.shields.io/badge/phi%C3%AAn_b%E1%BA%A3n-2.0.1-285a45?style=flat-square)](package.json)
+[![Plugin API 3.0](https://img.shields.io/badge/RisuAI-Plugin_API_3.0-d54b31?style=flat-square)](#cài-đặt)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?style=flat-square)](src/)
+[![Tài liệu tiếng Việt](https://img.shields.io/badge/t%C3%A0i_li%E1%BB%87u-ti%E1%BA%BFng_Vi%E1%BB%87t-285a45?style=flat-square)](#bắt-đầu-sử-dụng)
 
-Hệ thống không còn coi dữ kiện gốc, route, quyền lượt, giọng nhân vật, tự chủ, ASMR, cơ học, cảnh
-nhóm, tiếng Việt và ảnh là các checklist rời. Mỗi module vẫn có trọng tâm riêng nhưng các câu lệnh
-được nối bằng quan hệ điều kiện và hệ quả, để model áp dụng chúng đồng thời trong cùng khoảnh khắc
-thay vì nhớ từng luật độc lập rồi vá kết quả ở cuối.
+[Cài đặt](#cài-đặt) · [Tính năng](#tính-năng) · [Phát triển](#phát-triển) · [Đóng góp](#đóng-góp)
 
-## Yêu cầu
+![Giao diện TomiSakae VN-RP trên máy tính](docs/images/plugin-desktop.png)
 
-- Node.js 20.19 trở lên
-- pnpm 11
+</div>
 
-## Sử dụng
+TomiSakae VN-RP đưa hai bộ preset vào một bảng cấu hình tiếng Việt: chọn module, đổi bộ nền, theo
+dõi token và lưu cấu hình riêng cho từng card. Plugin giữ thứ tự prompt, role, macro và định danh kỹ
+thuật của preset; phần Việt hóa điều chỉnh ngôn ngữ đầu ra theo cách viết riêng của từng bộ.
+
+## Hai bộ preset nền
+
+| Bộ preset                   | Trạng thái | Đặc trưng                                                                          |
+| :-------------------------- | :--------- | :--------------------------------------------------------------------------------- |
+| **Freaky Frankenstein 5.4** | Ổn định    | GM theo task, mô phỏng thế giới, cơ chế DC/roll và trạng thái `<internal_states>`. |
+| **Sola V2 Flame**           | Ổn định    | Nhịp điện ảnh, giọng NPC riêng, Story Review, scene header và Showrunner HUD.      |
+
+Lựa chọn module và regex của từng bộ được lưu riêng. Khi đổi bộ nền, các tính năng Global vẫn giữ
+nguyên, còn prompt hỗ trợ tự chuyển sang phiên bản phù hợp.
+
+## Tính năng
+
+| Tính năng                        | Hoạt động                                                                                                           | Mặc định           |
+| :------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :----------------- |
+| **Đầu ra tiếng Việt**            | Điều chỉnh prompt, ví dụ đầu ra và nhãn hiển thị theo từng bộ nền; giữ khóa, thẻ và cú pháp cần cho xử lý kỹ thuật. | Bật                |
+| **Màu hội thoại theo giao diện** | Điều chỉnh bảng màu theo nền sáng/tối, giữ tên màu và hiệu ứng riêng của preset.                                    | Bật                |
+| **Tối ưu hình ảnh theo card**    | Ưu tiên ảnh trang phục, tư thế/trạng thái rồi đến biểu cảm; dùng ảnh có sẵn và phân bố theo diễn biến.              | Tắt · Thử nghiệm   |
+| **Danh sách ảnh của card**       | Đếm ảnh/token và gửi từ khóa ảnh bằng tin user riêng ngay sau tin user mới nhất.                                    | Tắt                |
+| **Fix Gemma 4**                  | Ghép lời nhắc ngắn về tiếng Việt, cú pháp ảnh và kiểm soát NSFW mức 0–3 vào cuối tin user mới nhất trong request.   | Tắt                |
+| **Biên tập bằng Submodel**       | Viết lại phản hồi AI cuối theo bộ nền đang dùng; lưu thành swipe mới để giữ bản gốc.                                | Tắt · Thử nghiệm   |
+| **Tự động biên tập**             | Chạy Submodel sau khi phản hồi hoàn tất; cần bật Biên tập bằng Submodel.                                            | Tắt · Thử nghiệm   |
+| **Âm báo hoàn tất**              | Báo thành công hoặc thất bại; khi tự biên tập, chờ Submodel kết thúc.                                               | Tắt                |
+| **Ước tính token**               | Tính cục bộ lượng prompt plugin chèn thêm và chi tiết theo module.                                                  | Có sẵn             |
+| **Dọn ngữ cảnh & phục hồi**      | Lưu ẩn state/tracker bị cắt theo độ sâu, phục hồi khi xóa tin, đổi swipe hoặc rẽ nhánh.                             | Theo bộ lọc đã bật |
+
+<details>
+<summary><strong>Xem giao diện trên điện thoại</strong></summary>
+
+<p align="center">
+  <img src="docs/images/plugin-mobile.png" width="390" alt="Bảng cấu hình TomiSakae VN-RP trên điện thoại">
+</p>
+
+</details>
+
+### Thao tác trực tiếp trong bảng cấu hình
+
+![Chuyển giữa hai bộ preset và điều chỉnh Global](docs/images/plugin-controls.gif)
+
+## Cài đặt
+
+**Yêu cầu:** RisuAI có Plugin API 3.0. Các tính năng Submodel, tự biên tập và swipe cần API chat
+output của PocketRisu.
+
+1. Build plugin theo [hướng dẫn bên dưới](#phát-triển) để tạo `dist/tomisakae-vn-rp-plugin.js`.
+2. Trong RisuAI/PocketRisu, mở **Plugin Settings → Import Plugin** và chọn file đó.
+3. Cấp quyền plugin yêu cầu: xử lý request, đọc database và `mainDom`.
+4. Mở card, chọn **TomiSakae VN-RP** trong menu chat để cấu hình.
+
+Plugin không cần dịch vụ riêng. Model, API, sampling và preset Submodel được cấu hình tại ứng dụng
+chủ; build chỉ lấy prompt/regex từ JSON nguồn.
+
+## Bắt đầu sử dụng
+
+1. **Chọn preset cấu hình** cho card, hoặc nhập tên rồi bấm **Tạo preset** để sao chép cấu hình hiện
+   tại.
+2. **Điều chỉnh Global**, sau đó chọn **Freaky Frankenstein 5.4** hoặc **Sola V2 Flame**.
+3. Chọn các mục trong **Nhóm chọn một**, rồi bật/tắt **Module độc lập** và **Bộ lọc kỹ thuật** theo
+   nhu cầu.
+4. Bấm **Lưu preset** để áp dụng. Đóng bảng khi có thay đổi chưa lưu sẽ hiện xác nhận.
+
+Card mới dùng preset **Mặc định**. Việc gán preset được nhớ theo `chaId`, áp dụng cho mọi chat của
+card. Lưu một preset cập nhật tất cả card đang dùng preset đó.
+
+**Đổi bộ nền sẽ tự lưu cấu hình đang hiển thị trước khi chuyển.** Các công tắc thông thường cần bấm
+**Lưu preset**. **Khôi phục** đưa cấu hình về mặc định của bộ nền đang chọn; preset Mặc định không
+thể đổi tên hoặc xóa.
+
+<details>
+<summary><strong>Token, lịch sử và tương thích: những điểm cần biết</strong></summary>
+
+- **Token hiển thị là ước tính**, dùng `o200k_base` sau khi bung macro và áp dụng tiếng Việt/theme.
+  Không gồm toàn bộ card/lore, memory, lịch sử chat, phản hồi hay request Submodel. Con số có thể
+  thay đổi theo card và khác tokenizer của model/API.
+- **Dọn ngữ cảnh thực sự cắt dữ liệu khỏi lịch sử và request**, đồng thời giữ snapshot ẩn theo
+  tin/swipe để phục hồi. FF5.4 và Sola dùng các ngưỡng giữ state riêng của bộ lọc.
+- **Sola giữ header trong lịch sử**; bộ lọc header chỉ cắt khỏi request theo độ sâu. HUD/tracker
+  được giữ hoặc cắt theo từng bộ lọc, không phải mọi phần đều có cùng tuổi thọ.
+- **Tắt module Sola** cũng loại các lời nhắc phụ thuộc tương ứng trong prompt khác. Những luật độc
+  lập thuộc các module còn bật vẫn được áp dụng.
+- **Submodel** giữ prompt/card/lore, hai lượt trao đổi AI gần nhất và tin user hiện tại, bỏ
+  memory/summary. Request lỗi hoặc bị ngắt giữ phản hồi gốc.
+- **JSON nguồn được giữ nguyên**. Các điều chỉnh ngôn ngữ, hiển thị, phụ thuộc module và lịch sử
+  được thực hiện trong mã plugin.
+- **Quyền `mainDom`** phục vụ nút viết lại và theo dõi request kết thúc để báo âm thanh. Cấu hình
+  lưu trong `pluginStorage`.
+
+</details>
+
+## Phát triển
+
+**Môi trường:** Node.js từ **20.19**, pnpm **11.9.0** theo trường `packageManager`. Chạy các lệnh từ
+thư mục gốc repository:
 
 ```bash
-pnpm install
-pnpm compile:prompts
+git clone https://github.com/PhuVinhAI/asmr-manga-prompt-compiler.git
+cd asmr-manga-prompt-compiler
+pnpm install --frozen-lockfile
+pnpm build
 ```
 
-Lệnh trên sinh `MASTER_PROMPT.md` vào cả sáu thư mục bundle. `generated/MASTER_PROMPT.md` vẫn là
-alias giống hệt `bundles/nsfw/MASTER_PROMPT.md` để giữ tương thích với cách dùng cũ. Nội dung mỗi
-master bắt đầu ngay từ mô-đun đầu tiên, không chèn metadata, danh sách nguồn hay lời mở đầu, nên có
-thể sao chép trực tiếp.
+Kết quả: **`dist/tomisakae-vn-rp-plugin.js`**. File này đã gộp mã plugin và hai preset nguồn, có thể
+import trực tiếp vào ứng dụng chủ.
 
-Thêm hoặc đổi module trong `prompts/` hay `profile-modules/`, sau đó khai báo thứ tự sử dụng trong
-manifest tương ứng tại `profiles/`. Bản `nsfw` tiếp tục trỏ tới nguyên bộ `prompts/` cũ để đầu ra
-đầy đủ không đổi.
+| Lệnh               | Mục đích                                                         |
+| :----------------- | :--------------------------------------------------------------- |
+| `pnpm build`       | Build plugin, lấy phiên bản từ `package.json`.                   |
+| `pnpm build:check` | Kiểm tra file build có khớp mã nguồn hiện tại.                   |
+| `pnpm check`       | Kiểm tra kiểu TypeScript và ESLint.                              |
+| `pnpm test`        | Chạy toàn bộ test.                                               |
+| `pnpm test:watch`  | Chạy test trong quá trình phát triển.                            |
+| `pnpm format`      | Định dạng mã và tài liệu bằng Prettier.                          |
+| `pnpm run ci`      | Kiểm tra định dạng, kiểu/lint, build, test và độ khớp bản build. |
 
-## Lệnh
-
-```bash
-pnpm dev --list                 # Xem thứ tự module của NSFW đầy đủ
-pnpm compile:prompts            # Sinh cả sáu profile
-pnpm compile:prompts:nsfw       # Chỉ sinh NSFW đầy đủ + alias cũ
-pnpm compile:prompts:sfw        # Chỉ sinh SFW cốt truyện
-pnpm compile:prompts:lite       # Chỉ sinh NSFW Lite
-pnpm compile:prompts:lite:en    # Chỉ sinh NSFW Lite English cho Gemma 4
-pnpm compile:prompts:lite:gemini3 # Chỉ sinh NSFW Lite English cho Gemini 3.x
-pnpm compile:prompts:lite:mimo25 # Chỉ sinh NSFW Lite English cho MiMo 2.5 Pro
-pnpm check:prompts              # Kiểm tra mọi master có mới hay không
-pnpm check                      # TypeScript và ESLint
-pnpm test                       # Vitest
-pnpm build                      # Biên dịch CLI vào dist/
-pnpm build:risuai -- --source <preset.json> --output-directory <directory> --mode gemma-4
-                                # Tách prompt đang bật từ preset RisuAI/SillyTavern
-pnpm zip:handoff                # ZIP nguồn cần thiết để gửi cho AI khác
-pnpm ci                         # Chạy toàn bộ kiểm tra
-```
-
-CLI cũng hỗ trợ đường dẫn tùy chỉnh khi cần:
-
-```bash
-pnpm dev --profile sfw --stdout
-pnpm dev --profile nsfw-lite --list
-pnpm dev --profile nsfw-lite-en --list
-pnpm dev --profile nsfw-lite-gemini3-en --list
-pnpm dev --profile nsfw-lite-mimo25-pro-en --list
-pnpm dev --source prompts --output generated/MASTER_PROMPT.md
-```
-
-Builder preset RisuAI đọc `prompt_order`, giữ nguyên nội dung của các prompt đang bật theo đúng thứ
-tự, tách prompt reasoning được cấu hình vào `REASONING_RULES.md`, sinh `END_INJECTED_PROMPT.md`, ghi
-các slot runtime vào `INTRODUCTION.md`, và loại `extensions.regex_scripts` khỏi các prompt đầu ra.
-Dùng `--set-enabled identifier=on|off` nhiều lần để đổi toggle mà không sửa JSON nguồn; dùng
-`--check` để kiểm tra bốn file đã sinh còn mới. `--mode gemma-4` chỉ bật lớp chống lộ reasoning và
-Việt hóa các prime hội thoại/âm giọng cho Gemma 4; bỏ cờ hoặc dùng `--mode default` sẽ giữ nguyên
-nội dung chuẩn. Với cấu hình dùng lại nhiều lần, sao chép
-`scripts/risuai-preset.config.example.json`, điền đường dẫn và `enabledOverrides`, rồi chạy:
-
-```bash
-pnpm build:risuai -- --config scripts/my-risuai-preset.config.json
-```
-
-## Đóng gói để chuyển cho AI khác
-
-Chạy `pnpm zip:handoff` để tạo ZIP trong `exports/`. Script lấy danh sách bằng
-`git ls-files --cached --others --exclude-standard`, vì vậy nó gồm tệp đang được Git theo dõi và tệp
-mới không bị ignore, nhưng loại `.git`, `node_modules`, `dist`, coverage, master sinh tự động và ZIP
-cũ. Thư mục `exports/` cũng nằm trong `.gitignore`.
-
-```powershell
-pnpm zip:handoff -ListOnly
-pnpm zip:handoff -OutputPath exports\prompt-review.zip
-```
-
-`-ListOnly` chỉ in danh sách dự kiến. `-OutputPath` chọn tên/đường dẫn ZIP; đường dẫn tương đối được
-tính từ gốc dự án.
-
-## Cấu trúc
+### Cấu trúc dự án
 
 ```text
-profiles/                    Manifest và thứ tự module của sáu profile
-bundles/nsfw/                Ba file dùng trực tiếp cho NSFW đầy đủ
-bundles/sfw/                 Ba file dùng trực tiếp cho SFW cốt truyện
-bundles/nsfw-lite/           Ba file dùng trực tiếp cho NSFW 1-on-1 cô đọng
-bundles/nsfw-lite-en/        Hai file điều khiển tiếng Anh dành cho Gemma 4
-bundles/nsfw-lite-gemini3-en/ Hai file điều khiển tiếng Anh dành cho Gemini 3.x
-bundles/nsfw-lite-mimo25-pro-en/ Hai file điều khiển tiếng Anh dành cho MiMo 2.5 Pro
-profile-modules/shared/      Luật dùng chung cho SFW và phần đóng tiếng Việt
-profile-modules/sfw/         Phần cốt truyện chuyên cho SFW
-profile-modules/nsfw-lite/   Lõi, trạng thái và ảnh 1-on-1 cho model nhỏ
-profile-modules/nsfw-lite-en/ Luật atomic, data boundary và output contract cho Gemma 4
-profile-modules/nsfw-lite-gemini3-en/ Luật rút gọn và output contract cho Gemini 3.x
-profile-modules/nsfw-lite-mimo25-pro-en/ Luật state, nhịp trung bình và output contract cho MiMo
-prompts/                     18 module của NSFW đầy đủ hiện tại
-src/compiler.ts              Compiler thư mục thô tương thích cách dùng cũ
-src/profiles.ts              Nạp manifest và biên dịch profile
-src/cli.ts                   Giao diện dòng lệnh
-scripts/build-risuai-preset.ts CLI dựng bốn file từ preset RisuAI/SillyTavern
-scripts/risuai-preset-builder.ts Bộ đọc, kiểm tra, chọn toggle và render dùng lại được
-scripts/export-project.ps1   Đóng gói tệp Git cần thiết thành ZIP
-test/compiler.test.ts        Kiểm thử prompt NSFW đầy đủ và compiler gốc
-test/profiles.test.ts        Kiểm thử ranh giới, kích thước và tương thích sáu profile
-generated/MASTER_PROMPT.md   Alias tương thích của bundle NSFW
-prompts/16-vietnamese-contrastive-examples.md
-                             109 ví dụ dương tiếng Việt cho solo và harem
+.
+├── src/                 Mã plugin, prompt thích ứng và giao diện
+├── source/              Hai preset JSON nguồn
+├── scripts/             Build và xuất báo cáo đối chiếu
+├── test/                Kiểm thử module và tích hợp plugin
+├── comparison/          Tài liệu đối chiếu prompt gốc và bản Việt hóa
+├── docs/images/         Ảnh và minh họa giao diện trong README
+├── package.json         Phiên bản, lệnh và dependency
+├── pnpm-lock.yaml       Phiên bản dependency cố định
+└── README.md
 ```
 
-Trình biên dịch không chèn thời gian tạo tệp, nên cùng một bộ mô-đun luôn tạo ra cùng một kết quả và
-cùng mã SHA-256. Điều này giúp dễ rà soát thay đổi và phát hiện tệp tổng hợp bị cũ.
+`comparison/` giữ các tài liệu đối chiếu để kiểm tra thay đổi prompt và được đưa vào Git. `dist/`,
+`coverage/` và `node_modules/` là các thư mục sinh ra khi build, kiểm thử hoặc cài dependency; không
+đưa vào Git. `dist/` chỉ chứa file plugin để import.
 
-## Bộ ví dụ đối chiếu
+<details>
+<summary><strong>Các điểm bắt đầu đọc mã</strong></summary>
 
-`prompts/16-vietnamese-contrastive-examples.md` là lớp giáo huấn bằng 109 ví dụ dương liên tục ngay
-trước cổng chất lượng cuối. Một hợp đồng độ phủ chung thay cho phần giải thích lặp sau từng ví dụ;
-231 dòng văn mẫu vẫn được giữ nguyên từng câu chữ và SHA-256 từ nhánh nguồn. Các ví dụ bao quát
-quyền nguồn, ranh giới lượt, giọng nhân vật, miệng đang bận, âm tiếp xúc, cảm giác bên trong, tự
-chủ, solo, harem hợp tác/cạnh tranh/phân cấp/luân phiên, ảnh, chống lặp, từ vựng trực tiếp và nhiều
-dạng thân mật.
+| File                                                                                       | Trách nhiệm                                                  |
+| :----------------------------------------------------------------------------------------- | :----------------------------------------------------------- |
+| [`src/plugin.ts`](src/plugin.ts)                                                           | Kết nối API host, bảng cấu hình và vòng đời plugin.          |
+| [`src/core.ts`](src/core.ts)                                                               | Ghép request, bung macro, lọc dữ liệu và chuẩn hóa cấu hình. |
+| [`src/preset-family.ts`](src/preset-family.ts)                                             | Chọn bộ nền, thứ tự prompt và xử lý riêng theo preset.       |
+| [`src/vietnamese.ts`](src/vietnamese.ts)                                                   | Prompt tiếng Việt và các phép thay thế theo từng bộ nền.     |
+| [`src/image.ts`](src/image.ts), [`src/card-images.ts`](src/card-images.ts)                 | Chỉ dẫn ảnh và danh sách tài nguyên của card.                |
+| [`src/gemma-fix.ts`](src/gemma-fix.ts)                                                     | Lời nhắc ngắn cho Gemma 4 và mức kiểm soát NSFW.             |
+| [`src/editor-prompts.ts`](src/editor-prompts.ts)                                           | Hai prompt biên tập Submodel theo bộ nền.                    |
+| [`src/sola-history.ts`](src/sola-history.ts), [`src/sola-display.ts`](src/sola-display.ts) | Dọn/phục hồi lịch sử và hiển thị Sola.                       |
+| [`src/sola-prompt-dependencies.ts`](src/sola-prompt-dependencies.ts)                       | Gỡ lời nhắc phụ thuộc các module đã tắt.                     |
 
-Âm thanh luôn gắn với nguồn, nguyên nhân, cảm giác và hệ quả thay vì đứng thành một khối riêng. Nhân
-vật có thể rên dài, ngắn, đứt quãng, rất ít, im lặng hoặc phát âm vô nghĩa tùy tính cách và trạng
-thái; không có quota dòng, mẫu nguyên âm, độ dài chữ hay khuôn cao trào bắt buộc. Khi nhân vật còn
-tỉnh táo và nói ổn, lời tự nhiên có nghĩa được ưu tiên. Khi miệng bận hoặc khoái cảm quá cao, âm
-tiết bị cản, tiếng rên phản xạ và âm vô nghĩa đều hợp lệ; điều bị cấm là dùng một âm cô lập rồi để
-văn kể dài nói thay toàn bộ trải nghiệm và làm giọng nhân vật biến mất.
+</details>
 
-Các ví dụ là khuôn quan hệ giữa trạng thái, âm, tiếp xúc, cảm giác, ham muốn, lựa chọn và dư âm,
-không phải kho câu hoặc danh mục hành động để sao chép. Model phải giữ dữ kiện, giọng, ranh giới và
-quyền lượt hiện tại; chỉ học cấu trúc nhân quả, không bê câu chữ, cường độ, giải phẫu hay kết quả
-sang cảnh khác.
+### Đối chiếu prompt gốc và bản Việt hóa
 
-`pnpm compact:examples` là phép biến đổi lặp lại an toàn: script chỉ giữ tiêu đề nhóm, đủ 109 tiêu
-đề ví dụ và các dòng mẫu, rồi dựng lại hợp đồng chung. Script dừng nếu số thứ tự, số dòng mẫu hoặc
-SHA-256 thay đổi.
+```bash
+pnpm review:ff54
+pnpm review:sola
+pnpm review:sola:changes
+pnpm review:sola:full
+```
 
-## Khung dòng và mật độ quy tắc
+Các lệnh ghi báo cáo vào `comparison/`. `review:sola` xuất toàn bộ cặp prompt gốc/Việt hóa;
+`review:sola:changes` chỉ liệt kê phần thay đổi cùng tóm tắt xử lý kỹ thuật; `review:sola:full` xuất
+bản kiểm tra chi tiết gồm cả regex và hiển thị. Đây là tài liệu đối chiếu, không phải prompt để nạp
+vào chat.
 
-Trong profile `nsfw`, file 00 là khung hệ thống chung đầy đủ của RisuAI và được giữ nguyên. Mỗi
-module 01–17 sở hữu một miền hành vi; câu nhắc chéo chỉ giữ khi nó làm nhiệm vụ khác ở router, hợp
-đồng đầu ra hoặc cổng kiểm tra. Profile `sfw` và `nsfw-lite` dùng module riêng ngắn hơn nhưng chia
-sẻ cùng luật trạng thái, cá nhân hóa, ảnh và nền tiếng Việt. `nsfw-lite-en` tách thành sáu lớp tiếng
-Anh theo hierarchy–data–task–contract, nhưng vẫn khóa cảnh đầu ra bằng tiếng Việt. Ngân sách mềm do
-từng manifest quy định; compiler chỉ cảnh báo khi vượt, không cắt nội dung. Các tệp prompt Markdown
-được loại khỏi Prettier; TypeScript, JSON cấu hình và README vẫn dùng định dạng tự động bình thường.
+## Đóng góp
 
-Đợt tái cấu trúc dựa trên hướng dẫn chính thức về việc ưu tiên kết quả, bỏ chỉ dẫn/ví dụ không đổi
-hành vi và chạy lại eval sau từng nhóm:
-[Prompting guidance for GPT-5.6 Sol](https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6)
-và [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-engineering).
+Báo lỗi hoặc đề xuất tại
+[GitHub Issues](https://github.com/PhuVinhAI/asmr-manga-prompt-compiler/issues). Khi báo lỗi, ghi
+phiên bản plugin, ứng dụng chủ, bộ nền, các module liên quan và các bước tái hiện. Nếu đính kèm
+request hoặc log, xóa API key và thông tin riêng.
 
-## NSFW Lite English cho Gemma 4
+Với pull request:
 
-`nsfw-lite-en` là bản thiết kế lại, không phải bản dịch từng câu của `nsfw-lite`. Bảy lớp system
-prompt lần lượt tách mục tiêu/hierarchy, data boundary và trạng thái, character–trajectory control,
-scene engine, image context/asset control, khóa tiếng Việt và output contract. Profile này có module
-chọn ảnh theo schema nguồn nhưng không có route RisuAI cố định. Mỗi luật có một mã ổn định và một
-yêu cầu kiểm chứng được; output contract cùng silent validation nằm gần điểm xuất để giảm lỗi quên
-luật khi context dài.
+1. Giữ thay đổi đúng phạm vi; giữ thứ tự, định danh và macro preset nguồn.
+2. Nếu sửa prompt, kèm đoạn trước/sau và lý do; dùng lệnh đối chiếu để rà cả module mặc định tắt.
+3. Bổ sung test phù hợp khi thay đổi hành vi request, lưu cấu hình, regex hoặc phục hồi lịch sử.
+4. Chạy `pnpm run ci` trước khi gửi pull request.
 
-Khi dùng Transformers hoặc inference stack có chat template, truyền `MASTER_PROMPT.md` bằng native
-`system` role và để tokenizer tự thêm control token Gemma 4. Không chép thủ công `<|turn>system`
-hoặc `<|turn>model>` vào nội dung nếu stack đã gọi `apply_chat_template`.
+## Nguồn preset và giấy phép
 
-Lớp character–trajectory mới chống các lỗi cộng đồng báo cáo: personality bị san phẳng khi ERP,
-flirt tự nhảy sang sex, NPC quá dễ bị thuyết phục, intimacy tự biến thành tình yêu/cứu chuộc, swipe
-chỉ đổi từ nhưng giữ cùng đường diễn biến, trope/slop. Các neo nhân vật cùng áp lực trajectory hiện
-tại nằm trong prompt chính để giảm drift khi hội thoại dài.
+Hai preset nền **Freaky Frankenstein 5.4** và **Sola V2 Flame** thuộc tác giả gốc. Các bản JSON dùng
+để build nằm trong [`source/`](source/); plugin lưu dấu SHA-256 để nhận diện nguồn.
 
-`nsfw-lite-gemini3-en` dùng cùng khóa tiếng Việt, quyền hành động của người dùng, trạng thái và tính
-liên tục, nhưng rút các luật trùng cho Gemini 3.x. Nó cho phép chi tiết môi trường tạm thời và nhiều
-hành động có quan hệ nhân quả của nhân vật AI/môi trường, thêm `RESPONSE SHAPE` để tránh phản hồi
-quá ngắn, và dùng hai câu `SILENT CHECK` thay cho danh sách kiểm tra dài. Nó không có ảnh,
-route/change-route, thinking setup riêng hoặc danh sách cấm từ thân mật của bản Gemma.
-
-`nsfw-lite-mimo25-pro-en` nén luật theo hướng dẫn tích cực cho MiMo 2.5 Pro. Trước mỗi lượt, model
-phải dựng lại state hiện tại gồm vị trí, tư thế, quần áo đang mặc, tiếp xúc, thương tích, mệt mỏi,
-mục tiêu và kiến thức để tránh đi vào nơi đã đứng hoặc cởi món không mặc. `RESPONSE SHAPE` yêu cầu
-độ dài trung bình và chỉ hoàn tất một nhịp cảnh hiện tại; không đặt giới hạn số từ, số đoạn hay số
-ký tự, nhưng không được kéo thêm đoạn, nhánh phụ hoặc nhịp mới chỉ để viết dài hơn.
-
-Thiết kế này bám các nguyên tắc trong nghiên cứu được cung cấp: luật bất biến ở system, hierarchy
-rõ, reference là data và contract cụ thể. Tham khảo
-[Gemma 4 model card](https://ai.google.dev/gemma/docs/core/model_card_4),
-[Gemma 4 prompt formatting](https://ai.google.dev/gemma/docs/core/prompt-formatting-gemma4).
-
-## Phạm vi tiếng Việt
-
-- Ba profile cũ viết cả luật điều khiển và nội dung hướng người đọc bằng tiếng Việt.
-- `nsfw-lite-en` viết luật điều khiển bằng tiếng Anh nhưng hợp đồng đầu ra vẫn bắt buộc cảnh nhập
-  vai hướng người đọc bằng tiếng Việt.
-- Bản tiếng Anh chỉ giữ nguyên biến, thẻ XML, chuỗi máy bắt buộc, mã, đường dẫn, tên riêng cần thiết
-  về kỹ thuật và key/cú pháp ảnh chính xác do nguồn yêu cầu; nội dung hiển thị gắn với ảnh vẫn phải
-  theo khóa tiếng Việt.
-- bộ lệnh phiên âm Gemini cũng được hướng dẫn hoàn toàn bằng tiếng Việt. Riêng lời nghe thấy trong
-  audio vẫn phải chép nguyên ngôn ngữ nguồn để bảo toàn tính nguyên văn; đây là ngoại lệ kỹ thuật
-  của tác vụ phiên âm, không phải hỗ trợ đa ngôn ngữ cho nhập vai.
-
-## Chuyển route và ký ức dài hạn
-
-`bundles/nsfw/ROLEPLAY_CHANGE_ROUTE.md` tạo Route V2.1 dưới dạng snapshot có độ sâu thích ứng. Route
-vẫn là một đoạn liên tục của cùng dòng nhập vai, không phải nhánh hoặc thế giới mới; có thể chuyển
-khi chuỗi hành động đã hoàn thành hoặc còn đang dở nhưng cần sang cửa sổ hội thoại mới.
-
-Ba route chuyên biệt của ba profile cũ dùng cùng nguyên tắc snapshot bất động và cổng
-`<USER_NEXT_PROMPT>`. Bản SFW ưu tiên tuyến truyện, thế giới, quan hệ và kiến thức, không thêm
-trường cơ học trưởng thành nhưng vẫn bảo toàn sự kiện trưởng thành thật sự còn hệ quả. Hai bản NSFW
-Lite giữ trạng thái độc lập cho một hoặc nhiều nhân vật với mật độ gọn hơn. `nsfw-lite-en` không có
-route/change-route.
-
-Mỗi lần tạo route, bộ chuyển đọc snapshot cũ thành bản ghi, áp dụng các lượt mới rồi render lại toàn
-bộ snapshot. `TRẠNG THÁI HIỆN TẠI` luôn bị thay hoàn toàn. Các nhóm còn lại dùng mã ổn định `E`,
-`F`, `R`, `K`, `A`, `O`, `P`, `M`: cùng một sự thật cập nhật đúng mã cũ, dữ kiện sai/hết hiệu lực và
-việc đã giải quyết không còn hệ quả bị xóa, còn mã mới chỉ dành cho dữ kiện thật sự mới. Snapshot
-chỉ giữ sequence hiện tại và cha trực tiếp, không tích lũy danh sách mọi route đã hoàn thành.
-
-Thay vì trần cứng 9.500 ký tự, bộ chuyển chọn ngân sách nhỏ nhất vẫn bảo toàn context: `GỌN` khoảng
-12.000 ký tự, `SÂU` khoảng 18.000 và `MỞ RỘNG` khoảng 24.000. Các mốc này là mục tiêu mềm theo độ
-phức tạp, không phải dung lượng phải dùng hết. Nếu toàn bộ thao tác nén hợp lệ vẫn không đủ,
-`BẢO TOÀN` được vượt 24.000 nhưng phần vượt chỉ chứa dữ kiện thật sự được bảo vệ. Vì vậy route có
-thể lớn theo độ phức tạp chưa giải quyết, không lớn chỉ vì số route đã đi qua.
-
-Số bản ghi của từng nhóm cũng là mục tiêu mật độ thay vì trần xóa tuyệt đối.
-`QUAN HỆ VÀ ĐỘNG CƠ BỀN` giữ nền tâm lý ổn định và nguyên nhân khiến nhân vật thường chọn hoặc tránh
-một hành vi; một phản ứng nhất thời không tự đổi tính cách. `VIỆC CHƯA XONG` và `MỐC BỀN` giữ chuỗi
-tối thiểu `nguyên nhân -> điều đã xảy ra -> hệ quả -> điều còn chờ`, tránh chỉ còn kết luận ngắn
-nhưng mất lý do. Kiến thức vẫn chỉ ghi ngoại lệ ai biết/không biết/nghi ngờ và tham chiếu mã thay vì
-lặp nội dung.
-
-Dữ kiện không bị xóa chỉ vì đã cũ, nhân vật tạm vắng hoặc chưa được nhắc lại vài route. Nó chỉ được
-làm nguội khi AI vẫn hiểu đúng nếu thiếu chi tiết đó; nhân vật phụ chỉ bị loại khi không còn quan
-hệ, bí mật, món nợ, lời hứa, vật, việc mở, kiến thức hoặc khả năng quay lại đã được thiết lập.
-
-`CÁ NHÂN HÓA ĐANG HOẠT ĐỘNG` lưu các quy tắc hiện hành đã chuẩn hóa thay cho mục lỗi cũ hoặc nhiều
-bản sao “chỉ dẫn / góp ý / ghi đè”. Nội dung người dùng tự đặt trong `{{...}}` có hiệu lực ngay và
-qua các phản hồi và ngữ cảnh sau; góp ý mới nhất, cụ thể nhất chỉ ghi đè phần xung đột. Biến
-`{{user}}`, lore, ví dụ và văn bản trích không bị nhận nhầm là cá nhân hóa.
-
-`XƯNG HÔ ĐANG HOẠT ĐỘNG` chỉ lưu dạng hiện tại theo từng chiều `người nói -> người nghe`, gồm đại từ
-tự xưng, từ gọi đối phương, tên/danh hiệu/biệt danh, mức và nhịp. A gọi B không ép B gọi A hoặc A
-gọi C giống vậy. Đổi cảm xúc, tăng thân mật/tình dục, quá tải hoặc lời tục nhất thời không tự đổi
-cách xưng hô; chỉ ảnh hưởng trực tiếp đã xảy ra mới cập nhật đúng bản ghi `A`.
-
-Để tạo route kế tiếp cho ba profile cũ, đưa cho bộ chuyển snapshot `<ROLEPLAY_CHANGE_ROUTE>` gần
-nhất nếu có, các lượt đã hoàn tất sau snapshot đó và nguồn nhân vật/thế giới cần thiết. Trong cuộc
-trò chuyện mới, đặt snapshot được sinh vào lớp bộ nhớ sau thẻ nhân vật và tri thức thế giới nhưng
-trước lượt hội thoại cần trả lời. Không gắn lại log hoặc các route cũ đã được snapshot thay thế.
-
-Gói sinh ra kết thúc bằng `<USER_NEXT_PROMPT>`. Trước khi gửi gói cho model nhận, thay dòng giữ chỗ
-bằng prompt kế tiếp thật của người dùng. Nếu trường này thiếu, trống hoặc vẫn còn placeholder và
-không có tin nhắn người dùng mới hơn, AI phải đứng yên và chỉ trả
-`Đang chờ prompt kế tiếp của bạn.`; không tiếp tục cảnh, giải quyết việc đang dở, xuất ảnh hoặc viết
-hành động cho {{user}}.
-
-## Thứ tự chèn khuyến nghị cho RisuAI
-
-Khi khung lệnh bao ngoài mặc định có `ROLEPLAY_RULE`, `ROLEPLAY_INFO` và `RESPONSE_INSTRUCTION`,
-dùng thứ tự sau:
-
-1. System/configuration chung của nền tảng.
-2. `ROLEPLAY_RULE` chung.
-3. Mở thư mục bundle đã chọn và dùng `MASTER_PROMPT.md` làm prefix thay cho phần từ `<SYSTEM_RULE>`
-   đến hết `<ROLEPLAY_INFO>` cũ. Master đã chứa sẵn các tag mở/đóng này; không lồng nó vào một
-   `<ROLEPLAY_INFO>` khác.
-4. Thẻ nhân vật, hồ sơ nhân vật người dùng, các mục tri thức thế giới đang hoạt động và bộ nhớ do
-   RisuAI chèn.
-5. Dùng `RESPONSE_INSTRUCTION.md` trong cùng thư mục bundle. Ba profile cũ giữ cùng response shell;
-   `nsfw-lite-en` dùng response instruction riêng và không có `<FINAL_EXECUTION_OVERRIDE>`.
-
-Khi chuyển cửa sổ hội thoại của ba profile cũ, dùng `ROLEPLAY_CHANGE_ROUTE.md` trong cùng thư mục
-bundle. `nsfw-lite-en` không có file change-route; không trộn file giữa các bundle vì mật độ và
-trường trạng thái khác nhau.
-
-Không chuyển toàn bộ master dài xuống vị trí cuối: làm vậy tăng độ gần của luật phong cách nhưng đẩy
-thẻ nhân vật và tri thức nền ra xa phản hồi. Phần chốt cuối đã được ghép vào cuối chỉ dẫn phản hồi
-để nhắc lại các điều kiện chặn có nguy cơ cao trong cùng thông điệp hệ thống và tránh bị gửi sai
-thành vai `assistant`.
+Repository hiện chưa có tệp `LICENSE` quy định quyền sử dụng và phân phối mã plugin. Việc công khai
+mã nguồn không thay thế giấy phép; quyền đối với preset và nội dung bên thứ ba vẫn thuộc chủ sở hữu
+tương ứng.

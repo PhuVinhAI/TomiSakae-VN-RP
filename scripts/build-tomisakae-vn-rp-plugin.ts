@@ -3,11 +3,11 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "esbuild";
-import type { PresetSources } from "../risuai/tomisakae-vn-rp-plugin/src/preset-family.js";
-import type { FfPreset } from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
+import type { PresetSources } from "../src/preset-family.js";
+import type { FfPreset } from "../src/core.js";
 
-const DEFAULT_SOURCE = "risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json";
-const DEFAULT_OUTPUT = "risuai/tomisakae-vn-rp-plugin/dist/tomisakae-vn-rp-plugin.js";
+const DEFAULT_SOURCE = "source/ff54-sillytavern-preset.json";
+const DEFAULT_OUTPUT = "dist/tomisakae-vn-rp-plugin.js";
 
 interface Options {
   sourceFile: string;
@@ -57,8 +57,9 @@ export async function buildPlugin(options: Options): Promise<{ output: string; d
   const canonicalPreset = JSON.stringify(preset);
   const sourceDigest = createHash("sha256").update(raw).digest("hex");
   const sources = await loadPresetSources(sourcePath);
+  const { version } = JSON.parse(await readFile("package.json", "utf8")) as { version: string };
   const result = await build({
-    entryPoints: [path.resolve("risuai/tomisakae-vn-rp-plugin/src/plugin.ts")],
+    entryPoints: [path.resolve("src/plugin.ts")],
     bundle: true,
     write: false,
     format: "iife",
@@ -77,7 +78,7 @@ export async function buildPlugin(options: Options): Promise<{ output: string; d
         "//@name tomisakae_vn_rp",
         "//@display-name TomiSakae VN-RP",
         "//@api 3.0",
-        "//@version 2.0.1",
+        `//@version ${version}`,
         "",
       ].join("\n"),
     },
@@ -102,7 +103,7 @@ export async function loadPresetSources(ff54Source = DEFAULT_SOURCE): Promise<Pr
   const sources = {} as PresetSources;
   const inputs = [
     ["ff54", ff54Source, path.basename(ff54Source)],
-    ["sola", "risuai/tomisakae-vn-rp-plugin/source/sola-v2-flame.json", "Sola V2 Flame.json"],
+    ["sola", "source/sola-v2-flame.json", "Sola V2 Flame.json"],
   ] as const;
   for (const [family, filename, sourceName] of inputs) {
     const raw = await readFile(path.resolve(filename), "utf8");

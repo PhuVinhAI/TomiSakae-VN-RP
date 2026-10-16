@@ -5,8 +5,8 @@ import {
   createDefaultSettings,
   PLACEMENT_AI_OUTPUT,
   type FfPreset,
-} from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
-import { splitSolaReasoning } from "../risuai/tomisakae-vn-rp-plugin/src/sola-reasoning.js";
+} from "../src/core.js";
+import { splitSolaReasoning } from "../src/sola-reasoning.js";
 
 let preset: FfPreset;
 beforeAll(async () => {

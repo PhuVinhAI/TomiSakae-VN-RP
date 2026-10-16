@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  cardImageKeywordCount,
-  cardImagePrompt,
-  collectCardImages,
-} from "../risuai/tomisakae-vn-rp-plugin/src/card-images.js";
+import { cardImageKeywordCount, cardImagePrompt, collectCardImages } from "../src/card-images.js";
 
 describe("Card image keywords", () => {
   it("keeps exact keys, counts images, groups duplicate keys and excludes other media", () => {

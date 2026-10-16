@@ -6,15 +6,9 @@ import {
   createDefaultSettings,
   PLACEMENT_AI_OUTPUT,
   type FfPreset,
-} from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
-import {
-  adaptSolaSceneHeaderForDisplay,
-  preserveSolaCardLineBreaks,
-} from "../risuai/tomisakae-vn-rp-plugin/src/sola-display.js";
-import {
-  adaptSolaDialogueColors,
-  textContrast,
-} from "../risuai/tomisakae-vn-rp-plugin/src/dialogue-colors.js";
+} from "../src/core.js";
+import { adaptSolaSceneHeaderForDisplay, preserveSolaCardLineBreaks } from "../src/sola-display.js";
+import { adaptSolaDialogueColors, textContrast } from "../src/dialogue-colors.js";
 
 let preset: FfPreset;
 beforeAll(async () => {

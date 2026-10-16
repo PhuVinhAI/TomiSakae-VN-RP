@@ -1,10 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
-import {
-  adaptDialogueColors,
-  resolveDialogueTheme,
-} from "../risuai/tomisakae-vn-rp-plugin/src/dialogue-colors.js";
-import type { FfPreset } from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
+import { adaptDialogueColors, resolveDialogueTheme } from "../src/dialogue-colors.js";
+import type { FfPreset } from "../src/core.js";
 
 describe("theme-aware dialogue palettes", () => {
   it("filters the existing named palette for a light UI without adding guidance", () => {
@@ -35,7 +32,7 @@ describe("theme-aware dialogue palettes", () => {
     "keeps source rules and examples consistent with an expanded %s palette",
     async (type) => {
       const preset = JSON.parse(
-        await readFile("risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json", "utf8"),
+        await readFile("source/ff54-sillytavern-preset.json", "utf8"),
       ) as FfPreset;
       const snapshot = structuredClone(preset);
       const source = String(

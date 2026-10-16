@@ -8,10 +8,10 @@ import {
   VIETNAMESE_OUTPUT_PROMPT,
   VIETNAMESE_OUTPUT_REPLACEMENTS,
   VIETNAMESE_REASONING_REPLACEMENTS,
-} from "../risuai/tomisakae-vn-rp-plugin/src/vietnamese.js";
+} from "../src/vietnamese.js";
 
-const DEFAULT_SOURCE = "risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json";
-const DEFAULT_OUTPUT_DIRECTORY = "risuai/tomisakae-vn-rp-plugin/comparison";
+const DEFAULT_SOURCE = "source/ff54-sillytavern-preset.json";
+const DEFAULT_OUTPUT_DIRECTORY = "comparison";
 
 interface SourcePrompt {
   identifier: string;

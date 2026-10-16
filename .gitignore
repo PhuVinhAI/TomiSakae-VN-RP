@@ -1,9 +1,7 @@
-coverage/
-dist/
-node_modules/
-exports/
-
-# The generated master prompt is reproducible from prompts/.
-generated/*.md
-!generated/.gitkeep
-bundles/*/MASTER_PROMPT.md
+/node_modules/
+/dist/
+/coverage/
+*.tsbuildinfo
+*.log
+.DS_Store
+Thumbs.db

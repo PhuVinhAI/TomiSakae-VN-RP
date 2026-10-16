@@ -1,4 +1,6 @@
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   adaptDisplayMarkupForRisuAI,
@@ -16,24 +18,24 @@ import {
   expandHostMacros,
   normalizeSettings,
   type FfPreset,
-} from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
+} from "../src/core.js";
 import {
   adaptPromptForVietnamese,
   VIETNAMESE_OUTPUT_PROMPT,
   VIETNAMESE_OUTPUT_REPLACEMENTS,
   VIETNAMESE_REASONING_REPLACEMENTS,
-} from "../risuai/tomisakae-vn-rp-plugin/src/vietnamese.js";
+} from "../src/vietnamese.js";
 import { buildVietnameseComparison } from "../scripts/build-ff54-vietnamese-comparison.js";
-import { DIALOGUE_COLORS } from "../risuai/tomisakae-vn-rp-plugin/src/dialogue-colors.js";
+import { DIALOGUE_COLORS } from "../src/dialogue-colors.js";
 import {
   EXCLUSIVE_PROMPT_GROUPS,
   HOST_MARKER_IDS,
   normalizeExclusivePromptGroups,
   PROMPT_SECTIONS,
   SOURCE_SEPARATOR_IDS,
-} from "../risuai/tomisakae-vn-rp-plugin/src/ui-vi.js";
+} from "../src/ui-vi.js";
 
-const source = "risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json";
+const source = "source/ff54-sillytavern-preset.json";
 const realismModeId = "019f62e8-892f-700c-9795-53ecb3381d7d";
 const freakyModeId = "019f62e8-892f-700d-b070-4add983aeae1";
 
@@ -313,8 +315,8 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
   });
 
   it("renders a Vietnamese responsive settings UI", async () => {
-    const pluginSource = await readFile("risuai/tomisakae-vn-rp-plugin/src/plugin.ts", "utf8");
-    const styles = await readFile("risuai/tomisakae-vn-rp-plugin/src/ui-style.ts", "utf8");
+    const pluginSource = await readFile("src/plugin.ts", "utf8");
+    const styles = await readFile("src/ui-style.ts", "utf8");
     expect(pluginSource).toContain("Điều khiển <em>TomiSakae VN-RP.</em>");
     expect(pluginSource).toContain('{ name: "TomiSakae VN-RP"');
     expect(pluginSource).toContain("<h2>Global</h2>");
@@ -567,7 +569,7 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
 
   it("builds original and Vietnamese comparison files from every source module", async () => {
     const data = await preset();
-    const outputDirectory = "risuai/tomisakae-vn-rp-plugin/comparison";
+    const outputDirectory = await mkdtemp(path.join(tmpdir(), "vn-rp-comparison-"));
     const result = await buildVietnameseComparison({
       sourceFile: source,
       outputDirectory,
@@ -597,10 +599,11 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
     expect(review).toContain(
       'NPCs talk, moan, and swear during intimacy. (e.g., "ưm... a... sướng quá...!")',
     );
+    await rm(outputDirectory, { recursive: true, force: true });
   });
 
   it("stores named presets and card assignments in plugin storage and reads legacy settings", async () => {
-    const pluginSource = await readFile("risuai/tomisakae-vn-rp-plugin/src/plugin.ts", "utf8");
+    const pluginSource = await readFile("src/plugin.ts", "utf8");
     expect(pluginSource).toContain('const STORAGE_KEY = "ff54-global-settings-v1"');
     expect(pluginSource).toContain('location: "chat"');
     expect(pluginSource).toContain("getCurrentCharacterIndex");
@@ -617,12 +620,10 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
   });
 
   it("does not bundle the unavailable chat-parser API", async () => {
-    const artifact = await readFile(
-      "risuai/tomisakae-vn-rp-plugin/dist/tomisakae-vn-rp-plugin.js",
-      "utf8",
-    );
+    const artifact = await readFile("dist/tomisakae-vn-rp-plugin.js", "utf8");
     expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
-    expect(artifact.match(/^\/\/@version (.+)$/m)?.[1]).toMatch(/^\d+\.\d+\.\d+$/);
+    const manifest = JSON.parse(await readFile("package.json", "utf8")) as { version: string };
+    expect(artifact.match(/^\/\/@version (.+)$/m)?.[1]).toBe(manifest.version);
   });
 
   it("context-saver regex keeps the two newest AI responses", async () => {

@@ -6,9 +6,9 @@ import {
   expandHostMacros,
   type FfGlobalSettings,
   type FfPreset,
-} from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
-import { vietnameseOutputFor } from "../risuai/tomisakae-vn-rp-plugin/src/preset-family.js";
-import { estimatePluginPromptTokens } from "../risuai/tomisakae-vn-rp-plugin/src/token-estimate.js";
+} from "../src/core.js";
+import { vietnameseOutputFor } from "../src/preset-family.js";
+import { estimatePluginPromptTokens } from "../src/token-estimate.js";
 
 const colorId = "01a0c1ff-4ecf-7010-9abd-989d574dc050";
 const gradientId = "01a0c1ff-4ecf-7012-9085-a5f80e9134d8";

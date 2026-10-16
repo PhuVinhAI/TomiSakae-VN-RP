@@ -1,51 +1,37 @@
 {
-  "name": "asmr-prompt-compiler",
-  "version": "1.0.0",
-  "description": "Deterministic compiler for profiled Vietnamese roleplay prompts.",
+  "name": "tomisakae-vn-rp-plugin",
+  "version": "2.0.1",
+  "description": "Vietnamese-first RisuAI roleplay plugin for Freaky Frankenstein 5.4 and Sola V2 Flame.",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.9.0",
   "engines": {
     "node": ">=20.19"
   },
-  "bin": {
-    "prompt-compiler": "dist/cli.js"
-  },
   "scripts": {
-    "dev": "tsx src/cli.ts --profile nsfw",
-    "compile:prompts": "tsx src/cli.ts --all-profiles",
-    "compile:prompts:nsfw": "tsx src/cli.ts --profile nsfw",
-    "compile:prompts:sfw": "tsx src/cli.ts --profile sfw",
-    "compile:prompts:lite": "tsx src/cli.ts --profile nsfw-lite",
-    "compile:prompts:lite:en": "tsx src/cli.ts --profile nsfw-lite-en",
-    "compile:prompts:lite:gemini3": "tsx src/cli.ts --profile nsfw-lite-gemini3-en",
-    "compile:prompts:lite:mimo25": "tsx src/cli.ts --profile nsfw-lite-mimo25-pro-en",
-    "check:prompts": "tsx src/cli.ts --all-profiles --check",
-    "build": "tsup",
+    "build": "tsx scripts/build-tomisakae-vn-rp-plugin.ts",
+    "build:check": "tsx scripts/build-tomisakae-vn-rp-plugin.ts --check",
     "check": "tsc --noEmit && eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "zip:handoff": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/export-project.ps1",
-    "build:risuai": "tsx scripts/build-risuai-preset.ts",
-    "build:risuai:comparison": "tsx scripts/build-risuai-comparison.ts",
-    "build:risuai:tomisakae-vn-rp": "tsx scripts/build-tomisakae-vn-rp-plugin.ts",
-    "build:risuai:ff54-vietnamese-comparison": "tsx scripts/build-ff54-vietnamese-comparison.ts",
+    "review:ff54": "tsx scripts/build-ff54-vietnamese-comparison.ts",
+    "review:sola": "tsx scripts/build-preset-vietnamese-review.ts",
+    "review:sola:changes": "tsx scripts/build-sola-raw-review.ts",
+    "review:sola:full": "tsx scripts/build-sola-raw-review.ts --full",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "ci": "pnpm format:check && pnpm check && pnpm test && pnpm build && pnpm compile:prompts && pnpm check:prompts"
+    "ci": "pnpm format:check && pnpm check && pnpm build && pnpm test && pnpm build:check"
   },
   "dependencies": {
-    "commander": "^14.0.2",
-    "gpt-tokenizer": "4.0.0",
-    "zod": "^4.1.12"
+    "gpt-tokenizer": "4.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
+    "commander": "^14.0.2",
     "esbuild": "^0.27.7",
     "eslint": "^9.39.1",
     "prettier": "^3.7.4",
-    "tsup": "^8.5.1",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.0",

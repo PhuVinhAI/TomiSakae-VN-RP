@@ -7,13 +7,10 @@ import {
   expandHostMacros,
   normalizeSettings,
   type FfPreset,
-} from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
-import {
-  addImageReasoningGuidance,
-  IMAGE_OPTIMIZATION_PROMPT,
-} from "../risuai/tomisakae-vn-rp-plugin/src/image.js";
-import { adaptPromptForVietnamese } from "../risuai/tomisakae-vn-rp-plugin/src/vietnamese.js";
-import { estimatePluginPromptTokens } from "../risuai/tomisakae-vn-rp-plugin/src/token-estimate.js";
+} from "../src/core.js";
+import { addImageReasoningGuidance, IMAGE_OPTIMIZATION_PROMPT } from "../src/image.js";
+import { adaptPromptForVietnamese } from "../src/vietnamese.js";
+import { estimatePluginPromptTokens } from "../src/token-estimate.js";
 
 const reasoningTasks = [
   ["019f62e8-892f-7032-b004-1869f8bc0782", "  B. You must list out concisely"],
@@ -26,7 +23,7 @@ describe("Card image optimization", () => {
     "integrates one image check into each existing CoT task with Vietnamese Output %s",
     async (vietnamese) => {
       const preset = JSON.parse(
-        await readFile("risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json", "utf8"),
+        await readFile("source/ff54-sillytavern-preset.json", "utf8"),
       ) as FfPreset;
       const snapshot = structuredClone(preset);
       const settings = createDefaultSettings(preset);
@@ -74,7 +71,7 @@ describe("Card image optimization", () => {
 
   it("counts the system module and CoT additions once and rebuilds without duplicate injections", async () => {
     const preset = JSON.parse(
-      await readFile("risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json", "utf8"),
+      await readFile("source/ff54-sillytavern-preset.json", "utf8"),
     ) as FfPreset;
     const settings = createDefaultSettings(preset);
     settings.imageOptimizationEnabled = true;

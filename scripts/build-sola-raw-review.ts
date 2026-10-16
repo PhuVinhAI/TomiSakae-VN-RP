@@ -5,45 +5,35 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import ts from "typescript";
 import { loadPresetSources } from "./build-tomisakae-vn-rp-plugin.js";
-import {
-  createDefaultSettings,
-  type FfGlobalSettings,
-  type FfRegexScript,
-} from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
+import { createDefaultSettings, type FfGlobalSettings, type FfRegexScript } from "../src/core.js";
 import {
   adaptFamilyPrompt,
   familyRegexScripts,
   imageOptimizationFor,
   presetOrder,
   vietnameseOutputFor,
-} from "../risuai/tomisakae-vn-rp-plugin/src/preset-family.js";
-import {
-  editorSystemFor,
-  editorUserFor,
-} from "../risuai/tomisakae-vn-rp-plugin/src/editor-prompts.js";
+} from "../src/preset-family.js";
+import { editorSystemFor, editorUserFor } from "../src/editor-prompts.js";
 import {
   adaptDialogueColorRegex,
   adaptSolaDialogueColors,
   adaptSolaDialogueReplacement,
   type DialogueTheme,
-} from "../risuai/tomisakae-vn-rp-plugin/src/dialogue-colors.js";
-import { adaptSolaDisplayReplacement } from "../risuai/tomisakae-vn-rp-plugin/src/sola-display.js";
-import { adaptSolaRegexForVietnamese } from "../risuai/tomisakae-vn-rp-plugin/src/sola-vietnamese-regex.js";
-import { SOLA_DIALOGUE_COLORS } from "../risuai/tomisakae-vn-rp-plugin/src/dialogue-colors.js";
-import {
-  SOLA_VIETNAMESE_LABELS,
-  SOLA_VIETNAMESE_REPLACEMENTS,
-} from "../risuai/tomisakae-vn-rp-plugin/src/vietnamese.js";
+} from "../src/dialogue-colors.js";
+import { adaptSolaDisplayReplacement } from "../src/sola-display.js";
+import { adaptSolaRegexForVietnamese } from "../src/sola-vietnamese-regex.js";
+import { SOLA_DIALOGUE_COLORS } from "../src/dialogue-colors.js";
+import { SOLA_VIETNAMESE_LABELS, SOLA_VIETNAMESE_REPLACEMENTS } from "../src/vietnamese.js";
 import {
   familyChoiceGroups,
   familyHiddenPromptIds,
   familyPromptSections,
   familyRegexGroups,
   normalizeFamilyChoices,
-} from "../risuai/tomisakae-vn-rp-plugin/src/family-ui.js";
-import { promptUiCopy, regexUiCopy } from "../risuai/tomisakae-vn-rp-plugin/src/ui-vi.js";
+} from "../src/family-ui.js";
+import { promptUiCopy, regexUiCopy } from "../src/ui-vi.js";
 
-const ROOT = "risuai/tomisakae-vn-rp-plugin";
+const ROOT = ".";
 const SOURCE = `${ROOT}/source/sola-v2-flame.json`;
 const OUTPUT = `${ROOT}/comparison/SOLA_V2_FLAME_RAW_PLUGIN_REVIEW.md`;
 const THEMES: DialogueTheme[] = [
@@ -678,7 +668,15 @@ export async function buildSolaRawReview(outputFile = OUTPUT) {
     appendix.push(
       `## CODE-${filename}\n\n${explanation}. JSON raw không có mã plugin tương ứng; cột cũ/mới về hành vi ở đầu phần này, regex cũ ở phần 5.\n\n${await sourceExcerpt(filename, names)}`,
     );
-  const commit = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+  let commit = "Không có metadata Git";
+  try {
+    commit = execFileSync("git", ["rev-parse", "HEAD"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    // Source archives can generate reports without a Git checkout.
+  }
   const document = [
     "# Sola V2 Flame — đối chiếu toàn bộ raw và plugin hiện tại",
     "",

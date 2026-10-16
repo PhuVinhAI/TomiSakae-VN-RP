@@ -2,25 +2,22 @@ import { readFile } from "node:fs/promises";
 import { runInNewContext } from "node:vm";
 import { build } from "esbuild";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-import { type ChatMessage, type FfPreset } from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
+import { type ChatMessage, type FfPreset } from "../src/core.js";
 import { loadPresetSources } from "../scripts/build-tomisakae-vn-rp-plugin.js";
-import { type PresetSources } from "../risuai/tomisakae-vn-rp-plugin/src/preset-family.js";
+import { type PresetSources } from "../src/preset-family.js";
 import {
   CONFIG_PRESETS_STORAGE_KEY,
   createConfigPreset,
   normalizePresetStore,
   selectCardPreset,
   switchPresetFamily,
-} from "../risuai/tomisakae-vn-rp-plugin/src/presets.js";
+} from "../src/presets.js";
 import {
   restoreSolaHistoryContent,
   SOLA_HEADER_SAVER_ID,
   type SolaHistoryArchive,
-} from "../risuai/tomisakae-vn-rp-plugin/src/sola-history.js";
-import {
-  cardImagePrompt,
-  collectCardImages,
-} from "../risuai/tomisakae-vn-rp-plugin/src/card-images.js";
+} from "../src/sola-history.js";
+import { cardImagePrompt, collectCardImages } from "../src/card-images.js";
 
 interface SavedMessage {
   role: "user" | "char";
@@ -53,14 +50,11 @@ let preset: FfPreset;
 let sources: PresetSources;
 
 beforeAll(async () => {
-  const raw = await readFile(
-    "risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json",
-    "utf8",
-  );
+  const raw = await readFile("source/ff54-sillytavern-preset.json", "utf8");
   preset = JSON.parse(raw) as FfPreset;
   sources = await loadPresetSources();
   const result = await build({
-    entryPoints: ["risuai/tomisakae-vn-rp-plugin/src/plugin.ts"],
+    entryPoints: ["src/plugin.ts"],
     bundle: true,
     write: false,
     format: "iife",

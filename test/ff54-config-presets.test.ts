@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { beforeAll, describe, expect, it } from "vitest";
-import { createDefaultSettings, type FfPreset } from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
+import { createDefaultSettings, type FfPreset } from "../src/core.js";
 import {
   createConfigPreset,
   deleteConfigPreset,
@@ -8,13 +8,11 @@ import {
   presetForCard,
   renameConfigPreset,
   selectCardPreset,
-} from "../risuai/tomisakae-vn-rp-plugin/src/presets.js";
+} from "../src/presets.js";
 
 let source: FfPreset;
 beforeAll(async () => {
-  source = JSON.parse(
-    await readFile("risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json", "utf8"),
-  ) as FfPreset;
+  source = JSON.parse(await readFile("source/ff54-sillytavern-preset.json", "utf8")) as FfPreset;
 });
 
 describe("FF5.4 configuration presets", () => {

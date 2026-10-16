@@ -9,7 +9,7 @@ import {
   type FfOrderEntry,
   type FfPreset,
   type FfPrompt,
-} from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
+} from "../src/core.js";
 import {
   adaptFamilyPrompt,
   imageOptimizationFor,
@@ -17,15 +17,12 @@ import {
   presetOrder,
   vietnameseOutputFor,
   type PresetSource,
-} from "../risuai/tomisakae-vn-rp-plugin/src/preset-family.js";
-import {
-  editorSystemFor,
-  editorUserFor,
-} from "../risuai/tomisakae-vn-rp-plugin/src/editor-prompts.js";
-import { adaptSolaDialogueColors } from "../risuai/tomisakae-vn-rp-plugin/src/dialogue-colors.js";
-import { VIETNAMESE_OUTPUT_PROMPT } from "../risuai/tomisakae-vn-rp-plugin/src/vietnamese.js";
+} from "../src/preset-family.js";
+import { editorSystemFor, editorUserFor } from "../src/editor-prompts.js";
+import { adaptSolaDialogueColors } from "../src/dialogue-colors.js";
+import { VIETNAMESE_OUTPUT_PROMPT } from "../src/vietnamese.js";
 
-const DEFAULT_OUTPUT = "risuai/tomisakae-vn-rp-plugin/comparison/SOLA_ALL_PROMPTS_EN_VI_REVIEW.md";
+const DEFAULT_OUTPUT = "comparison/SOLA_ALL_PROMPTS_EN_VI_REVIEW.md";
 const AUXILIARY_KEYS = [
   "send_if_empty",
   "impersonation_prompt",
@@ -112,7 +109,7 @@ async function familyReview(source: PresetSource, index: number) {
   const family = preset.family;
   const name = PRESET_FAMILIES.find((item) => item.id === family)?.name;
   if (!name || family !== "sola") throw new Error("Expected Sola preset.");
-  const filename = `risuai/tomisakae-vn-rp-plugin/source/sola-v2-flame.json`;
+  const filename = `source/sola-v2-flame.json`;
   const raw = await readFile(filename, "utf8");
   if (digest(raw) !== source.sha256) throw new Error(`Source changed while exporting: ${filename}`);
   const fullSource: Record<string, unknown> = JSON.parse(raw.replace(/^\uFEFF/, ""));

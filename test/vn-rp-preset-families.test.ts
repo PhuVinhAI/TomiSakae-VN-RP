@@ -9,7 +9,7 @@ import {
   expandHostMacros,
   normalizeSettings,
   PLACEMENT_AI_OUTPUT,
-} from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
+} from "../src/core.js";
 import {
   PRESET_FAMILIES,
   familyPrompts,
@@ -19,45 +19,39 @@ import {
   vietnameseOutputFor,
   adaptFamilyPrompt,
   type PresetSources,
-} from "../risuai/tomisakae-vn-rp-plugin/src/preset-family.js";
+} from "../src/preset-family.js";
 import {
   createConfigPreset,
   normalizePresetStore,
   presetForCard,
   selectCardPreset,
   switchPresetFamily,
-} from "../risuai/tomisakae-vn-rp-plugin/src/presets.js";
+} from "../src/presets.js";
 import {
   editorSystemFor,
   editorUserFor,
   insertSubmodelEditorSystem,
-} from "../risuai/tomisakae-vn-rp-plugin/src/editor-prompts.js";
-import { estimatePluginPromptTokens } from "../risuai/tomisakae-vn-rp-plugin/src/token-estimate.js";
+} from "../src/editor-prompts.js";
+import { estimatePluginPromptTokens } from "../src/token-estimate.js";
 import {
   familyPromptSections,
   familyChoiceGroups,
   familyHiddenPromptIds,
   familyRegexGroups,
   normalizeFamilyChoices,
-} from "../risuai/tomisakae-vn-rp-plugin/src/family-ui.js";
-import { promptUiCopy, regexUiCopy } from "../risuai/tomisakae-vn-rp-plugin/src/ui-vi.js";
-import { solaRegexUiCopy } from "../risuai/tomisakae-vn-rp-plugin/src/preset-ui-copy.js";
-import { adaptSolaSceneHeaderForDisplay } from "../risuai/tomisakae-vn-rp-plugin/src/sola-display.js";
-import { SOLA_VIETNAMESE_REPLACEMENTS } from "../risuai/tomisakae-vn-rp-plugin/src/vietnamese.js";
-import { adaptSolaRegexForVietnamese } from "../risuai/tomisakae-vn-rp-plugin/src/sola-vietnamese-regex.js";
-import {
-  GEMMA_FIX_PROMPT,
-  gemmaFixPromptFor,
-} from "../risuai/tomisakae-vn-rp-plugin/src/gemma-fix.js";
-import {
-  cardImagePrompt,
-  collectCardImages,
-} from "../risuai/tomisakae-vn-rp-plugin/src/card-images.js";
+} from "../src/family-ui.js";
+import { promptUiCopy, regexUiCopy } from "../src/ui-vi.js";
+import { solaRegexUiCopy } from "../src/preset-ui-copy.js";
+import { adaptSolaSceneHeaderForDisplay } from "../src/sola-display.js";
+import { SOLA_VIETNAMESE_REPLACEMENTS } from "../src/vietnamese.js";
+import { adaptSolaRegexForVietnamese } from "../src/sola-vietnamese-regex.js";
+import { GEMMA_FIX_PROMPT, gemmaFixPromptFor } from "../src/gemma-fix.js";
+import { cardImagePrompt, collectCardImages } from "../src/card-images.js";
 import {
   adaptSolaDialogueColors,
   SOLA_DIALOGUE_COLORS,
   textContrast,
-} from "../risuai/tomisakae-vn-rp-plugin/src/dialogue-colors.js";
+} from "../src/dialogue-colors.js";
 
 let sources: PresetSources;
 const host = { characterName: "An", userName: "TomiSakae" };
@@ -74,9 +68,7 @@ describe("TomiSakae VN-RP preset families", () => {
       "Sola V2 Flame",
     ]);
     for (const [family, filename] of [["sola", "sola-v2-flame.json"]] as const) {
-      const original = JSON.parse(
-        await readFile(`risuai/tomisakae-vn-rp-plugin/source/${filename}`, "utf8"),
-      );
+      const original = JSON.parse(await readFile(`source/${filename}`, "utf8"));
       expect(sources[family].preset.prompts).toEqual(original.prompts);
       expect(sources[family].preset.prompt_order).toEqual(original.prompt_order);
       expect(sources[family].preset.extensions?.regex_scripts).toEqual(

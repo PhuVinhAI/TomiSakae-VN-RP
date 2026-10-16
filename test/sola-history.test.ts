@@ -7,12 +7,12 @@ import {
   PLACEMENT_AI_OUTPUT,
   type ChatMessage,
   type FfPreset,
-} from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
+} from "../src/core.js";
 import {
   restoreSolaHistoryContent,
   SOLA_HEADER_SAVER_ID,
   type SolaHistoryRemoval,
-} from "../risuai/tomisakae-vn-rp-plugin/src/sola-history.js";
+} from "../src/sola-history.js";
 
 let preset: FfPreset;
 beforeAll(async () => {

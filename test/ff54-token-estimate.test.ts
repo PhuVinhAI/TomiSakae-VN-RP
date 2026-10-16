@@ -6,9 +6,9 @@ import {
   createDefaultSettings,
   expandHostMacros,
   type FfPreset,
-} from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
-import { estimatePluginPromptTokens } from "../risuai/tomisakae-vn-rp-plugin/src/token-estimate.js";
-import { collectCardImages } from "../risuai/tomisakae-vn-rp-plugin/src/card-images.js";
+} from "../src/core.js";
+import { estimatePluginPromptTokens } from "../src/token-estimate.js";
+import { collectCardImages } from "../src/card-images.js";
 
 const host = { characterName: "An", userName: "Tomi", maxContext: 32768, maxResponse: 8192 };
 const tokenCount = (text: string) => encode(text, { disallowedSpecial: new Set<string>() }).length;
@@ -79,7 +79,7 @@ describe("Plugin dashboard token estimates", () => {
     "matches the actual injected prompt text with Vietnamese Output %s, Submodel %s and Gemma level %s",
     async (vietnamese, submodel, level) => {
       const preset = JSON.parse(
-        await readFile("risuai/tomisakae-vn-rp-plugin/source/ff54-sillytavern-preset.json", "utf8"),
+        await readFile("source/ff54-sillytavern-preset.json", "utf8"),
       ) as FfPreset;
       const settings = createDefaultSettings(preset);
       settings.vietnameseOutputEnabled = vietnamese;
