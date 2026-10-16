@@ -175,7 +175,7 @@ async function startPlugin(
           const id = attributes.match(/\bid="([^"]*)"/)?.[1] ?? `input-${inputs.length}`;
           inputs.push(makeNode(id, attributes));
         }
-        for (const match of html.matchAll(/<(?:button|div)\b[^>]*\bid="([^"]*)"/g))
+        for (const match of html.matchAll(/<(?:button|div|output)\b[^>]*\bid="([^"]*)"/g))
           makeNode(match[1]!);
         const selected = html.match(/<option value="([^"]*)" selected/);
         makeNode("config-preset").value = selected?.[1] ?? "";
