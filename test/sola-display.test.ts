@@ -131,7 +131,7 @@ describe("Sola message UI", () => {
           // A literal blank line would end the host's raw HTML block and let
           // Markdown insert <p> margins and <br> + newline inside pre-wrap.
           expect(displayed).not.toMatch(/[\r\n]/);
-          expect(displayed).toContain(body.replaceAll("\n", "&#10;"));
+          expect(displayed.replace(/<[^>]+>/g, "")).toContain(body.replaceAll("\n", "&#10;"));
           expect(displayed).toContain("white-space:pre-wrap;");
           expect(
             applyRegexScripts(input, preset, settings, {
@@ -161,7 +161,7 @@ describe("Sola message UI", () => {
     });
     expect(displayed).toContain("Suy nghĩ nội tâm — Eriri");
     expect(displayed).toContain("Suy nghĩ nội tâm — An");
-    expect(displayed).toContain('"Về nhà."</span></font>&#10;&#10;Sola:');
+    expect(displayed).toContain('"Về nhà."</span></font></span>&#10;&#10;');
     expect(displayed).toContain("Tay áo xắn lên.");
     expect(displayed).toContain("Cổ áo cài kín.");
     expect(displayed).not.toMatch(/<\/?(?:thought_engine|wardrobe|copper)\b/);
@@ -169,6 +169,40 @@ describe("Sola message UI", () => {
     expect(bodies).toHaveLength(3);
     for (const [, body] of bodies) expect(body).not.toMatch(/[\r\n]/);
   });
+
+  it.each([true, false])(
+    "distinguishes Thought Engine speakers without depending on the language toggle (%s)",
+    (vietnameseOutputEnabled) => {
+      const settings = createDefaultSettings(preset);
+      settings.vietnameseOutputEnabled = vietnameseOutputEnabled;
+      const body = 'Sola: "Cậu đang nghĩ gì?"\r\nNgọc-An: "Tôi cần bình tĩnh."';
+      for (const opening of ["<thought_engine>", '<thought_engine char="Ngọc-An">']) {
+        const input = `${opening}\r\n${body}\r\n</thought_engine>`;
+        const displayed = applyRegexScripts(input, preset, settings, {
+          placement: PLACEMENT_AI_OUTPUT,
+          markdown: true,
+          depth: 0,
+        });
+        expect(displayed).toMatch(
+          /<span style="color:#EBC889;[^>]*><span style="font-weight:700;">Sola:<\/span> "Cậu đang nghĩ gì\?"<\/span>/,
+        );
+        expect(displayed).toMatch(
+          /<span style="color:#B7D8CD;[^>]*><span style="font-weight:700;">Ngọc-An:<\/span> "Tôi cần bình tĩnh\."<\/span>/,
+        );
+        // The host's quote/emphasis elements must inherit the speaker color.
+        expect(displayed).toContain("--FontColorQuote2:#EBC889;");
+        expect(displayed).toContain("--FontColorBold:#B7D8CD;");
+        expect(displayed).not.toMatch(/[\r\n]/);
+        expect(
+          applyRegexScripts(input, preset, settings, {
+            placement: PLACEMENT_AI_OUTPUT,
+            prompt: true,
+            depth: 0,
+          }),
+        ).toBe(input);
+      }
+    },
+  );
 
   it("does not normalize captured HTML attributes, comments or authored line-break tags", () => {
     const markup = '<span title="A > B\nC" style="letter-spacing:3px;">Nội dung</span>';

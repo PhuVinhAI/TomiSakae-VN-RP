@@ -25,7 +25,7 @@ import {
   adaptSolaTrackerLabelsForDisplay,
 } from "./sola-vietnamese-regex.js";
 import { SOLA_HEADER_SAVER_ID } from "./sola-history.js";
-import { adaptSolaDisplayReplacement, preserveSolaCardLineBreaks } from "./sola-display.js";
+import { adaptSolaCardContentForDisplay, adaptSolaDisplayReplacement } from "./sola-display.js";
 import { renderVoyageReasoning, VOYAGE_REASONING_DISPLAY_ID } from "./voyage-reasoning.js";
 import { gemmaFixPromptFor, normalizeGemmaNsfwLevel, type GemmaNsfwLevel } from "./gemma-fix.js";
 import { cardImagePrompt, type CardImageCatalog } from "./card-images.js";
@@ -778,7 +778,7 @@ export function applyRegexScripts(
       replacement.replace(/\\n/g, "\n"),
       script.trimStrings ?? [],
       options.markdown && familyOf(preset) === "sola" && script.scriptName?.startsWith("Sola Card:")
-        ? preserveSolaCardLineBreaks
+        ? (value) => adaptSolaCardContentForDisplay(value, script.scriptName!)
         : undefined,
     );
   }

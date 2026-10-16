@@ -15,6 +15,41 @@ export function preserveSolaCardLineBreaks(content: string): string {
   );
 }
 
+/** Add speaker contrast only to the Thought Engine's display copy. */
+export function adaptSolaCardContentForDisplay(content: string, scriptName: string): string {
+  if (scriptName.startsWith("Sola Card: Thought Engine (")) {
+    content = content.replace(
+      /<!--[\s\S]*?-->|<\/?[a-z](?:[^>"']|"[^"]*"|'[^']*')*>|^([ \t]*)([\p{L}][\p{L}\p{M}\p{N}_ .,'’()-]{0,99})(:)([ \t]*)([^\r\n]+)/gimu,
+      (
+        match,
+        indent: string | undefined,
+        name: string,
+        colon: string,
+        gap: string,
+        text: string,
+      ) => {
+        if (indent === undefined) return match;
+        // Leave unusual multiline markup alone rather than split an HTML tag.
+        if (/<[^>]*$/.test(text)) return match;
+        const color = name.trim().toLowerCase() === "sola" ? "#EBC889" : "#B7D8CD";
+        const scope = [
+          "color",
+          "--FontColorStandard",
+          "--FontColorItalic",
+          "--FontColorBold",
+          "--FontColorItalicBold",
+          "--FontColorQuote1",
+          "--FontColorQuote2",
+        ]
+          .map((property) => `${property}:${color};`)
+          .join("");
+        return `${indent}<span style="${scope}"><span style="font-weight:700;">${name}${colon}</span>${gap}${text}</span>`;
+      },
+    );
+  }
+  return preserveSolaCardLineBreaks(content);
+}
+
 function setStyle(style: string, property: string, value: string): string {
   const declaration = new RegExp(`(^|;)\\s*${property}\\s*:[^;]*`, "i");
   return declaration.test(style)
