@@ -3,6 +3,11 @@ import { adaptSolaSaver, SOLA_HEADER_SAVER } from "./sola-history.js";
 import { SOLA_REASONING_SCRIPTS } from "./sola-reasoning.js";
 import { addVoyageReasoningBoundary, VOYAGE_REASONING_SCRIPTS } from "./voyage-reasoning.js";
 import {
+  adaptSolaStyleDependencies,
+  adaptSolaHudDependencies,
+  solaList,
+} from "./sola-prompt-dependencies.js";
+import {
   VIETNAMESE_OUTPUT_PROMPT,
   SOLA_VIETNAMESE_OUTPUT_PROMPT,
   VOYAGE_VIETNAMESE_OUTPUT_PROMPT,
@@ -123,12 +128,31 @@ export function vietnameseOutputFor(preset: FfPreset, settings?: FfGlobalSetting
       if (!settings) return SOLA_VIETNAMESE_OUTPUT_PROMPT;
       const modules = activeSolaModules(preset, settings);
       let content = SOLA_VIETNAMESE_OUTPUT_PROMPT;
-      if (!modules.has("mod_solahud")) content = content.replace("HUDs, ", "");
-      if (![...modules].some((name) => name.startsWith("mod_track_") || name === "mod_tempo"))
-        content = content.replace("trackers, ", "");
-      content = content.replace("headers, and props", "headers and props");
-      if (!modules.has("mod_track_fengine") && !modules.has("mod_solahud"))
-        content = content.replace("T/F/D/Y codes, ", "");
+      const props = settings.promptEnabled["01a0c1ff-4ecf-701c-8c25-cccd4043f936"] === true;
+      const displays = [
+        ...(modules.has("mod_scene_header") ? ["headers"] : []),
+        ...(modules.has("mod_solahud") ? ["HUDs"] : []),
+        ...([...modules].some((name) => name.startsWith("mod_track_") || name === "mod_tempo")
+          ? ["trackers"]
+          : []),
+        ...(props ? ["props"] : []),
+      ];
+      content = content.replace(
+        ", and readable content in headers, HUDs, trackers, and props",
+        displays.length ? `, and readable content in ${solaList(displays)}` : "",
+      );
+      const styles = [
+        ...(modules.has("mod_color") ? ["palette"] : []),
+        ...(modules.has("mod_gradient") ? ["gradient"] : []),
+        ...(modules.has("mod_tone") ? ["tone"] : []),
+        ...(modules.has("mod_kinetic") ? ["kinetic"] : []),
+      ];
+      content = content.replace(
+        "palette/gradient/tone/kinetic names, ",
+        styles.length ? `${styles.join("/")} names, ` : "",
+      );
+      if (!modules.has("mod_scene_header")) content = content.replace("sky identifiers, ", "");
+      if (!modules.has("mod_track_fengine")) content = content.replace("T/F/D/Y codes, ", "");
       const values = [
         ...(modules.has("mod_tempo") ? ["tempo"] : []),
         ...(modules.has("mod_track_arrow") ? ["fate"] : []),
@@ -138,6 +162,18 @@ export function vietnameseOutputFor(preset: FfPreset, settings?: FfGlobalSetting
         values.length ? `${values.join("/")} values, ` : "",
       );
       if (!solaTrackersEnabled(modules)) content = content.replace(", and numeric mechanics", "");
+      if (!displays.length)
+        content = content.replace(", including display attributes and empty-state text", "");
+      if (
+        !props &&
+        !modules.has("mod_scene_header") &&
+        !modules.has("mod_solahud") &&
+        !modules.has("mod_track_date")
+      )
+        content = content.replace(
+          " Time uses Vietnamese day-period wording or a 24-hour clock.",
+          "",
+        );
       return content;
     }
     case "voyage":
@@ -159,8 +195,13 @@ export function adaptFamilyPrompt(
   }
   if (familyOf(preset) === "sola") {
     const modules = activeSolaModules(preset, settings);
-    if (!solaTrackersEnabled(modules))
-      content = content.replaceAll(" Trackers do not count towards word count.", "");
+    content = adaptSolaHudDependencies(content, modules);
+    if (!solaTrackersEnabled(modules)) {
+      content = content
+        .replaceAll(" Trackers do not count towards word count.", "")
+        .replace("5. **Suspend Trackers**: During OOC conversation omit all trackers.\n", "")
+        .replace("6. **OOC Formatting**:", "5. **OOC Formatting**:");
+    }
     if (!modules.has("mod_solahud")) content = content.replace("`<sola_hud>`, ", "");
     content = content
       .replace(
@@ -178,6 +219,11 @@ export function adaptFamilyPrompt(
     if (settings.vietnameseOutputEnabled) {
       content = adaptSolaPromptForVietnamese(content);
     }
+    // Adapt localized examples and macro reminders together, preserving source comments.
+    content = content
+      .split(/(\{\{\/\/[\s\S]*?\}\})/g)
+      .map((part) => (part.startsWith("{{//") ? part : adaptSolaStyleDependencies(part, modules)))
+      .join("");
     if (settings.imageOptimizationEnabled) {
       content = content.replace(
         "- Map physical contact, displacement, or reflexive reaction.",
