@@ -219,15 +219,16 @@ describe("TomiSakae VN-RP preset families", () => {
       0,
       GEMMA_FIX_PROMPT.indexOf(", write all visible text"),
     );
-    expect(gemmaFixPromptFor(3).startsWith(`${strongPrefix}; personality and boundaries`)).toBe(
+    expect(gemmaFixPromptFor(3).startsWith(`${strongPrefix}; {{user}} MUST NOT be assumed`)).toBe(
       true,
     );
     expect(gemmaFixPromptFor(3)).toContain(
-      "defined by card/lore MUST remain consistent across turns",
+      "{{user}} MUST NOT be assumed to like sex or want sexual activity",
     );
     expect(gemmaFixPromptFor(3)).toContain(
-      "NEVER erase unresolved conflict or reward coercion with intimacy",
+      "NEVER invent sexual desire, intent, or consent not expressed through words or actions directly written by the user",
     );
+    expect(gemmaFixPromptFor(3)).not.toContain("across turns");
     for (const level of [0, 1, 2, 3]) {
       expect(gemmaFixPromptFor(level).endsWith(suffix)).toBe(true);
       expect(gemmaFixPromptFor(level)).toContain("every NSFW action that occurs");

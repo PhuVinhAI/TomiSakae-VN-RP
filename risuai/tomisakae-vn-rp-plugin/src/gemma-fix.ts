@@ -7,7 +7,7 @@ const NSFW_PREFIXES = [
   "",
   "{{char}} should not offer sex or readily accept offers of sex; never invent lustful, submissive, dependent, or infatuated traits absent from the card/lore, ",
   `${STRONG_NSFW_RULES}, `,
-  `${STRONG_NSFW_RULES}; personality and boundaries defined by card/lore MUST remain consistent across turns; NEVER turn repeated advances, pressure, or boundary violations into desire, submission, dependency, or eventual acceptance; reactions and consequences MUST be proportionate to the events and consistent with card/lore and the current relationship; NEVER erase unresolved conflict or reward coercion with intimacy, `,
+  `${STRONG_NSFW_RULES}; {{user}} MUST NOT be assumed to like sex or want sexual activity; NEVER invent sexual desire, intent, or consent not expressed through words or actions directly written by the user, `,
 ] as const;
 
 const VIETNAMESE_AND_IMAGES = `write all visible text in natural Vietnamese with Latin-script names and no Hangul or foreign wording except required machine syntax, use many images at multiple suitable points throughout the response; use only available card/lore images matching the current state with exact image-tag syntax and identifiers supported by card/lore/schema; omit consecutive duplicate images; prioritize outfit changes > action/pose/physical state > expression; place each beside its matching beat with narration or dialogue between images; every NSFW action that occurs must still use a matching available NSFW image in exact supported syntax, even if {{char}} refuses or resists; depiction does not imply consent; action takes priority over facial expression`;

@@ -442,8 +442,11 @@ describe("Named presets in plugin UI and requests", () => {
         const user = request.find((message) => message.memo === "user-a")!.content;
         expect(user).toContain("MUST NOT offer sex");
         expect(user).toContain("lustful, submissive, dependent, or infatuated traits");
-        expect(user).toContain("defined by card/lore MUST remain consistent across turns");
-        expect(user).toContain("NEVER erase unresolved conflict or reward coercion with intimacy");
+        expect(user).toContain("User MUST NOT be assumed to like sex or want sexual activity");
+        expect(user).toContain(
+          "NEVER invent sexual desire, intent, or consent not expressed through words or actions directly written by the user",
+        );
+        expect(user).not.toContain("across turns");
         reloaded.toggle("gemma-fix").checked = false;
         await reloaded.toggle("gemma-fix").handlers.get("change")!();
         expect(reloaded.ui("gemma-nsfw-level").disabled).toBe(true);
