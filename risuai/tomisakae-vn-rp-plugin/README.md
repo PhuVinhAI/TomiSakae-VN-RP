@@ -1,6 +1,6 @@
 # TomiSakae VN-RP for RisuAI
 
-Plugin **TomiSakae VN-RP 2.0.0** hỗ trợ hai bộ preset nền, giữ thứ tự prompt, role, macro, module và regex của từng bộ:
+Plugin **TomiSakae VN-RP 2.0.1** hỗ trợ hai bộ preset nền, giữ thứ tự prompt, role, macro, module và regex của từng bộ:
 
 - **Freaky Frankenstein 5.4**: GM theo task, mô phỏng thế giới và `<internal_states>`.
 - **Sola V2 Flame**: nhịp điện ảnh, giọng NPC riêng, Story Review, scene header và Showrunner HUD.

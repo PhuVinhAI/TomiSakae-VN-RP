@@ -1083,6 +1083,90 @@ describe("FF5.4 Submodel editor integration", () => {
 });
 
 describe("Named presets in plugin UI and requests", () => {
+  it("closes unchanged or reverted settings without an unsaved warning", async () => {
+    const plugin = await startPlugin(false);
+    await plugin.settingsUi();
+    await plugin.uiEvent("close");
+    expect(plugin.api.hideContainer).toHaveBeenCalledTimes(1);
+    expect(plugin.api.alertConfirm).not.toHaveBeenCalled();
+
+    await plugin.settingsUi();
+    const original = plugin.toggle("vietnamese-output").checked;
+    plugin.toggle("vietnamese-output").checked = !original;
+    plugin.toggle("vietnamese-output").checked = original;
+    await plugin.uiEvent("close");
+    expect(plugin.api.hideContainer).toHaveBeenCalledTimes(2);
+    expect(plugin.api.alertConfirm).not.toHaveBeenCalled();
+    await plugin.callbacks.unload!();
+  });
+
+  it("keeps an unsaved draft when closing is canceled and closes normally after saving", async () => {
+    const plugin = await startPlugin(false);
+    await plugin.settingsUi();
+    plugin.toggle("image-optimization").checked = true;
+    await plugin.uiEvent("close");
+    expect(plugin.api.alertConfirm).toHaveBeenCalledWith(
+      "Có thay đổi chưa lưu. Đóng và bỏ các thay đổi này?",
+    );
+    expect(plugin.api.hideContainer).not.toHaveBeenCalled();
+    expect(plugin.toggle("image-optimization").checked).toBe(true);
+    expect(
+      (await plugin.request()).some((message) => message.memo === "ff54:image-optimization"),
+    ).toBe(false);
+
+    await plugin.uiEvent("save");
+    await plugin.uiEvent("close");
+    expect(plugin.api.alertConfirm).toHaveBeenCalledTimes(1);
+    expect(plugin.api.hideContainer).toHaveBeenCalledTimes(1);
+    expect(
+      (await plugin.request()).some((message) => message.memo === "ff54:image-optimization"),
+    ).toBe(true);
+    await plugin.callbacks.unload!();
+  });
+
+  it.each(["sound-notifications", "submodel-editor", "master", "gemma-nsfw-level"])(
+    "warns before discarding changes to %s without saving them",
+    async (id) => {
+      const plugin = await startPlugin(false);
+      await plugin.settingsUi();
+      const stored = structuredClone(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
+      if (id === "gemma-nsfw-level") plugin.ui(id).value = "3";
+      else {
+        const input = id === "master" ? plugin.ui(id) : plugin.toggle(id);
+        input.checked = !input.checked;
+      }
+      plugin.api.alertConfirm.mockResolvedValueOnce(true);
+      await plugin.uiEvent("close");
+      expect(plugin.api.alertConfirm).toHaveBeenCalledTimes(1);
+      expect(plugin.api.hideContainer).toHaveBeenCalledTimes(1);
+      expect(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY)).toEqual(stored);
+      await plugin.settingsUi();
+      await plugin.uiEvent("close");
+      expect(plugin.api.alertConfirm).toHaveBeenCalledTimes(1);
+      await plugin.callbacks.unload!();
+    },
+  );
+
+  it("shows only one unsaved confirmation when Close is clicked repeatedly", async () => {
+    const plugin = await startPlugin(false);
+    await plugin.settingsUi();
+    plugin.toggle("vietnamese-output").checked = false;
+    let answer!: (confirmed: boolean) => void;
+    plugin.api.alertConfirm.mockImplementationOnce(
+      () =>
+        new Promise<boolean>((resolve) => {
+          answer = resolve;
+        }),
+    );
+    const closing = plugin.uiEvent("close");
+    await plugin.uiEvent("close");
+    expect(plugin.api.alertConfirm).toHaveBeenCalledTimes(1);
+    answer(false);
+    await closing;
+    expect(plugin.api.hideContainer).not.toHaveBeenCalled();
+    await plugin.callbacks.unload!();
+  });
+
   it("saves the image module per preset and restores its toggle after reload", async () => {
     const plugin = await startPlugin(false);
     await plugin.settingsUi();

@@ -77,7 +77,7 @@ export async function buildPlugin(options: Options): Promise<{ output: string; d
         "//@name tomisakae_vn_rp",
         "//@display-name TomiSakae VN-RP",
         "//@api 3.0",
-        "//@version 2.0.0",
+        "//@version 2.0.1",
         "",
       ].join("\n"),
     },

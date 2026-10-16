@@ -122,6 +122,7 @@ declare const Risuai: {
     allowPlugins?: boolean;
   }): Promise<unknown>;
   alert(message: string): Promise<void>;
+  alertConfirm(message: string): Promise<boolean>;
   alertError(message: string): Promise<void>;
   getRootDocument: RewriteButtonApi["getRootDocument"];
   createMutationObserver: RewriteButtonApi["createMutationObserver"];
@@ -676,6 +677,8 @@ async function showSettings(): Promise<void> {
       else if (id === "submodel-auto-rewrite") settings.submodelAutoRewriteEnabled = node.checked;
     }
   };
+  readUi();
+  let savedState = JSON.stringify(settings);
   const tokenPanel = document.getElementById("token-estimate-panel")!;
   const tokenHostContext = await getHostMacroContext(character).catch(() => ({
     characterName: character?.nickname || character?.name || "Character",
@@ -738,7 +741,22 @@ async function showSettings(): Promise<void> {
     ?.addEventListener("change", (event) => {
       playCompletionSound((event.currentTarget as HTMLInputElement).checked, true);
     });
-  document.getElementById("close")!.addEventListener("click", () => void Risuai.hideContainer());
+  let closing = false;
+  document.getElementById("close")!.addEventListener("click", async () => {
+    if (closing) return;
+    closing = true;
+    try {
+      readUi();
+      if (
+        JSON.stringify(settings) !== savedState &&
+        !(await Risuai.alertConfirm("Có thay đổi chưa lưu. Đóng và bỏ các thay đổi này?"))
+      )
+        return;
+      await Risuai.hideContainer();
+    } finally {
+      closing = false;
+    }
+  });
   const presetPicker = document.getElementById("preset-picker")!;
   const presetTrigger = document.getElementById("config-preset-trigger") as HTMLButtonElement;
   const presetMenu = document.getElementById("config-preset-menu")!;
@@ -824,6 +842,7 @@ async function showSettings(): Promise<void> {
       playCompletionSound(true, true);
     profile.settings = structuredClone(settings);
     await saveSettings();
+    savedState = JSON.stringify(profile.settings);
     status.textContent = `Đã lưu preset “${profile.name}”.`;
   });
   document.getElementById("reset")!.addEventListener("click", async () => {
