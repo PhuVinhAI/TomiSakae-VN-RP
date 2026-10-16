@@ -25,7 +25,7 @@ import {
   adaptSolaTrackerLabelsForDisplay,
 } from "./sola-vietnamese-regex.js";
 import { SOLA_HEADER_SAVER_ID } from "./sola-history.js";
-import { adaptSolaDisplayReplacement } from "./sola-display.js";
+import { adaptSolaDisplayReplacement, preserveSolaCardLineBreaks } from "./sola-display.js";
 import { renderVoyageReasoning, VOYAGE_REASONING_DISPLAY_ID } from "./voyage-reasoning.js";
 import { gemmaFixPromptFor, normalizeGemmaNsfwLevel, type GemmaNsfwLevel } from "./gemma-fix.js";
 import { cardImagePrompt, type CardImageCatalog } from "./card-images.js";
@@ -652,6 +652,7 @@ function replaceWithSourceGroups(
   regex: RegExp,
   replacement: string,
   trimStrings: string[],
+  transformCapture?: (value: string) => string,
 ): string {
   return input.replace(regex, (...args: unknown[]) => {
     const match = String(args[0] ?? "");
@@ -667,7 +668,7 @@ function replaceWithSourceGroups(
         if (number !== undefined) value = String(args[Number(number)] ?? "");
         else if (groupName !== undefined) value = String(namedGroups?.[String(groupName)] ?? "");
         for (const trimString of trimStrings) value = value.replaceAll(trimString, "");
-        return value;
+        return transformCapture ? transformCapture(value) : value;
       });
   });
 }
@@ -776,6 +777,9 @@ export function applyRegexScripts(
       regex,
       replacement.replace(/\\n/g, "\n"),
       script.trimStrings ?? [],
+      options.markdown && familyOf(preset) === "sola" && script.scriptName?.startsWith("Sola Card:")
+        ? preserveSolaCardLineBreaks
+        : undefined,
     );
   }
   return output;

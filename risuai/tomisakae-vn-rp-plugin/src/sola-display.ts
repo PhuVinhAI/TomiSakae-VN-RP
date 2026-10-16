@@ -3,6 +3,18 @@ const SOLA_UI_FONT =
 const SOLA_SERIF_FONT = "Georgia,'Noto Serif','Times New Roman',serif";
 const SOLA_MONO_FONT = "ui-monospace,'SFMono-Regular',Consolas,'Liberation Mono',monospace";
 
+/** Keep pre-wrapped card text out of the host's second Markdown pass. */
+export function preserveSolaCardLineBreaks(content: string): string {
+  // A blank line ends Markdown's raw HTML block. Later entries then acquire
+  // <p> margins and <br> + newline pairs, which pre-wrap displays twice.
+  // Character references keep the same visual breaks without starting a new
+  // Markdown block. Leave captured HTML tags, attributes and comments intact.
+  return content.replace(
+    /<!--[\s\S]*?-->|<\/?[a-z](?:[^>"']|"[^"]*"|'[^']*')*>|\r\n|[\r\n]/gi,
+    (part) => (part.startsWith("<") ? part : "&#10;"),
+  );
+}
+
 function setStyle(style: string, property: string, value: string): string {
   const declaration = new RegExp(`(^|;)\\s*${property}\\s*:[^;]*`, "i");
   return declaration.test(style)

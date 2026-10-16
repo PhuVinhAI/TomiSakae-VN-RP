@@ -7,7 +7,10 @@ import {
   PLACEMENT_AI_OUTPUT,
   type FfPreset,
 } from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
-import { adaptSolaSceneHeaderForDisplay } from "../risuai/tomisakae-vn-rp-plugin/src/sola-display.js";
+import {
+  adaptSolaSceneHeaderForDisplay,
+  preserveSolaCardLineBreaks,
+} from "../risuai/tomisakae-vn-rp-plugin/src/sola-display.js";
 import {
   adaptSolaDialogueColors,
   textContrast,
@@ -101,6 +104,94 @@ describe("Sola message UI", () => {
       applyRegexScripts(input, preset, settings, {
         placement: PLACEMENT_AI_OUTPUT,
         prompt: true,
+        depth: 0,
+      }),
+    ).toBe(input);
+  });
+
+  it.each(["thought_engine", "wardrobe", "scene_cast", "bond", "char_matrix"])(
+    "keeps later entries in %s out of Markdown paragraph and double-line-break conversion",
+    (tag) => {
+      const settings = createDefaultSettings(preset);
+      const body = [
+        'Sola: "Cậu định làm gì?"\nEriri: "Tôi sẽ về nhà."',
+        'Sola: "Cậu cảm thấy thế nào?"\nEriri: "Vẫn còn giận."',
+        'Sola: "Cậu đang nghĩ gì?"\nEriri: "Tôi cần bình tĩnh."',
+      ].join("\n\n");
+      for (const vietnameseOutputEnabled of [true, false]) {
+        settings.vietnameseOutputEnabled = vietnameseOutputEnabled;
+        for (const newline of ["\n", "\r\n"]) {
+          const content = body.replaceAll("\n", newline);
+          const input = `<${tag}>${newline}${content}${newline}</${tag}>`;
+          const displayed = applyRegexScripts(input, preset, settings, {
+            placement: PLACEMENT_AI_OUTPUT,
+            markdown: true,
+            depth: 0,
+          });
+          // A literal blank line would end the host's raw HTML block and let
+          // Markdown insert <p> margins and <br> + newline inside pre-wrap.
+          expect(displayed).not.toMatch(/[\r\n]/);
+          expect(displayed).toContain(body.replaceAll("\n", "&#10;"));
+          expect(displayed).toContain("white-space:pre-wrap;");
+          expect(
+            applyRegexScripts(input, preset, settings, {
+              placement: PLACEMENT_AI_OUTPUT,
+              prompt: true,
+              depth: 0,
+            }),
+          ).toBe(input);
+        }
+      }
+    },
+  );
+
+  it("preserves named thought cards, inline colors and Sola notes across multiple HUD entries", () => {
+    const settings = createDefaultSettings(preset);
+    const input = [
+      '<sola_hud digest="Ngày 1">',
+      '<thought_engine char="Eriri">\nSola: "Đi đâu?"\nEriri: <copper>"Về nhà."</copper>\n\nSola: "Vì sao?"\nEriri: "Đã muộn."\n</thought_engine>',
+      '<thought_engine char="An">\nSola: "Đi đâu?"\nAn: "Ra vườn."\n\nSola: "Vì sao?"\nAn: "Tưới cây."\n</thought_engine>',
+      "<wardrobe>\nEriri:\nLayers: Áo khoác xanh\nSola: *Tay áo xắn lên.*\n\nAn:\nLayers: Sơ mi trắng\nSola: *Cổ áo cài kín.*\n</wardrobe>",
+      "</sola_hud>",
+    ].join("\n\n");
+    const displayed = applyRegexScripts(input, preset, settings, {
+      placement: PLACEMENT_AI_OUTPUT,
+      markdown: true,
+      depth: 0,
+    });
+    expect(displayed).toContain("Suy nghĩ nội tâm — Eriri");
+    expect(displayed).toContain("Suy nghĩ nội tâm — An");
+    expect(displayed).toContain('"Về nhà."</span></font>&#10;&#10;Sola:');
+    expect(displayed).toContain("Tay áo xắn lên.");
+    expect(displayed).toContain("Cổ áo cài kín.");
+    expect(displayed).not.toMatch(/<\/?(?:thought_engine|wardrobe|copper)\b/);
+    const bodies = [...displayed.matchAll(/white-space:pre-wrap;[^>]*>([\s\S]*?)<\/details>/g)];
+    expect(bodies).toHaveLength(3);
+    for (const [, body] of bodies) expect(body).not.toMatch(/[\r\n]/);
+  });
+
+  it("does not normalize captured HTML attributes, comments or authored line-break tags", () => {
+    const markup = '<span title="A > B\nC" style="letter-spacing:3px;">Nội dung</span>';
+    const comment = "<!-- ghi chú\nẩn -->";
+    const content = `${markup}\n\n${comment}<br>Cuối.`;
+    expect(preserveSolaCardLineBreaks(content)).toBe(`${markup}&#10;&#10;${comment}<br>Cuối.`);
+    const settings = createDefaultSettings(preset);
+    const input = `<story_notes>${content}</story_notes>`;
+    const displayed = applyRegexScripts(input, preset, settings, {
+      placement: PLACEMENT_AI_OUTPUT,
+      markdown: true,
+      depth: 0,
+    });
+    expect(displayed).toContain(markup);
+    expect(displayed).toContain(comment);
+    expect(displayed).toContain("<br>Cuối.");
+    for (const script of preset.extensions?.regex_scripts ?? [])
+      if (script.scriptName?.startsWith("Sola Card:")) settings.regexEnabled[script.id] = false;
+    settings.vietnameseOutputEnabled = false;
+    expect(
+      applyRegexScripts(input, preset, settings, {
+        placement: PLACEMENT_AI_OUTPUT,
+        markdown: true,
         depth: 0,
       }),
     ).toBe(input);
