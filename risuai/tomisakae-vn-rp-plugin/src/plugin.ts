@@ -348,10 +348,11 @@ function checkbox(
   label: string,
   detail: string,
   disabled = false,
+  experimental = false,
 ): string {
   return `<label class="toggle-row">
     <input class="switch" type="checkbox" data-kind="${kind}" data-id="${escapeHtml(id)}" ${checked ? "checked" : ""} ${disabled ? "disabled" : ""}>
-    <span class="toggle-copy"><strong>${escapeHtml(label)}</strong><small>${escapeHtml(detail)}</small></span>
+    <span class="toggle-copy"><span class="toggle-title"><strong>${escapeHtml(label)}</strong>${experimental ? '<span class="ui-badge ui-badge-experimental">Thử nghiệm</span>' : ""}</span><small>${escapeHtml(detail)}</small></span>
   </label>`;
 }
 
@@ -572,6 +573,8 @@ async function showSettings(): Promise<void> {
       settings.imageOptimizationEnabled,
       "🖼️ Tối ưu hình ảnh theo card",
       "Chọn ảnh đúng trạng thái và trang phục theo card/lore; đặt sát đoạn phù hợp, đa dạng xuyên suốt phản hồi, không đặt hai ảnh liên tiếp · Mặc định tắt",
+      false,
+      true,
     )}${checkbox(
       "plugin",
       "card-image-catalog",
@@ -596,6 +599,8 @@ async function showSettings(): Promise<void> {
       settings.submodelEditorEnabled,
       "✍️ Biên tập bằng Submodel",
       "Hiện nút ✍️ ở phản hồi AI cuối để viết lại tiếng Việt bằng preset Submodel hiện tại của PocketRisu; chỉ lấy 2 lượt trước và tin user hiện tại, không gửi memory/summary",
+      false,
+      true,
     )}${checkbox(
       "plugin",
       "submodel-auto-rewrite",
@@ -603,6 +608,7 @@ async function showSettings(): Promise<void> {
       "🔄 Tự động biên tập bằng Submodel",
       "Cần bật Biên tập bằng Submodel. Tự sửa phản hồi mới sau khi tạo xong và hoàn chỉnh theo định dạng của bộ nền; thông báo khi đã lưu · Mặc định tắt",
       !settings.submodelEditorEnabled,
+      true,
     )}${checkbox(
       "plugin",
       "dialogue-theme",
@@ -610,7 +616,7 @@ async function showSettings(): Promise<void> {
       "🎨 Màu hội thoại theo giao diện",
       "Điều chỉnh bảng màu của bộ nền theo theme sáng/tối, giữ cú pháp màu riêng; bộ không có màu không bị thêm thẻ",
     )}</div></details></section>
-    <section id="family" class="panel"><div class="panel-heading"><span class="index">02 / Bộ nền</span><h2>Bộ preset nền</h2></div><p class="section-note">Chọn một bộ cho cấu hình “${escapeHtml(profile.name)}”. Các module của mỗi bộ được lưu riêng; lựa chọn Global giữ nguyên.</p><div class="family-grid">${PRESET_FAMILIES.map((entry) => `<label class="choice-option family-option"><input type="radio" name="preset-family" data-family="${entry.id}" ${entry.id === family.id ? "checked" : ""}><span class="radio-body"><span class="radio-dot"></span><span class="family-copy"><strong>${escapeHtml(`${entry.name} · ${entry.status}`)}</strong><small>${escapeHtml(entry.description)}</small></span></span></label>`).join("")}</div></section>
+    <section id="family" class="panel"><div class="panel-heading"><span class="index">02 / Bộ nền</span><h2>Bộ preset nền</h2></div><p class="section-note">Chọn một bộ cho cấu hình “${escapeHtml(profile.name)}”. Các module của mỗi bộ được lưu riêng; lựa chọn Global giữ nguyên.</p><div class="family-grid">${PRESET_FAMILIES.map((entry) => `<label class="choice-option family-option"><input type="radio" name="preset-family" data-family="${entry.id}" ${entry.id === family.id ? "checked" : ""}><span class="radio-body"><span class="radio-dot"></span><span class="family-copy"><span class="family-heading"><strong>${escapeHtml(entry.name)}</strong><span class="ui-badge ui-badge-stable">${escapeHtml(entry.status)}</span></span><small>${escapeHtml(entry.description)}</small></span></span></label>`).join("")}</div></section>
     <section id="choices" class="panel"><div class="panel-heading"><span class="index">03 / Quy tắc lựa chọn</span><h2>Nhóm chọn một</h2></div><p class="section-note">Mỗi nhóm chỉ kích hoạt một lựa chọn; có lựa chọn tắt các module trong nhóm.</p><div class="choice-grid">${choiceGroups}</div></section>
     <section id="modules" class="panel"><div class="panel-heading"><span class="index">04 / Bộ công cụ</span><h2>Module độc lập</h2></div><p class="section-note">Mở một nhóm để xem chức năng và bật những module bạn cần.</p>${promptSections}</section>
     <section id="filters" class="panel"><div class="panel-heading"><span class="index">05 / Vận hành</span><h2>Bộ lọc kỹ thuật</h2></div>${regexMap.size ? `<p class="section-note">Các bộ lọc gốc dùng khi gửi ngữ cảnh và hiển thị phản hồi. Chỉ thay đổi khi bạn hiểu rõ tác dụng của chúng.</p><details><summary><span class="summary-copy"><strong>Xem ${regexMap.size} bộ lọc</strong><small>Được chia theo công việc để dễ tìm.</small></span></summary><div class="regex-groups">${regexGroups}</div></details>` : '<p class="section-note">Bộ preset này không có bộ lọc kỹ thuật riêng.</p>'}</section>

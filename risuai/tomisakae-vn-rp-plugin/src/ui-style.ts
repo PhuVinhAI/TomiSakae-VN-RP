@@ -1,5 +1,6 @@
 export const SETTINGS_STYLES = `
-  .family-grid{display:grid;gap:10px}.family-option .radio-body{padding:18px;min-height:80px}.family-copy{display:grid;gap:6px}.family-copy strong{font-size:18px}.family-copy small{font-size:12px;line-height:1.5;color:#687167}
+  .family-grid{display:grid;gap:10px}.family-option .radio-body{padding:18px;min-height:80px;align-items:start}.family-option .radio-dot{margin-top:4px}.family-copy{display:grid;gap:6px;flex:1;min-width:0}.family-heading{display:grid;grid-template-columns:minmax(0,1fr) max-content;align-items:start;gap:12px}.family-copy strong{font-size:18px;line-height:1.35;overflow-wrap:anywhere}.family-copy small{font-size:12px;line-height:1.5;color:#687167}
+  .ui-badge{display:inline-flex;align-items:center;gap:5px;width:max-content;padding:3px 8px;border:1px solid;border-radius:999px;font-size:10px;font-weight:700;line-height:1.5;white-space:nowrap}.ui-badge:before{content:"";width:5px;height:5px;flex:none;border-radius:50%;background:currentColor}.ui-badge-stable{color:#285a45;background:#e1ecdf;border-color:#adc5ad}.ui-badge-experimental{color:#805016;background:#f8ebcd;border-color:#d9bd82}.toggle-title{display:flex;align-items:center;flex-wrap:wrap;gap:6px 9px}
   :root{font-family:'Segoe UI',Arial,sans-serif;color:#202722;background:#eae7dc;font-synthesis:none}
   *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-width:320px;background:#eae7dc;color:#202722}
   button,input,select{font:inherit}button{cursor:pointer}:focus-visible{outline:3px solid #d54b31;outline-offset:3px}
