@@ -1639,43 +1639,7 @@ describe("FF5.4 completion sounds", () => {
   });
 });
 
-describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
-  it("uses the final Voyage GM marker for auto rewrite and the saved swipe", async () => {
-    vi.useFakeTimers();
-    const store = normalizePresetStore(preset, undefined, {
-      submodelEditorEnabled: true,
-      submodelAutoRewriteEnabled: true,
-    });
-    store.presets[0]!.settings = switchPresetFamily(
-      store.presets[0]!.settings,
-      sources.voyage.preset,
-    );
-    const plugin = await startPlugin(true, true, store, false, false, true);
-    const raw = '<!-- GM -->\n"Come in."\n<!-- * Name: An; A-Life: waiting in the hall -->';
-    const original = `Use \`<!-- GM -->\` after reasoning.\n<!--GM-->\nFinish planning.\n${raw}`;
-    const edited = raw.replace("Come in.", "Vào đi.");
-    try {
-      await plugin.request();
-      plugin.runModel.mockImplementation(async () => {
-        await vi.advanceTimersByTimeAsync(250);
-        return {
-          type: "success",
-          result: `Use \`<!--GM-->\` after editing.\nFinish checking.\n${edited}`,
-        };
-      });
-      await plugin.complete(original);
-      expect(plugin.runModel).toHaveBeenCalledOnce();
-      expect(plugin.runModel.mock.calls[0]![0].messages.at(-2)?.content).toBe(raw);
-      const saved = plugin.chats.get("0:0")!.message.at(-1)!;
-      expect(saved.data).toBe(edited);
-      expect(saved.swipes).toEqual([original, edited]);
-      expect(saved.swipeId).toBe(1);
-      expect(plugin.api.alertError).not.toHaveBeenCalled();
-    } finally {
-      await plugin.callbacks.unload!();
-    }
-  });
-
+describe("Sola V2 Flame plugin integration", () => {
   it("keeps Sola auto rewrite swipes valid when the watcher removes reasoning during editing", async () => {
     vi.useFakeTimers();
     const store = normalizePresetStore(preset, undefined, {
@@ -1716,7 +1680,7 @@ describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
     expect(html.indexOf("<h2>Global</h2>")).toBeLessThan(html.indexOf("<h2>Bộ preset nền</h2>"));
     expect(html).toContain("Freaky Frankenstein 5.4");
     expect(html).toContain("Sola V2 Flame");
-    expect(html).toContain("Voyage-Universal-v5");
+    expect(html.match(/name="preset-family"/g)).toHaveLength(2);
     await plugin.selectFamily("sola");
     const saved = plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY) as {
       presets: Array<{
@@ -1741,22 +1705,9 @@ describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
     expect(plugin.settingsHtml()).not.toContain("Chế độ Hiện thực");
     const request = await plugin.request();
     expect(request.map((m) => m.content).join("\n")).toContain("## Vietnamese Output");
-    await plugin.selectFamily("voyage");
-    const voyageRequest = await plugin.request();
-    expect(voyageRequest.map((m) => m.content).join("\n")).toContain("## Rule: Direct Prose");
-    expect(plugin.settingsHtml()).not.toContain("HUD tổng hợp trạng thái");
-    expect(plugin.settingsHtml()).toContain("Luật cốt lõi &amp; lượt chơi");
-    expect(plugin.settingsHtml()).toContain("Hồ sơ nhân vật ẩn");
-    expect(plugin.settingsHtml()).toContain("Kiểm tra PbtA do người dùng tung");
-    expect(plugin.settingsHtml()).not.toContain("[V][R]");
-    expect(plugin.settingsHtml()).not.toContain("Preset gốc không có chú thích");
-    expect(plugin.settingsHtml()).toContain("Xem 2 bộ lọc");
-    expect(plugin.settingsHtml()).toContain("Xóa suy luận");
-    expect(plugin.settingsHtml()).toContain("Thu gọn suy luận");
-    expect(plugin.settingsHtml()).not.toContain("Xem 0 bộ lọc");
   });
 
-  it.each(["sola", "voyage"] as const)(
+  it.each(["sola"] as const)(
     "auto-rewrites %s without FF5.4 header/state requirements and adds a new swipe",
     async (family) => {
       const store = normalizePresetStore(preset, undefined, {
@@ -1774,18 +1725,14 @@ describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
         { role: "user", content: "Tôi mở cửa.", memo: "user-a" },
       ]);
       const raw =
-        family === "sola"
-          ? '<scene_header location="Hall" time="13:20" />\n<copper:bite>"Come in."</copper>\n<sola_hud digest="Day 1"><date>Day: 1</date></sola_hud>'
-          : '"Come in."\n<!-- * Name: An; A-Life: waiting in the hall -->';
+        '<scene_header location="Hall" time="13:20" />\n<copper:bite>"Come in."</copper>\n<sola_hud digest="Day 1"><date>Day: 1</date></sola_hud>';
       const edited = raw.replace("Come in.", "Vào đi.");
       plugin.runModel.mockResolvedValue({ type: "success", result: edited });
       await plugin.complete(raw);
       expect(plugin.runModel).toHaveBeenCalledOnce();
       const sent = plugin.runModel.mock.calls[0]![0].messages;
       const joined = sent.map((m) => m.content).join("\n");
-      expect(joined).toContain(
-        family === "sola" ? "## Vietnamese Editor" : "## Rule: Vietnamese Editor",
-      );
+      expect(joined).toContain("## Vietnamese Editor");
       expect(joined).not.toContain("<vietnamese_editor>");
       expect(joined).not.toContain("manga, anime, and light-novel pacing");
       expect(joined).not.toContain("Summary must not reach editor.");
@@ -1794,13 +1741,7 @@ describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
       const editorIndex = sent.findIndex(
         (message) => message.memo === `${pluginMemoPrefix(sources[family].preset)}submodel-editor`,
       );
-      const postHistoryIndex = sent.findIndex(
-        (message) =>
-          message.memo ===
-          (family === "sola"
-            ? "vn-rp:sola:jailbreak"
-            : "vn-rp:voyage:713e9dd1-366f-4f2a-9e4b-5e28b6ee63a5"),
-      );
+      const postHistoryIndex = sent.findIndex((message) => message.memo === "vn-rp:sola:jailbreak");
       expect(editorIndex).toBeGreaterThan(-1);
       expect(editorIndex + 1).toBe(postHistoryIndex);
       const saved = plugin.chats.get("0:0")!.message.at(-1)!;
@@ -1845,7 +1786,7 @@ describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
     },
   );
 
-  it("does not auto-rewrite unbalanced nested Sola trackers or unfinished Voyage notes", async () => {
+  it("does not auto-rewrite unbalanced nested Sola trackers", async () => {
     const store = normalizePresetStore(preset, undefined, {
       submodelEditorEnabled: true,
       submodelAutoRewriteEnabled: true,
@@ -1857,11 +1798,6 @@ describe("Sola V2 Flame and Voyage-Universal-v5 plugin integration", () => {
     const plugin = await startPlugin(true, true, store);
     await plugin.request();
     await plugin.complete("A scene. <sola_hud><date><date>Day: 1</date></sola_hud>");
-    expect(plugin.runModel).not.toHaveBeenCalled();
-    await plugin.settingsUi();
-    await plugin.selectFamily("voyage");
-    await plugin.request();
-    await plugin.complete("A scene. <!-- Name: An");
     expect(plugin.runModel).not.toHaveBeenCalled();
   });
 

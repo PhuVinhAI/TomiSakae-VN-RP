@@ -5,14 +5,12 @@ import {
   familyOf,
   imageOptimizationFor,
   isPluginMemo,
+  normalizePresetFamily,
   pluginMemoPrefix,
   presetOrder,
   vietnameseOutputFor,
-  VOYAGE_AUTOMATIC_PBTA_ID,
-  VOYAGE_ABILITY_CHECK_VALUE_ID,
   type PresetFamilyId,
 } from "./preset-family.js";
-import { VOYAGE_FF54_JAILBREAK_ID, VOYAGE_FF54_JAILBREAK_STAGES } from "./voyage-jailbreak.js";
 import {
   adaptDialogueColors,
   adaptDialogueColorRegex,
@@ -26,7 +24,6 @@ import {
 } from "./sola-vietnamese-regex.js";
 import { SOLA_HEADER_SAVER_ID } from "./sola-history.js";
 import { adaptSolaCardContentForDisplay, adaptSolaDisplayReplacement } from "./sola-display.js";
-import { renderVoyageReasoning, VOYAGE_REASONING_DISPLAY_ID } from "./voyage-reasoning.js";
 import { gemmaFixPromptFor, normalizeGemmaNsfwLevel, type GemmaNsfwLevel } from "./gemma-fix.js";
 import { cardImagePrompt, type CardImageCatalog } from "./card-images.js";
 
@@ -170,30 +167,20 @@ const SOLA_PROMPT_DEFAULTS: Readonly<Record<string, boolean>> = {
   "01a0c1ff-4ecf-7006-aa85-a9d7fd7ed074": true, // Freaky Jailbreak
   "01a0c1ff-4ecf-702e-9a5f-c2003733ab34": true, // Body Description Enhancement
 };
-const VOYAGE_PROMPT_DEFAULTS: Readonly<Record<string, boolean>> = {
-  "867a59b8-8216-4d9f-bc24-222490ed0051": false, // OOC
-  "54e77eae-eba6-49f4-b594-4266aaf19ef0": false, // Game Over
-  "43769028-2d80-4b27-b795-bbbdf7730a44": true, // Mortality
-  "216aa279-7af9-401b-8d51-fea7cc725a43": false, // Adult Topics
-  "ee7a5f53-672d-4b32-a607-c976db5f32eb": false, // Adult Language
-};
 
 export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
   const order = presetOrder(preset);
   const regexScripts = familyRegexScripts(preset);
   const promptDefaults: Readonly<Record<string, boolean>> =
-    familyOf(preset) === "voyage"
-      ? VOYAGE_PROMPT_DEFAULTS
-      : familyOf(preset) === "sola"
-        ? SOLA_PROMPT_DEFAULTS
-        : { [REALISM_MODE_ID]: true, [FREAKY_MODE_ID]: false };
+    familyOf(preset) === "sola"
+      ? SOLA_PROMPT_DEFAULTS
+      : { [REALISM_MODE_ID]: true, [FREAKY_MODE_ID]: false };
   const promptEnabled = Object.fromEntries(
     order.map((entry) => [
       entry.identifier,
       promptDefaults[entry.identifier] ?? entry.enabled !== false,
     ]),
   );
-  if (familyOf(preset) === "voyage") promptEnabled[VOYAGE_FF54_JAILBREAK_ID] = false;
   return {
     enabled: true,
     promptEnabled,
@@ -223,16 +210,25 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
     typeof record.familyModules === "object" &&
     !Array.isArray(record.familyModules)
   )
-    defaults.familyModules = structuredClone(record.familyModules) as NonNullable<
-      FfGlobalSettings["familyModules"]
-    >;
+    defaults.familyModules = structuredClone(
+      Object.fromEntries(
+        Object.entries(record.familyModules).filter(
+          ([family]) => family === "ff54" || family === "sola",
+        ),
+      ),
+    ) as NonNullable<FfGlobalSettings["familyModules"]>;
+  const retiredFamily =
+    typeof record.presetFamily === "string" &&
+    normalizePresetFamily(record.presetFamily) !== record.presetFamily;
+  // Recover the remaining family's saved bank instead of applying a retired preset's IDs.
+  const moduleSettings = retiredFamily ? defaults.familyModules?.[familyOf(preset)] : record;
   const promptEnabled =
-    record.promptEnabled && typeof record.promptEnabled === "object"
-      ? (record.promptEnabled as Record<string, unknown>)
+    moduleSettings?.promptEnabled && typeof moduleSettings.promptEnabled === "object"
+      ? (moduleSettings.promptEnabled as Record<string, unknown>)
       : {};
   const regexEnabled =
-    record.regexEnabled && typeof record.regexEnabled === "object"
-      ? (record.regexEnabled as Record<string, unknown>)
+    moduleSettings?.regexEnabled && typeof moduleSettings.regexEnabled === "object"
+      ? (moduleSettings.regexEnabled as Record<string, unknown>)
       : {};
 
   for (const identifier of Object.keys(defaults.promptEnabled)) {
@@ -483,35 +479,10 @@ export function composePresetPrompts(
     const memoPrefix = pluginMemoPrefix(preset);
     let afterHistory = false;
 
-    const pushVoyageJailbreakStage = async (
-      stage: (typeof VOYAGE_FF54_JAILBREAK_STAGES)[number],
-    ) => {
-      let content = expandSourceMacros(stage.prompt.content, variables, macroContext);
-      content = await parseHostMacros(content, promptRole(stage.prompt));
-      if (!content.trim()) return;
-      const message: ChatMessage = {
-        role: promptRole(stage.prompt),
-        content: content.trim(),
-        memo: `${memoPrefix}${VOYAGE_FF54_JAILBREAK_ID}:${stage.slot}`,
-      };
-      onExpandedPrompt?.(message, stage.prompt);
-      if (afterHistory) pushMerged(trailing, message);
-      else pushMerged(leading, message);
-    };
-
     for (const entry of order) {
       if (entry.identifier === "chatHistory") afterHistory = true;
-      if (familyOf(preset) === "voyage" && settings.promptEnabled[VOYAGE_FF54_JAILBREAK_ID]) {
-        for (const stage of VOYAGE_FF54_JAILBREAK_STAGES) {
-          if (stage.before === entry.identifier) await pushVoyageJailbreakStage(stage);
-        }
-      }
-      // Voyage's automatic rule owns its result; expand the native random macro in place.
-      const enabled =
-        familyOf(preset) === "voyage" && entry.identifier === VOYAGE_ABILITY_CHECK_VALUE_ID
-          ? settings.promptEnabled[VOYAGE_AUTOMATIC_PBTA_ID]
-          : settings.promptEnabled[entry.identifier];
-      if (!enabled || MARKER_IDENTIFIERS.has(entry.identifier)) continue;
+      if (!settings.promptEnabled[entry.identifier] || MARKER_IDENTIFIERS.has(entry.identifier))
+        continue;
       const prompt = map.get(entry.identifier);
       if (!prompt || prompt.marker || typeof prompt.content !== "string") continue;
       let sourceContent = adaptFamilyPrompt(prompt.content, preset, settings);
@@ -732,12 +703,6 @@ export function applyRegexScripts(
       options.markdown ? adaptDialogueColorRegex(findRegex) : findRegex,
     );
     if (!regex) continue;
-    if (options.markdown && script.id === VOYAGE_REASONING_DISPLAY_ID) {
-      output = output.replace(regex, (match) =>
-        renderVoyageReasoning(match, settings.vietnameseOutputEnabled),
-      );
-      continue;
-    }
     if (
       options.onHistoryRemoval &&
       script.scriptName?.startsWith("Sola Saver:") &&
@@ -1008,9 +973,7 @@ export function injectAbsoluteAtDepth(
   // latest message and higher depths walk farther back.
   const byDepth = new Map<number, ChatMessage[]>();
   for (const message of injections) {
-    const match = String(message.memo ?? "").match(
-      /^(?:ff54:|vn-rp:(?:sola|voyage):)absolute:([0-9]+):/,
-    );
+    const match = String(message.memo ?? "").match(/^(?:ff54:|vn-rp:sola:)absolute:([0-9]+):/);
     const depth = match ? Number(match[1]) : 0;
     const bucket = byDepth.get(depth) ?? [];
     bucket.push(message);

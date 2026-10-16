@@ -1,7 +1,6 @@
 import type { FfGlobalSettings, FfPreset, FfPrompt, FfRegexScript } from "./core.js";
 import { adaptSolaSaver, SOLA_HEADER_SAVER } from "./sola-history.js";
 import { SOLA_REASONING_SCRIPTS } from "./sola-reasoning.js";
-import { addVoyageReasoningBoundary, VOYAGE_REASONING_SCRIPTS } from "./voyage-reasoning.js";
 import {
   adaptSolaStyleDependencies,
   adaptSolaHudDependencies,
@@ -10,22 +9,14 @@ import {
 import {
   VIETNAMESE_OUTPUT_PROMPT,
   SOLA_VIETNAMESE_OUTPUT_PROMPT,
-  VOYAGE_VIETNAMESE_OUTPUT_PROMPT,
   adaptSolaPromptForVietnamese,
-  adaptVoyagePromptForVietnamese,
   adaptPromptForVietnamese,
 } from "./vietnamese.js";
 import {
   IMAGE_OPTIMIZATION_PROMPT,
   SOLA_IMAGE_OPTIMIZATION_PROMPT,
-  VOYAGE_IMAGE_OPTIMIZATION_PROMPT,
   addImageReasoningGuidance,
 } from "./image.js";
-import {
-  addVoyageJailbreakToReasoning,
-  VOYAGE_FF54_JAILBREAK_CONTROL,
-  VOYAGE_FF54_JAILBREAK_ID,
-} from "./voyage-jailbreak.js";
 
 export const PRESET_FAMILIES = [
   {
@@ -41,17 +32,9 @@ export const PRESET_FAMILIES = [
     description:
       "Nhịp điện ảnh, giọng NPC riêng, Story Review và Showrunner HUD. Đang phát triển và chỉnh sửa.",
   },
-  {
-    id: "voyage",
-    name: "Voyage-Universal-v5",
-    status: "Beta",
-    description: "GM PbtA, văn trực tiếp, thế giới mở và ghi chú ẩn. Đang phát triển và chỉnh sửa.",
-  },
 ] as const;
 
 export type PresetFamilyId = (typeof PRESET_FAMILIES)[number]["id"];
-export const VOYAGE_AUTOMATIC_PBTA_ID = "f7855edd-a399-4f2c-a376-317368b545ee";
-export const VOYAGE_ABILITY_CHECK_VALUE_ID = "58b58785-f5e9-49c4-9cd5-a3bbe0297e74";
 export interface PresetSource {
   preset: FfPreset;
   sourceName: string;
@@ -60,7 +43,7 @@ export interface PresetSource {
 export type PresetSources = Record<PresetFamilyId, PresetSource>;
 
 export function normalizePresetFamily(value: unknown): PresetFamilyId {
-  return value === "sola" || value === "voyage" ? value : "ff54";
+  return value === "sola" ? value : "ff54";
 }
 
 export function familyOf(preset: FfPreset): PresetFamilyId {
@@ -76,20 +59,15 @@ export function presetOrder(preset: FfPreset) {
 }
 
 export function familyPrompts(preset: FfPreset): FfPrompt[] {
-  return familyOf(preset) === "voyage"
-    ? [...preset.prompts, VOYAGE_FF54_JAILBREAK_CONTROL]
-    : preset.prompts;
+  return preset.prompts;
 }
 
 export function familyRegexScripts(preset: FfPreset): FfRegexScript[] {
   const scripts = preset.extensions?.regex_scripts ?? [];
   if (familyOf(preset) === "sola")
     return [...SOLA_REASONING_SCRIPTS, ...scripts.map(adaptSolaSaver), SOLA_HEADER_SAVER];
-  if (familyOf(preset) === "voyage") return [...VOYAGE_REASONING_SCRIPTS, ...scripts];
   return scripts;
 }
-
-export { VOYAGE_FF54_JAILBREAK_ID };
 
 export function pluginMemoPrefix(preset: FfPreset): string {
   return familyOf(preset) === "ff54" ? "ff54:" : `vn-rp:${familyOf(preset)}:`;
@@ -176,8 +154,6 @@ export function vietnameseOutputFor(preset: FfPreset, settings?: FfGlobalSetting
         );
       return content;
     }
-    case "voyage":
-      return VOYAGE_VIETNAMESE_OUTPUT_PROMPT;
     default:
       return VIETNAMESE_OUTPUT_PROMPT;
   }
@@ -230,38 +206,11 @@ export function adaptFamilyPrompt(
         "- Map physical contact, displacement, or reflexive reaction and matching image beats under Image Coverage.",
       );
     }
-  } else {
-    content = addVoyageReasoningBoundary(
-      content,
-      settings.promptEnabled["713e9dd1-366f-4f2a-9e4b-5e28b6ee63a5"] === true,
-    );
-    if (settings.vietnameseOutputEnabled) {
-      content = adaptVoyagePromptForVietnamese(content);
-    }
-    if (settings.promptEnabled[VOYAGE_FF54_JAILBREAK_ID]) {
-      content = addVoyageJailbreakToReasoning(content);
-    }
-    content = content
-      .replace("* > blockquote for documents and chat messages\n", "")
-      .replace("* ```codeblock``` for terminal and code\n", "");
-    if (!settings.promptEnabled["54e77eae-eba6-49f4-b594-4266aaf19ef0"]) {
-      content = content.replace(
-        "GM is allowed to declare PC game over for any reason in any way at any time.\n",
-        "",
-      );
-    }
-    if (settings.imageOptimizationEnabled) {
-      content = content.replace(
-        "* explore three to five different ways to take the story",
-        "* explore three to five different ways to take the story and matching image beats under Image Coverage",
-      );
-    }
   }
   return content;
 }
 
 export function imageOptimizationFor(preset: FfPreset): string {
   if (familyOf(preset) === "ff54") return IMAGE_OPTIMIZATION_PROMPT;
-  if (familyOf(preset) === "voyage") return VOYAGE_IMAGE_OPTIMIZATION_PROMPT;
   return SOLA_IMAGE_OPTIMIZATION_PROMPT;
 }

@@ -629,7 +629,7 @@ export async function buildSolaRawReview(outputFile = OUTPUT) {
         "applyRequestFiltersToMessages",
         "buildRequestMessages",
       ],
-      "Composer/filter/depth thật; các nhánh FF5.4/Voyage được giữ trong hàm dùng chung để không sửa trích đoạn",
+      "Composer/filter/depth thật; nhánh FF5.4 được giữ trong hàm dùng chung để không sửa trích đoạn",
     ],
     [
       "plugin.ts",

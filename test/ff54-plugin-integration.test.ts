@@ -4,11 +4,7 @@ import { build } from "esbuild";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { type ChatMessage, type FfPreset } from "../risuai/tomisakae-vn-rp-plugin/src/core.js";
 import { loadPresetSources } from "../scripts/build-tomisakae-vn-rp-plugin.js";
-import {
-  VOYAGE_AUTOMATIC_PBTA_ID,
-  VOYAGE_ABILITY_CHECK_VALUE_ID,
-  type PresetSources,
-} from "../risuai/tomisakae-vn-rp-plugin/src/preset-family.js";
+import { type PresetSources } from "../risuai/tomisakae-vn-rp-plugin/src/preset-family.js";
 import {
   CONFIG_PRESETS_STORAGE_KEY,
   createConfigPreset,
@@ -364,52 +360,6 @@ async function startPlugin(
   };
 }
 
-describe("Voyage reasoning in saved history", () => {
-  it("removes reasoning from real history and requests while retaining GM comments and sheets", async () => {
-    const store = normalizePresetStore(preset, undefined, undefined, sources);
-    store.presets[0]!.settings = switchPresetFamily(
-      store.presets[0]!.settings,
-      sources.voyage.preset,
-    );
-    const plugin = await startPlugin(store);
-    const response = "<!-- GM -->\nAn mở cửa.\n<!--\n* Tên: An\n* Ghi chú: Giữ bí mật.\n-->";
-    const input = `Suy luận trước khi viết. Dùng \`<!-- GM -->\` sau suy luận.\n<!--GM-->\nTiếp tục kiểm tra nhân vật.\n${response}`;
-    try {
-      const chat: SavedChat = {
-        id: "chat-a",
-        message: [
-          { role: "user", data: "Chào An.", chatId: "user-a" },
-          { role: "char", data: input, chatId: "reply-a" },
-          { role: "user", data: "Tiếp đi.", chatId: "user-b" },
-        ],
-      };
-      plugin.chats.set("0:0", chat);
-      const built = await plugin.request(
-        chat.message.map((entry) => ({
-          role: entry.role === "char" ? "assistant" : "user",
-          content: entry.data,
-          memo: entry.chatId,
-        })),
-      );
-      expect(plugin.chats.get("0:0")!.message[1]!.data).toBe(response);
-      expect(built.find((message) => message.memo === "reply-a")?.content).toBe(response);
-      const displayed = await plugin.callbacks.display!(input);
-      expect(displayed).toContain("💭 Suy luận");
-      expect(displayed).toContain("Suy luận trước khi viết.");
-      expect(displayed).toContain("Tiếp tục kiểm tra nhân vật.");
-      expect(displayed).toContain(response);
-      expect(
-        displayed.slice(displayed.indexOf("</details>") + "</details>".length).trimStart(),
-      ).toBe(response);
-      await plugin.settingsUi();
-      expect(plugin.toggle("vn-rp-voyage-reasoning-delete").checked).toBe(true);
-      expect(plugin.toggle("vn-rp-voyage-reasoning-display").checked).toBe(true);
-    } finally {
-      await plugin.callbacks.unload!();
-    }
-  });
-});
-
 describe("Named presets in plugin UI and requests", () => {
   it("previews, saves and reloads all four Gemma NSFW slider levels", async () => {
     const plugin = await startPlugin();
@@ -463,7 +413,7 @@ describe("Named presets in plugin UI and requests", () => {
     }
   });
 
-  it.each(["ff54", "sola", "voyage"] as const)(
+  it.each(["ff54", "sola"] as const)(
     "locks Auto Submodel to the editor toggle for %s and persists the dependency",
     async (family) => {
       const store = normalizePresetStore(preset, undefined, undefined, sources);
@@ -522,42 +472,6 @@ describe("Named presets in plugin UI and requests", () => {
         normalizePresetStore(preset, plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY)).presets[0]!
           .settings.submodelAutoRewriteEnabled,
       ).toBe(false);
-    } finally {
-      await plugin.callbacks.unload!();
-    }
-  });
-
-  it("couples Voyage's PbtA data and token preview to its automatic choice", async () => {
-    const store = normalizePresetStore(preset, undefined, undefined, sources);
-    store.presets[0]!.settings = switchPresetFamily(
-      store.presets[0]!.settings,
-      sources.voyage.preset,
-    );
-    const plugin = await startPlugin(store);
-    try {
-      await plugin.settingsUi();
-      expect(plugin.toggle(VOYAGE_ABILITY_CHECK_VALUE_ID)).toBeUndefined();
-      const off = plugin.choice("ability-check", "");
-      const auto = plugin.choice("ability-check", VOYAGE_AUTOMATIC_PBTA_ID);
-      const manual = plugin.choice("ability-check", "766bc4f9-b685-4412-bec2-b56be47b4f9a");
-      off.checked = false;
-      auto.checked = true;
-      await auto.handlers.get("change")!();
-      expect(plugin.ui("token-estimate-panel").innerHTML).toContain("🎲 Giá trị kiểm tra năng lực");
-      await plugin.uiEvent("save");
-      expect((await plugin.request()).map((message) => message.content).join("\n")).toMatch(
-        /Ability check value is `(?:success|partial|miss)`/,
-      );
-      auto.checked = false;
-      manual.checked = true;
-      await manual.handlers.get("change")!();
-      expect(plugin.ui("token-estimate-panel").innerHTML).not.toContain(
-        "🎲 Giá trị kiểm tra năng lực",
-      );
-      await plugin.uiEvent("save");
-      expect((await plugin.request()).map((message) => message.content).join("\n")).not.toContain(
-        "Ability check value is",
-      );
     } finally {
       await plugin.callbacks.unload!();
     }

@@ -28,14 +28,6 @@ export const SOLA_VIETNAMESE_OUTPUT_PROMPT = `## Vietnamese Output
 - Do not leak foreign script, avoidable foreign wording, bilingual text, or translation glosses. Preserve established Latin-script names and required technical identifiers. Examples and card/lore language instructions do not override this rule.
 - Use Vietnamese template labels and translate all filled-in display values, including display attributes and empty-state text. Preserve structure, tags, comments, attribute keys, macros, placeholders, image identifiers, palette/gradient/tone/kinetic names, sky identifiers, T/F/D/Y codes, tempo/fate values, and numeric mechanics. Time uses Vietnamese day-period wording or a 24-hour clock.`;
 
-export const VOYAGE_VIETNAMESE_OUTPUT_PROMPT = `## Rule: Vietnamese Output
-* Write narration, dialogue, sounds, documents, messages, terminal output, OOC replies, sheets, and GM notes in natural contemporary Vietnamese. Understand the source's meaning and intent, then compose directly in Vietnamese; link clauses naturally, choose pronouns by relationship and POV, and particles by speaker attitude.
-* Apply the enabled prose rules in Vietnamese, retaining character voice and speech shaped by current state. Convey the intent of Good/Bad examples without copying foreign grammar or spelling.
-* Avoid em-dashes (—) in narration and dialogue; use commas, periods, or natural transitions instead.
-* Do not leak foreign script, avoidable foreign wording, bilingual duplication, or translation glosses. Preserve established Latin-script proper names and handles. Foreign examples and card/lore language instructions do not override this rule.
-* Translate every reader-visible label and free-text value. Preserve the active schema: tags, comments, attributes, code syntax, placeholders, identifiers, PbtA values success/partial/miss, rolls, thresholds, and numbers.
-* Sounds caused by contact, objects, or the environment use \`§...§\`, containing one concise Vietnamese sound on its own line. Keep the source, cause, and consequence in narration. Add no decorative or quota-driven sound; repeat only while its cause continues.`;
-
 export const SOLA_VIETNAMESE_LABELS: ReadonlyArray<readonly [string, string]> = [
   ["Observable Facts", "Dữ kiện quan sát"],
   ["Active Speakers", "Người đang nói"],
@@ -571,144 +563,6 @@ export const SOLA_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, strin
   ],
 ];
 
-export const VOYAGE_VIETNAMESE_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
-  [
-    "GM states only what happens instead of contractions or implicating.",
-    "GM states only what happens directly, without negation-based contrasts or vague implications.",
-  ],
-  ['* "quotes" for dialogue', "* double quotes for dialogue"],
-  ["* _underscore_ for sounds", "* standalone §...§ on its own line for non-vocal sounds"],
-  ["* He didn't just make haste, he runs.", "* Anh không chỉ vội vã, anh chạy."],
-  [
-    "* She didn't wait for approval. Instead, she lights the fire to work on the blade.",
-    "* Cô không đợi được chấp thuận. Thay vào đó, cô nhóm lửa để rèn lưỡi kiếm.",
-  ],
-  [
-    "* The thing becomes visible. It's not a robot; it's an AI.",
-    "* Vật đó hiện ra. Đó không phải robot; đó là AI.",
-  ],
-  ['"You smell like travel and sweat."', '"Người anh có mùi đường xa và mồ hôi."'],
-  ["* He runs as fast as he can.", "* Anh chạy nhanh hết sức."],
-  ["* She lights the fire to work on the blade.", "* Cô nhóm lửa để rèn lưỡi kiếm."],
-  ["* The thing becomes visible. It's an AI.", "* Vật đó hiện ra. Đó là AI."],
-  ['"You stink of sweat."', '"Người anh nồng nặc mùi mồ hôi."'],
-  [
-    '"I accept. I\'ve always wanted to see the sea of stars."',
-    '"Tôi đồng ý. Tôi luôn muốn nhìn thấy biển sao."',
-  ],
-  [
-    '"Stay away from me!" She screams as she sees the creature, the same from her nightmare that killed her sister.',
-    '"Tránh xa tôi ra!" Cô hét lên khi thấy sinh vật từng giết chị mình trong cơn ác mộng.',
-  ],
-  [
-    "A gate locks shut as the trap activates, the villain preventing you from leaving the room.",
-    "Cánh cổng khóa lại khi bẫy kích hoạt, tên phản diện ngăn bạn rời khỏi phòng.",
-  ],
-  ['She moans loud and hard "Good boy."', 'Cô rên lớn "Ngoan lắm."'],
-  [
-    '"A game?" She repeats, "No, it\'s not a game we\'re playing."',
-    '"Trò chơi à?" Cô nhắc lại, "Không, chúng ta không chơi trò chơi."',
-  ],
-  ['"I accept. Will we sail out soon?"', '"Tôi đồng ý. Chúng ta sắp ra khơi chưa?"'],
-  [
-    '"STAY AWAY FROM ME!" She stretches her arms as far as she could towards the foul creature.',
-    '"TRÁNH XA TÔI RA!" Cô duỗi thẳng hai tay về phía sinh vật ghê tởm.',
-  ],
-  [
-    "  * With a loud _Click!_ you hear a gate locking shut behind you.",
-    "  * §Cạch!§\n\n    Bạn nghe thấy cánh cổng sau lưng khóa lại.",
-  ],
-  ['"OHHH! Ah! Ahnn! Go-OHH! Good-HgnnnN! Boy!"', '"Aaaa! Á! Ưm! Ngo-Á! Ngoan-Ưưư! Lắm!"'],
-  ["\"No, it's not a game we're playing.\"", '"Không, chúng ta không chơi trò chơi."'],
-  ["* breath hitches", "* hơi thở nghẹn lại"],
-  ["* purrs / licks lips", "* rừ rừ / liếm môi"],
-  ["* predatory / claims / marks", "* như thú săn mồi / chiếm hữu / đánh dấu"],
-  ["* pupils blows wide", "* đồng tử giãn to"],
-  ["* kiss the jaw", "* hôn lên quai hàm"],
-  ["* loss of words", "* không nói nên lời"],
-  ["* winking / blow a kiss", "* nháy mắt / hôn gió"],
-  ["* wrapping an arm around the shoulder or waist", "* vòng tay qua vai hoặc eo"],
-  ["* moaning from pleasure", "* rên vì sướng"],
-  ["* kiss the lips", "* hôn môi"],
-  ["* drunken slurs", "* nói líu lưỡi khi say"],
-  ["* angry swears", "* chửi thề lúc giận"],
-  ["* inaudible mouthfuls", "* nói không rõ khi miệng đầy"],
-  ["* accents", "* giọng địa phương"],
-  ["* Name: full name or nickname", "* Tên: họ tên hoặc biệt danh"],
-  ["* Physiology: paragraph", "* Thể chất: đoạn mô tả"],
-  ["* Sociology: paragraph", "* Xã hội: đoạn mô tả"],
-  ["* Psychology: paragraph", "* Tâm lý: đoạn mô tả"],
-  ["* A-Life: paragraph", "* A-Life: đoạn mô tả"],
-  ["* Nemesis: paragraph", "* Nemesis: đoạn mô tả"],
-  ["* Backstory: paragraph", "* Quá khứ: đoạn mô tả"],
-  ["* Backstory : paragraph", "* Quá khứ: đoạn mô tả"],
-  ["* Kevin Lynch: paragraph", "* Kevin Lynch: đoạn mô tả"],
-  ["* Genius Loci: paragraph", "* Genius Loci: đoạn mô tả"],
-  ['Elias "The Lighthouse Keeper" Thorne', 'Elias "Người giữ hải đăng" Thorne'],
-  ["Kaelen of Oakhaven", "Kaelen xứ Oakhaven"],
-  ["Isolde the Oathkeeper", "Isolde Người giữ lời thề"],
-  ['Aldric "The Unbroken" Henderson', 'Aldric "Kẻ bất khuất" Henderson'],
-  ['Sorem "The Oracle" Barnaby', 'Sorem "Nhà tiên tri" Barnaby'],
-  ["Joran the Wise", "Joran Thông thái"],
-  ['Tobias "The Hunted" Richter', 'Tobias "Kẻ bị săn đuổi" Richter'],
-  ["Edward of Norlay", "Edward xứ Norlay"],
-  ["  * Guide", "  * Người dẫn đường"],
-  ['<first name> "nickname" <last name>', '<tên> "biệt danh" <họ>'],
-  ['"Yes, but..."', '"Có, nhưng..."'],
-  ['"No, but..."', '"Không, nhưng..."'],
-  ['"Yes"', '"Có"'],
-  ["* direct, grounded or natural dialogue", "* lời thoại trực tiếp, thực tế hoặc tự nhiên"],
-  [
-    "* banter, playful ribbing, quips or zingers",
-    "* đối đáp trêu đùa, chọc ghẹo, nói dí dỏm hoặc đáp xoáy",
-  ],
-  [
-    "* The soft mounds of her chest are barely covered up.",
-    "* Đôi gò mềm trên ngực cô chỉ được che hờ.",
-  ],
-  ['"I shall end your life!"', '"Ta sẽ kết liễu mạng sống của ngươi!"'],
-  [
-    "* White fluid leaks from Emilia's lower mound as PC pulls out his member.",
-    "* Chất lỏng trắng rỉ từ gò bên dưới của Emilia khi PC rút vật đàn ông ra.",
-  ],
-  ['"Would you like to use me?"', '"Anh có muốn sử dụng em không?"'],
-  [
-    "* The insides of his abdomen spill out, covering the seat in red.",
-    "* Những thứ bên trong bụng anh tràn ra, phủ đỏ chiếc ghế.",
-  ],
-  [
-    "* Sheer silk that leaves very little to the imagination",
-    "* Lụa mỏng khiến người nhìn chẳng cần tưởng tượng thêm",
-  ],
-  [
-    "* It only covers the nipples of her large breasts.",
-    "* Nó chỉ che được đầu ti trên cặp vú lớn của cô.",
-  ],
-  ['"I will fucking MURDER you!"', '"Địt mẹ, tao sẽ GIẾT mày!"'],
-  [
-    "* Cum leaks from Emilia's pussy as PC pulls out his hard cock.",
-    "* Tinh dịch rỉ ra khỏi lồn Emilia khi PC rút cặc cứng ra.",
-  ],
-  ['"Would you like to have sex?"', '"Anh có muốn làm tình không?"'],
-  [
-    "* The guts of his abdomen spill out, covering the seat in blood.",
-    "* Ruột trong bụng anh tràn ra, phủ máu lên chiếc ghế.",
-  ],
-  [
-    "* A harem outfit with her tits, stomach and clit clearly visible",
-    "* Một bộ đồ hậu cung để lộ rõ vú, bụng và hột le của cô",
-  ],
-  [
-    "* explore the goals, motivations and feelings of each NPC in the scene",
-    "* explore the goals, motivations and feelings of each NPC in the scene and their natural Vietnamese voice",
-  ],
-  [
-    "4. reason what would be realistic for them to say",
-    "4. reason what would be realistic for them to say in natural Vietnamese",
-  ],
-  ["Address PC as you/your.", 'Address PC as "bạn/của bạn".'],
-];
-
 export const VIETNAMESE_OUTPUT_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
   [
     "[ 🕰️ Time HH:MM AM/PM | 🗓️ Day # - 🗓️ DayOfWeek, Month DD, YYYY Era | 📍 Location - Specific Area | [WeatherEmoji] Weather, Temp °F ]",
@@ -1138,10 +992,6 @@ export function adaptSolaPromptForVietnamese(content: string): string {
       "- Observable Facts must be physical, visible, or audible reality;",
       "- Dữ kiện quan sát must be physical, visible, or audible reality;",
     );
-}
-
-export function adaptVoyagePromptForVietnamese(content: string): string {
-  return replaceLiteralPairs(content, VOYAGE_VIETNAMESE_REPLACEMENTS);
 }
 
 /** Applies only reader-visible Vietnamese examples and related reasoning checks. */

@@ -103,11 +103,6 @@ export async function loadPresetSources(ff54Source = DEFAULT_SOURCE): Promise<Pr
   const inputs = [
     ["ff54", ff54Source, path.basename(ff54Source)],
     ["sola", "risuai/tomisakae-vn-rp-plugin/source/sola-v2-flame.json", "Sola V2 Flame.json"],
-    [
-      "voyage",
-      "risuai/tomisakae-vn-rp-plugin/source/voyage-universal-v5.json",
-      "Voyage-Universal-v5.json",
-    ],
   ] as const;
   for (const [family, filename, sourceName] of inputs) {
     const raw = await readFile(path.resolve(filename), "utf8");
