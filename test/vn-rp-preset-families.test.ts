@@ -571,6 +571,11 @@ describe("TomiSakae VN-RP preset families", () => {
       const all = built.map((m) => m.content).join("\n");
       expect(all).toContain(vietnameseOutputFor(preset, settings));
       expect(all).toContain("## Image Coverage");
+      const imagePrompt = built.find(
+        (message) => message.memo === `${pluginMemoPrefix(preset)}image-optimization`,
+      )!;
+      expect(imagePrompt.content).toContain("even if An refuses or resists");
+      expect(imagePrompt.content).not.toContain("{{char}}");
       expect(all).not.toContain("<vietnamese_output>");
       expect(all).not.toContain("<image_optimization>");
       expect(all).not.toContain("Max 2 clauses per sentence");

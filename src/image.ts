@@ -12,10 +12,11 @@ Rules:
 
 export const SOLA_IMAGE_OPTIMIZATION_PROMPT = `## Image Coverage
 When card/lore provides images:
-- Use its image syntax and available identifiers. Match the current form, clothing, and setting; prioritize clothing changes, then action-driven changes in pose or physical state, then expression.
-- Place each image immediately before the narration or dialogue it depicts.
-- Illustrate meaningful changes throughout the response. Reassess images when action, expression, speaker, or scene focus changes, including later beats. Vary images with the depicted state; repeat only while that state continues and no better match exists.
-- Always separate images with narration or dialogue. Never place images consecutively, invent identifiers, or add unrelated images to fill space.`;
+- Use card/lore image syntax and available identifiers. Choose images of the correct character matching their current clothing, state, and setting. Prioritize images of clothing changes, then action/pose/physical state images, then expression images.
+- Every NSFW action that occurs must still use a matching available NSFW image in exact supported image syntax, even if {{char}} refuses or resists; depiction does not imply consent; prioritize NSFW action images over expression images.
+- Place 1 image immediately before the narration or dialogue it depicts.
+- Use many images throughout the response, reselecting images when the character, action, or state changes.
+- Always output the complete image syntax and the full image name as provided by card/lore.`;
 
 const IMAGE_REASONING_REPLACEMENTS: ReadonlyArray<readonly [string, string]> = [
   [

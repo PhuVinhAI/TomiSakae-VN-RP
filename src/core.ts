@@ -551,7 +551,7 @@ export function composePresetPrompts(
     if (settings.imageOptimizationEnabled) {
       leading.push({
         role: "system",
-        content: imageOptimizationFor(preset),
+        content: await parseHostMacros(imageOptimizationFor(preset), "system"),
         memo: `${memoPrefix}image-optimization`,
       });
     }
