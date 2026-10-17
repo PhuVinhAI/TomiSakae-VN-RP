@@ -6,7 +6,7 @@
 
 Freaky Frankenstein 5.4 · Sola V2 Flame
 
-[![Phiên bản 2.0.1](https://img.shields.io/badge/phi%C3%AAn_b%E1%BA%A3n-2.0.1-285a45?style=flat-square)](package.json)
+[![Phiên bản 2.0.2](https://img.shields.io/badge/phi%C3%AAn_b%E1%BA%A3n-2.0.2-285a45?style=flat-square)](package.json)
 [![Plugin API 3.0](https://img.shields.io/badge/RisuAI-Plugin_API_3.0-d54b31?style=flat-square)](#cài-đặt)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?style=flat-square)](src/)
 [![Tài liệu tiếng Việt](https://img.shields.io/badge/t%C3%A0i_li%E1%BB%87u-ti%E1%BA%BFng_Vi%E1%BB%87t-285a45?style=flat-square)](#bắt-đầu-sử-dụng)
@@ -39,7 +39,7 @@ nguyên, còn prompt hỗ trợ tự chuyển sang phiên bản phù hợp.
 | **Màu hội thoại theo giao diện** | Điều chỉnh bảng màu theo nền sáng/tối, giữ tên màu và hiệu ứng riêng của preset.                                    | Bật                |
 | **Tối ưu hình ảnh theo card**    | Ưu tiên ảnh trang phục, tư thế/trạng thái rồi đến biểu cảm; dùng ảnh có sẵn và phân bố theo diễn biến.              | Tắt · Thử nghiệm   |
 | **Danh sách ảnh của card**       | Đếm ảnh/token và gửi từ khóa ảnh bằng tin user riêng ngay sau tin user mới nhất.                                    | Tắt                |
-| **Fix Gemma 4**                  | Ghép lời nhắc ngắn về tiếng Việt, cú pháp ảnh và kiểm soát NSFW mức 0–3 vào cuối tin user mới nhất trong request.   | Tắt                |
+| **Fix Gemma 4**                  | Ghép lời nhắc ngắn về tiếng Việt, cú pháp ảnh và kiểm soát NSFW mức 0–4 vào cuối tin user mới nhất trong request.   | Tắt                |
 | **Biên tập bằng Submodel**       | Viết lại phản hồi AI cuối theo bộ nền đang dùng; lưu thành swipe mới để giữ bản gốc.                                | Tắt · Thử nghiệm   |
 | **Tự động biên tập**             | Chạy Submodel sau khi phản hồi hoàn tất; cần bật Biên tập bằng Submodel.                                            | Tắt · Thử nghiệm   |
 | **Âm báo hoàn tất**              | Báo thành công hoặc thất bại; khi tự biên tập, chờ Submodel kết thúc.                                               | Tắt                |
@@ -65,7 +65,7 @@ nguyên, còn prompt hỗ trợ tự chuyển sang phiên bản phù hợp.
 output của PocketRisu.
 
 1. Build plugin theo [hướng dẫn bên dưới](#phát-triển) để tạo
-   `dist/tomisakae-vn-rp-plugin-2.0.1.js`.
+   `dist/tomisakae-vn-rp-plugin-2.0.2.js`.
 2. Trong RisuAI/PocketRisu, mở **Plugin Settings → Import Plugin** và chọn file đó.
 3. Cấp quyền plugin yêu cầu: xử lý request, đọc database và `mainDom`.
 4. Mở card, chọn **TomiSakae VN-RP** trong menu chat để cấu hình.
@@ -122,7 +122,7 @@ pnpm install --frozen-lockfile
 pnpm build
 ```
 
-Kết quả: **`dist/tomisakae-vn-rp-plugin-2.0.1.js`**. Tên file tự lấy phiên bản từ `package.json`.
+Kết quả: **`dist/tomisakae-vn-rp-plugin-2.0.2.js`**. Tên file tự lấy phiên bản từ `package.json`.
 File này đã gộp mã plugin và hai preset nguồn, có thể import trực tiếp vào ứng dụng chủ.
 
 | Lệnh               | Mục đích                                                         |

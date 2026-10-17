@@ -355,7 +355,7 @@ async function startPlugin(
 }
 
 describe("Named presets in plugin UI and requests", () => {
-  it("previews, saves and reloads all four Gemma NSFW slider levels", async () => {
+  it("previews all five Gemma NSFW slider levels and saves/reloads level four", async () => {
     const plugin = await startPlugin();
     try {
       await plugin.settingsUi();
@@ -366,22 +366,22 @@ describe("Named presets in plugin UI and requests", () => {
       expect(plugin.ui("gemma-nsfw-level").disabled).toBe(false);
       const saved = structuredClone(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
       const previews = new Set<string>();
-      for (const level of [0, 1, 2, 3]) {
+      for (const level of [0, 1, 2, 3, 4]) {
         plugin.ui("gemma-nsfw-level").value = String(level);
         await plugin.uiEvent("gemma-nsfw-level", "input");
         expect(plugin.ui("gemma-nsfw-value").textContent).toBe(
-          `${level} · ${["Bỏ", "Nhẹ", "Mạnh", "Cao nhất"][level]}`,
+          `${level} · ${["Bỏ", "Nhẹ", "Mạnh", "Rất mạnh", "Hệ quả"][level]}`,
         );
         previews.add(plugin.ui("token-estimate-panel").innerHTML);
         expect(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY)).toEqual(saved);
       }
-      expect(previews.size).toBe(4);
-      plugin.ui("gemma-nsfw-level").value = "3";
+      expect(previews.size).toBe(5);
+      plugin.ui("gemma-nsfw-level").value = "4";
       await plugin.uiEvent("save");
       const reloaded = await startPlugin(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
       try {
         await reloaded.settingsUi();
-        expect(reloaded.ui("gemma-nsfw-level").value).toBe("3");
+        expect(reloaded.ui("gemma-nsfw-level").value).toBe("4");
         const request = await reloaded.request();
         const user = request.find((message) => message.memo === "user-a")!.content;
         expect(user).toContain("MUST NOT offer sex");
@@ -391,10 +391,13 @@ describe("Named presets in plugin UI and requests", () => {
           "NEVER invent sexual desire, intent, or consent not expressed through words or actions directly written by the user",
         );
         expect(user).not.toContain("across turns");
+        expect(user).toContain(
+          "NPCs MUST NOT impulsively request, encourage, or accept risky sex; personal and social consequences MUST govern desire, dialogue, and actions",
+        );
         reloaded.toggle("gemma-fix").checked = false;
         await reloaded.toggle("gemma-fix").handlers.get("change")!();
         expect(reloaded.ui("gemma-nsfw-level").disabled).toBe(true);
-        expect(reloaded.ui("gemma-nsfw-level").value).toBe("3");
+        expect(reloaded.ui("gemma-nsfw-level").value).toBe("4");
         await reloaded.uiEvent("save");
         expect(
           (await reloaded.request()).find((message) => message.memo === "user-a")!.content,

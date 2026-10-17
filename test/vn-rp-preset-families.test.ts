@@ -80,7 +80,7 @@ describe("TomiSakae VN-RP preset families", () => {
 
   it.each(
     (["ff54", "sola"] as const).flatMap((family) =>
-      ([0, 1, 2, 3] as const).map((level) => [family, level] as const),
+      ([0, 1, 2, 3, 4] as const).map((level) => [family, level] as const),
     ),
   )(
     "appends the shared Gemma fix inside the latest user message for %s at level %s",
@@ -184,7 +184,18 @@ describe("TomiSakae VN-RP preset families", () => {
       "NEVER invent sexual desire, intent, or consent not expressed through words or actions directly written by the user",
     );
     expect(gemmaFixPromptFor(3)).not.toContain("across turns");
+    const consequenceRule =
+      "NPCs MUST NOT impulsively request, encourage, or accept risky sex; personal and social consequences MUST govern desire, dialogue, and actions";
+    expect(gemmaFixPromptFor(4)).toBe(
+      gemmaFixPromptFor(3).replace(
+        ", write all visible text",
+        `; ${consequenceRule}, write all visible text`,
+      ),
+    );
     for (const level of [0, 1, 2, 3]) {
+      expect(gemmaFixPromptFor(level)).not.toContain(consequenceRule);
+    }
+    for (const level of [0, 1, 2, 3, 4]) {
       expect(gemmaFixPromptFor(level).endsWith(suffix)).toBe(true);
       expect(gemmaFixPromptFor(level)).toContain("every NSFW action that occurs");
       expect(gemmaFixPromptFor(level)).toContain("exact image-tag syntax");
@@ -196,10 +207,10 @@ describe("TomiSakae VN-RP preset families", () => {
     (family) => {
       const preset = sources[family].preset;
       expect(normalizeSettings(preset, { gemmaFixEnabled: true }).gemmaFixNsfwLevel).toBe(2);
-      for (const value of [-1, 4, 0.5, "0", null, undefined]) {
+      for (const value of [-1, 5, 0.5, "0", "4", null, undefined]) {
         expect(normalizeSettings(preset, { gemmaFixNsfwLevel: value }).gemmaFixNsfwLevel).toBe(2);
       }
-      for (const level of [0, 1, 2, 3] as const) {
+      for (const level of [0, 1, 2, 3, 4] as const) {
         const settings = normalizeSettings(preset, {
           gemmaFixEnabled: true,
           gemmaFixNsfwLevel: level,

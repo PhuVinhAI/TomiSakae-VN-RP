@@ -75,6 +75,7 @@ describe("Plugin dashboard token estimates", () => {
     [false, false, 1],
     [true, true, 0],
     [false, true, 3],
+    [true, false, 4],
   ] as const)(
     "matches the actual injected prompt text with Vietnamese Output %s, Submodel %s and Gemma level %s",
     async (vietnamese, submodel, level) => {
