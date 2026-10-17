@@ -64,7 +64,8 @@ nguyên, còn prompt hỗ trợ tự chuyển sang phiên bản phù hợp.
 **Yêu cầu:** RisuAI có Plugin API 3.0. Các tính năng Submodel, tự biên tập và swipe cần API chat
 output của PocketRisu.
 
-1. Build plugin theo [hướng dẫn bên dưới](#phát-triển) để tạo `dist/tomisakae-vn-rp-plugin.js`.
+1. Build plugin theo [hướng dẫn bên dưới](#phát-triển) để tạo
+   `dist/tomisakae-vn-rp-plugin-2.0.1.js`.
 2. Trong RisuAI/PocketRisu, mở **Plugin Settings → Import Plugin** và chọn file đó.
 3. Cấp quyền plugin yêu cầu: xử lý request, đọc database và `mainDom`.
 4. Mở card, chọn **TomiSakae VN-RP** trong menu chat để cấu hình.
@@ -121,8 +122,8 @@ pnpm install --frozen-lockfile
 pnpm build
 ```
 
-Kết quả: **`dist/tomisakae-vn-rp-plugin.js`**. File này đã gộp mã plugin và hai preset nguồn, có thể
-import trực tiếp vào ứng dụng chủ.
+Kết quả: **`dist/tomisakae-vn-rp-plugin-2.0.1.js`**. Tên file tự lấy phiên bản từ `package.json`.
+File này đã gộp mã plugin và hai preset nguồn, có thể import trực tiếp vào ứng dụng chủ.
 
 | Lệnh               | Mục đích                                                         |
 | :----------------- | :--------------------------------------------------------------- |

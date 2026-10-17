@@ -620,9 +620,9 @@ describe("FF5.4 RisuAI plugin compatibility", () => {
   });
 
   it("does not bundle the unavailable chat-parser API", async () => {
-    const artifact = await readFile("dist/tomisakae-vn-rp-plugin.js", "utf8");
-    expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
     const manifest = JSON.parse(await readFile("package.json", "utf8")) as { version: string };
+    const artifact = await readFile(`dist/tomisakae-vn-rp-plugin-${manifest.version}.js`, "utf8");
+    expect(artifact).not.toContain(["parse", "Risu", "Chat"].join(""));
     expect(artifact.match(/^\/\/@version (.+)$/m)?.[1]).toBe(manifest.version);
   });
 

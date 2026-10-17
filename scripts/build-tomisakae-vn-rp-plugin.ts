@@ -7,18 +7,16 @@ import type { PresetSources } from "../src/preset-family.js";
 import type { FfPreset } from "../src/core.js";
 
 const DEFAULT_SOURCE = "source/ff54-sillytavern-preset.json";
-const DEFAULT_OUTPUT = "dist/tomisakae-vn-rp-plugin.js";
 
 interface Options {
   sourceFile: string;
-  outputFile: string;
+  outputFile?: string;
   check: boolean;
 }
 
 function parseArguments(argv: string[]): Options {
   const options: Options = {
     sourceFile: DEFAULT_SOURCE,
-    outputFile: DEFAULT_OUTPUT,
     check: false,
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -29,7 +27,7 @@ function parseArguments(argv: string[]): Options {
     else throw new Error(`Unknown argument: ${argument}`);
   }
   if (!options.sourceFile) throw new Error("--source requires a JSON path.");
-  if (!options.outputFile) throw new Error("--output requires a JavaScript path.");
+  if (options.outputFile === "") throw new Error("--output requires a JavaScript path.");
   return options;
 }
 
@@ -50,7 +48,6 @@ function validatePreset(value: unknown): asserts value is {
 
 export async function buildPlugin(options: Options): Promise<{ output: string; digest: string }> {
   const sourcePath = path.resolve(options.sourceFile);
-  const outputPath = path.resolve(options.outputFile);
   const raw = await readFile(sourcePath, "utf8");
   const preset = JSON.parse(raw) as unknown;
   validatePreset(preset);
@@ -58,6 +55,9 @@ export async function buildPlugin(options: Options): Promise<{ output: string; d
   const sourceDigest = createHash("sha256").update(raw).digest("hex");
   const sources = await loadPresetSources(sourcePath);
   const { version } = JSON.parse(await readFile("package.json", "utf8")) as { version: string };
+  const outputPath = path.resolve(
+    options.outputFile ?? `dist/tomisakae-vn-rp-plugin-${version}.js`,
+  );
   const result = await build({
     entryPoints: [path.resolve("src/plugin.ts")],
     bundle: true,

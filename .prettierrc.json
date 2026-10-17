@@ -3,5 +3,11 @@
   "proseWrap": "always",
   "semi": true,
   "singleQuote": false,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "overrides": [
+    {
+      "files": "docs/releases/*.md",
+      "options": { "proseWrap": "never" }
+    }
+  ]
 }
