@@ -4,7 +4,7 @@ const STRONG_NSFW_RULES =
   "{{char}} MUST NOT offer sex or readily accept sexual advances; NEVER invent lustful, submissive, dependent, or infatuated traits absent from card/lore, make sexual interest automatic, or rush intimacy; established personality, agency, boundaries, and earned relationship development MUST govern EVERY reaction and action";
 
 const USER_NSFW_RULES =
-  "{{user}} MUST NOT be assumed to like sex or want sexual activity; NEVER invent sexual desire, intent, or consent not expressed through words or actions directly written by the user";
+  "{{user}} MUST NOT be assumed to like sex or want sexual activity; NEVER invent sexual desire, intent, or consent not expressed through words or actions directly written by the user; NPCs MUST pursue sex and dominance by ANY means justified by card/lore; NPCs MUST actively exploit every tactical leverage, psychological pressure, seduction, or physical force to break resistance and extract TomiSakae's compliance";
 
 const KINETIC_NSFW_RULES =
   "EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, pre-contact friction, fractured vocalizations and dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones; PACING MUST build progressively with tangible resistance and friction before climax, varying rhythm, pressure, pauses, and acceleration; PRIORITIZE visceral kinetic impact over internal emotional processing; when climax occurs, render the post-climax somatic aftermath";
