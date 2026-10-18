@@ -21,10 +21,10 @@ const SEXUAL_RISK_RULES =
   "NPCs MUST handle sexual, reproductive, STI, hygiene, and contraceptive risks only through card/lore consistent age, knowledge, experience, beliefs, and judgment; NEVER grant unearned risk awareness or default to unprotected penetration or internal ejaculation; barriers, withdrawal, oral, manual, and anal alternatives, fertility status, protection failure, unwanted exposure, stealthing, and reproductive coercion MUST shape character consistent decisions, mistakes, and consequences";
 
 const VIETNAMESE_OUTPUT_RULES =
-  "write all visible text in natural Vietnamese without em-dashes, with Latin-script names and no Hangul or foreign wording except required machine syntax; NEVER repeat or rephrase {{user}}'s words or write {{user}}'s dialogue";
+  "Write all visible text in natural Vietnamese without em-dashes, with Latin-script names and no Hangul or foreign wording except required machine syntax; NEVER repeat or rephrase {{user}}'s words or write {{user}}'s dialogue";
 
 const IMAGE_USE_RULES =
-  "use many images at multiple suitable points throughout the response; explore available images for the best fit; avoid safe defaults; use only available card/lore images matching the current state with exact image-tag syntax and identifiers supported by card/lore/schema; NO duplicate images per response; prioritize outfit changes > action/pose/physical state > expression; place each beside its matching beat with narration or dialogue between images; every NSFW action that occurs must still use a matching available NSFW image in exact supported syntax, even if {{char}} refuses or resists; depiction does not imply consent; action takes priority over facial expression";
+  "Use many images at multiple suitable points throughout the response; EXPLORE available images for the best fit; AVOID safe defaults; ONLY use available card/lore images matching the current state with exact image-tag syntax and identifiers supported by card/lore/schema; NO duplicate images per response; PRIORITIZE outfit changes > action/pose/physical state > expression; PLACE each beside its matching beat with narration or dialogue between images; every NSFW action that occurs must still use a matching available NSFW image in exact supported syntax, even if {{char}} refuses or resists; depiction does not imply consent; action takes priority over facial expression";
 
 export function normalizeGemmaNsfwLevel(value: unknown): GemmaNsfwLevel {
   return value === 0 || value === 1 || value === 3 || value === 4 ? value : 2;
