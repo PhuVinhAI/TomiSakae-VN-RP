@@ -1751,6 +1751,7 @@ describe("Sola V2 Flame plugin integration", () => {
     expect(html.indexOf("<h2>Global</h2>")).toBeLessThan(html.indexOf("<h2>Bộ preset nền</h2>"));
     expect(html).toContain("Freaky Frankenstein 5.4");
     expect(html).toContain("Sola V2 Flame");
+    expect(html).not.toContain("🔥 Bộ theo dõi NSFW");
     expect(html.match(/name="preset-family"/g)).toHaveLength(2);
     await plugin.selectFamily("sola");
     const saved = plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY) as {
@@ -1765,6 +1766,17 @@ describe("Sola V2 Flame plugin integration", () => {
     expect(saved.presets[0]!.settings.presetFamily).toBe("sola");
     expect(saved.presets[0]!.settings.submodelEditorEnabled).toBe(true);
     expect(saved.presets[0]!.settings.soundNotificationsEnabled).toBe(true);
+    expect(plugin.settingsHtml()).toContain("🔥 Bộ theo dõi NSFW");
+    expect(plugin.toggle("sola-nsfw-tracker").checked).toBe(false);
+    plugin.toggle("sola-nsfw-tracker").checked = true;
+    await plugin.uiEvent("save");
+    expect(
+      (
+        plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY) as {
+          presets: Array<{ settings: { solaNsfwTrackerEnabled: boolean } }>;
+        }
+      ).presets[0]!.settings.solaNsfwTrackerEnabled,
+    ).toBe(true);
     expect(plugin.settingsHtml()).toContain("HUD tổng hợp trạng thái");
     expect(plugin.settingsHtml()).toContain("Chỉ số cảm xúc TFDY");
     expect(plugin.settingsHtml()).toContain("Header mở cảnh");
@@ -1776,6 +1788,7 @@ describe("Sola V2 Flame plugin integration", () => {
     expect(plugin.settingsHtml()).not.toContain("Chế độ Hiện thực");
     const request = await plugin.request();
     expect(request.map((m) => m.content).join("\n")).toContain("## Vietnamese Output");
+    expect(request.map((m) => m.content).join("\n")).toContain("## Tracker: NSFW Variety 🔥");
   });
 
   it.each(["sola"] as const)(

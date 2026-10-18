@@ -31,7 +31,7 @@ const SAVER_TAGS: Readonly<Record<string, string>> = {
     "fengine|wardrobe|inventory|scene_cast|scene_state|cabinet|arrow|omen|date|story_notes|solatag|char_matrix",
 };
 const TRACKER_TAGS =
-  "sola_hud|fengine|thought_engine|wardrobe|inventory|scene_cast|scene_state|bond|date|story_notes|solatag|char_matrix|tempo|cabinet|arrow|omen|scene_header";
+  "sola_hud|fengine|thought_engine|wardrobe|inventory|scene_cast|scene_state|bond|date|story_notes|solatag|char_matrix|tempo|cabinet|arrow|omen|nsfw_tracker|scene_header";
 
 /** Keep native saver scope/depth; stop a broken block at the next boundary. */
 export function adaptSolaSaver(script: FfRegexScript): FfRegexScript {

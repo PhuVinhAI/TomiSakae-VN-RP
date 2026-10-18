@@ -175,13 +175,19 @@ export function adaptSolaHudDependencies(content: string, modules: ReadonlySet<s
     ["mod_track_arrow", "arrow"],
     ["mod_track_omen", "omen"],
     ["mod_track_dossier", "scene_state"],
+    ["mod_track_nsfw", "nsfw_tracker"],
   ];
   const tags = trackerTags.filter(([key]) => modules.has(key)).map(([, tag]) => `<${tag}>`);
   // Only the HUD's example lists other trackers; each standalone schema owns its own fields.
-  if (trackerTags.slice(0, 7).some(([key]) => !modules.has(key)))
+  if (modules.has("mod_track_nsfw") || trackerTags.slice(0, 7).some(([key]) => !modules.has(key)))
     content = content.replace(
       "[Append all active tracker blocks here: <story_notes>, <date>, <bond>, <fengine>, <thought_engine>, <char_matrix>, <wardrobe>, etc.]",
       tags.length ? `[Append all active tracker blocks here: ${tags.join(", ")}.]` : "",
+    );
+  if (modules.has("mod_track_nsfw"))
+    content = content.replaceAll(
+      "{{getvar::mod_solahud}}",
+      "{{getvar::mod_track_nsfw}}{{getvar::mod_solahud}}",
     );
   if (!modules.has("mod_tempo")) content = content.replaceAll(" · [GEAR]", "");
   if (!modules.has("mod_track_fengine")) {

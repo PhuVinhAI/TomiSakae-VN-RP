@@ -90,6 +90,7 @@ function activeSolaModules(preset: FfPreset, settings: FfGlobalSettings): Set<st
     for (const match of prompt.content.matchAll(/\{\{setvar::(mod_[a-z_]+)::(?!\}\})/g))
       modules.add(match[1]!);
   }
+  if (settings.solaNsfwTrackerEnabled) modules.add("mod_track_nsfw");
   return modules;
 }
 

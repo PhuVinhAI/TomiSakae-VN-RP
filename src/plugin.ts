@@ -375,11 +375,13 @@ function tokenEstimateHtml(estimate: PluginTokenEstimate, preset: FfPreset): str
             ? "🖼️ Tối ưu hình ảnh theo card"
             : entry.identifier === "card-image-catalog"
               ? "🖼️ Danh sách ảnh của card"
-              : entry.identifier === "gemma-fix"
-                ? "🛠️ Fix Gemma 4"
-                : prompt
-                  ? promptUiCopy(prompt, familyOf(preset)).name
-                  : entry.identifier;
+              : entry.identifier === "nsfw-tracker"
+                ? "🔥 Bộ theo dõi NSFW"
+                : entry.identifier === "gemma-fix"
+                  ? "🛠️ Fix Gemma 4"
+                  : prompt
+                    ? promptUiCopy(prompt, familyOf(preset)).name
+                    : entry.identifier;
       return `<div class="token-row"><span>${escapeHtml(name)}</span><strong>≈ ${number(entry.tokens)}</strong></div>`;
     })
     .join("");
@@ -582,7 +584,17 @@ async function showSettings(): Promise<void> {
       settings.cardImageCatalogEnabled,
       "🖼️ Danh sách ảnh của card",
       "Đếm ảnh và token; gửi toàn bộ từ khóa ảnh bằng tin user riêng ngay sau tin user mới nhất · Mặc định tắt",
-    )}${checkbox(
+    )}${
+      family.id === "sola"
+        ? checkbox(
+            "plugin",
+            "sola-nsfw-tracker",
+            settings.solaNsfwTrackerEnabled,
+            "🔥 Bộ theo dõi NSFW",
+            "Cấm cách miêu tả, kiểu thoại và tiếng rên vừa dùng ở lượt kế; tự ghi đè sau mỗi phản hồi NSFW · Mặc định tắt",
+          )
+        : ""
+    }${checkbox(
       "plugin",
       "gemma-fix",
       settings.gemmaFixEnabled,
@@ -671,6 +683,7 @@ async function showSettings(): Promise<void> {
       else if (id === "dialogue-theme") settings.dialogueThemeEnabled = node.checked;
       else if (id === "image-optimization") settings.imageOptimizationEnabled = node.checked;
       else if (id === "card-image-catalog") settings.cardImageCatalogEnabled = node.checked;
+      else if (id === "sola-nsfw-tracker") settings.solaNsfwTrackerEnabled = node.checked;
       else if (id === "gemma-fix") settings.gemmaFixEnabled = node.checked;
       else if (id === "sound-notifications") settings.soundNotificationsEnabled = node.checked;
       else if (id === "submodel-editor") settings.submodelEditorEnabled = node.checked;
@@ -731,6 +744,7 @@ async function showSettings(): Promise<void> {
       node.dataset.id === "vietnamese-output" ||
       node.dataset.id === "image-optimization" ||
       node.dataset.id === "card-image-catalog" ||
+      node.dataset.id === "sola-nsfw-tracker" ||
       node.dataset.id === "gemma-fix" ||
       node.dataset.id === "dialogue-theme"
     )

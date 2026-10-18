@@ -1,0 +1,196 @@
+import { beforeAll, describe, expect, it } from "vitest";
+import { loadPresetSources } from "../scripts/build-tomisakae-vn-rp-plugin.js";
+import {
+  applyPromptRegexToMessages,
+  applyRegexScripts,
+  composePresetPrompts,
+  createDefaultSettings,
+  normalizeSettings,
+  PLACEMENT_AI_OUTPUT,
+  type ChatMessage,
+  type FfPreset,
+} from "../src/core.js";
+import { restoreSolaHistoryContent, type SolaHistoryRemoval } from "../src/sola-history.js";
+import { estimatePluginPromptTokens } from "../src/token-estimate.js";
+
+let sola: FfPreset;
+let ff54: FfPreset;
+
+beforeAll(async () => {
+  const sources = await loadPresetSources();
+  sola = sources.sola.preset;
+  ff54 = sources.ff54.preset;
+});
+
+const tracker = (name: string, pattern: string) => `<nsfw_tracker>
+[${name}]:
+Description patterns:
+- ${pattern}
+Dialogue patterns:
+- "Lại đây."
+Moans/Vocal reactions:
+- "Ahn~♡"
+</nsfw_tracker>`;
+
+describe("Sola NSFW Tracker", () => {
+  it("is off by default, normalizes saved state, and injects only for Sola", async () => {
+    expect(createDefaultSettings(sola).solaNsfwTrackerEnabled).toBe(false);
+    expect(normalizeSettings(sola, { solaNsfwTrackerEnabled: true }).solaNsfwTrackerEnabled).toBe(
+      true,
+    );
+
+    const settings = createDefaultSettings(sola);
+    settings.solaNsfwTrackerEnabled = true;
+    const composed = await composePresetPrompts(sola, settings, async (value) => value);
+    const module = composed.trailing.find((message) => message.memo?.endsWith(":nsfw-tracker"));
+    expect(module?.content).toContain("Treat the previous `<nsfw_tracker>` as a BAN LIST");
+    expect(module?.content).toContain("Cách miêu tả:");
+    expect(module?.content).toContain("Located inside of '<sola_hud>' tags.");
+    const storyReview = composed.absolute.find((message) =>
+      message.content.includes("## Story Review"),
+    );
+    expect(storyReview?.content).toContain("NSFW Variety (<nsfw_tracker>)");
+    expect(
+      composed.absolute.find((message) => message.content.includes("## Showrunner Master HUD"))
+        ?.content,
+    ).toContain("<nsfw_tracker>");
+
+    const off = await composePresetPrompts(
+      sola,
+      createDefaultSettings(sola),
+      async (value) => value,
+    );
+    expect(off.trailing.some((message) => message.memo?.endsWith(":nsfw-tracker"))).toBe(false);
+
+    const other = createDefaultSettings(ff54);
+    other.solaNsfwTrackerEnabled = true;
+    const ff = await composePresetPrompts(ff54, other, async (value) => value);
+    expect(
+      [...ff.leading, ...ff.trailing].some((message) => message.content.includes("nsfw_tracker")),
+    ).toBe(false);
+  });
+
+  it("adds the reminder to Reminder System and both Story Reviews", async () => {
+    const settings = createDefaultSettings(sola);
+    settings.solaNsfwTrackerEnabled = true;
+    for (const id of [
+      "01a0c1ff-4ecf-7049-99ca-b8289f911924",
+      "01a0c1ff-4ecf-704a-82b3-0c9b9af52526",
+      "01a0c1ff-4ecf-704b-80c7-70e3c11b723f",
+    ])
+      settings.promptEnabled[id] = true;
+    const composed = await composePresetPrompts(sola, settings, async (value) => value);
+    const reminder = "BAN every listed description, dialogue, and vocal pattern this turn";
+    expect(composed.absolute.filter((message) => message.content.includes(reminder))).toHaveLength(
+      2,
+    );
+    const reminderPrompt = sola.prompts.find(
+      (prompt) => prompt.identifier === "01a0c1ff-4ecf-7049-99ca-b8289f911924",
+    )!;
+    const reminderOnly: FfPreset = {
+      ...sola,
+      prompt_order: [
+        {
+          character_id: 100001,
+          order: [{ identifier: reminderPrompt.identifier, enabled: true }],
+        },
+      ],
+      prompts: [reminderPrompt],
+    };
+    const reminderSettings = createDefaultSettings(reminderOnly);
+    reminderSettings.solaNsfwTrackerEnabled = true;
+    const reminderComposed = await composePresetPrompts(
+      reminderOnly,
+      reminderSettings,
+      async (value) => value,
+    );
+    expect(reminderComposed.absolute[0]?.content).toContain(reminder);
+  });
+
+  it("keeps only the latest assistant tracker and does not age on user messages or repeated filtering", () => {
+    const settings = createDefaultSettings(sola);
+    settings.solaNsfwTrackerEnabled = true;
+    const messages: ChatMessage[] = [
+      { role: "assistant", content: `Cũ.\n${tracker("Nana", "mẫu cũ")}` },
+      { role: "user", content: "Lượt trước." },
+      { role: "assistant", content: `Mới.\n${tracker("Nana", "mẫu mới")}` },
+      { role: "user", content: "Lượt hiện tại." },
+    ];
+    const first = applyPromptRegexToMessages(messages, sola, settings);
+    expect(first[0]!.content).not.toContain("<nsfw_tracker>");
+    expect(first[2]!.content).toContain("mẫu mới");
+    const repeated = applyPromptRegexToMessages(
+      [...messages, { role: "user", content: "OOC." }],
+      sola,
+      settings,
+    );
+    expect(repeated[2]!.content).toContain("mẫu mới");
+
+    const afterNextResponse = applyPromptRegexToMessages(
+      [...messages, { role: "assistant", content: "Lượt mới không có NSFW." }],
+      sola,
+      settings,
+    );
+    expect(afterNextResponse[2]!.content).not.toContain("<nsfw_tracker>");
+  });
+
+  it("archives expired tracker text for branch and swipe restoration", () => {
+    const settings = createDefaultSettings(sola);
+    settings.solaNsfwTrackerEnabled = true;
+    const old: ChatMessage = {
+      role: "assistant",
+      content: `Đoạn cũ.\n${tracker("Nana", "mẫu cũ")}`,
+    };
+    const messages: ChatMessage[] = [
+      old,
+      { role: "user", content: "Tiếp." },
+      { role: "assistant", content: `Đoạn mới.\n${tracker("Nana", "mẫu mới")}` },
+    ];
+    const removals: SolaHistoryRemoval[] = [];
+    const filtered = applyPromptRegexToMessages(messages, sola, settings, {
+      history: true,
+      onHistoryRemoval: (message, offset, text) => {
+        if (message === old) removals.push({ offset, text });
+      },
+    });
+    expect(filtered[0]!.content).toBe("Đoạn cũ.\n");
+    expect(
+      restoreSolaHistoryContent(filtered[0]!.content, { visible: filtered[0]!.content, removals }),
+    ).toBe(old.content);
+  });
+
+  it("renders an escaped localized HUD card and preserves English labels when requested", () => {
+    const input = tracker("Nana <img src=x>", "da <script>alert(1)</script>");
+    for (const [vietnamese, title, label] of [
+      [true, "🔥 Sola: Bộ theo dõi NSFW", "Cách miêu tả"],
+      [false, "🔥 Sola: NSFW Tracker", "Description patterns"],
+    ] as const) {
+      const settings = createDefaultSettings(sola);
+      settings.solaNsfwTrackerEnabled = true;
+      settings.vietnameseOutputEnabled = vietnamese;
+      const displayed = applyRegexScripts(input, sola, settings, {
+        placement: PLACEMENT_AI_OUTPUT,
+        markdown: true,
+        depth: 0,
+      });
+      expect(displayed).toContain('data-sola-ui="nsfw-tracker"');
+      expect(displayed).toContain(title);
+      expect(displayed).toContain(label);
+      expect(displayed).toContain("&lt;img src=x&gt;");
+      expect(displayed).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
+      expect(displayed).not.toContain("<img src=x>");
+    }
+  });
+
+  it("counts the injected module in token estimates", async () => {
+    const settings = createDefaultSettings(sola);
+    settings.solaNsfwTrackerEnabled = true;
+    const estimate = await estimatePluginPromptTokens(sola, settings, {
+      characterName: "Nana",
+      userName: "TomiSakae",
+    });
+    expect(
+      estimate.entries.find((entry) => entry.identifier === "nsfw-tracker")?.tokens,
+    ).toBeGreaterThan(0);
+  });
+});

@@ -26,6 +26,13 @@ import { SOLA_HEADER_SAVER_ID } from "./sola-history.js";
 import { adaptSolaCardContentForDisplay, adaptSolaDisplayReplacement } from "./sola-display.js";
 import { gemmaFixPromptFor, normalizeGemmaNsfwLevel, type GemmaNsfwLevel } from "./gemma-fix.js";
 import { cardImagePrompt, type CardImageCatalog } from "./card-images.js";
+import {
+  adaptSolaNsfwTrackerForDisplay,
+  expireSolaNsfwTracker,
+  solaNsfwTrackerPrompt,
+  SOLA_NSFW_TRACKER_MEMO,
+  SOLA_NSFW_TRACKER_REMINDER,
+} from "./sola-nsfw-tracker.js";
 
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
@@ -96,6 +103,7 @@ export interface FfGlobalSettings {
   vietnameseOutputEnabled: boolean;
   imageOptimizationEnabled: boolean;
   cardImageCatalogEnabled: boolean;
+  solaNsfwTrackerEnabled: boolean;
   soundNotificationsEnabled: boolean;
   submodelEditorEnabled: boolean;
   submodelAutoRewriteEnabled: boolean;
@@ -190,6 +198,7 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
     vietnameseOutputEnabled: true,
     imageOptimizationEnabled: false,
     cardImageCatalogEnabled: false,
+    solaNsfwTrackerEnabled: false,
     soundNotificationsEnabled: false,
     submodelEditorEnabled: false,
     submodelAutoRewriteEnabled: false,
@@ -250,6 +259,8 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
   }
   if (typeof record.cardImageCatalogEnabled === "boolean")
     defaults.cardImageCatalogEnabled = record.cardImageCatalogEnabled;
+  if (typeof record.solaNsfwTrackerEnabled === "boolean")
+    defaults.solaNsfwTrackerEnabled = record.solaNsfwTrackerEnabled;
   if (typeof record.soundNotificationsEnabled === "boolean") {
     defaults.soundNotificationsEnabled = record.soundNotificationsEnabled;
   }
@@ -472,6 +483,8 @@ export function composePresetPrompts(
   return (async () => {
     const map = promptMap(preset);
     const variables = new Map<string, string>();
+    if (familyOf(preset) === "sola" && settings.solaNsfwTrackerEnabled)
+      variables.set("mod_track_nsfw", SOLA_NSFW_TRACKER_REMINDER);
     const leading: ChatMessage[] = [];
     const absoluteByDepth = new Map<number, FfPrompt[]>();
     const trailing: ChatMessage[] = [];
@@ -479,7 +492,27 @@ export function composePresetPrompts(
     const memoPrefix = pluginMemoPrefix(preset);
     let afterHistory = false;
 
+    let nsfwTrackerInjected = false;
+    const injectNsfwTracker = async () => {
+      if (nsfwTrackerInjected || familyOf(preset) !== "sola" || !settings.solaNsfwTrackerEnabled)
+        return;
+      nsfwTrackerInjected = true;
+      const content = await parseHostMacros(
+        solaNsfwTrackerPrompt(
+          settings.vietnameseOutputEnabled,
+          variables.get("tracker_location") ?? "at the end of your response",
+        ),
+        "system",
+      );
+      trailing.push({
+        role: "system",
+        content,
+        memo: `${memoPrefix}${SOLA_NSFW_TRACKER_MEMO}`,
+      });
+    };
+
     for (const entry of order) {
+      if (entry.identifier === "01a0c1ff-4ecf-7046-9d4a-25993cf80b62") await injectNsfwTracker();
       if (entry.identifier === "chatHistory") afterHistory = true;
       if (!settings.promptEnabled[entry.identifier] || MARKER_IDENTIFIERS.has(entry.identifier))
         continue;
@@ -520,6 +553,7 @@ export function composePresetPrompts(
         pushMerged(leading, message);
       }
     }
+    await injectNsfwTracker();
 
     const absolute: ChatMessage[] = [];
     for (const depth of [...absoluteByDepth.keys()].sort((left, right) => left - right)) {
@@ -664,6 +698,8 @@ export function applyRegexScripts(
     options.markdown && settings.vietnameseOutputEnabled && familyOf(preset) === "sola"
       ? adaptSolaTrackerLabelsForDisplay(input)
       : input;
+  if (options.markdown && settings.solaNsfwTrackerEnabled && familyOf(preset) === "sola")
+    output = adaptSolaNsfwTrackerForDisplay(output, settings.vietnameseOutputEnabled);
   for (const script of familyRegexScripts(preset)) {
     if (!settings.regexEnabled[script.id] || !script.findRegex || !output) continue;
     if (options.history && script.id === SOLA_HEADER_SAVER_ID) continue;
@@ -934,30 +970,39 @@ export function applyPromptRegexToMessages(
           ? PLACEMENT_AI_OUTPUT
           : undefined;
     if (placement === undefined) return { ...message };
+    let content = applyRegexScripts(message.content, preset, settings, {
+      placement,
+      prompt: true,
+      ...(options.history ? { history: true } : {}),
+      ...(options.onHistoryRemoval
+        ? {
+            onHistoryRemoval: (offset: number, text: string) =>
+              options.onHistoryRemoval!(message, offset, text),
+          }
+        : {}),
+      ...(depths.has(message) ? { depth: depths.get(message)! } : {}),
+      ...((contextSaver !== undefined || solaDepths !== undefined) &&
+      placement === PLACEMENT_AI_OUTPUT
+        ? {
+            depthForScript: (script: FfRegexScript) => {
+              if (solaDepths && script.scriptName?.startsWith("Sola Saver:"))
+                return solaDepths.get(message);
+              return script.id === contextSaver?.id ? contextSaverDepths.get(message) : undefined;
+            },
+          }
+        : {}),
+    });
+    if (
+      settings.solaNsfwTrackerEnabled &&
+      familyOf(preset) === "sola" &&
+      placement === PLACEMENT_AI_OUTPUT
+    )
+      content = expireSolaNsfwTracker(content, solaDepths?.get(message), (offset, text) =>
+        options.onHistoryRemoval?.(message, offset, text),
+      );
     return {
       ...message,
-      content: applyRegexScripts(message.content, preset, settings, {
-        placement,
-        prompt: true,
-        ...(options.history ? { history: true } : {}),
-        ...(options.onHistoryRemoval
-          ? {
-              onHistoryRemoval: (offset: number, text: string) =>
-                options.onHistoryRemoval!(message, offset, text),
-            }
-          : {}),
-        ...(depths.has(message) ? { depth: depths.get(message)! } : {}),
-        ...((contextSaver !== undefined || solaDepths !== undefined) &&
-        placement === PLACEMENT_AI_OUTPUT
-          ? {
-              depthForScript: (script: FfRegexScript) => {
-                if (solaDepths && script.scriptName?.startsWith("Sola Saver:"))
-                  return solaDepths.get(message);
-                return script.id === contextSaver?.id ? contextSaverDepths.get(message) : undefined;
-              },
-            }
-          : {}),
-      }),
+      content,
     };
   });
 }
