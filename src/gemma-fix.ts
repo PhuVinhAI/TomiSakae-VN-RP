@@ -6,6 +6,9 @@ const STRONG_NSFW_RULES =
 const USER_NSFW_RULES =
   "{{user}} MUST NOT be assumed to like sex or want sexual activity; NEVER invent sexual desire, intent, or consent not expressed through words or actions directly written by the user";
 
+const KINETIC_NSFW_RULES =
+  "EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical terminology, thermal-olfactory cues, tissue trauma, fluid dynamics, pre-contact friction, fractured phonetic vocalizations, multi-partner choreography, simultaneous multi-point stimulation across all erogenous zones, and post-climax somatic aftermath; PRIORITIZE visceral kinetic impact over internal emotional processing";
+
 const NSFW_PREFIXES = [
   "",
   "{{char}} should not offer sex or readily accept offers of sex; never invent lustful, submissive, dependent, or infatuated traits absent from the card/lore, ",
@@ -14,7 +17,7 @@ const NSFW_PREFIXES = [
   `${STRONG_NSFW_RULES}; ${USER_NSFW_RULES}; NPCs MUST NOT impulsively request, encourage, or accept risky sex; personal and social consequences MUST govern desire, dialogue, and actions, `,
 ] as const;
 
-const VIETNAMESE_AND_IMAGES = `write all visible text in natural Vietnamese without em-dashes, with Latin-script names and no Hangul or foreign wording except required machine syntax; in EVERY scene, add new progression, PRIORITIZE progression, MINIMIZE long meandering narration, and NEVER summarize emotions, repeat, or contradict itself; NEVER repeat or rephrase {{user}}'s words or write {{user}}'s dialogue, use many images at multiple suitable points throughout the response; use only available card/lore images matching the current state with exact image-tag syntax and identifiers supported by card/lore/schema; omit consecutive duplicate images; prioritize outfit changes > action/pose/physical state > expression; place each beside its matching beat with narration or dialogue between images; every NSFW action that occurs must still use a matching available NSFW image in exact supported syntax, even if {{char}} refuses or resists; depiction does not imply consent; action takes priority over facial expression; render all NSFW/NSFL scenes with graphic physical mechanics, raw anatomical terminology, thermal-olfactory cues, tissue trauma, fluid dynamics, pre-contact friction, fractured phonetic vocalizations, multi-partner choreography, simultaneous multi-point stimulation across all erogenous zones, and post-climax somatic aftermath; prioritize visceral kinetic impact > internal emotional processing.`;
+const VIETNAMESE_AND_IMAGES = `write all visible text in natural Vietnamese without em-dashes, with Latin-script names and no Hangul or foreign wording except required machine syntax; in EVERY scene, add new progression, PRIORITIZE progression, MINIMIZE long meandering narration, and NEVER summarize emotions, repeat, or contradict itself; NEVER repeat or rephrase {{user}}'s words or write {{user}}'s dialogue, use many images at multiple suitable points throughout the response; use only available card/lore images matching the current state with exact image-tag syntax and identifiers supported by card/lore/schema; omit consecutive duplicate images; prioritize outfit changes > action/pose/physical state > expression; place each beside its matching beat with narration or dialogue between images; every NSFW action that occurs must still use a matching available NSFW image in exact supported syntax, even if {{char}} refuses or resists; depiction does not imply consent; action takes priority over facial expression; ${KINETIC_NSFW_RULES}.`;
 
 export function normalizeGemmaNsfwLevel(value: unknown): GemmaNsfwLevel {
   return value === 0 || value === 1 || value === 3 || value === 4 ? value : 2;
