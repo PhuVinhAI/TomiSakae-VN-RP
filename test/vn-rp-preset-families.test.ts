@@ -187,7 +187,7 @@ describe("TomiSakae VN-RP preset families", () => {
     const consequenceRule =
       "NPCs MUST NOT impulsively request, encourage, or accept risky sex; personal and social consequences MUST govern desire, dialogue, and actions";
     const kineticRule =
-      "EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical terminology, thermal-olfactory cues, tissue trauma, fluid dynamics, pre-contact friction, fractured phonetic vocalizations, multi-partner choreography, simultaneous multi-point stimulation across all erogenous zones, and post-climax somatic aftermath; PRIORITIZE visceral kinetic impact over internal emotional processing";
+      "EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical terminology, body mass and tissue deformation, thermal-olfactory cues, fluid movement, tissue trauma, pre-contact friction, fractured phonetic vocalizations, multi-partner choreography, simultaneous multi-point stimulation across all erogenous zones, and post-climax somatic aftermath; PRIORITIZE visceral kinetic impact over internal emotional processing";
     expect(gemmaFixPromptFor(4)).toBe(
       gemmaFixPromptFor(3).replace(
         ", write all visible text",

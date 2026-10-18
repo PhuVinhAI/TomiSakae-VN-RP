@@ -7,7 +7,7 @@ const USER_NSFW_RULES =
   "{{user}} MUST NOT be assumed to like sex or want sexual activity; NEVER invent sexual desire, intent, or consent not expressed through words or actions directly written by the user";
 
 const KINETIC_NSFW_RULES =
-  "EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical terminology, thermal-olfactory cues, tissue trauma, fluid dynamics, pre-contact friction, fractured phonetic vocalizations, multi-partner choreography, simultaneous multi-point stimulation across all erogenous zones, and post-climax somatic aftermath; PRIORITIZE visceral kinetic impact over internal emotional processing";
+  "EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical terminology, body mass and tissue deformation, thermal-olfactory cues, fluid movement, tissue trauma, pre-contact friction, fractured phonetic vocalizations, multi-partner choreography, simultaneous multi-point stimulation across all erogenous zones, and post-climax somatic aftermath; PRIORITIZE visceral kinetic impact over internal emotional processing";
 
 const NSFW_PREFIXES = [
   "",
