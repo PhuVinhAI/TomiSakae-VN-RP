@@ -392,7 +392,7 @@ describe("Named presets in plugin UI and requests", () => {
         );
         expect(user).not.toContain("across turns");
         expect(user).toContain(
-          "NPCs MUST NOT impulsively request, encourage, or accept risky sex; personal and social consequences MUST govern desire, dialogue, and actions",
+          "NPCs MUST handle sexual, reproductive, STI, hygiene, and contraceptive risks only through card/lore consistent age, knowledge, experience, beliefs, and judgment; NEVER grant unearned risk awareness or default to unprotected penetration or internal ejaculation; barriers, withdrawal, oral, manual, and anal alternatives, fertility status, protection failure, unwanted exposure, stealthing, and reproductive coercion MUST shape character consistent decisions, mistakes, and consequences",
         );
         reloaded.toggle("gemma-fix").checked = false;
         await reloaded.toggle("gemma-fix").handlers.get("change")!();

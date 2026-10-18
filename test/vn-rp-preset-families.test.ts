@@ -185,7 +185,7 @@ describe("TomiSakae VN-RP preset families", () => {
     );
     expect(gemmaFixPromptFor(3)).not.toContain("across turns");
     const consequenceRule =
-      "NPCs MUST NOT impulsively request, encourage, or accept risky sex; personal and social consequences MUST govern desire, dialogue, and actions";
+      "NPCs MUST handle sexual, reproductive, STI, hygiene, and contraceptive risks only through card/lore consistent age, knowledge, experience, beliefs, and judgment; NEVER grant unearned risk awareness or default to unprotected penetration or internal ejaculation; barriers, withdrawal, oral, manual, and anal alternatives, fertility status, protection failure, unwanted exposure, stealthing, and reproductive coercion MUST shape character consistent decisions, mistakes, and consequences";
     const kineticRule =
       "EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, pre-contact friction, fractured vocalizations and dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones; PACING MUST build progressively with tangible resistance and friction before climax, varying rhythm, pressure, pauses, and acceleration; PRIORITIZE visceral kinetic impact over internal emotional processing; when climax occurs, render the post-climax somatic aftermath";
     expect(gemmaFixPromptFor(4)).toBe(
