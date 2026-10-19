@@ -18,7 +18,7 @@ const CHARACTER_INTEGRITY_RULES = [
 ] as const;
 
 const VIETNAMESE_OUTPUT_RULES =
-  "Write all visible text in natural Vietnamese without em-dashes, with Latin-script names and no Hangul or foreign wording except required machine syntax; NEVER repeat or rephrase {{user}}'s words or write {{user}}'s dialogue";
+  "Write all visible text in natural Vietnamese without em-dashes, with Latin-script names and no Hangul or foreign wording except required machine syntax; NEVER repeat or rephrase {{user}}'s words or write {{user}}'s dialogue; ONE text type per line: narration/action/sensory, dialogue, vocal sounds, or thoughts";
 
 const IMAGE_USE_RULES =
   "Use many images at multiple suitable points throughout the response; EXPLORE available images for the best fit; AVOID safe defaults; ONLY use available card/lore images matching the current state with exact image-tag syntax and identifiers supported by card/lore/schema; NO duplicate images per response; PRIORITIZE outfit changes > action/pose/physical state > expression; PLACE each beside its matching beat with narration or dialogue between images; every NSFW action that occurs must still use a matching available NSFW image in exact supported syntax, even if {{char}} refuses or resists; depiction does not imply consent; action takes priority over facial expression";

@@ -26,10 +26,16 @@ const tracker = (name: string, pattern: string) => `<nsfw_tracker>
 [${name}]:
 Description patterns:
 - ${pattern}
+Action/Body dynamics:
+- shifting pressure
+Sensory emphasis:
+- warm skin
 Dialogue patterns:
 - "Lại đây."
 Moans/Vocal reactions:
 - "Ahn~♡"
+Pacing:
+- tension to interruption
 </nsfw_tracker>`;
 
 describe("Sola NSFW Tracker", () => {
@@ -43,8 +49,12 @@ describe("Sola NSFW Tracker", () => {
     settings.solaNsfwTrackerEnabled = true;
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
     const module = composed.absolute.find((message) => message.memo?.endsWith(":nsfw-tracker"));
-    expect(module?.content).toContain("Use the previous <nsfw_tracker> as a BAN LIST");
+    expect(module?.content).toContain("Use the previous <nsfw_tracker> as an ABSOLUTE BAN LIST");
     expect(module?.content).toContain("Cách miêu tả:");
+    expect(module?.content).toContain("Hành động/Động lực cơ thể:");
+    expect(module?.content).toContain("Điểm nhấn cảm giác:");
+    expect(module?.content).toContain("Nhịp triển khai:");
+    expect(module?.content).toContain("ABSOLUTE BAN LIST");
     expect(module?.content).toContain("Located inside of '<sola_hud>' tags, append:");
     const storyReview = composed.absolute.find((message) =>
       message.content.includes("## Story Review"),
@@ -100,7 +110,7 @@ describe("Sola NSFW Tracker", () => {
     ])
       settings.promptEnabled[id] = true;
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
-    const reminder = "BAN the previous NSFW description, dialogue, and vocal patterns";
+    const reminder = "BAN the previous NSFW patterns";
     expect(composed.absolute.filter((message) => message.content.includes(reminder))).toHaveLength(
       2,
     );

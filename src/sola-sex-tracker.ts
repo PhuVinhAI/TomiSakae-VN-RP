@@ -4,23 +4,31 @@ const TRACKER_RE =
 export const SOLA_SEX_TRACKER_MEMO = "sex-tracker";
 
 export const SOLA_SEX_TRACKER_REMINDER =
-  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update the current cycle, pregnancy likelihood, date knowledge, and character awareness.";
+  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update cycle state, physical condition, pregnancy likelihood, cycle-timing knowledge, awareness, risk attitude, protection measure, and risk status.";
 
 export function solaSexTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
     ? {
         character: "Tên nhân vật",
         cycle: "Chu kỳ kinh nguyệt",
+        physicalCondition: "Tình trạng cơ thể",
         pregnancy: "Khả năng mang thai",
-        dateKnowledge: "Biết ngày hiện tại",
+        dateKnowledge: "Biết mốc chu kỳ",
         awareness: "Nhận thức thực tế",
+        riskAttitude: "Thái độ với rủi ro",
+        protection: "Biện pháp bảo vệ",
+        riskStatus: "Tình trạng rủi ro",
       }
     : {
         character: "Character Name",
         cycle: "Menstrual cycle",
+        physicalCondition: "Physical condition",
         pregnancy: "Pregnancy likelihood",
-        dateKnowledge: "Knows current date",
+        dateKnowledge: "Knows cycle timing",
         awareness: "Actual awareness",
+        riskAttitude: "Risk attitude",
+        protection: "Protection measure",
+        riskStatus: "Risk status",
       };
   const unknown = vietnamese ? "chưa rõ" : "unknown";
   const dateKnowledge = vietnamese ? "Đã biết / Chưa biết / Chưa rõ" : "Known / Unknown / Unclear";
@@ -29,16 +37,22 @@ Located ${location || "at the end of your response"}, append:
 <sex_tracker>
 [${labels.character}]:
 ${labels.cycle}: [Current cycle state or ${unknown}]
+${labels.physicalCondition}: [No prior/prior intercourse, childbirth history, injuries, recovery status, or ${unknown}]
 ${labels.pregnancy}: [Current likelihood or ${unknown}]
 ${labels.dateKnowledge}: [${dateKnowledge}]
 ${labels.awareness}: [What the character actually understands about the current reproductive risk]
+${labels.riskAttitude}: [How the character avoids, opposes, or accepts the current risk according to their awareness and context]
+${labels.protection}: [How the character handles the risk according to their actual awareness or ${unknown}]
+${labels.riskStatus}: [Not occurred / ongoing / occurred / ${unknown}]
 </sex_tracker>
 
 Rules:
 - Before writing, run a Cognitive Check: identify the character's current facts, age, knowledge, experience, and beliefs; then let their established personality and card/lore determine the reaction.
-- Do not default any sexual outcome; derive each decision from the checked context and the character's established awareness.
+- Identify the current turn's actual reproductive facts first; if a fact is missing, mark it unknown rather than infer it.
+- Assess pregnancy likelihood from the current context, cycle timing, and known facts, not from generic patterns or desire.
+- Do not default a sexual outcome or risk response; let the checked awareness, personality, card, and lore determine whether the character avoids, opposes, or accepts risk and how they handle it.
 - Do not let a generic sexual pattern decide the outcome. Write the character's response to the checked context, including uncertainty or conflict when present.
-- Place all active characters within a SINGLE <sex_tracker> container, separated by one blank line.
+- Include only characters with sexual or reproductive context in this turn; place them within a SINGLE <sex_tracker> container, separated by one blank line.
 - Replace it with this turn's values and omit it when no sexual or reproductive context is present.`;
 }
 
@@ -55,12 +69,22 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
   const labels = new Map<string, string>([
     ["menstrual cycle", vietnamese ? "Chu kỳ kinh nguyệt" : "Menstrual cycle"],
     ["chu kỳ kinh nguyệt", vietnamese ? "Chu kỳ kinh nguyệt" : "Menstrual cycle"],
+    ["physical condition", vietnamese ? "Tình trạng cơ thể" : "Physical condition"],
+    ["tình trạng cơ thể", vietnamese ? "Tình trạng cơ thể" : "Physical condition"],
     ["pregnancy likelihood", vietnamese ? "Khả năng mang thai" : "Pregnancy likelihood"],
     ["khả năng mang thai", vietnamese ? "Khả năng mang thai" : "Pregnancy likelihood"],
-    ["knows current date", vietnamese ? "Biết ngày hiện tại" : "Knows current date"],
-    ["biết ngày hiện tại", vietnamese ? "Biết ngày hiện tại" : "Knows current date"],
+    ["knows cycle timing", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
+    ["biết mốc chu kỳ", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
+    ["knows current date", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
+    ["biết ngày hiện tại", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
     ["actual awareness", vietnamese ? "Nhận thức thực tế" : "Actual awareness"],
     ["nhận thức thực tế", vietnamese ? "Nhận thức thực tế" : "Actual awareness"],
+    ["risk attitude", vietnamese ? "Thái độ với rủi ro" : "Risk attitude"],
+    ["thái độ với rủi ro", vietnamese ? "Thái độ với rủi ro" : "Risk attitude"],
+    ["protection measure", vietnamese ? "Biện pháp bảo vệ" : "Protection measure"],
+    ["biện pháp bảo vệ", vietnamese ? "Biện pháp bảo vệ" : "Protection measure"],
+    ["risk status", vietnamese ? "Tình trạng rủi ro" : "Risk status"],
+    ["tình trạng rủi ro", vietnamese ? "Tình trạng rủi ro" : "Risk status"],
   ]);
   return body
     .trim()

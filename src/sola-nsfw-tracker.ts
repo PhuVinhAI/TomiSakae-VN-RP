@@ -4,33 +4,42 @@ const TRACKER_RE =
 export const SOLA_NSFW_TRACKER_MEMO = "nsfw-tracker";
 
 export const SOLA_NSFW_TRACKER_REMINDER =
-  "- Telemetry (<nsfw_tracker>): BAN the previous NSFW description, dialogue, and vocal patterns; record this turn's new patterns.";
+  "- Telemetry (<nsfw_tracker>): BAN the previous NSFW patterns; record this turn's new descriptive, kinetic, sensory, dialogue, vocal, and pacing patterns.";
 
 export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
     ? {
         character: "Tên nhân vật",
         description: "Cách miêu tả",
+        kinetics: "Hành động/Động lực cơ thể",
+        sensory: "Điểm nhấn cảm giác",
         dialogue: "Kiểu thoại",
         vocal: "Tiếng rên/Phản ứng giọng",
+        pacing: "Nhịp triển khai",
       }
     : {
         character: "Character Name",
         description: "Description patterns",
+        kinetics: "Action/Body dynamics",
+        sensory: "Sensory emphasis",
         dialogue: "Dialogue patterns",
         vocal: "Moans/Vocal reactions",
+        pacing: "Pacing",
       };
   return `## NSFW Variety Tracker 🔥
 Located ${location || "at the end of your response"}, append:
 <nsfw_tracker>
 [${labels.character}]:
 ${labels.description}: [Distinct descriptive constructions used this turn]
+${labels.kinetics}: [Distinct movement, force, pose, and contact patterns used this turn]
+${labels.sensory}: [Distinct tactile, thermal, fluid, olfactory, or acoustic details used this turn]
 ${labels.dialogue}: [Distinct erotic dialogue constructions used this turn]
 ${labels.vocal}: [Exact moans, gasps, stammers, or phonetic reactions used this turn]
+${labels.pacing}: [How this turn moved from opening to shift and stopping point]
 </nsfw_tracker>
 
 Rules:
-- Use the previous <nsfw_tracker> as a BAN LIST for this turn; do not reuse or closely paraphrase its entries.
+- Use the previous <nsfw_tracker> as an ABSOLUTE BAN LIST; do not repeat, closely paraphrase, synonym-swap, or reuse its structures, rhythms, or reaction patterns. Create new writing this turn.
 - Place all active characters within a SINGLE <nsfw_tracker> container, separated by one blank line.
 - Record only distinct patterns actually used in this turn, then overwrite the tracker.
 - Omit the tracker when no NSFW content occurs.`;
@@ -49,11 +58,17 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
   const groups = new Map<string, string>([
     ["description patterns", vietnamese ? "Cách miêu tả" : "Description patterns"],
     ["cách miêu tả", vietnamese ? "Cách miêu tả" : "Description patterns"],
+    ["action/body dynamics", vietnamese ? "Hành động/Động lực cơ thể" : "Action/Body dynamics"],
+    ["hành động/động lực cơ thể", vietnamese ? "Hành động/Động lực cơ thể" : "Action/Body dynamics"],
+    ["sensory emphasis", vietnamese ? "Điểm nhấn cảm giác" : "Sensory emphasis"],
+    ["điểm nhấn cảm giác", vietnamese ? "Điểm nhấn cảm giác" : "Sensory emphasis"],
     ["dialogue patterns", vietnamese ? "Kiểu thoại" : "Dialogue patterns"],
     ["kiểu thoại", vietnamese ? "Kiểu thoại" : "Dialogue patterns"],
     ["moans/vocal reactions", vietnamese ? "Tiếng rên/Phản ứng giọng" : "Moans/Vocal reactions"],
     ["vocal patterns", vietnamese ? "Tiếng rên/Phản ứng giọng" : "Vocal patterns"],
     ["tiếng rên/phản ứng giọng", vietnamese ? "Tiếng rên/Phản ứng giọng" : "Moans/Vocal reactions"],
+    ["pacing", vietnamese ? "Nhịp triển khai" : "Pacing"],
+    ["nhịp triển khai", vietnamese ? "Nhịp triển khai" : "Pacing"],
   ]);
   return body
     .trim()

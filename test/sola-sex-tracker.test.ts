@@ -24,9 +24,13 @@ beforeAll(async () => {
 const tracker = (character: string, cycle: string) => `<sex_tracker>
 [${character}]:
 Menstrual cycle: ${cycle}
+Physical condition: unknown
 Pregnancy likelihood: unknown
-Knows current date: Unclear
+Knows cycle timing: Unclear
 Actual awareness: unknown
+Risk attitude: unknown
+Protection measure: unknown
+Risk status: unknown
 </sex_tracker>`;
 
 describe("Sola Sexual Context Tracker", () => {
@@ -38,6 +42,10 @@ describe("Sola Sexual Context Tracker", () => {
     const module = composed.absolute.find((message) => message.memo?.endsWith(":sex-tracker"));
     expect(module?.content).toContain("## Sexual Context Tracker");
     expect(module?.content).toContain("Chu kỳ kinh nguyệt:");
+    expect(module?.content).toContain("Tình trạng cơ thể:");
+    expect(module?.content).toContain("Thái độ với rủi ro:");
+    expect(module?.content).toContain("Biện pháp bảo vệ:");
+    expect(module?.content).toContain("Tình trạng rủi ro:");
     expect(
       [...composed.leading, ...composed.absolute, ...composed.trailing].some((message) =>
         message.content.includes(
@@ -155,6 +163,7 @@ describe("Sola Sexual Context Tracker", () => {
     });
     expect(displayed).toContain('data-sola-ui="sex-tracker"');
     expect(displayed).toContain("🌙 Sola: Bối cảnh tình dục");
+    expect(displayed).toContain("Tình trạng cơ thể:</span> unknown");
     expect(displayed).toContain("&lt;img&gt;");
     const estimate = await estimatePluginPromptTokens(sola, settings, {
       characterName: "Nana",
