@@ -79,6 +79,15 @@ export async function estimatePluginPromptTokens(
   if (nsfwTrackerPrompt) {
     estimate.entries.push({ identifier: "nsfw-tracker", tokens: count(nsfwTrackerPrompt.content) });
   }
+  const cycleTrackerPrompt = composed.trailing.find((message) =>
+    String(message.memo).endsWith(":cycle-tracker"),
+  );
+  if (cycleTrackerPrompt) {
+    estimate.entries.push({
+      identifier: "cycle-tracker",
+      tokens: count(cycleTrackerPrompt.content),
+    });
+  }
   if (settings.vietnameseOutputEnabled) {
     const outputPrompt = vietnameseOutputFor(preset, settings);
     messages.push({ role: "system", content: outputPrompt });

@@ -91,6 +91,7 @@ function activeSolaModules(preset: FfPreset, settings: FfGlobalSettings): Set<st
       modules.add(match[1]!);
   }
   if (settings.solaNsfwTrackerEnabled) modules.add("mod_track_nsfw");
+  if (settings.solaCycleTrackerEnabled) modules.add("mod_track_cycle");
   return modules;
 }
 

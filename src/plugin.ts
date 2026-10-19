@@ -377,11 +377,13 @@ function tokenEstimateHtml(estimate: PluginTokenEstimate, preset: FfPreset): str
               ? "🖼️ Danh sách ảnh của card"
               : entry.identifier === "nsfw-tracker"
                 ? "🔥 Bộ theo dõi NSFW"
-                : entry.identifier === "gemma-fix"
-                  ? "🛠️ Fix Gemma 4"
-                  : prompt
-                    ? promptUiCopy(prompt, familyOf(preset)).name
-                    : entry.identifier;
+                : entry.identifier === "cycle-tracker"
+                  ? "🌙 Bộ theo dõi chu kỳ kinh nguyệt"
+                  : entry.identifier === "gemma-fix"
+                    ? "🛠️ Fix Gemma 4"
+                    : prompt
+                      ? promptUiCopy(prompt, familyOf(preset)).name
+                      : entry.identifier;
       return `<div class="token-row"><span>${escapeHtml(name)}</span><strong>≈ ${number(entry.tokens)}</strong></div>`;
     })
     .join("");
@@ -594,6 +596,16 @@ async function showSettings(): Promise<void> {
             "Cấm cách miêu tả, kiểu thoại và tiếng rên vừa dùng ở lượt kế; tự ghi đè sau mỗi phản hồi NSFW · Mặc định tắt",
           )
         : ""
+    }${
+      family.id === "sola"
+        ? checkbox(
+            "plugin",
+            "sola-cycle-tracker",
+            settings.solaCycleTrackerEnabled,
+            "🌙 Bộ theo dõi chu kỳ kinh nguyệt",
+            "Ghi chu kỳ và khả năng thụ thai cho đúng lượt; tự xóa sau phản hồi kế · Mặc định tắt",
+          )
+        : ""
     }${checkbox(
       "plugin",
       "gemma-fix",
@@ -684,6 +696,7 @@ async function showSettings(): Promise<void> {
       else if (id === "image-optimization") settings.imageOptimizationEnabled = node.checked;
       else if (id === "card-image-catalog") settings.cardImageCatalogEnabled = node.checked;
       else if (id === "sola-nsfw-tracker") settings.solaNsfwTrackerEnabled = node.checked;
+      else if (id === "sola-cycle-tracker") settings.solaCycleTrackerEnabled = node.checked;
       else if (id === "gemma-fix") settings.gemmaFixEnabled = node.checked;
       else if (id === "sound-notifications") settings.soundNotificationsEnabled = node.checked;
       else if (id === "submodel-editor") settings.submodelEditorEnabled = node.checked;
@@ -745,6 +758,7 @@ async function showSettings(): Promise<void> {
       node.dataset.id === "image-optimization" ||
       node.dataset.id === "card-image-catalog" ||
       node.dataset.id === "sola-nsfw-tracker" ||
+      node.dataset.id === "sola-cycle-tracker" ||
       node.dataset.id === "gemma-fix" ||
       node.dataset.id === "dialogue-theme"
     )
@@ -1400,7 +1414,7 @@ function completeAutoRewriteResponse(text: string, preset: FfPreset): boolean {
     const body = splitEditorResponse(text, preset).response.trim();
     if (!body) return false;
     const tracked =
-      /<(\/?)(sola_hud|fengine|thought_engine|bond|date|story_notes|wardrobe|inventory|scene_cast|scene_state|char_matrix|solatag|tempo|cabinet|arrow|omen)\b[^>]*>/gi;
+      /<(\/?)(sola_hud|fengine|thought_engine|bond|date|story_notes|wardrobe|inventory|scene_cast|scene_state|char_matrix|solatag|tempo|cabinet|arrow|omen|nsfw_tracker|cycle_tracker)\b[^>]*>/gi;
     const open: string[] = [];
     for (const match of body.matchAll(tracked)) {
       const tag = match[2]!.toLowerCase();

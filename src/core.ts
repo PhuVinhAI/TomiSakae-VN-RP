@@ -33,6 +33,13 @@ import {
   SOLA_NSFW_TRACKER_MEMO,
   SOLA_NSFW_TRACKER_REMINDER,
 } from "./sola-nsfw-tracker.js";
+import {
+  adaptSolaCycleTrackerForDisplay,
+  expireSolaCycleTracker,
+  solaCycleTrackerPrompt,
+  SOLA_CYCLE_TRACKER_MEMO,
+  SOLA_CYCLE_TRACKER_REMINDER,
+} from "./sola-cycle-tracker.js";
 
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
@@ -104,6 +111,7 @@ export interface FfGlobalSettings {
   imageOptimizationEnabled: boolean;
   cardImageCatalogEnabled: boolean;
   solaNsfwTrackerEnabled: boolean;
+  solaCycleTrackerEnabled: boolean;
   soundNotificationsEnabled: boolean;
   submodelEditorEnabled: boolean;
   submodelAutoRewriteEnabled: boolean;
@@ -199,6 +207,7 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
     imageOptimizationEnabled: false,
     cardImageCatalogEnabled: false,
     solaNsfwTrackerEnabled: false,
+    solaCycleTrackerEnabled: false,
     soundNotificationsEnabled: false,
     submodelEditorEnabled: false,
     submodelAutoRewriteEnabled: false,
@@ -261,6 +270,8 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
     defaults.cardImageCatalogEnabled = record.cardImageCatalogEnabled;
   if (typeof record.solaNsfwTrackerEnabled === "boolean")
     defaults.solaNsfwTrackerEnabled = record.solaNsfwTrackerEnabled;
+  if (typeof record.solaCycleTrackerEnabled === "boolean")
+    defaults.solaCycleTrackerEnabled = record.solaCycleTrackerEnabled;
   if (typeof record.soundNotificationsEnabled === "boolean") {
     defaults.soundNotificationsEnabled = record.soundNotificationsEnabled;
   }
@@ -485,6 +496,8 @@ export function composePresetPrompts(
     const variables = new Map<string, string>();
     if (familyOf(preset) === "sola" && settings.solaNsfwTrackerEnabled)
       variables.set("mod_track_nsfw", SOLA_NSFW_TRACKER_REMINDER);
+    if (familyOf(preset) === "sola" && settings.solaCycleTrackerEnabled)
+      variables.set("mod_track_cycle", SOLA_CYCLE_TRACKER_REMINDER);
     const leading: ChatMessage[] = [];
     const absoluteByDepth = new Map<number, FfPrompt[]>();
     const trailing: ChatMessage[] = [];
@@ -493,6 +506,7 @@ export function composePresetPrompts(
     let afterHistory = false;
 
     let nsfwTrackerInjected = false;
+    let cycleTrackerInjected = false;
     const injectNsfwTracker = async () => {
       if (nsfwTrackerInjected || familyOf(preset) !== "sola" || !settings.solaNsfwTrackerEnabled)
         return;
@@ -510,9 +524,27 @@ export function composePresetPrompts(
         memo: `${memoPrefix}${SOLA_NSFW_TRACKER_MEMO}`,
       });
     };
+    const injectCycleTracker = async () => {
+      if (cycleTrackerInjected || familyOf(preset) !== "sola" || !settings.solaCycleTrackerEnabled)
+        return;
+      cycleTrackerInjected = true;
+      const content = await parseHostMacros(
+        solaCycleTrackerPrompt(
+          settings.vietnameseOutputEnabled,
+          variables.get("tracker_location") ?? "at the end of your response",
+        ),
+        "system",
+      );
+      trailing.push({
+        role: "system",
+        content,
+        memo: `${memoPrefix}${SOLA_CYCLE_TRACKER_MEMO}`,
+      });
+    };
 
     for (const entry of order) {
       if (entry.identifier === "01a0c1ff-4ecf-7046-9d4a-25993cf80b62") await injectNsfwTracker();
+      if (entry.identifier === "01a0c1ff-4ecf-7046-9d4a-25993cf80b62") await injectCycleTracker();
       if (entry.identifier === "chatHistory") afterHistory = true;
       if (!settings.promptEnabled[entry.identifier] || MARKER_IDENTIFIERS.has(entry.identifier))
         continue;
@@ -554,6 +586,7 @@ export function composePresetPrompts(
       }
     }
     await injectNsfwTracker();
+    await injectCycleTracker();
 
     const absolute: ChatMessage[] = [];
     for (const depth of [...absoluteByDepth.keys()].sort((left, right) => left - right)) {
@@ -700,6 +733,8 @@ export function applyRegexScripts(
       : input;
   if (options.markdown && settings.solaNsfwTrackerEnabled && familyOf(preset) === "sola")
     output = adaptSolaNsfwTrackerForDisplay(output, settings.vietnameseOutputEnabled);
+  if (options.markdown && settings.solaCycleTrackerEnabled && familyOf(preset) === "sola")
+    output = adaptSolaCycleTrackerForDisplay(output, settings.vietnameseOutputEnabled);
   for (const script of familyRegexScripts(preset)) {
     if (!settings.regexEnabled[script.id] || !script.findRegex || !output) continue;
     if (options.history && script.id === SOLA_HEADER_SAVER_ID) continue;
@@ -998,6 +1033,14 @@ export function applyPromptRegexToMessages(
       placement === PLACEMENT_AI_OUTPUT
     )
       content = expireSolaNsfwTracker(content, solaDepths?.get(message), (offset, text) =>
+        options.onHistoryRemoval?.(message, offset, text),
+      );
+    if (
+      settings.solaCycleTrackerEnabled &&
+      familyOf(preset) === "sola" &&
+      placement === PLACEMENT_AI_OUTPUT
+    )
+      content = expireSolaCycleTracker(content, solaDepths?.get(message), (offset, text) =>
         options.onHistoryRemoval?.(message, offset, text),
       );
     return {
