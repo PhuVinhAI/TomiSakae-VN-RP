@@ -53,6 +53,7 @@ beforeAll(async () => {
   const raw = await readFile("source/ff54-sillytavern-preset.json", "utf8");
   preset = JSON.parse(raw) as FfPreset;
   sources = await loadPresetSources();
+  const { version } = JSON.parse(await readFile("package.json", "utf8")) as { version: string };
   const result = await build({
     entryPoints: ["src/plugin.ts"],
     bundle: true,
@@ -61,6 +62,7 @@ beforeAll(async () => {
     platform: "browser",
     target: "es2022",
     define: {
+      __PLUGIN_VERSION__: JSON.stringify(version),
       __FF54_PRESET__: raw,
       __PRESET_SOURCES__: JSON.stringify(sources),
       __FF54_SOURCE_NAME__: '"test-preset"',

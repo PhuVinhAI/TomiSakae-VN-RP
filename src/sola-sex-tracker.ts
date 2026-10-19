@@ -42,7 +42,7 @@ ${labels.protection}: [Protection methods or protective actions the character kn
 
 Rules:
 - Before writing, run a Cognitive Check: identify the character's current facts, age, knowledge, experience, and beliefs; then let their established personality and card/lore determine the reaction.
-- Infer tracker values from card/lore, the previous tracker, elapsed time, and current actions; invent plausible missing details and keep them consistent. Use ${unknown} only for the character's uncertainty in cycle-timing knowledge or risk awareness.
+- Infer and update tracker values from card/lore, the previous tracker, elapsed time, and current actions; when data is missing, choose the most plausible development and keep it consistent. For ${labels.cycle}, always record a suitable phase or timing; use ${unknown} only for the character's limited knowledge of cycle timing or risk.
 - Assess pregnancy likelihood from cycle state, current actions, and protection measures/actions, not from generic patterns or desire.
 - Do not default a sexual outcome or risk response; let the checked risk awareness, personality, card, and lore determine whether the character avoids, opposes, or accepts risk and how they handle it.
 - Do not let a generic sexual pattern decide the outcome. Write the character's response to the checked context, including uncertainty or conflict when present.

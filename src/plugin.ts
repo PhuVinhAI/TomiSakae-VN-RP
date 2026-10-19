@@ -207,11 +207,13 @@ interface HostDatabase {
   selectedPersona?: number;
 }
 
+declare const __PLUGIN_VERSION__: string;
 declare const __PRESET_SOURCES__: PresetSources;
 declare const __FF54_PRESET__: FfPreset;
 declare const __FF54_SOURCE_NAME__: string;
 declare const __FF54_SOURCE_SHA256__: string;
 
+const PLUGIN_DISPLAY_NAME = `TomiSakae VN-RP v${__PLUGIN_VERSION__}`;
 const STORAGE_KEY = "ff54-global-settings-v1";
 const BUTTON_ID = "ff54-global-config";
 const presetSources: PresetSources =
@@ -377,7 +379,7 @@ function tokenEstimateHtml(estimate: PluginTokenEstimate, preset: FfPreset): str
               ? "🖼️ Danh sách ảnh của card"
               : entry.identifier === "nsfw-tracker"
                 ? "🔥 Bộ theo dõi NSFW"
-              : entry.identifier === "sex-tracker"
+                : entry.identifier === "sex-tracker"
                   ? "🌙 Bộ theo dõi tình dục"
                   : entry.identifier === "gemma-fix"
                     ? "🛠️ Fix Gemma 4"
@@ -558,7 +560,7 @@ async function showSettings(): Promise<void> {
 
   document.head.innerHTML = `<meta name="viewport" content="width=device-width,initial-scale=1"><style>${SETTINGS_STYLES}</style>`;
   document.body.innerHTML = `<main class="shell">
-    <div class="masthead"><div class="brand"><span class="brand-mark">ts</span><span>TomiSakae VN-RP</span></div><span class="edition">${escapeHtml(familyLabel)}</span></div>
+    <div class="masthead"><div class="brand"><span class="brand-mark">ts</span><span>${escapeHtml(PLUGIN_DISPLAY_NAME)}</span></div><span class="edition">${escapeHtml(familyLabel)}</span></div>
     <section class="hero"><div><span class="eyebrow">Không gian cấu hình</span><h1>Điều khiển <em>TomiSakae VN-RP.</em></h1><p class="hero-copy">Tính năng Global dùng chung, bộ nền giữ phong cách và quy tắc riêng. Mỗi preset dùng chung cho các card đã chọn preset đó.</p></div><div class="hero-side"><span class="index">Preset: ${escapeHtml(profile.name)}</span><p>Chọn cách thế giới của bạn vận hành.</p><small>Card mới dùng “Mặc định”. Chọn preset khác để ghi nhớ cho card hiện tại.</small></div></section>
     <div class="workspace"><nav class="rail" aria-label="Điều hướng cấu hình"><p class="rail-title">Danh mục</p><a href="#general"><span>01</span>Global</a><a href="#family"><span>02</span>Bộ preset nền</a><a href="#choices"><span>03</span>Nhóm chọn một</a><a href="#modules"><span>04</span>Module độc lập</a><a href="#filters"><span>05</span>Bộ lọc kỹ thuật</a><p class="rail-note">Sửa cấu hình rồi bấm “Lưu preset” để áp dụng.</p></nav>
     <div class="content">
@@ -647,7 +649,7 @@ async function showSettings(): Promise<void> {
     <section id="filters" class="panel"><div class="panel-heading"><span class="index">05 / Vận hành</span><h2>Bộ lọc kỹ thuật</h2></div>${regexMap.size ? `<p class="section-note">Các bộ lọc gốc dùng khi gửi ngữ cảnh và hiển thị phản hồi. Chỉ thay đổi khi bạn hiểu rõ tác dụng của chúng.</p><details><summary><span class="summary-copy"><strong>Xem ${regexMap.size} bộ lọc</strong><small>Được chia theo công việc để dễ tìm.</small></span></summary><div class="regex-groups">${regexGroups}</div></details>` : '<p class="section-note">Bộ preset này không có bộ lọc kỹ thuật riêng.</p>'}</section>
     <p class="source-note">Nguồn: ${escapeHtml(source.sourceName)}<br>SHA-256: ${escapeHtml(source.sha256)}</p>
     </div></div>
-    <div class="command-bar"><div class="command-inner"><span class="command-label">TomiSakae VN-RP · ${escapeHtml(familyLabel)} / ${escapeHtml(profile.name)}</span><button class="action primary" id="save">Lưu preset</button><button class="action" id="reset">Khôi phục</button><button class="action" id="close">Đóng</button><div class="status" id="status" role="status" aria-live="polite"></div></div></div>
+    <div class="command-bar"><div class="command-inner"><span class="command-label">${escapeHtml(PLUGIN_DISPLAY_NAME)} · ${escapeHtml(familyLabel)} / ${escapeHtml(profile.name)}</span><button class="action primary" id="save">Lưu preset</button><button class="action" id="reset">Khôi phục</button><button class="action" id="close">Đóng</button><div class="status" id="status" role="status" aria-live="polite"></div></div></div>
   </main>`;
 
   const status = document.getElementById("status")!;
@@ -1634,7 +1636,7 @@ void (async () => {
     normalizeFamilyChoices(sourceForSettings(profile.settings), profile.settings);
   await Risuai.pluginStorage.setItem(CONFIG_PRESETS_STORAGE_KEY, configPresets);
   const button = await Risuai.registerButton(
-    { name: "TomiSakae VN-RP", icon: "⚡", iconType: "html", location: "chat", id: BUTTON_ID },
+    { name: PLUGIN_DISPLAY_NAME, icon: "⚡", iconType: "html", location: "chat", id: BUTTON_ID },
     () => void showSettings(),
   );
   await Risuai.addRisuReplacer("beforeRequest", beforeRequest);

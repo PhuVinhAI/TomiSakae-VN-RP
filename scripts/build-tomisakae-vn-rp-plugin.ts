@@ -68,6 +68,7 @@ export async function buildPlugin(options: Options): Promise<{ output: string; d
     minify: false,
     legalComments: "none",
     define: {
+      __PLUGIN_VERSION__: JSON.stringify(version),
       __FF54_PRESET__: canonicalPreset,
       __FF54_SOURCE_NAME__: JSON.stringify(path.basename(sourcePath)),
       __FF54_SOURCE_SHA256__: JSON.stringify(sourceDigest),
@@ -76,7 +77,7 @@ export async function buildPlugin(options: Options): Promise<{ output: string; d
     banner: {
       js: [
         "//@name tomisakae_vn_rp",
-        "//@display-name TomiSakae VN-RP",
+        `//@display-name TomiSakae VN-RP v${version}`,
         "//@api 3.0",
         `//@version ${version}`,
         "",

@@ -45,6 +45,12 @@ describe("Sola Sexual Context Tracker", () => {
     expect(module?.content).toContain("Nhận thức và thái độ với rủi ro:");
     expect(module?.content).toContain("Biện pháp và hành động bảo vệ:");
     expect(module?.content).toContain("Protection methods or protective actions");
+    expect(module?.content).toContain(
+      "For Chu kỳ kinh nguyệt, always record a suitable phase or timing",
+    );
+    expect(module?.content).toContain(
+      "use chưa rõ only for the character's limited knowledge of cycle timing or risk",
+    );
     expect(module?.content).not.toContain("Tình trạng rủi ro:");
     expect(
       [...composed.leading, ...composed.absolute, ...composed.trailing].some((message) =>
