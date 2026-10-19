@@ -49,6 +49,37 @@ async function requestText(settings: FfGlobalSettings) {
 
 describe("Sola cross-module prompt dependencies", () => {
   it.each([true, false])(
+    "keeps sound placement inline in enabled reminders and both reviews with Vietnamese=%s",
+    async (vietnamese) => {
+      const settings = createDefaultSettings(preset);
+      settings.vietnameseOutputEnabled = vietnamese;
+      const vocal = preset.prompts.find((prompt) => prompt.name?.includes("Voice: Vocal Sounds"))!;
+      settings.promptEnabled[vocal.identifier] = true;
+      settings.promptEnabled[kineticId] = true;
+      for (const id of [
+        "01a0c1ff-4ecf-7049-99ca-b8289f911924",
+        "01a0c1ff-4ecf-704a-82b3-0c9b9af52526",
+        "01a0c1ff-4ecf-704b-80c7-70e3c11b723f",
+      ])
+        settings.promptEnabled[id] = true;
+      const text = await requestText(settings);
+      const vocalReminder =
+        "- Voice Check (Vocal Sounds): Integrate realistic disfluency, throat sounds, gasps, and non-verbal vocal texture where earned, with vocal sounds on separate lines.";
+      expect(text.split(vocalReminder)).toHaveLength(4);
+      for (const reminder of text.matchAll(/^- Kinetic Typography:[^\n]*/gm))
+        expect(reminder[0]).toContain("standalone sound lines (");
+      expect([...text.matchAll(/^- Kinetic Typography:/gm)]).toHaveLength(3);
+      expect(text).not.toMatch(/^\s*(?:- )?(?:Keep each vocal sound|Render vocal sounds)/m);
+
+      settings.promptEnabled[vocal.identifier] = false;
+      settings.promptEnabled[kineticId] = false;
+      const disabled = await requestText(settings);
+      expect(disabled).not.toContain("Voice Check (Vocal Sounds)");
+      expect(disabled).not.toContain("- Kinetic Typography:");
+    },
+  );
+
+  it.each([true, false])(
     "removes disabled effects from plain colors and both reviews with Vietnamese=%s",
     async (vietnamese) => {
       const settings = createDefaultSettings(preset);
@@ -62,7 +93,9 @@ describe("Sola cross-module prompt dependencies", () => {
       const snapshot = JSON.stringify(preset);
       const text = await requestText(settings);
       expect(text).toContain("## Style: Dialogue Colors");
-      expect(text).toContain("- Dialogue Colors: Keep recurring NPCs in their assigned colors.");
+      expect(text).toContain(
+        "- Dialogue Colors: Keep recurring NPCs in their assigned colors, vocal sounds on separate lines.",
+      );
       expect(text).toContain("Knowledge Audit: verify what the NPC personally saw or heard.");
       expect(text).toContain("## Emotional Engine");
       expect(text).toContain("## Idiolect, Dialect & Dialogue Craft");

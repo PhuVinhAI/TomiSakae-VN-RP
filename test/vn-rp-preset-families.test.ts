@@ -46,6 +46,7 @@ import { adaptSolaSceneHeaderForDisplay } from "../src/sola-display.js";
 import { SOLA_VIETNAMESE_REPLACEMENTS } from "../src/vietnamese.js";
 import { adaptSolaRegexForVietnamese } from "../src/sola-vietnamese-regex.js";
 import { GEMMA_FIX_PROMPT, gemmaFixPromptFor } from "../src/gemma-fix.js";
+import { adaptSolaSoundPlacement, SOLA_SOUND_REPLACEMENTS } from "../src/sola-sound.js";
 import { cardImagePrompt, collectCardImages } from "../src/card-images.js";
 import {
   adaptSolaDialogueColors,
@@ -181,9 +182,7 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(gemmaFixPromptFor(3)).toContain(
       "{{user}}'s desire, intent, or consent MUST NOT be assumed",
     );
-    expect(gemmaFixPromptFor(3)).toContain(
-      "NEVER invent sexual initiative",
-    );
+    expect(gemmaFixPromptFor(3)).toContain("NEVER invent sexual initiative");
     expect(gemmaFixPromptFor(3)).not.toContain("across turns");
     const kineticRule =
       "EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, pre-contact friction, fractured vocalizations and dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones; PACING MUST build progressively with tangible resistance and friction before climax, varying rhythm, pressure, pauses, and acceleration; PRIORITIZE visceral kinetic impact over internal emotional processing; when climax occurs, render the post-climax somatic aftermath";
@@ -194,8 +193,12 @@ describe("TomiSakae VN-RP preset families", () => {
         expect(gemmaFixPromptFor(level)).toContain(`## ${section}\n`);
       }
       expect(gemmaFixPromptFor(level)).toContain("every NSFW action that occurs");
+      expect(gemmaFixPromptFor(level)).toContain(
+        "in NSFW scenes, INTERLEAVE matching NSFW action images with suitable expression/reaction images",
+      );
       expect(gemmaFixPromptFor(level)).toContain("exact image-tag syntax");
       expect(gemmaFixPromptFor(level)).toContain(kineticRule);
+      expect(gemmaFixPromptFor(level)).not.toContain("ONE text type per line");
     }
   });
 
@@ -760,7 +763,13 @@ describe("TomiSakae VN-RP preset families", () => {
           const schemaAndEngine = (text: string) =>
             text.slice(text.indexOf("```html"), text.indexOf("### Rules"));
           expect(schemaAndEngine(withoutVietnamese)).toBe(schemaAndEngine(prompt.content));
-        } else expect(withoutVietnamese, prompt.name).toBe(prompt.content);
+        } else {
+          const withoutSoundPlacement = SOLA_SOUND_REPLACEMENTS.reduce(
+            (text, [source, replacement]) => text.replaceAll(replacement, source),
+            withoutVietnamese,
+          );
+          expect(withoutSoundPlacement, prompt.name).toBe(prompt.content);
+        }
         settings.promptEnabled[prompt.identifier] = true;
       }
       const composed = await composePresetPrompts(preset, settings, parse, {
@@ -845,7 +854,7 @@ describe("TomiSakae VN-RP preset families", () => {
       "[Module] Intimacy: Visceral Gooner Mode",
     ]) {
       const prompt = preset.prompts.find((prompt) => prompt.name === name)!;
-      expect(adapted.get(prompt.identifier)).toBe(prompt.content);
+      expect(adapted.get(prompt.identifier)).toBe(adaptSolaSoundPlacement(String(prompt.content)));
     }
     const explicit = preset.prompts.find(
       (prompt) => prompt.name === "[Module] Intimacy: Explicit Register",
@@ -858,6 +867,7 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(instructions).toContain(
       'đầu ngực/núm vú cứng lên vì lạnh, "khuôn ngực phập phồng", and vague "một âm thanh ướt át"',
     );
+    expect(instructions).toContain("Every sound occupies its own line, has a physical cause");
   });
 
   it.each([true, false])(
@@ -971,8 +981,8 @@ describe("TomiSakae VN-RP preset families", () => {
     const settings = createDefaultSettings(preset);
     const prompts = preset.prompts.filter((p) => typeof p.content === "string" && p.content);
     const nativeRules = [
-      "Stylistic modules like Chromatic Gradients and Kinetic Emphasis govern prose and sound effects",
-      "- Kinetic Typography: Give physical weight to tactile prose, impacts, and sounds",
+      "Stylistic modules like Chromatic Gradients and Kinetic Emphasis govern prose and sound effects, each sound effect on its own line",
+      "- Kinetic Typography: Give physical weight to tactile prose, impacts, and standalone sound lines",
       "Render tactile physical force, sensory shifts, sudden impacts, and acoustic texture through visceral kinetic typography tags.",
       "- Tactile Prose & Sound Beats: Gunshots, door clicks, heavy footsteps, jarring collisions.",
       "Sensory Touch: Sprinkle 1–3 kinetic accents across a scene",
@@ -982,7 +992,11 @@ describe("TomiSakae VN-RP preset families", () => {
       const text = adaptFamilyPrompt(source, preset, settings);
       expect(text, p.name).not.toContain("§");
       for (const rule of nativeRules) {
-        if (source.includes(rule)) expect(text, p.name).toContain(rule);
+        const original = SOLA_SOUND_REPLACEMENTS.reduce(
+          (current, [before, after]) => current.replaceAll(after, before),
+          rule,
+        );
+        if (source.includes(original)) expect(text, p.name).toContain(rule);
       }
       return text;
     });
@@ -993,7 +1007,7 @@ describe("TomiSakae VN-RP preset families", () => {
       "<heavy>RẦM.</heavy>",
       "<echo>*Tích tắc. Tích tắc.*</echo>",
       "<fracture>RẮC.</fracture>",
-      "- Standalone (Prose & Sound Beats): `<kinetic_tag>RẮC.</kinetic_tag>`",
+      "- Standalone (Prose & Sound Beats, each sound on its own line): `<kinetic_tag>RẮC.</kinetic_tag>`",
     ])
       expect(text).toContain(example);
     const sounds = "<heavy>RẦM.</heavy>\n<echo>*Tích tắc.*</echo>\n<fracture>RẮC.</fracture>";
@@ -1006,6 +1020,18 @@ describe("TomiSakae VN-RP preset families", () => {
     for (const sound of ["RẦM.", "Tích tắc.", "RẮC."]) expect(rendered).toContain(sound);
     const vocal = preset.prompts.find((p) => p.name?.includes("Voice: Vocal Sounds"))!;
     expect(adaptFamilyPrompt(String(vocal.content), preset, settings)).toContain('"Ưm~"');
+    for (const [before, after] of SOLA_SOUND_REPLACEMENTS) {
+      const prompt = prompts.find((p) => String(p.content).includes(before));
+      expect(prompt, before).toBeDefined();
+      expect(adaptFamilyPrompt(String(prompt!.content), preset, settings), before).toContain(after);
+    }
+    for (const prompt of prompts) {
+      const source = String(prompt.content);
+      const inline = adaptSolaSoundPlacement(source);
+      expect(inline.split("\n")).toHaveLength(source.split("\n").length);
+      expect(adaptSolaSoundPlacement(inline)).toBe(inline);
+      expect(inline).not.toMatch(/^\s*(?:- )?(?:Keep each vocal sound|Render vocal sounds)/m);
+    }
   });
 
   it("renders both Sola tracker languages and preserves prompt saver depth and raw text", () => {

@@ -1,6 +1,7 @@
 import type { FfGlobalSettings, FfPreset, FfPrompt, FfRegexScript } from "./core.js";
 import { adaptSolaSaver, SOLA_HEADER_SAVER } from "./sola-history.js";
 import { SOLA_REASONING_SCRIPTS } from "./sola-reasoning.js";
+import { adaptSolaSoundPlacement } from "./sola-sound.js";
 import {
   adaptSolaStyleDependencies,
   adaptSolaHudDependencies,
@@ -199,7 +200,11 @@ export function adaptFamilyPrompt(
     // Adapt localized examples and macro reminders together, preserving source comments.
     content = content
       .split(/(\{\{\/\/[\s\S]*?\}\})/g)
-      .map((part) => (part.startsWith("{{//") ? part : adaptSolaStyleDependencies(part, modules)))
+      .map((part) =>
+        part.startsWith("{{//")
+          ? part
+          : adaptSolaSoundPlacement(adaptSolaStyleDependencies(part, modules)),
+      )
       .join("");
     if (settings.imageOptimizationEnabled) {
       content = content.replace(
