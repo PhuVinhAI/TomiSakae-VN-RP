@@ -48,25 +48,28 @@ describe("Sola NSFW Tracker", () => {
     settings.solaNsfwTrackerEnabled = true;
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
     const module = composed.absolute.find((message) => message.memo?.endsWith(":nsfw-tracker"));
-    expect(module?.content).toContain("Use the previous <nsfw_ban_list> as an ABSOLUTE BAN LIST");
+    expect(module?.content).toContain(
+      "Use the previous <nsfw_ban_list> as an ABSOLUTE NSFW/NSFL BAN LIST",
+    );
     expect(module?.content).toContain("Cách miêu tả:");
     expect(module?.content).toContain("Hành động/Động lực cơ thể:");
     expect(module?.content).toContain("Điểm nhấn cảm giác:");
     expect(module?.content).toContain("Nhịp triển khai:");
+    expect(module?.content).toContain("Phản ứng với NSFL:");
     expect(module?.content).toContain(
       "[Tên nhân vật]: [Distinct movement, force, pose, and contact patterns used this turn",
     );
     expect(module?.content).toContain(
       "Record shared description, sensory, and pacing patterns once",
     );
-    expect(module?.content?.match(/\[Tên nhân vật\]:/g)).toHaveLength(3);
+    expect(module?.content?.match(/\[Tên nhân vật\]:/g)).toHaveLength(4);
     expect(module?.content).not.toContain("<nsfw_ban_list>\n[Tên nhân vật]:");
-    expect(module?.content).toContain("ABSOLUTE BAN LIST");
+    expect(module?.content).toContain("ABSOLUTE NSFW/NSFL BAN LIST");
     expect(module?.content).toContain(
       "Distinct descriptive constructions used this turn, or Không có",
     );
     expect(module?.content).toContain(
-      "When no NSFW content occurs this turn, write Không có in every field",
+      "When no NSFW/NSFL content occurs this turn, write Không có in every field",
     );
     expect(module?.content).not.toContain("Omit the tracker when no NSFW content occurs");
     expect(module?.content).toContain("Located inside of '<sola_hud>' tags, append:");
@@ -124,7 +127,7 @@ describe("Sola NSFW Tracker", () => {
     ])
       settings.promptEnabled[id] = true;
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
-    const reminder = "BAN the previous NSFW patterns";
+    const reminder = "BAN the previous NSFW/NSFL patterns";
     expect(composed.absolute.filter((message) => message.content.includes(reminder))).toHaveLength(
       2,
     );
@@ -209,8 +212,8 @@ describe("Sola NSFW Tracker", () => {
       "[Nana <img src=x>]: shifting pressure\n[Mina]: stepping back",
     );
     for (const [vietnamese, title, label] of [
-      [true, "🔥 Sola: Danh sách cấm NSFW", "Cách miêu tả"],
-      [false, "🔥 Sola: NSFW Ban List", "Description patterns"],
+      [true, "🔥 Sola: Danh sách cấm NSFW/NSFL", "Cách miêu tả"],
+      [false, "🔥 Sola: NSFW/NSFL Ban List", "Description patterns"],
     ] as const) {
       const settings = createDefaultSettings(sola);
       settings.solaNsfwTrackerEnabled = true;
@@ -220,7 +223,7 @@ describe("Sola NSFW Tracker", () => {
         markdown: true,
         depth: 0,
       });
-      expect(displayed).toContain('data-sola-ui="nsfw-tracker"');
+      expect(displayed).toContain('data-sola-ui="nsfw-nsfl-tracker"');
       expect(displayed).toContain(title);
       expect(displayed).toContain(label);
       expect(displayed).toContain("&lt;img src=x&gt;");

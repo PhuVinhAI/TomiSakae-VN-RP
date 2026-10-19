@@ -378,7 +378,7 @@ function tokenEstimateHtml(estimate: PluginTokenEstimate, preset: FfPreset): str
             : entry.identifier === "card-image-catalog"
               ? "🖼️ Danh sách ảnh của card"
               : entry.identifier === "nsfw-tracker"
-                ? "🔥 Bộ theo dõi NSFW"
+                ? "🔥 Bộ theo dõi NSFW/NSFL"
                 : entry.identifier === "sex-tracker"
                   ? "🌙 Bộ theo dõi tình dục"
                   : entry.identifier === "gemma-fix"
@@ -594,8 +594,8 @@ async function showSettings(): Promise<void> {
             "plugin",
             "sola-nsfw-tracker",
             settings.solaNsfwTrackerEnabled,
-            "🔥 Bộ theo dõi NSFW",
-            "Cấm cách miêu tả, kiểu thoại và tiếng rên vừa dùng ở lượt kế; tự ghi đè sau mỗi phản hồi NSFW · Mặc định tắt",
+            "🔥 Bộ theo dõi NSFW/NSFL",
+            "Cấm cách miêu tả, kiểu thoại, tiếng rên và phản ứng NSFL vừa dùng ở lượt kế; tự ghi đè sau mỗi phản hồi NSFW/NSFL · Mặc định tắt",
           )
         : ""
     }${
