@@ -1798,7 +1798,7 @@ describe("Sola V2 Flame plugin integration", () => {
     expect(plugin.settingsHtml()).not.toContain("Chế độ Hiện thực");
     const request = await plugin.request();
     expect(request.map((m) => m.content).join("\n")).toContain("## Vietnamese Output");
-    expect(request.map((m) => m.content).join("\n")).toContain("## NSFW Variety Tracker 🔥");
+    expect(request.map((m) => m.content).join("\n")).toContain("## Danh sách cấm NSFW 🔥");
     expect(request.map((m) => m.content).join("\n")).toContain("## Sexual Context Tracker 🌙");
   });
 

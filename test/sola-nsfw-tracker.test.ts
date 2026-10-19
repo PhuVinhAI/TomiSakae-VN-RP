@@ -22,7 +22,7 @@ beforeAll(async () => {
   ff54 = sources.ff54.preset;
 });
 
-const tracker = (name: string, pattern: string) => `<nsfw_tracker>
+const tracker = (name: string, pattern: string) => `<nsfw_ban_list>
 [${name}]:
 Description patterns:
 - ${pattern}
@@ -36,7 +36,7 @@ Moans/Vocal reactions:
 - "Ahn~♡"
 Pacing:
 - tension to interruption
-</nsfw_tracker>`;
+</nsfw_ban_list>`;
 
 describe("Sola NSFW Tracker", () => {
   it("is off by default, normalizes saved state, and injects only for Sola", async () => {
@@ -49,7 +49,7 @@ describe("Sola NSFW Tracker", () => {
     settings.solaNsfwTrackerEnabled = true;
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
     const module = composed.absolute.find((message) => message.memo?.endsWith(":nsfw-tracker"));
-    expect(module?.content).toContain("Use the previous <nsfw_tracker> as an ABSOLUTE BAN LIST");
+    expect(module?.content).toContain("Use the previous <nsfw_ban_list> as an ABSOLUTE BAN LIST");
     expect(module?.content).toContain("Cách miêu tả:");
     expect(module?.content).toContain("Hành động/Động lực cơ thể:");
     expect(module?.content).toContain("Điểm nhấn cảm giác:");
@@ -59,11 +59,11 @@ describe("Sola NSFW Tracker", () => {
     const storyReview = composed.absolute.find((message) =>
       message.content.includes("## Story Review"),
     );
-    expect(storyReview?.content).toContain("Telemetry (<nsfw_tracker>)");
+    expect(storyReview?.content).toContain("Telemetry (<nsfw_ban_list>)");
     expect(
       composed.absolute.find((message) => message.content.includes("## Showrunner Master HUD"))
         ?.content,
-    ).toContain("<nsfw_tracker>");
+    ).toContain("<nsfw_ban_list>");
 
     const showrunnerIndex = composed.absolute.findIndex((message) =>
       message.content.includes("## Showrunner Master HUD"),
@@ -84,7 +84,7 @@ describe("Sola NSFW Tracker", () => {
     other.solaNsfwTrackerEnabled = true;
     const ff = await composePresetPrompts(ff54, other, async (value) => value);
     expect(
-      [...ff.leading, ...ff.trailing].some((message) => message.content.includes("nsfw_tracker")),
+      [...ff.leading, ...ff.trailing].some((message) => message.content.includes("nsfw_ban_list")),
     ).toBe(false);
   });
 
@@ -147,7 +147,7 @@ describe("Sola NSFW Tracker", () => {
       { role: "user", content: "Lượt hiện tại." },
     ];
     const first = applyPromptRegexToMessages(messages, sola, settings);
-    expect(first[0]!.content).not.toContain("<nsfw_tracker>");
+    expect(first[0]!.content).not.toContain("<nsfw_ban_list>");
     expect(first[2]!.content).toContain("mẫu mới");
     const repeated = applyPromptRegexToMessages(
       [...messages, { role: "user", content: "OOC." }],
@@ -161,7 +161,7 @@ describe("Sola NSFW Tracker", () => {
       sola,
       settings,
     );
-    expect(afterNextResponse[2]!.content).not.toContain("<nsfw_tracker>");
+    expect(afterNextResponse[2]!.content).not.toContain("<nsfw_ban_list>");
   });
 
   it("archives expired tracker text for branch and swipe restoration", () => {
@@ -192,8 +192,8 @@ describe("Sola NSFW Tracker", () => {
   it("renders an escaped localized HUD card and preserves English labels when requested", () => {
     const input = tracker("Nana <img src=x>", "da <script>alert(1)</script>");
     for (const [vietnamese, title, label] of [
-      [true, "🔥 Sola: Bộ theo dõi NSFW", "Cách miêu tả"],
-      [false, "🔥 Sola: NSFW Tracker", "Description patterns"],
+      [true, "🔥 Sola: Danh sách cấm NSFW", "Cách miêu tả"],
+      [false, "🔥 Sola: NSFW Ban List", "Description patterns"],
     ] as const) {
       const settings = createDefaultSettings(sola);
       settings.solaNsfwTrackerEnabled = true;
