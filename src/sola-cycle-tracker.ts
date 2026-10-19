@@ -4,7 +4,7 @@ const TRACKER_RE =
 export const SOLA_CYCLE_TRACKER_MEMO = "cycle-tracker";
 
 export const SOLA_CYCLE_TRACKER_REMINDER =
-  "- Menstrual Cycle (<cycle_tracker>): Update cycle and fertility for this turn.";
+  "- Telemetry (<cycle_tracker>): Update menstrual cycle and fertility for this turn.";
 
 export function solaCycleTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
@@ -18,19 +18,17 @@ export function solaCycleTrackerPrompt(vietnamese: boolean, location: string): s
         cycle: "Cycle",
         fertility: "Fertility",
       };
-  return `## Tracker: Menstrual Cycle 🌙
-Located ${location || "at the end of your response"}.
-
-Track the cycle and fertility state for this turn. This tracker is removed after the next response.
-
-### Output Format
+  return `## Menstrual Cycle Tracker 🌙
+Located ${location || "at the end of your response"}, append:
 <cycle_tracker>
 [${labels.character}]:
-${labels.cycle}: [day, phase, period, or unknown]
-${labels.fertility}: [lower, fertile window, ovulation, or unknown]
+${labels.cycle}: [Current cycle day, phase, period, or unknown]
+${labels.fertility}: [Lower, fertile window, ovulation, or unknown]
 </cycle_tracker>
 
-Replace it with this turn's values; omit it when neither appears.`;
+Rules:
+- Place all active characters within a SINGLE <cycle_tracker> container, separated by one blank line.
+- Update the values for this turn and omit the tracker when neither cycle nor fertility appears.`;
 }
 
 function escapeHtml(value: string): string {

@@ -32,11 +32,13 @@ describe("Sola Menstrual Cycle Tracker", () => {
     settings.solaCycleTrackerEnabled = true;
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
     const module = composed.trailing.find((message) => message.memo?.endsWith(":cycle-tracker"));
-    expect(module?.content).toContain("Track the cycle and fertility state");
+    expect(module?.content).toContain("## Menstrual Cycle Tracker");
     expect(module?.content).toContain("Chu kỳ:");
     expect(
       [...composed.leading, ...composed.absolute, ...composed.trailing].some((message) =>
-        message.content.includes("Menstrual Cycle (<cycle_tracker>)"),
+        message.content.includes(
+          "Telemetry (<cycle_tracker>): Update menstrual cycle and fertility",
+        ),
       ),
     ).toBe(true);
     expect(composed.absolute.some((message) => message.content.includes("<cycle_tracker>"))).toBe(
@@ -63,7 +65,7 @@ describe("Sola Menstrual Cycle Tracker", () => {
     ])
       settings.promptEnabled[id] = true;
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
-    const reminder = "Update cycle and fertility for this turn";
+    const reminder = "Update menstrual cycle and fertility for this turn";
     expect(composed.absolute.filter((message) => message.content.includes(reminder))).toHaveLength(
       2,
     );

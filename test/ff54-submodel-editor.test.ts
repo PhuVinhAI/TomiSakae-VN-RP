@@ -1798,8 +1798,8 @@ describe("Sola V2 Flame plugin integration", () => {
     expect(plugin.settingsHtml()).not.toContain("Chế độ Hiện thực");
     const request = await plugin.request();
     expect(request.map((m) => m.content).join("\n")).toContain("## Vietnamese Output");
-    expect(request.map((m) => m.content).join("\n")).toContain("## Tracker: NSFW Variety 🔥");
-    expect(request.map((m) => m.content).join("\n")).toContain("## Tracker: Menstrual Cycle 🌙");
+    expect(request.map((m) => m.content).join("\n")).toContain("## NSFW Variety Tracker 🔥");
+    expect(request.map((m) => m.content).join("\n")).toContain("## Menstrual Cycle Tracker 🌙");
   });
 
   it.each(["sola"] as const)(

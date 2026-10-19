@@ -4,7 +4,7 @@ const TRACKER_RE =
 export const SOLA_NSFW_TRACKER_MEMO = "nsfw-tracker";
 
 export const SOLA_NSFW_TRACKER_REMINDER =
-  "- NSFW Variety (<nsfw_tracker>): BAN every listed description, dialogue, and vocal pattern this turn; overwrite it with only the patterns used in the new NSFW response.";
+  "- Telemetry (<nsfw_tracker>): BAN the previous NSFW description, dialogue, and vocal patterns; record this turn's new patterns.";
 
 export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
@@ -20,26 +20,20 @@ export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): st
         dialogue: "Dialogue patterns",
         vocal: "Moans/Vocal reactions",
       };
-  return `## Tracker: NSFW Variety 🔥
-Located ${location || "at the end of your response"}.
-
-Treat the previous \`<nsfw_tracker>\` as a BAN LIST for this response. Every listed description construction, dialogue construction, moan, and vocal reaction must be replaced with a distinct new one suited to the current beat and character.
-
-### Output Format
+  return `## NSFW Variety Tracker 🔥
+Located ${location || "at the end of your response"}, append:
 <nsfw_tracker>
 [${labels.character}]:
-${labels.description}:
-- [Concrete descriptive constructions used in this response]
-${labels.dialogue}:
-- [Erotic dialogue constructions used in this response]
-${labels.vocal}:
-- [Exact moans, gasps, stammers, or phonetic reactions used in this response]
+${labels.description}: [Distinct descriptive constructions used this turn]
+${labels.dialogue}: [Distinct erotic dialogue constructions used this turn]
+${labels.vocal}: [Exact moans, gasps, stammers, or phonetic reactions used this turn]
 </nsfw_tracker>
 
-### Directorial Rules
-- Do not reuse or closely paraphrase anything in the previous tracker.
-- After writing NSFW content, overwrite the tracker with every distinct pattern actually used above, grouped by character.
-- Never carry previous entries into the new tracker. Omit the tracker when no NSFW content occurs.`;
+Rules:
+- Use the previous <nsfw_tracker> as a BAN LIST for this turn; do not reuse or closely paraphrase its entries.
+- Place all active characters within a SINGLE <nsfw_tracker> container, separated by one blank line.
+- Record only distinct patterns actually used in this turn, then overwrite the tracker.
+- Omit the tracker when no NSFW content occurs.`;
 }
 
 function escapeHtml(value: string): string {

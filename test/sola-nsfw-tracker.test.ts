@@ -43,13 +43,13 @@ describe("Sola NSFW Tracker", () => {
     settings.solaNsfwTrackerEnabled = true;
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
     const module = composed.trailing.find((message) => message.memo?.endsWith(":nsfw-tracker"));
-    expect(module?.content).toContain("Treat the previous `<nsfw_tracker>` as a BAN LIST");
+    expect(module?.content).toContain("Use the previous <nsfw_tracker> as a BAN LIST");
     expect(module?.content).toContain("Cách miêu tả:");
-    expect(module?.content).toContain("Located inside of '<sola_hud>' tags.");
+    expect(module?.content).toContain("Located inside of '<sola_hud>' tags, append:");
     const storyReview = composed.absolute.find((message) =>
       message.content.includes("## Story Review"),
     );
-    expect(storyReview?.content).toContain("NSFW Variety (<nsfw_tracker>)");
+    expect(storyReview?.content).toContain("Telemetry (<nsfw_tracker>)");
     expect(
       composed.absolute.find((message) => message.content.includes("## Showrunner Master HUD"))
         ?.content,
@@ -80,7 +80,7 @@ describe("Sola NSFW Tracker", () => {
     ])
       settings.promptEnabled[id] = true;
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
-    const reminder = "BAN every listed description, dialogue, and vocal pattern this turn";
+    const reminder = "BAN the previous NSFW description, dialogue, and vocal patterns";
     expect(composed.absolute.filter((message) => message.content.includes(reminder))).toHaveLength(
       2,
     );
