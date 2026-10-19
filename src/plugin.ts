@@ -989,29 +989,61 @@ function syncRestoredStatesToRequest(
     const matchIndex = assistantHistory.findIndex((entry, index) => {
       if (used.has(index)) return false;
       const data = String(entry.data ?? "");
+      const swipeData =
+        Array.isArray(entry.swipes) &&
+        typeof entry.swipeId === "number" &&
+        typeof entry.swipes[entry.swipeId] === "string"
+          ? entry.swipes[entry.swipeId]!
+          : undefined;
+      const activeData = swipeData ?? data;
       if (familyOf(preset) === "sola") {
+        const snapshot = entry.solaHistory?.[solaHistorySwipeKey(entry.swipeId)];
+        const restoredSnapshot = snapshot
+          ? restoreSolaHistoryContent(snapshot.visible, snapshot)
+          : undefined;
+        if (
+          snapshot &&
+          (message.content === snapshot.visible || message.content === restoredSnapshot)
+        )
+          return true;
         if (
           message.memo !== undefined &&
           message.memo === entry.chatId &&
-          solaBody(message.content) === solaBody(data)
-        )
-          return true;
-        const snapshot = entry.solaHistory?.[solaHistorySwipeKey(entry.swipeId)];
-        if (
-          snapshot &&
-          (message.content === snapshot.visible ||
-            message.content === restoreSolaHistoryContent(snapshot.visible, snapshot))
+          solaBody(message.content) === solaBody(activeData)
         )
           return true;
       }
-      if (data === message.content) return true;
-      const state = extractInternalStateBlock(data);
-      return state !== undefined && data.replace(state, "").trimEnd() === message.content.trimEnd();
+      if (activeData === message.content) return true;
+      const state = extractInternalStateBlock(activeData);
+      return (
+        state !== undefined && activeData.replace(state, "").trimEnd() === message.content.trimEnd()
+      );
     });
     if (matchIndex < 0) return message;
     used.add(matchIndex);
-    const restored = String(assistantHistory[matchIndex]?.data ?? "");
-    return restored && restored !== message.content ? { ...message, content: restored } : message;
+    const matchedEntry = assistantHistory[matchIndex];
+    const matchedSnapshot = matchedEntry?.solaHistory?.[solaHistorySwipeKey(matchedEntry.swipeId)];
+    const restored = matchedSnapshot
+      ? restoreSolaHistoryContent(matchedSnapshot.visible, matchedSnapshot)
+      : Array.isArray(matchedEntry?.swipes) &&
+          typeof matchedEntry.swipeId === "number" &&
+          typeof matchedEntry.swipes[matchedEntry.swipeId] === "string"
+        ? matchedEntry.swipes[matchedEntry.swipeId]!
+        : String(matchedEntry?.data ?? "");
+    const restoreTrackers =
+      matchedSnapshot !== undefined ||
+      (Array.isArray(matchedEntry?.swipes) &&
+        typeof matchedEntry.swipeId === "number" &&
+        typeof matchedEntry.swipes[matchedEntry.swipeId] === "string" &&
+        matchedEntry.swipes[matchedEntry.swipeId] !== String(matchedEntry.data ?? "") &&
+        /<(?:nsfw_ban_list|sex_tracker)\b/i.test(restored));
+    return restored && (restored !== message.content || restoreTrackers)
+      ? {
+          ...message,
+          ...(restored !== message.content ? { content: restored } : {}),
+          ...(restoreTrackers ? { vnRpRestoreSolaTrackers: true } : {}),
+        }
+      : message;
   });
 }
 

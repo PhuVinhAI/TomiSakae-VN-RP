@@ -49,6 +49,8 @@ export interface ChatMessage {
   memo?: string;
   isComment?: boolean;
   vnRpGemmaFixSuffix?: string;
+  /** Internal request marker: retain restored Sola trackers during a reroll/swipe. */
+  vnRpRestoreSolaTrackers?: boolean;
   [key: string]: unknown;
 }
 
@@ -504,28 +506,20 @@ export function composePresetPrompts(
     const order = presetOrder(preset);
     const memoPrefix = pluginMemoPrefix(preset);
     const solaHudEnabled =
-      familyOf(preset) === "sola" && settings.promptEnabled["01a0c1ff-4ecf-701f-ae98-acfb7b26a41f"] === true;
+      familyOf(preset) === "sola" &&
+      settings.promptEnabled["01a0c1ff-4ecf-701f-ae98-acfb7b26a41f"] === true;
     let afterHistory = false;
 
     let nsfwTrackerInjected = false;
     let sexTrackerInjected = false;
-    const addTracker = async (
-      kind: "nsfw" | "sex",
-      absoluteBucket?: FfPrompt[],
-    ) => {
+    const addTracker = async (kind: "nsfw" | "sex", absoluteBucket?: FfPrompt[]) => {
       const location =
         variables.get("tracker_location") ??
         (solaHudEnabled ? "inside of '<sola_hud>' tags" : "at the end of your response");
       const content = await parseHostMacros(
         kind === "nsfw"
-          ? solaNsfwTrackerPrompt(
-              settings.vietnameseOutputEnabled,
-              location,
-            )
-          : solaSexTrackerPrompt(
-              settings.vietnameseOutputEnabled,
-              location,
-            ),
+          ? solaNsfwTrackerPrompt(settings.vietnameseOutputEnabled, location)
+          : solaSexTrackerPrompt(settings.vietnameseOutputEnabled, location),
         "system",
       );
       const memo = `${memoPrefix}${kind === "nsfw" ? SOLA_NSFW_TRACKER_MEMO : SOLA_SEX_TRACKER_MEMO}`;
@@ -1063,7 +1057,8 @@ export function applyPromptRegexToMessages(
     if (
       settings.solaNsfwTrackerEnabled &&
       familyOf(preset) === "sola" &&
-      placement === PLACEMENT_AI_OUTPUT
+      placement === PLACEMENT_AI_OUTPUT &&
+      message.vnRpRestoreSolaTrackers !== true
     )
       content = expireSolaNsfwTracker(content, solaDepths?.get(message), (offset, text) =>
         options.onHistoryRemoval?.(message, offset, text),
@@ -1071,7 +1066,8 @@ export function applyPromptRegexToMessages(
     if (
       settings.solaSexTrackerEnabled &&
       familyOf(preset) === "sola" &&
-      placement === PLACEMENT_AI_OUTPUT
+      placement === PLACEMENT_AI_OUTPUT &&
+      message.vnRpRestoreSolaTrackers !== true
     )
       content = expireSolaSexTracker(content, solaDepths?.get(message), (offset, text) =>
         options.onHistoryRemoval?.(message, offset, text),
@@ -1157,6 +1153,11 @@ export async function buildRequestMessages(
       }
     }
   }
+  const requestHistoryWithoutInternalMarkers = historyWithPrompts.map((message) => {
+    const publicMessage = { ...message };
+    delete publicMessage.vnRpRestoreSolaTrackers;
+    return publicMessage;
+  });
   return [
     ...composed.leading,
     ...(settings.vietnameseOutputEnabled
@@ -1168,7 +1169,7 @@ export async function buildRequestMessages(
           },
         ]
       : []),
-    ...historyWithPrompts,
+    ...requestHistoryWithoutInternalMarkers,
     ...composed.trailing,
   ];
 }

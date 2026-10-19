@@ -973,6 +973,38 @@ describe("Sola saved-history restoration", () => {
     expect(reloaded.chats.get("0:0")!.message[1]!.data).toBe(reply(0));
   });
 
+  it("restores NSFW and sex trackers into a rerolled prior response request", async () => {
+    const store = solaStore();
+    store.presets[0]!.settings.solaNsfwTrackerEnabled = true;
+    store.presets[0]!.settings.solaSexTrackerEnabled = true;
+    const plugin = await startPlugin(store);
+    const nsfw = "<nsfw_ban_list>NSFW tracker</nsfw_ban_list>";
+    const sex = "<sex_tracker>Sex tracker</sex_tracker>";
+    const original = `${reply(0)}\n${nsfw}\n${sex}`;
+    const alternate = `${reply(0)} bản swipe mới.\n${nsfw}\n${sex}`;
+    const chat = { id: "chat-a", message: history(4) };
+    chat.message[1] = {
+      ...chat.message[1]!,
+      data: original,
+      swipes: [original, alternate],
+      swipeId: 0,
+    };
+    plugin.chats.set("0:0", chat);
+
+    await plugin.request(requestOf(chat));
+    const cleaned = plugin.chats.get("0:0")!;
+    expect(cleaned.message[1]!.data).not.toContain("<nsfw_ban_list>");
+    expect(cleaned.message[1]!.data).not.toContain("<sex_tracker>");
+    expect(cleaned.message[1]!.solaHistory?.["swipe:0"]).toBeDefined();
+
+    cleaned.message[1]!.data = alternate;
+    cleaned.message[1]!.swipeId = 1;
+    const rerolledRequest = await plugin.request(requestOf(cleaned));
+    const rerolledResponse = rerolledRequest.find((message) => message.memo === "sola-a-0");
+    expect(rerolledResponse?.content).toContain("<nsfw_ban_list>");
+    expect(rerolledResponse?.content).toContain("<sex_tracker>");
+  });
+
   it("preserves host changes to narration when syncing restored trackers into a request", async () => {
     const plugin = await startPlugin(solaStore());
     const chat = { id: "chat-a", message: history(4) };
