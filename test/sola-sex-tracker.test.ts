@@ -43,8 +43,10 @@ describe("Sola Sexual Context Tracker", () => {
     expect(module?.content).toContain("## Sexual Context Tracker");
     expect(module?.content).toContain("Chu kỳ kinh nguyệt:");
     expect(module?.content).toContain("Tình trạng cơ thể:");
+    expect(module?.content).toContain("recent orgasm, lingering sensitivity or itchiness, arousal");
     expect(module?.content).toContain("Thái độ với rủi ro:");
-    expect(module?.content).toContain("Biện pháp bảo vệ:");
+    expect(module?.content).toContain("Biện pháp và hành động bảo vệ:");
+    expect(module?.content).toContain("Protection methods or protective actions");
     expect(module?.content).toContain("Tình trạng rủi ro:");
     expect(
       [...composed.leading, ...composed.absolute, ...composed.trailing].some((message) =>
@@ -86,9 +88,7 @@ describe("Sola Sexual Context Tracker", () => {
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
     const module = composed.trailing.find((message) => message.memo?.endsWith(":sex-tracker"));
     expect(module?.content).toContain("Located at the end of your response, append:");
-    expect(composed.absolute.some((message) => message.memo?.endsWith(":sex-tracker"))).toBe(
-      false,
-    );
+    expect(composed.absolute.some((message) => message.memo?.endsWith(":sex-tracker"))).toBe(false);
   });
 
   it("adds the sexual-context reminder to Reminder System and both Story Reviews", async () => {

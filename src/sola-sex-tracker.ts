@@ -4,7 +4,7 @@ const TRACKER_RE =
 export const SOLA_SEX_TRACKER_MEMO = "sex-tracker";
 
 export const SOLA_SEX_TRACKER_REMINDER =
-  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update cycle state, physical condition, pregnancy likelihood, cycle-timing knowledge, awareness, risk attitude, protection measure, and risk status.";
+  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update cycle state, physical condition, pregnancy likelihood, cycle-timing knowledge, awareness, risk attitude, protection measures/actions, and risk status.";
 
 export function solaSexTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
@@ -16,7 +16,7 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
         dateKnowledge: "Biết mốc chu kỳ",
         awareness: "Nhận thức thực tế",
         riskAttitude: "Thái độ với rủi ro",
-        protection: "Biện pháp bảo vệ",
+        protection: "Biện pháp và hành động bảo vệ",
         riskStatus: "Tình trạng rủi ro",
       }
     : {
@@ -27,7 +27,7 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
         dateKnowledge: "Knows cycle timing",
         awareness: "Actual awareness",
         riskAttitude: "Risk attitude",
-        protection: "Protection measure",
+        protection: "Protection measures/actions",
         riskStatus: "Risk status",
       };
   const unknown = vietnamese ? "chưa rõ" : "unknown";
@@ -37,12 +37,12 @@ Located ${location || "at the end of your response"}, append:
 <sex_tracker>
 [${labels.character}]:
 ${labels.cycle}: [Current cycle state or ${unknown}]
-${labels.physicalCondition}: [No prior/prior intercourse, childbirth history, injuries, recovery status, or ${unknown}]
+${labels.physicalCondition}: [No prior/prior intercourse, childbirth history, injuries, recent orgasm, lingering sensitivity or itchiness, arousal, recovery status, or ${unknown}]
 ${labels.pregnancy}: [Current likelihood or ${unknown}]
 ${labels.dateKnowledge}: [${dateKnowledge}]
 ${labels.awareness}: [What the character actually understands about the current reproductive risk]
 ${labels.riskAttitude}: [How the character avoids, opposes, or accepts the current risk according to their awareness and context]
-${labels.protection}: [How the character handles the risk according to their actual awareness or ${unknown}]
+${labels.protection}: [Protection methods or protective actions the character knows and takes, or ${unknown}]
 ${labels.riskStatus}: [Not occurred / ongoing / occurred / ${unknown}]
 </sex_tracker>
 
@@ -52,8 +52,7 @@ Rules:
 - Assess pregnancy likelihood from the current context, cycle timing, and known facts, not from generic patterns or desire.
 - Do not default a sexual outcome or risk response; let the checked awareness, personality, card, and lore determine whether the character avoids, opposes, or accepts risk and how they handle it.
 - Do not let a generic sexual pattern decide the outcome. Write the character's response to the checked context, including uncertainty or conflict when present.
-- Include only characters with sexual or reproductive context in this turn; place them within a SINGLE <sex_tracker> container, separated by one blank line.
-- Replace it with this turn's values and omit it when no sexual or reproductive context is present.`;
+- Place characters within a SINGLE <sex_tracker> container, separated by one blank line.`;
 }
 
 function escapeHtml(value: string): string {
@@ -81,8 +80,22 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
     ["nhận thức thực tế", vietnamese ? "Nhận thức thực tế" : "Actual awareness"],
     ["risk attitude", vietnamese ? "Thái độ với rủi ro" : "Risk attitude"],
     ["thái độ với rủi ro", vietnamese ? "Thái độ với rủi ro" : "Risk attitude"],
-    ["protection measure", vietnamese ? "Biện pháp bảo vệ" : "Protection measure"],
-    ["biện pháp bảo vệ", vietnamese ? "Biện pháp bảo vệ" : "Protection measure"],
+    [
+      "protection measures/actions",
+      vietnamese ? "Biện pháp và hành động bảo vệ" : "Protection measures/actions",
+    ],
+    [
+      "protection measure",
+      vietnamese ? "Biện pháp và hành động bảo vệ" : "Protection measures/actions",
+    ],
+    [
+      "biện pháp và hành động bảo vệ",
+      vietnamese ? "Biện pháp và hành động bảo vệ" : "Protection measures/actions",
+    ],
+    [
+      "biện pháp bảo vệ",
+      vietnamese ? "Biện pháp và hành động bảo vệ" : "Protection measures/actions",
+    ],
     ["risk status", vietnamese ? "Tình trạng rủi ro" : "Risk status"],
     ["tình trạng rủi ro", vietnamese ? "Tình trạng rủi ro" : "Risk status"],
   ]);

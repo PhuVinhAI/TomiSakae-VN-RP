@@ -55,6 +55,13 @@ describe("Sola NSFW Tracker", () => {
     expect(module?.content).toContain("Điểm nhấn cảm giác:");
     expect(module?.content).toContain("Nhịp triển khai:");
     expect(module?.content).toContain("ABSOLUTE BAN LIST");
+    expect(module?.content).toContain(
+      "Distinct descriptive constructions used this turn, or Không có",
+    );
+    expect(module?.content).toContain(
+      "When no NSFW content occurs this turn, write Không có in every field",
+    );
+    expect(module?.content).not.toContain("Omit the tracker when no NSFW content occurs");
     expect(module?.content).toContain("Located inside of '<sola_hud>' tags, append:");
     const storyReview = composed.absolute.find((message) =>
       message.content.includes("## Story Review"),

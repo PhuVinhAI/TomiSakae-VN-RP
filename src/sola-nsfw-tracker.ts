@@ -30,19 +30,19 @@ export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): st
 Located ${location || "at the end of your response"}, append:
 <nsfw_ban_list>
 [${labels.character}]:
-${labels.description}: [Distinct descriptive constructions used this turn]
-${labels.kinetics}: [Distinct movement, force, pose, and contact patterns used this turn]
-${labels.sensory}: [Distinct tactile, thermal, fluid, olfactory, or acoustic details used this turn]
-${labels.dialogue}: [Distinct erotic dialogue constructions used this turn]
-${labels.vocal}: [Exact moans, gasps, stammers, or phonetic reactions used this turn]
-${labels.pacing}: [How this turn moved from opening to shift and stopping point]
+${labels.description}: [Distinct descriptive constructions used this turn, or ${vietnamese ? "Không có" : "None"}]
+${labels.kinetics}: [Distinct movement, force, pose, and contact patterns used this turn, or ${vietnamese ? "Không có" : "None"}]
+${labels.sensory}: [Distinct tactile, thermal, fluid, olfactory, or acoustic details used this turn, or ${vietnamese ? "Không có" : "None"}]
+${labels.dialogue}: [Distinct erotic dialogue constructions used this turn, or ${vietnamese ? "Không có" : "None"}]
+${labels.vocal}: [Exact moans, gasps, stammers, or phonetic reactions used this turn, or ${vietnamese ? "Không có" : "None"}]
+${labels.pacing}: [How this turn moved from opening to shift and stopping point, or ${vietnamese ? "Không có" : "None"}]
 </nsfw_ban_list>
 
 Rules:
 - Use the previous <nsfw_ban_list> as an ABSOLUTE BAN LIST; do not repeat, closely paraphrase, synonym-swap, or reuse its structures, rhythms, or reaction patterns. Create new writing this turn.
 - Place all active characters within a SINGLE <nsfw_ban_list> container, separated by one blank line.
-- Record only distinct patterns actually used in this turn, then overwrite the tracker.
-- Omit the tracker when no NSFW content occurs.`;
+- Record only distinct patterns actually used in this turn, then overwrite the tracker. When no NSFW content occurs this turn, write ${vietnamese ? "Không có" : "None"} in every field.
+`;
 }
 
 function escapeHtml(value: string): string {
@@ -59,7 +59,10 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
     ["description patterns", vietnamese ? "Cách miêu tả" : "Description patterns"],
     ["cách miêu tả", vietnamese ? "Cách miêu tả" : "Description patterns"],
     ["action/body dynamics", vietnamese ? "Hành động/Động lực cơ thể" : "Action/Body dynamics"],
-    ["hành động/động lực cơ thể", vietnamese ? "Hành động/Động lực cơ thể" : "Action/Body dynamics"],
+    [
+      "hành động/động lực cơ thể",
+      vietnamese ? "Hành động/Động lực cơ thể" : "Action/Body dynamics",
+    ],
     ["sensory emphasis", vietnamese ? "Điểm nhấn cảm giác" : "Sensory emphasis"],
     ["điểm nhấn cảm giác", vietnamese ? "Điểm nhấn cảm giác" : "Sensory emphasis"],
     ["dialogue patterns", vietnamese ? "Kiểu thoại" : "Dialogue patterns"],
