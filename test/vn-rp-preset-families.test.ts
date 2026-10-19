@@ -80,7 +80,7 @@ describe("TomiSakae VN-RP preset families", () => {
 
   it.each(
     (["ff54", "sola"] as const).flatMap((family) =>
-      ([0, 1, 2, 3, 4] as const).map((level) => [family, level] as const),
+      ([0, 1, 2, 3] as const).map((level) => [family, level] as const),
     ),
   )(
     "appends the shared Gemma fix inside the latest user message for %s at level %s",
@@ -179,21 +179,15 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(gemmaFixPromptFor(3)).toContain("## User Agency");
     expect(gemmaFixPromptFor(3)).not.toContain("## Sexual Risk");
     expect(gemmaFixPromptFor(3)).toContain(
-      "{{user}} MUST NOT be assumed to like sex or want sexual activity",
+      "{{user}}'s desire, intent, or consent MUST NOT be assumed",
     );
     expect(gemmaFixPromptFor(3)).toContain(
-      "NEVER invent sexual desire, intent, or consent not expressed through words or actions directly written by the user",
+      "NEVER invent sexual initiative",
     );
     expect(gemmaFixPromptFor(3)).not.toContain("across turns");
-    const consequenceRule =
-      "NPCs MUST handle sexual, reproductive, STI, hygiene, and contraceptive risks only through card/lore consistent age, knowledge, experience, beliefs, and judgment; NEVER grant unearned risk awareness or default to unprotected penetration or internal ejaculation; barriers, withdrawal, oral, manual, and anal alternatives, fertility status, protection failure, unwanted exposure, stealthing, and reproductive coercion MUST shape character consistent decisions, mistakes, and consequences";
     const kineticRule =
       "EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, pre-contact friction, fractured vocalizations and dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones; PACING MUST build progressively with tangible resistance and friction before climax, varying rhythm, pressure, pauses, and acceleration; PRIORITIZE visceral kinetic impact over internal emotional processing; when climax occurs, render the post-climax somatic aftermath";
-    expect(gemmaFixPromptFor(4)).toContain(`## Sexual Risk\n${consequenceRule}`);
     for (const level of [0, 1, 2, 3]) {
-      expect(gemmaFixPromptFor(level)).not.toContain(consequenceRule);
-    }
-    for (const level of [0, 1, 2, 3, 4]) {
       expect(gemmaFixPromptFor(level).startsWith("{{\n")).toBe(true);
       expect(gemmaFixPromptFor(level).endsWith("\n}}")).toBe(true);
       for (const section of commonSections) {
@@ -213,7 +207,7 @@ describe("TomiSakae VN-RP preset families", () => {
       for (const value of [-1, 5, 0.5, "0", "4", null, undefined]) {
         expect(normalizeSettings(preset, { gemmaFixNsfwLevel: value }).gemmaFixNsfwLevel).toBe(2);
       }
-      for (const level of [0, 1, 2, 3, 4] as const) {
+      for (const level of [0, 1, 2, 3] as const) {
         const settings = normalizeSettings(preset, {
           gemmaFixEnabled: true,
           gemmaFixNsfwLevel: level,

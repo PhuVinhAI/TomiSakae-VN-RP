@@ -377,8 +377,8 @@ function tokenEstimateHtml(estimate: PluginTokenEstimate, preset: FfPreset): str
               ? "🖼️ Danh sách ảnh của card"
               : entry.identifier === "nsfw-tracker"
                 ? "🔥 Bộ theo dõi NSFW"
-                : entry.identifier === "cycle-tracker"
-                  ? "🌙 Bộ theo dõi chu kỳ kinh nguyệt"
+              : entry.identifier === "sex-tracker"
+                  ? "🌙 Bộ theo dõi tình dục"
                   : entry.identifier === "gemma-fix"
                     ? "🛠️ Fix Gemma 4"
                     : prompt
@@ -600,10 +600,10 @@ async function showSettings(): Promise<void> {
       family.id === "sola"
         ? checkbox(
             "plugin",
-            "sola-cycle-tracker",
-            settings.solaCycleTrackerEnabled,
-            "🌙 Bộ theo dõi chu kỳ kinh nguyệt",
-            "Ghi chu kỳ và khả năng thụ thai cho đúng lượt; tự xóa sau phản hồi kế · Mặc định tắt",
+            "sola-sex-tracker",
+            settings.solaSexTrackerEnabled,
+            "🌙 Bộ theo dõi bối cảnh tình dục",
+            "Ghi bối cảnh sinh sản và Cognitive Check cho đúng lượt; tự xóa sau phản hồi kế · Mặc định tắt",
           )
         : ""
     }${checkbox(
@@ -612,7 +612,7 @@ async function showSettings(): Promise<void> {
       settings.gemmaFixEnabled,
       "🛠️ Fix Gemma 4",
       "Tiếng Việt, ảnh có sẵn và kiểm soát NSFW theo mức đã chọn · Mặc định tắt",
-    )}<div class="gemma-level"><div class="gemma-level-heading"><label id="gemma-nsfw-label" for="gemma-nsfw-level">Kiểm soát NSFW</label><output id="gemma-nsfw-value" for="gemma-nsfw-level">${settings.gemmaFixNsfwLevel}</output></div><input id="gemma-nsfw-level" type="range" min="0" max="4" step="1" value="${settings.gemmaFixNsfwLevel}" aria-labelledby="gemma-nsfw-label gemma-nsfw-value" ${settings.gemmaFixEnabled ? "" : "disabled"}><div class="gemma-level-ticks" aria-hidden="true"><span>0 · Bỏ</span><span>1 · Nhẹ</span><span>2 · Mạnh</span><span>3 · Rất mạnh</span><span>4 · Hệ quả</span></div></div>${checkbox(
+    )}<div class="gemma-level"><div class="gemma-level-heading"><label id="gemma-nsfw-label" for="gemma-nsfw-level">Kiểm soát NSFW</label><output id="gemma-nsfw-value" for="gemma-nsfw-level">${settings.gemmaFixNsfwLevel}</output></div><input id="gemma-nsfw-level" type="range" min="0" max="3" step="1" value="${settings.gemmaFixNsfwLevel}" aria-labelledby="gemma-nsfw-label gemma-nsfw-value" ${settings.gemmaFixEnabled ? "" : "disabled"}><div class="gemma-level-ticks" aria-hidden="true"><span>0 · Bỏ</span><span>1 · Nhẹ</span><span>2 · Mạnh</span><span>3 · Rất mạnh</span></div></div>${checkbox(
       "plugin",
       "sound-notifications",
       settings.soundNotificationsEnabled,
@@ -669,7 +669,7 @@ async function showSettings(): Promise<void> {
     gemmaNsfwSlider.disabled = !gemmaFixToggle.checked;
     const level = normalizeGemmaNsfwLevel(Number(gemmaNsfwSlider.value));
     document.getElementById("gemma-nsfw-value")!.textContent =
-      `${level} · ${["Bỏ", "Nhẹ", "Mạnh", "Rất mạnh", "Hệ quả"][level]}`;
+      `${level} · ${["Bỏ", "Nhẹ", "Mạnh", "Rất mạnh"][level]}`;
   };
   syncGemmaNsfwSlider();
   gemmaFixToggle.addEventListener("change", syncGemmaNsfwSlider);
@@ -696,7 +696,7 @@ async function showSettings(): Promise<void> {
       else if (id === "image-optimization") settings.imageOptimizationEnabled = node.checked;
       else if (id === "card-image-catalog") settings.cardImageCatalogEnabled = node.checked;
       else if (id === "sola-nsfw-tracker") settings.solaNsfwTrackerEnabled = node.checked;
-      else if (id === "sola-cycle-tracker") settings.solaCycleTrackerEnabled = node.checked;
+      else if (id === "sola-sex-tracker") settings.solaSexTrackerEnabled = node.checked;
       else if (id === "gemma-fix") settings.gemmaFixEnabled = node.checked;
       else if (id === "sound-notifications") settings.soundNotificationsEnabled = node.checked;
       else if (id === "submodel-editor") settings.submodelEditorEnabled = node.checked;
@@ -758,7 +758,7 @@ async function showSettings(): Promise<void> {
       node.dataset.id === "image-optimization" ||
       node.dataset.id === "card-image-catalog" ||
       node.dataset.id === "sola-nsfw-tracker" ||
-      node.dataset.id === "sola-cycle-tracker" ||
+      node.dataset.id === "sola-sex-tracker" ||
       node.dataset.id === "gemma-fix" ||
       node.dataset.id === "dialogue-theme"
     )
@@ -1414,7 +1414,7 @@ function completeAutoRewriteResponse(text: string, preset: FfPreset): boolean {
     const body = splitEditorResponse(text, preset).response.trim();
     if (!body) return false;
     const tracked =
-      /<(\/?)(sola_hud|fengine|thought_engine|bond|date|story_notes|wardrobe|inventory|scene_cast|scene_state|char_matrix|solatag|tempo|cabinet|arrow|omen|nsfw_tracker|cycle_tracker)\b[^>]*>/gi;
+      /<(\/?)(sola_hud|fengine|thought_engine|bond|date|story_notes|wardrobe|inventory|scene_cast|scene_state|char_matrix|solatag|tempo|cabinet|arrow|omen|nsfw_tracker|sex_tracker)\b[^>]*>/gi;
     const open: string[] = [];
     for (const match of body.matchAll(tracked)) {
       const tag = match[2]!.toLowerCase();

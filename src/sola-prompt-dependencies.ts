@@ -176,13 +176,13 @@ export function adaptSolaHudDependencies(content: string, modules: ReadonlySet<s
     ["mod_track_omen", "omen"],
     ["mod_track_dossier", "scene_state"],
     ["mod_track_nsfw", "nsfw_tracker"],
-    ["mod_track_cycle", "cycle_tracker"],
+    ["mod_track_sex", "sex_tracker"],
   ];
   const tags = trackerTags.filter(([key]) => modules.has(key)).map(([, tag]) => `<${tag}>`);
   // Only the HUD's example lists other trackers; each standalone schema owns its own fields.
   if (
     modules.has("mod_track_nsfw") ||
-    modules.has("mod_track_cycle") ||
+    modules.has("mod_track_sex") ||
     trackerTags.slice(0, 7).some(([key]) => !modules.has(key))
   )
     content = content.replace(
@@ -191,7 +191,7 @@ export function adaptSolaHudDependencies(content: string, modules: ReadonlySet<s
     );
   const trackerReminders = [
     ...(modules.has("mod_track_nsfw") ? ["{{getvar::mod_track_nsfw}}"] : []),
-    ...(modules.has("mod_track_cycle") ? ["{{getvar::mod_track_cycle}}"] : []),
+    ...(modules.has("mod_track_sex") ? ["{{getvar::mod_track_sex}}"] : []),
   ];
   if (trackerReminders.length)
     content = content.replaceAll(

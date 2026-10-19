@@ -42,7 +42,7 @@ describe("Sola NSFW Tracker", () => {
     const settings = createDefaultSettings(sola);
     settings.solaNsfwTrackerEnabled = true;
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
-    const module = composed.trailing.find((message) => message.memo?.endsWith(":nsfw-tracker"));
+    const module = composed.absolute.find((message) => message.memo?.endsWith(":nsfw-tracker"));
     expect(module?.content).toContain("Use the previous <nsfw_tracker> as a BAN LIST");
     expect(module?.content).toContain("Cách miêu tả:");
     expect(module?.content).toContain("Located inside of '<sola_hud>' tags, append:");
@@ -54,6 +54,14 @@ describe("Sola NSFW Tracker", () => {
       composed.absolute.find((message) => message.content.includes("## Showrunner Master HUD"))
         ?.content,
     ).toContain("<nsfw_tracker>");
+
+    const showrunnerIndex = composed.absolute.findIndex((message) =>
+      message.content.includes("## Showrunner Master HUD"),
+    );
+    const trackerIndex = composed.absolute.findIndex((message) =>
+      message.memo?.endsWith(":nsfw-tracker"),
+    );
+    expect(trackerIndex).toBeGreaterThan(showrunnerIndex);
 
     const off = await composePresetPrompts(
       sola,
@@ -68,6 +76,18 @@ describe("Sola NSFW Tracker", () => {
     expect(
       [...ff.leading, ...ff.trailing].some((message) => message.content.includes("nsfw_tracker")),
     ).toBe(false);
+  });
+
+  it("falls back to trailing output when the Showrunner HUD is disabled", async () => {
+    const settings = createDefaultSettings(sola);
+    settings.solaNsfwTrackerEnabled = true;
+    settings.promptEnabled["01a0c1ff-4ecf-701f-ae98-acfb7b26a41f"] = false;
+    const composed = await composePresetPrompts(sola, settings, async (value) => value);
+    const module = composed.trailing.find((message) => message.memo?.endsWith(":nsfw-tracker"));
+    expect(module?.content).toContain("Located at the end of your response, append:");
+    expect(composed.absolute.some((message) => message.memo?.endsWith(":nsfw-tracker"))).toBe(
+      false,
+    );
   });
 
   it("adds the reminder to Reminder System and both Story Reviews", async () => {

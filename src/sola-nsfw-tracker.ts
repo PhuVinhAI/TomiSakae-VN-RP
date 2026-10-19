@@ -1,5 +1,5 @@
 const TRACKER_RE =
-  /<\s{0,8}nsfw_tracker\b(?:"[^"]*"|'[^']*'|[^'">])*(?:\/\s*>|>[\s\S]*?(?:<\s{0,8}\/\s{0,8}nsfw_tracker\s{0,8}>|(?=<\s{0,8}\/?\s{0,8}(?:sola_hud|scene_header|fengine|thought_engine|wardrobe|inventory|scene_cast|scene_state|bond|date|story_notes|solatag|char_matrix|tempo|cabinet|arrow|omen|cycle_tracker)\b|<!--\s{0,8}HTML_(?:START|END)\s{0,8}-->)|$))/gi;
+  /<\s{0,8}nsfw_tracker\b(?:"[^"]*"|'[^']*'|[^'">])*(?:\/\s*>|>[\s\S]*?(?:<\s{0,8}\/\s{0,8}nsfw_tracker\s{0,8}>|(?=<\s{0,8}\/?\s{0,8}(?:sola_hud|scene_header|fengine|thought_engine|wardrobe|inventory|scene_cast|scene_state|bond|date|story_notes|solatag|char_matrix|tempo|cabinet|arrow|omen|sex_tracker)\b|<!--\s{0,8}HTML_(?:START|END)\s{0,8}-->)|$))/gi;
 
 export const SOLA_NSFW_TRACKER_MEMO = "nsfw-tracker";
 
@@ -64,10 +64,10 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
       const character = line.match(/^\[([^\]]+)]\s*:\s*$/);
       if (character)
         return `<div style="margin:10px 0 5px;color:#F6C177;font-weight:800;">${escapeHtml(character[1]!)}</div>`;
-      const field = line.match(/^([^:]{1,80})\s*:\s*$/);
+      const field = line.match(/^([^:]{1,80})\s*:\s*(.*)$/);
       const label = field ? groups.get(field[1]!.trim().toLocaleLowerCase("vi")) : undefined;
       if (label)
-        return `<div style="margin:7px 0 3px;color:#E8A87C;font-size:.82em;font-weight:750;letter-spacing:.02em;">${escapeHtml(label)}</div>`;
+        return `<div style="margin:7px 0 3px;padding:7px 9px;border-radius:6px;background:rgba(214,112,91,.08);color:#F6C177;font-size:.82em;font-weight:750;letter-spacing:.02em;">${escapeHtml(label)}<div style="margin-top:3px;color:#F1E8DF;font-size:.94em;font-weight:500;letter-spacing:0;">${escapeHtml(field![2]!)}</div></div>`;
       if (/^[-*]\s+/.test(line))
         return `<div style="padding-left:12px;color:#E7DED7;"><span style="color:#C97B63;">•</span> ${escapeHtml(line.replace(/^[-*]\s+/, ""))}</div>`;
       return `<div style="color:#E7DED7;">${escapeHtml(line)}</div>`;

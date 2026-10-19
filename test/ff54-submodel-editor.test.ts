@@ -1767,11 +1767,11 @@ describe("Sola V2 Flame plugin integration", () => {
     expect(saved.presets[0]!.settings.submodelEditorEnabled).toBe(true);
     expect(saved.presets[0]!.settings.soundNotificationsEnabled).toBe(true);
     expect(plugin.settingsHtml()).toContain("🔥 Bộ theo dõi NSFW");
-    expect(plugin.settingsHtml()).toContain("🌙 Bộ theo dõi chu kỳ kinh nguyệt");
+    expect(plugin.settingsHtml()).toContain("🌙 Bộ theo dõi bối cảnh tình dục");
     expect(plugin.toggle("sola-nsfw-tracker").checked).toBe(false);
-    expect(plugin.toggle("sola-cycle-tracker").checked).toBe(false);
+    expect(plugin.toggle("sola-sex-tracker").checked).toBe(false);
     plugin.toggle("sola-nsfw-tracker").checked = true;
-    plugin.toggle("sola-cycle-tracker").checked = true;
+    plugin.toggle("sola-sex-tracker").checked = true;
     await plugin.uiEvent("save");
     expect(
       (
@@ -1783,9 +1783,9 @@ describe("Sola V2 Flame plugin integration", () => {
     expect(
       (
         plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY) as {
-          presets: Array<{ settings: { solaCycleTrackerEnabled: boolean } }>;
+          presets: Array<{ settings: { solaSexTrackerEnabled: boolean } }>;
         }
-      ).presets[0]!.settings.solaCycleTrackerEnabled,
+      ).presets[0]!.settings.solaSexTrackerEnabled,
     ).toBe(true);
     expect(plugin.settingsHtml()).toContain("HUD tổng hợp trạng thái");
     expect(plugin.settingsHtml()).toContain("Chỉ số cảm xúc TFDY");
@@ -1799,7 +1799,7 @@ describe("Sola V2 Flame plugin integration", () => {
     const request = await plugin.request();
     expect(request.map((m) => m.content).join("\n")).toContain("## Vietnamese Output");
     expect(request.map((m) => m.content).join("\n")).toContain("## NSFW Variety Tracker 🔥");
-    expect(request.map((m) => m.content).join("\n")).toContain("## Menstrual Cycle Tracker 🌙");
+    expect(request.map((m) => m.content).join("\n")).toContain("## Sexual Context Tracker 🌙");
   });
 
   it.each(["sola"] as const)(

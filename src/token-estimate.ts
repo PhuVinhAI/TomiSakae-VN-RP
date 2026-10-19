@@ -73,19 +73,19 @@ export async function estimatePluginPromptTokens(
   if (imagePrompt) {
     estimate.entries.push({ identifier: "image-optimization", tokens: count(imagePrompt.content) });
   }
-  const nsfwTrackerPrompt = composed.trailing.find((message) =>
+  const nsfwTrackerPrompt = [...composed.leading, ...composed.absolute, ...composed.trailing].find((message) =>
     String(message.memo).endsWith(":nsfw-tracker"),
   );
   if (nsfwTrackerPrompt) {
     estimate.entries.push({ identifier: "nsfw-tracker", tokens: count(nsfwTrackerPrompt.content) });
   }
-  const cycleTrackerPrompt = composed.trailing.find((message) =>
-    String(message.memo).endsWith(":cycle-tracker"),
+  const sexTrackerPrompt = [...composed.leading, ...composed.absolute, ...composed.trailing].find((message) =>
+    String(message.memo).endsWith(":sex-tracker"),
   );
-  if (cycleTrackerPrompt) {
+  if (sexTrackerPrompt) {
     estimate.entries.push({
-      identifier: "cycle-tracker",
-      tokens: count(cycleTrackerPrompt.content),
+      identifier: "sex-tracker",
+      tokens: count(sexTrackerPrompt.content),
     });
   }
   if (settings.vietnameseOutputEnabled) {

@@ -34,12 +34,12 @@ import {
   SOLA_NSFW_TRACKER_REMINDER,
 } from "./sola-nsfw-tracker.js";
 import {
-  adaptSolaCycleTrackerForDisplay,
-  expireSolaCycleTracker,
-  solaCycleTrackerPrompt,
-  SOLA_CYCLE_TRACKER_MEMO,
-  SOLA_CYCLE_TRACKER_REMINDER,
-} from "./sola-cycle-tracker.js";
+  adaptSolaSexTrackerForDisplay,
+  expireSolaSexTracker,
+  solaSexTrackerPrompt,
+  SOLA_SEX_TRACKER_MEMO,
+  SOLA_SEX_TRACKER_REMINDER,
+} from "./sola-sex-tracker.js";
 
 export type ChatRole = "system" | "user" | "assistant" | "function";
 
@@ -111,7 +111,7 @@ export interface FfGlobalSettings {
   imageOptimizationEnabled: boolean;
   cardImageCatalogEnabled: boolean;
   solaNsfwTrackerEnabled: boolean;
-  solaCycleTrackerEnabled: boolean;
+  solaSexTrackerEnabled: boolean;
   soundNotificationsEnabled: boolean;
   submodelEditorEnabled: boolean;
   submodelAutoRewriteEnabled: boolean;
@@ -207,7 +207,7 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
     imageOptimizationEnabled: false,
     cardImageCatalogEnabled: false,
     solaNsfwTrackerEnabled: false,
-    solaCycleTrackerEnabled: false,
+    solaSexTrackerEnabled: false,
     soundNotificationsEnabled: false,
     submodelEditorEnabled: false,
     submodelAutoRewriteEnabled: false,
@@ -270,8 +270,8 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
     defaults.cardImageCatalogEnabled = record.cardImageCatalogEnabled;
   if (typeof record.solaNsfwTrackerEnabled === "boolean")
     defaults.solaNsfwTrackerEnabled = record.solaNsfwTrackerEnabled;
-  if (typeof record.solaCycleTrackerEnabled === "boolean")
-    defaults.solaCycleTrackerEnabled = record.solaCycleTrackerEnabled;
+  if (typeof record.solaSexTrackerEnabled === "boolean")
+    defaults.solaSexTrackerEnabled = record.solaSexTrackerEnabled;
   if (typeof record.soundNotificationsEnabled === "boolean") {
     defaults.soundNotificationsEnabled = record.soundNotificationsEnabled;
   }
@@ -496,55 +496,76 @@ export function composePresetPrompts(
     const variables = new Map<string, string>();
     if (familyOf(preset) === "sola" && settings.solaNsfwTrackerEnabled)
       variables.set("mod_track_nsfw", SOLA_NSFW_TRACKER_REMINDER);
-    if (familyOf(preset) === "sola" && settings.solaCycleTrackerEnabled)
-      variables.set("mod_track_cycle", SOLA_CYCLE_TRACKER_REMINDER);
+    if (familyOf(preset) === "sola" && settings.solaSexTrackerEnabled)
+      variables.set("mod_track_sex", SOLA_SEX_TRACKER_REMINDER);
     const leading: ChatMessage[] = [];
     const absoluteByDepth = new Map<number, FfPrompt[]>();
     const trailing: ChatMessage[] = [];
     const order = presetOrder(preset);
     const memoPrefix = pluginMemoPrefix(preset);
+    const solaHudEnabled =
+      familyOf(preset) === "sola" && settings.promptEnabled["01a0c1ff-4ecf-701f-ae98-acfb7b26a41f"] === true;
     let afterHistory = false;
 
     let nsfwTrackerInjected = false;
-    let cycleTrackerInjected = false;
-    const injectNsfwTracker = async () => {
+    let sexTrackerInjected = false;
+    const addTracker = async (
+      kind: "nsfw" | "sex",
+      absoluteBucket?: FfPrompt[],
+    ) => {
+      const location =
+        variables.get("tracker_location") ??
+        (solaHudEnabled ? "inside of '<sola_hud>' tags" : "at the end of your response");
+      const content = await parseHostMacros(
+        kind === "nsfw"
+          ? solaNsfwTrackerPrompt(
+              settings.vietnameseOutputEnabled,
+              location,
+            )
+          : solaSexTrackerPrompt(
+              settings.vietnameseOutputEnabled,
+              location,
+            ),
+        "system",
+      );
+      const memo = `${memoPrefix}${kind === "nsfw" ? SOLA_NSFW_TRACKER_MEMO : SOLA_SEX_TRACKER_MEMO}`;
+      if (absoluteBucket) {
+        absoluteBucket.push({
+          identifier: kind === "nsfw" ? "sola-nsfw-tracker" : "sola-sex-tracker",
+          content,
+          role: "system",
+          injection_position: ABSOLUTE_POSITION,
+          injection_depth: 0,
+          injection_order: kind === "nsfw" ? 99 : 98,
+        });
+      } else {
+        trailing.push({ role: "system", content, memo });
+      }
+    };
+    const injectNsfwTracker = async (at: FfPrompt[] | undefined) => {
       if (nsfwTrackerInjected || familyOf(preset) !== "sola" || !settings.solaNsfwTrackerEnabled)
         return;
       nsfwTrackerInjected = true;
-      const content = await parseHostMacros(
-        solaNsfwTrackerPrompt(
-          settings.vietnameseOutputEnabled,
-          variables.get("tracker_location") ?? "at the end of your response",
-        ),
-        "system",
-      );
-      trailing.push({
-        role: "system",
-        content,
-        memo: `${memoPrefix}${SOLA_NSFW_TRACKER_MEMO}`,
-      });
+      if (at) await addTracker("nsfw", at);
+      else if (solaHudEnabled) {
+        const bucket = absoluteByDepth.get(0) ?? [];
+        await addTracker("nsfw", bucket);
+        absoluteByDepth.set(0, bucket);
+      } else await addTracker("nsfw");
     };
-    const injectCycleTracker = async () => {
-      if (cycleTrackerInjected || familyOf(preset) !== "sola" || !settings.solaCycleTrackerEnabled)
+    const injectSexTracker = async (at: FfPrompt[] | undefined) => {
+      if (sexTrackerInjected || familyOf(preset) !== "sola" || !settings.solaSexTrackerEnabled)
         return;
-      cycleTrackerInjected = true;
-      const content = await parseHostMacros(
-        solaCycleTrackerPrompt(
-          settings.vietnameseOutputEnabled,
-          variables.get("tracker_location") ?? "at the end of your response",
-        ),
-        "system",
-      );
-      trailing.push({
-        role: "system",
-        content,
-        memo: `${memoPrefix}${SOLA_CYCLE_TRACKER_MEMO}`,
-      });
+      sexTrackerInjected = true;
+      if (at) await addTracker("sex", at);
+      else if (solaHudEnabled) {
+        const bucket = absoluteByDepth.get(0) ?? [];
+        await addTracker("sex", bucket);
+        absoluteByDepth.set(0, bucket);
+      } else await addTracker("sex");
     };
 
     for (const entry of order) {
-      if (entry.identifier === "01a0c1ff-4ecf-7046-9d4a-25993cf80b62") await injectNsfwTracker();
-      if (entry.identifier === "01a0c1ff-4ecf-7046-9d4a-25993cf80b62") await injectCycleTracker();
       if (entry.identifier === "chatHistory") afterHistory = true;
       if (!settings.promptEnabled[entry.identifier] || MARKER_IDENTIFIERS.has(entry.identifier))
         continue;
@@ -573,6 +594,10 @@ export function composePresetPrompts(
         const bucket = absoluteByDepth.get(depth) ?? [];
         bucket.push({ ...prompt, content: message.content });
         absoluteByDepth.set(depth, bucket);
+        if (entry.identifier === "01a0c1ff-4ecf-701f-ae98-acfb7b26a41f") {
+          await injectNsfwTracker(bucket);
+          await injectSexTracker(bucket);
+        }
       } else if (
         entry.identifier === "jailbreak" ||
         (familyOf(preset) !== "ff54" && afterHistory)
@@ -585,8 +610,8 @@ export function composePresetPrompts(
         pushMerged(leading, message);
       }
     }
-    await injectNsfwTracker();
-    await injectCycleTracker();
+    await injectNsfwTracker(undefined);
+    await injectSexTracker(undefined);
 
     const absolute: ChatMessage[] = [];
     for (const depth of [...absoluteByDepth.keys()].sort((left, right) => left - right)) {
@@ -601,15 +626,23 @@ export function composePresetPrompts(
       }
       for (const order of [...orderGroups.keys()].sort((left, right) => right - left)) {
         for (const role of roleOrder) {
-          const contents = (orderGroups.get(order) ?? [])
+          const grouped = orderGroups.get(order) ?? [];
+          const contents = grouped
             .filter((prompt) => promptRole(prompt) === role)
             .map((prompt) => String(prompt.content).trim())
             .filter(Boolean);
           if (contents.length > 0) {
+            const tracker = grouped.length === 1 ? grouped[0]!.identifier : "";
+            const memo =
+              tracker === "sola-nsfw-tracker"
+                ? `${memoPrefix}${SOLA_NSFW_TRACKER_MEMO}`
+                : tracker === "sola-sex-tracker"
+                  ? `${memoPrefix}${SOLA_SEX_TRACKER_MEMO}`
+                  : `${memoPrefix}absolute:${depth}:${order}:${role}`;
             absolute.push({
               role,
               content: contents.join("\n"),
-              memo: `${memoPrefix}absolute:${depth}:${order}:${role}`,
+              memo,
             });
           }
         }
@@ -733,8 +766,8 @@ export function applyRegexScripts(
       : input;
   if (options.markdown && settings.solaNsfwTrackerEnabled && familyOf(preset) === "sola")
     output = adaptSolaNsfwTrackerForDisplay(output, settings.vietnameseOutputEnabled);
-  if (options.markdown && settings.solaCycleTrackerEnabled && familyOf(preset) === "sola")
-    output = adaptSolaCycleTrackerForDisplay(output, settings.vietnameseOutputEnabled);
+  if (options.markdown && settings.solaSexTrackerEnabled && familyOf(preset) === "sola")
+    output = adaptSolaSexTrackerForDisplay(output, settings.vietnameseOutputEnabled);
   for (const script of familyRegexScripts(preset)) {
     if (!settings.regexEnabled[script.id] || !script.findRegex || !output) continue;
     if (options.history && script.id === SOLA_HEADER_SAVER_ID) continue;
@@ -1036,11 +1069,11 @@ export function applyPromptRegexToMessages(
         options.onHistoryRemoval?.(message, offset, text),
       );
     if (
-      settings.solaCycleTrackerEnabled &&
+      settings.solaSexTrackerEnabled &&
       familyOf(preset) === "sola" &&
       placement === PLACEMENT_AI_OUTPUT
     )
-      content = expireSolaCycleTracker(content, solaDepths?.get(message), (offset, text) =>
+      content = expireSolaSexTracker(content, solaDepths?.get(message), (offset, text) =>
         options.onHistoryRemoval?.(message, offset, text),
       );
     return {
