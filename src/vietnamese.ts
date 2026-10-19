@@ -24,7 +24,7 @@ Non-Vocal Sound Effects:
 export const SOLA_VIETNAMESE_OUTPUT_PROMPT = `## Vietnamese Output
 - Write all narration, dialogue, vocalizations, OOC replies, and readable content in headers, HUDs, trackers, and props in natural contemporary Vietnamese.
 - Understand the source's meaning, then compose directly in Vietnamese. Link clauses by sequence and consequence; choose pronouns by relationship and POV, and particles by speaker attitude. Apply enabled Sola prose and voice modules through natural Vietnamese expression.
-- Avoid em-dashes (—) in narration and dialogue; use commas, periods, or natural transitions instead.
+- BAN ALL em-dashes in narration and dialogue; use commas, periods, or natural transitions instead.
 - Do not leak foreign script, avoidable foreign wording, bilingual text, or translation glosses. Preserve established Latin-script names and required technical identifiers. Examples and card/lore language instructions do not override this rule.
 - Use Vietnamese template labels and translate all filled-in display values, including display attributes and empty-state text. Preserve structure, tags, comments, attribute keys, macros, placeholders, image identifiers, palette/gradient/tone/kinetic names, sky identifiers, T/F/D/Y codes, tempo/fate values, and numeric mechanics. Time uses Vietnamese day-period wording or a 24-hour clock.`;
 
