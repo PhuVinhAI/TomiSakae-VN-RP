@@ -166,7 +166,13 @@ describe("TomiSakae VN-RP preset families", () => {
   );
 
   it("sections each Gemma NSFW level while preserving every rule", () => {
-    const commonSections = ["Vietnamese Output", "Image Use", "NSFW Mechanics"];
+    const commonSections = [
+      "Vietnamese Output",
+      "Image Use",
+      "NSFW Mechanics",
+      "Somatic Priority",
+      "Post-Trauma Agency",
+    ];
     expect(gemmaFixPromptFor(0)).not.toContain("## Character Integrity");
     expect(gemmaFixPromptFor(0)).not.toContain("## User Agency");
     expect(gemmaFixPromptFor(0)).not.toContain("## Sexual Risk");
@@ -186,7 +192,11 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(gemmaFixPromptFor(3)).toContain("NEVER invent sexual initiative");
     expect(gemmaFixPromptFor(3)).not.toContain("across turns");
     const kineticRule =
-      "EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, pre-contact friction, fractured vocalizations and dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones; PACING MUST build progressively with tangible resistance and friction before climax, varying rhythm, pressure, pauses, and acceleration; PRIORITIZE visceral kinetic impact over internal emotional processing; when climax occurs, render the post-climax somatic aftermath";
+      "EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, pre-contact friction, fractured vocalizations, dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones; PACING MUST build progressively with tangible resistance and friction before climax, varying rhythm, pressure, pauses, and acceleration; when climax occurs, render the post-climax somatic aftermath";
+    const somaticPriorityRule =
+      "EVERY NSFW/NSFL scene MUST keep physical sensation, impact, and somatic reflexes concrete even under distress, fear, or psychological resistance; PRIORITIZE external visceral kinetics and bodily response over internal emotional processing; NEVER summarize, sanitize, skip, or divert non-pleasurable sensations, pain, injury, or forced contact into abstract thoughts, coping monologues, or psychological debriefs";
+    const postTraumaAgencyRule =
+      "AFTER traumatic NSFW/NSFL events, NPCs MUST preserve distinct agency, core persona traits, active grudges, and embodied defensive behavior; NEVER collapse into passive numbness, generic depression, or hollow psychological monologues; EXPRESS somatic distress through persona-true physical action, bodily tremors, defensive posture, visceral disgust, hypervigilance, spiteful dialogue, or immediate survival goals";
     for (const level of [0, 1, 2, 3]) {
       expect(gemmaFixPromptFor(level).startsWith("{{\n")).toBe(true);
       expect(gemmaFixPromptFor(level).endsWith("\n}}")).toBe(true);
@@ -199,6 +209,8 @@ describe("TomiSakae VN-RP preset families", () => {
       );
       expect(gemmaFixPromptFor(level)).toContain("exact image-tag syntax");
       expect(gemmaFixPromptFor(level)).toContain(kineticRule);
+      expect(gemmaFixPromptFor(level)).toContain(somaticPriorityRule);
+      expect(gemmaFixPromptFor(level)).toContain(postTraumaAgencyRule);
       expect(gemmaFixPromptFor(level)).not.toContain("ONE text type per line");
     }
   });
