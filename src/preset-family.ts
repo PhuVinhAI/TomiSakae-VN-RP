@@ -2,6 +2,7 @@ import type { FfGlobalSettings, FfPreset, FfPrompt, FfRegexScript } from "./core
 import { adaptSolaSaver, SOLA_HEADER_SAVER } from "./sola-history.js";
 import { SOLA_REASONING_SCRIPTS } from "./sola-reasoning.js";
 import { adaptSolaSoundPlacement } from "./sola-sound.js";
+import { adaptSolaPunctuation } from "./sola-punctuation.js";
 import {
   adaptSolaStyleDependencies,
   adaptSolaHudDependencies,
@@ -212,6 +213,7 @@ export function adaptFamilyPrompt(
         "- Map physical contact, displacement, or reflexive reaction and matching image beats under Image Coverage.",
       );
     }
+    content = adaptSolaPunctuation(content);
   }
   return content;
 }

@@ -23,19 +23,18 @@ beforeAll(async () => {
 });
 
 const tracker = (name: string, pattern: string) => `<nsfw_ban_list>
-[${name}]:
-Description patterns:
-- ${pattern}
+Description patterns: ${pattern}
+Sensory emphasis: warm skin
+Pacing: tension to interruption
+
 Action/Body dynamics:
-- shifting pressure
-Sensory emphasis:
-- warm skin
+[${name}]: shifting pressure
+
 Dialogue patterns:
-- "Lại đây."
+[${name}]: "Lại đây."
+
 Moans/Vocal reactions:
-- "Ahn~♡"
-Pacing:
-- tension to interruption
+[${name}]: breath catching
 </nsfw_ban_list>`;
 
 describe("Sola NSFW Tracker", () => {
@@ -54,6 +53,14 @@ describe("Sola NSFW Tracker", () => {
     expect(module?.content).toContain("Hành động/Động lực cơ thể:");
     expect(module?.content).toContain("Điểm nhấn cảm giác:");
     expect(module?.content).toContain("Nhịp triển khai:");
+    expect(module?.content).toContain(
+      "[Tên nhân vật]: [Distinct movement, force, pose, and contact patterns used this turn",
+    );
+    expect(module?.content).toContain(
+      "Record shared description, sensory, and pacing patterns once",
+    );
+    expect(module?.content?.match(/\[Tên nhân vật\]:/g)).toHaveLength(3);
+    expect(module?.content).not.toContain("<nsfw_ban_list>\n[Tên nhân vật]:");
     expect(module?.content).toContain("ABSOLUTE BAN LIST");
     expect(module?.content).toContain(
       "Distinct descriptive constructions used this turn, or Không có",
@@ -197,7 +204,10 @@ describe("Sola NSFW Tracker", () => {
   });
 
   it("renders an escaped localized HUD card and preserves English labels when requested", () => {
-    const input = tracker("Nana <img src=x>", "da <script>alert(1)</script>");
+    const input = tracker("Nana <img src=x>", "da <script>alert(1)</script>").replace(
+      "[Nana <img src=x>]: shifting pressure",
+      "[Nana <img src=x>]: shifting pressure\n[Mina]: stepping back",
+    );
     for (const [vietnamese, title, label] of [
       [true, "🔥 Sola: Danh sách cấm NSFW", "Cách miêu tả"],
       [false, "🔥 Sola: NSFW Ban List", "Description patterns"],
@@ -216,6 +226,9 @@ describe("Sola NSFW Tracker", () => {
       expect(displayed).toContain("&lt;img src=x&gt;");
       expect(displayed).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
       expect(displayed).not.toContain("<img src=x>");
+      expect(displayed).toContain("Nana &lt;img src=x&gt;:</span> shifting pressure");
+      expect(displayed).toContain("Mina:</span> stepping back");
+      expect(displayed).not.toContain("[Nana");
     }
   });
 

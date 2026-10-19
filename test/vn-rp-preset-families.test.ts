@@ -43,7 +43,8 @@ import {
 import { promptUiCopy, regexUiCopy } from "../src/ui-vi.js";
 import { solaRegexUiCopy } from "../src/preset-ui-copy.js";
 import { adaptSolaSceneHeaderForDisplay } from "../src/sola-display.js";
-import { SOLA_VIETNAMESE_REPLACEMENTS } from "../src/vietnamese.js";
+import { adaptSolaPromptForVietnamese, SOLA_VIETNAMESE_REPLACEMENTS } from "../src/vietnamese.js";
+import { adaptSolaPunctuation, SOLA_PUNCTUATION_REPLACEMENTS } from "../src/sola-punctuation.js";
 import { adaptSolaRegexForVietnamese } from "../src/sola-vietnamese-regex.js";
 import { GEMMA_FIX_PROMPT, gemmaFixPromptFor } from "../src/gemma-fix.js";
 import { adaptSolaSoundPlacement, SOLA_SOUND_REPLACEMENTS } from "../src/sola-sound.js";
@@ -555,6 +556,51 @@ describe("TomiSakae VN-RP preset families", () => {
     }
   });
 
+  it("uses reviewed Sola punctuation edits without changing words or unlisted text", () => {
+    const raw = sources.sola.preset.prompts.map((prompt) => prompt.content ?? "").join("\n");
+    const localized = adaptSolaPromptForVietnamese(raw);
+    const variants = [
+      raw,
+      localized,
+      adaptSolaSoundPlacement(raw),
+      adaptSolaSoundPlacement(localized),
+    ];
+    const wording = (text: string) => text.replace(/[\p{P}\s]/gu, "");
+    for (const [source, replacement] of SOLA_PUNCTUATION_REPLACEMENTS) {
+      expect(
+        variants.some((text) => text.includes(source)),
+        source,
+      ).toBe(true);
+      expect(wording(replacement), source).toBe(wording(source));
+      expect(replacement, source).not.toContain("—");
+    }
+    for (const text of variants) {
+      const adapted = adaptSolaPunctuation(text);
+      expect(adapted).not.toContain("—");
+      expect(wording(adapted)).toBe(wording(text));
+      expect(adapted.split("\n")).toHaveLength(text.split("\n").length);
+    }
+    const adapted = adaptSolaPunctuation(raw);
+    expect(adapted).toContain("You are Sola, a deeply observant storyteller and co-author.");
+    expect(adapted).toContain(
+      "They shift only if what they know (and what they stand to gain or lose) would actually move them.",
+    );
+    expect(adapted).toContain("Vulnerability shows through the body: a turned wrist");
+    expect(adapted).toContain(
+      "Questions rare and transactional; never ask one just to fill a turn.",
+    );
+    expect(adapted).toContain('"I-I can\'t...", "c-can\'t think..."');
+    const unlisted = "Unlisted text — leave this untouched.";
+    expect(adaptSolaPunctuation(unlisted)).toBe(unlisted);
+    expect(
+      adaptFamilyPrompt(raw, sources.ff54.preset, {
+        ...createDefaultSettings(sources.ff54.preset),
+        vietnameseOutputEnabled: false,
+        imageOptimizationEnabled: false,
+      }),
+    ).toBe(raw);
+  });
+
   it.each(["sola"] as const)(
     "uses %s's native language, editor, image rules and UI modules",
     async (family) => {
@@ -750,12 +796,15 @@ describe("TomiSakae VN-RP preset families", () => {
           expect(adapted).toContain("past events with natural Vietnamese time cues");
         }
         const macroTokens = (text: string) =>
-          [...text.matchAll(/\{\{(?:setvar|getvar|random|roll)::([^}:]+)/g)].map((m) => m[0]);
+          [...text.matchAll(/\{\{(?:(setvar|getvar|roll)::([^}:]+)|(random)::)/g)].map(
+            (m) => m[3] ?? `${m[1]}::${m[2]}`,
+          );
         expect(macroTokens(adapted), prompt.name).toEqual(macroTokens(prompt.content));
         const withoutVietnamese = adaptFamilyPrompt(prompt.content, preset, {
           ...settings,
           vietnameseOutputEnabled: false,
         });
+        expect(withoutVietnamese, prompt.name).not.toContain("—");
         if (family === "sola" && prompt.identifier === "01a0c1ff-4ecf-701d-97b3-6626434ed938") {
           // Header frequency is deliberately adapted for PocketRisu in both languages.
           expect(withoutVietnamese).toContain("Begin every response with <scene_header>");
@@ -765,10 +814,11 @@ describe("TomiSakae VN-RP preset families", () => {
           expect(schemaAndEngine(withoutVietnamese)).toBe(schemaAndEngine(prompt.content));
         } else {
           const withoutSoundPlacement = SOLA_SOUND_REPLACEMENTS.reduce(
-            (text, [source, replacement]) => text.replaceAll(replacement, source),
+            (text, [source, replacement]) =>
+              text.replaceAll(adaptSolaPunctuation(replacement), adaptSolaPunctuation(source)),
             withoutVietnamese,
           );
-          expect(withoutSoundPlacement, prompt.name).toBe(prompt.content);
+          expect(withoutSoundPlacement, prompt.name).toBe(adaptSolaPunctuation(prompt.content));
         }
         settings.promptEnabled[prompt.identifier] = true;
       }
@@ -805,6 +855,7 @@ describe("TomiSakae VN-RP preset families", () => {
       expect(text).not.toContain("shout, whisper, measured, tremble");
       expect(text).not.toContain("<internal_states>");
       expect(text).not.toContain("manga, anime, and light-novel pacing");
+      expect(text).not.toContain("—");
 
       expect(text).not.toContain("§");
       expect(vietnameseOutputFor(preset)).not.toContain("§");
@@ -827,6 +878,7 @@ describe("TomiSakae VN-RP preset families", () => {
       ]),
     );
     const all = [...adapted.values()].join("\n");
+    expect(all).not.toContain("—");
     expect(all).toContain('"E-em yêu anh sao?!" *rolling the words in her mouth* BAD X');
     expect(all).toContain('*blushes* "A-anh cũng yêu em." APPROVED');
     expect(all).not.toContain("nhắc đi nhắc lại lời vừa nghe");
@@ -854,7 +906,9 @@ describe("TomiSakae VN-RP preset families", () => {
       "[Module] Intimacy: Visceral Gooner Mode",
     ]) {
       const prompt = preset.prompts.find((prompt) => prompt.name === name)!;
-      expect(adapted.get(prompt.identifier)).toBe(adaptSolaSoundPlacement(String(prompt.content)));
+      expect(adapted.get(prompt.identifier)).toBe(
+        adaptSolaPunctuation(adaptSolaSoundPlacement(String(prompt.content))),
+      );
     }
     const explicit = preset.prompts.find(
       (prompt) => prompt.name === "[Module] Intimacy: Explicit Register",

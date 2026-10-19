@@ -27,10 +27,8 @@ Menstrual cycle: ${cycle}
 Physical condition: unknown
 Pregnancy likelihood: unknown
 Knows cycle timing: Unclear
-Actual awareness: unknown
-Risk attitude: unknown
+Risk awareness and attitude: unknown
 Protection measure: unknown
-Risk status: unknown
 </sex_tracker>`;
 
 describe("Sola Sexual Context Tracker", () => {
@@ -44,10 +42,10 @@ describe("Sola Sexual Context Tracker", () => {
     expect(module?.content).toContain("Chu kỳ kinh nguyệt:");
     expect(module?.content).toContain("Tình trạng cơ thể:");
     expect(module?.content).toContain("recent orgasm, lingering sensitivity or itchiness, arousal");
-    expect(module?.content).toContain("Thái độ với rủi ro:");
+    expect(module?.content).toContain("Nhận thức và thái độ với rủi ro:");
     expect(module?.content).toContain("Biện pháp và hành động bảo vệ:");
     expect(module?.content).toContain("Protection methods or protective actions");
-    expect(module?.content).toContain("Tình trạng rủi ro:");
+    expect(module?.content).not.toContain("Tình trạng rủi ro:");
     expect(
       [...composed.leading, ...composed.absolute, ...composed.trailing].some((message) =>
         message.content.includes(

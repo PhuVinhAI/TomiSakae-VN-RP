@@ -4,7 +4,7 @@ const TRACKER_RE =
 export const SOLA_SEX_TRACKER_MEMO = "sex-tracker";
 
 export const SOLA_SEX_TRACKER_REMINDER =
-  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update cycle state, physical condition, pregnancy likelihood, cycle-timing knowledge, awareness, risk attitude, protection measures/actions, and risk status.";
+  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update cycle state, physical condition, pregnancy likelihood, cycle-timing knowledge, risk awareness and attitude, and protection measures/actions.";
 
 export function solaSexTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
@@ -14,10 +14,8 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
         physicalCondition: "Tình trạng cơ thể",
         pregnancy: "Khả năng mang thai",
         dateKnowledge: "Biết mốc chu kỳ",
-        awareness: "Nhận thức thực tế",
-        riskAttitude: "Thái độ với rủi ro",
+        awareness: "Nhận thức và thái độ với rủi ro",
         protection: "Biện pháp và hành động bảo vệ",
-        riskStatus: "Tình trạng rủi ro",
       }
     : {
         character: "Character Name",
@@ -25,10 +23,8 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
         physicalCondition: "Physical condition",
         pregnancy: "Pregnancy likelihood",
         dateKnowledge: "Knows cycle timing",
-        awareness: "Actual awareness",
-        riskAttitude: "Risk attitude",
+        awareness: "Risk awareness and attitude",
         protection: "Protection measures/actions",
-        riskStatus: "Risk status",
       };
   const unknown = vietnamese ? "chưa rõ" : "unknown";
   const dateKnowledge = vietnamese ? "Đã biết / Chưa biết / Chưa rõ" : "Known / Unknown / Unclear";
@@ -36,21 +32,19 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
 Located ${location || "at the end of your response"}, append:
 <sex_tracker>
 [${labels.character}]:
-${labels.cycle}: [Current cycle state or ${unknown}]
-${labels.physicalCondition}: [No prior/prior intercourse, childbirth history, injuries, recent orgasm, lingering sensitivity or itchiness, arousal, recovery status, or ${unknown}]
-${labels.pregnancy}: [Current likelihood or ${unknown}]
+${labels.cycle}: [Current cycle state]
+${labels.physicalCondition}: [No prior/prior intercourse, childbirth history, injuries, recent orgasm, lingering sensitivity or itchiness, arousal, recovery status]
+${labels.pregnancy}: [Current likelihood]
 ${labels.dateKnowledge}: [${dateKnowledge}]
-${labels.awareness}: [What the character actually understands about the current reproductive risk]
-${labels.riskAttitude}: [How the character avoids, opposes, or accepts the current risk according to their awareness and context]
-${labels.protection}: [Protection methods or protective actions the character knows and takes, or ${unknown}]
-${labels.riskStatus}: [Not occurred / ongoing / occurred / ${unknown}]
+${labels.awareness}: [What the character understands about the current reproductive risk and how they avoid, oppose, or accept it]
+${labels.protection}: [Protection methods or protective actions the character knows and takes, or none / not applicable]
 </sex_tracker>
 
 Rules:
 - Before writing, run a Cognitive Check: identify the character's current facts, age, knowledge, experience, and beliefs; then let their established personality and card/lore determine the reaction.
-- Identify the current turn's actual reproductive facts first; if a fact is missing, mark it unknown rather than infer it.
-- Assess pregnancy likelihood from the current context, cycle timing, and known facts, not from generic patterns or desire.
-- Do not default a sexual outcome or risk response; let the checked awareness, personality, card, and lore determine whether the character avoids, opposes, or accepts risk and how they handle it.
+- Infer tracker values from card/lore, the previous tracker, elapsed time, and current actions; invent plausible missing details and keep them consistent. Use ${unknown} only for the character's uncertainty in cycle-timing knowledge or risk awareness.
+- Assess pregnancy likelihood from cycle state, current actions, and protection measures/actions, not from generic patterns or desire.
+- Do not default a sexual outcome or risk response; let the checked risk awareness, personality, card, and lore determine whether the character avoids, opposes, or accepts risk and how they handle it.
 - Do not let a generic sexual pattern decide the outcome. Write the character's response to the checked context, including uncertainty or conflict when present.
 - Place characters within a SINGLE <sex_tracker> container, separated by one blank line.`;
 }
@@ -76,10 +70,14 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
     ["biết mốc chu kỳ", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
     ["knows current date", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
     ["biết ngày hiện tại", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
-    ["actual awareness", vietnamese ? "Nhận thức thực tế" : "Actual awareness"],
-    ["nhận thức thực tế", vietnamese ? "Nhận thức thực tế" : "Actual awareness"],
-    ["risk attitude", vietnamese ? "Thái độ với rủi ro" : "Risk attitude"],
-    ["thái độ với rủi ro", vietnamese ? "Thái độ với rủi ro" : "Risk attitude"],
+    [
+      "risk awareness and attitude",
+      vietnamese ? "Nhận thức và thái độ với rủi ro" : "Risk awareness and attitude",
+    ],
+    [
+      "nhận thức và thái độ với rủi ro",
+      vietnamese ? "Nhận thức và thái độ với rủi ro" : "Risk awareness and attitude",
+    ],
     [
       "protection measures/actions",
       vietnamese ? "Biện pháp và hành động bảo vệ" : "Protection measures/actions",
@@ -96,8 +94,6 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
       "biện pháp bảo vệ",
       vietnamese ? "Biện pháp và hành động bảo vệ" : "Protection measures/actions",
     ],
-    ["risk status", vietnamese ? "Tình trạng rủi ro" : "Risk status"],
-    ["tình trạng rủi ro", vietnamese ? "Tình trạng rủi ro" : "Risk status"],
   ]);
   return body
     .trim()

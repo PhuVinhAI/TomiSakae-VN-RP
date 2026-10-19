@@ -4,12 +4,11 @@ const TRACKER_RE =
 export const SOLA_NSFW_TRACKER_MEMO = "nsfw-tracker";
 
 export const SOLA_NSFW_TRACKER_REMINDER =
-  "- Telemetry (<nsfw_ban_list>): BAN the previous NSFW patterns; record this turn's new descriptive, kinetic, sensory, dialogue, vocal, and pacing patterns.";
+  "- Telemetry (<nsfw_ban_list>): BAN the previous NSFW patterns; record shared description, sensory, and pacing patterns once, then record action, dialogue, and vocal patterns per character.";
 
 export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
     ? {
-        character: "Tên nhân vật",
         description: "Cách miêu tả",
         kinetics: "Hành động/Động lực cơ thể",
         sensory: "Điểm nhấn cảm giác",
@@ -18,7 +17,6 @@ export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): st
         pacing: "Nhịp triển khai",
       }
     : {
-        character: "Character Name",
         description: "Description patterns",
         kinetics: "Action/Body dynamics",
         sensory: "Sensory emphasis",
@@ -29,18 +27,23 @@ export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): st
   return `## ${vietnamese ? "Danh sách cấm NSFW" : "NSFW Ban List"} 🔥
 Located ${location || "at the end of your response"}, append:
 <nsfw_ban_list>
-[${labels.character}]:
 ${labels.description}: [Distinct descriptive constructions used this turn, or ${vietnamese ? "Không có" : "None"}]
-${labels.kinetics}: [Distinct movement, force, pose, and contact patterns used this turn, or ${vietnamese ? "Không có" : "None"}]
 ${labels.sensory}: [Distinct tactile, thermal, fluid, olfactory, or acoustic details used this turn, or ${vietnamese ? "Không có" : "None"}]
-${labels.dialogue}: [Distinct erotic dialogue constructions used this turn, or ${vietnamese ? "Không có" : "None"}]
-${labels.vocal}: [Exact moans, gasps, stammers, or phonetic reactions used this turn, or ${vietnamese ? "Không có" : "None"}]
 ${labels.pacing}: [How this turn moved from opening to shift and stopping point, or ${vietnamese ? "Không có" : "None"}]
+
+${labels.kinetics}:
+[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Distinct movement, force, pose, and contact patterns used this turn, or ${vietnamese ? "Không có" : "None"}]
+
+${labels.dialogue}:
+[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Distinct erotic dialogue constructions used this turn, or ${vietnamese ? "Không có" : "None"}]
+
+${labels.vocal}:
+[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Exact moans, gasps, stammers, or phonetic reactions used this turn, or ${vietnamese ? "Không có" : "None"}]
 </nsfw_ban_list>
 
 Rules:
 - Use the previous <nsfw_ban_list> as an ABSOLUTE BAN LIST; do not repeat, closely paraphrase, synonym-swap, or reuse its structures, rhythms, or reaction patterns. Create new writing this turn.
-- Place all active characters within a SINGLE <nsfw_ban_list> container, separated by one blank line.
+- Record shared description, sensory, and pacing patterns once within a SINGLE <nsfw_ban_list>. Under each remaining heading, write one [Character]: pattern line per active character.
 - Record only distinct patterns actually used in this turn, then overwrite the tracker. When no NSFW content occurs this turn, write ${vietnamese ? "Không có" : "None"} in every field.
 `;
 }
@@ -79,13 +82,16 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
     .map((source) => {
       const line = source.trim();
       if (!line) return '<div style="height:5px;"></div>';
-      const character = line.match(/^\[([^\]]+)]\s*:\s*$/);
+      const character = line.match(/^\[([^\]]+)]\s*:\s*(.*)$/);
       if (character)
-        return `<div style="margin:10px 0 5px;color:#F6C177;font-weight:800;">${escapeHtml(character[1]!)}</div>`;
+        return `<div style="padding:3px 0 3px 12px;color:#E7DED7;"><span style="color:#F6C177;font-weight:750;">${escapeHtml(character[1]!)}:</span> ${escapeHtml(character[2]!)}</div>`;
       const field = line.match(/^([^:]{1,80})\s*:\s*(.*)$/);
       const label = field ? groups.get(field[1]!.trim().toLocaleLowerCase("vi")) : undefined;
-      if (label)
+      if (label) {
+        if (!field![2]!.trim())
+          return `<div style="margin:10px 0 4px;color:#F6C177;font-size:.82em;font-weight:800;letter-spacing:.02em;">${escapeHtml(label)}</div>`;
         return `<div style="margin:7px 0 3px;padding:7px 9px;border-radius:6px;background:rgba(214,112,91,.08);color:#F6C177;font-size:.82em;font-weight:750;letter-spacing:.02em;">${escapeHtml(label)}<div style="margin-top:3px;color:#F1E8DF;font-size:.94em;font-weight:500;letter-spacing:0;">${escapeHtml(field![2]!)}</div></div>`;
+      }
       if (/^[-*]\s+/.test(line))
         return `<div style="padding-left:12px;color:#E7DED7;"><span style="color:#C97B63;">•</span> ${escapeHtml(line.replace(/^[-*]\s+/, ""))}</div>`;
       return `<div style="color:#E7DED7;">${escapeHtml(line)}</div>`;
