@@ -205,7 +205,7 @@ describe("TomiSakae VN-RP preset families", () => {
       }
       expect(gemmaFixPromptFor(level)).toContain("every NSFW action that occurs");
       expect(gemmaFixPromptFor(level)).toContain(
-        "in NSFW scenes, INTERLEAVE matching NSFW action images with suitable expression/reaction images",
+        "in NSFW scenes, COVER every distinct NSFW action, body state, and pose with its own matching available NSFW image",
       );
       expect(gemmaFixPromptFor(level)).toContain("exact image-tag syntax");
       expect(gemmaFixPromptFor(level)).toContain(
