@@ -973,7 +973,7 @@ describe("Sola saved-history restoration", () => {
     expect(reloaded.chats.get("0:0")!.message[1]!.data).toBe(reply(0));
   });
 
-  it("restores NSFW and sex trackers into a rerolled prior response request", async () => {
+  it("restores a rerolled response's sex tracker while removing its raw NSFW tracker from the request", async () => {
     const store = solaStore();
     store.presets[0]!.settings.solaNsfwTrackerEnabled = true;
     store.presets[0]!.settings.solaSexTrackerEnabled = true;
@@ -1001,9 +1001,62 @@ describe("Sola saved-history restoration", () => {
     cleaned.message[1]!.swipeId = 1;
     const rerolledRequest = await plugin.request(requestOf(cleaned));
     const rerolledResponse = rerolledRequest.find((message) => message.memo === "sola-a-0");
-    expect(rerolledResponse?.content).toContain("<nsfw_nsfl_ban_list>");
+    expect(rerolledResponse?.content).not.toContain("<nsfw_nsfl_ban_list>");
     expect(rerolledResponse?.content).toContain("<sex_tracker>");
+    expect(rerolledRequest.some((message) => message.memo?.endsWith(":nsfw-pattern-ban"))).toBe(
+      false,
+    );
   });
+
+  it.each(["delete", "branch"] as const)(
+    "wraps the active swipe's restored tracker in a system ban after %s",
+    async (action) => {
+      const store = solaStore();
+      store.presets[0]!.settings.solaNsfwTrackerEnabled = true;
+      const plugin = await startPlugin(store);
+      const record = (pattern: string) =>
+        `<nsfw_nsfl_ban_list>Description patterns: ${pattern}\nPacing: opening to interruption</nsfw_nsfl_ban_list>`;
+      const original = `${reply(0)}\n${record("mẫu ban đầu")}`;
+      const alternate = `${reply(0)} bản swipe mới.\n${record("mẫu swipe đang chọn")}`;
+      const chat: SavedChat = { id: "chat-a", message: history(4) };
+      chat.message[1] = {
+        ...chat.message[1]!,
+        data: original,
+        swipes: [original, alternate],
+        swipeId: 0,
+      };
+      plugin.chats.set("0:0", chat);
+      await plugin.request(requestOf(chat));
+      const cleaned = plugin.chats.get("0:0")!;
+      cleaned.message[1]!.data = alternate;
+      cleaned.message[1]!.swipeId = 1;
+      await plugin.request(requestOf(cleaned));
+      const saved = plugin.chats.get("0:0")!;
+      expect(saved.message[1]!.data).not.toContain("<nsfw_nsfl_ban_list>");
+
+      const shortened: SavedChat = {
+        id: action === "branch" ? "chat-branch" : saved.id,
+        message: structuredClone(saved.message.slice(0, 2)),
+      };
+      const staleRequest = requestOf(shortened);
+      const chatIndex = action === "branch" ? 1 : 0;
+      plugin.chats.set(`0:${chatIndex}`, shortened);
+      plugin.selectChat(chatIndex);
+      const request = await plugin.request([...staleRequest, { role: "user", content: "Tiếp." }]);
+      const bans = request.filter((message) => message.memo?.endsWith(":nsfw-pattern-ban"));
+      expect(bans).toHaveLength(1);
+      expect(bans[0]!.role).toBe("system");
+      expect(bans[0]!.content).toContain("mẫu swipe đang chọn");
+      expect(bans[0]!.content).not.toContain("mẫu ban đầu");
+      expect(request.find((message) => message.memo === "sola-a-0")?.content).not.toContain(
+        "<nsfw_nsfl_ban_list>",
+      );
+      expect(plugin.chats.get(`0:${chatIndex}`)!.message[1]!.data).toContain(
+        "<nsfw_nsfl_ban_list>",
+      );
+      if (action === "branch") expect(plugin.chats.get("0:0")).toEqual(saved);
+    },
+  );
 
   it("preserves host changes to narration when syncing restored trackers into a request", async () => {
     const plugin = await startPlugin(solaStore());

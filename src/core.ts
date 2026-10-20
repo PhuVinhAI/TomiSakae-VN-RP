@@ -29,7 +29,9 @@ import { cardImagePrompt, type CardImageCatalog } from "./card-images.js";
 import {
   adaptSolaNsfwTrackerForDisplay,
   expireSolaNsfwTracker,
+  solaNsfwPatternBanPrompt,
   solaNsfwTrackerPrompt,
+  splitSolaNsfwTracker,
   SOLA_NSFW_TRACKER_MEMO,
   SOLA_NSFW_TRACKER_REMINDER,
 } from "./sola-nsfw-tracker.js";
@@ -49,6 +51,8 @@ export interface ChatMessage {
   memo?: string;
   isComment?: boolean;
   vnRpGemmaFixSuffix?: string;
+  /** Request-only record retained when rebuilding a request without raw tracker blocks. */
+  vnRpNsfwTracker?: string;
   /** Internal request marker: retain restored Sola trackers during a reroll/swipe. */
   vnRpRestoreSolaTrackers?: boolean;
   [key: string]: unknown;
@@ -1122,6 +1126,24 @@ export async function buildRequestMessages(
         hostMessage.content = hostMessage.content.slice(0, -suffix.length);
       return hostMessage;
     });
+  let nsfwPatternBan = "";
+  if (familyOf(preset) === "sola" && settings.solaNsfwTrackerEnabled) {
+    const latestResponse = [...hostMessages].reverse().find(
+      (message) => message.role === "assistant" && !isChatComment(message),
+    );
+    for (let index = 0; index < hostMessages.length; index += 1) {
+      const message = hostMessages[index]!;
+      if (message.role !== "assistant" || isChatComment(message)) continue;
+      const extracted = splitSolaNsfwTracker(message.content);
+      const patterns = extracted.patterns || message.vnRpNsfwTracker || "";
+      if (message === latestResponse) nsfwPatternBan = solaNsfwPatternBanPrompt(patterns);
+      hostMessages[index] = {
+        ...message,
+        content: extracted.content,
+        ...(patterns ? { vnRpNsfwTracker: patterns } : {}),
+      };
+    }
+  }
   const requestHistory = applyRequestFiltersToMessages(hostMessages, preset, settings);
   const composed = await composePresetPrompts(preset, settings, parseHostMacros, macroContext);
   if (settings.gemmaFixEnabled) {
@@ -1171,5 +1193,14 @@ export async function buildRequestMessages(
       : []),
     ...requestHistoryWithoutInternalMarkers,
     ...composed.trailing,
+    ...(nsfwPatternBan
+      ? [
+          {
+            role: "system" as const,
+            content: nsfwPatternBan,
+            memo: `${pluginMemoPrefix(preset)}nsfw-pattern-ban`,
+          },
+        ]
+      : []),
   ];
 }

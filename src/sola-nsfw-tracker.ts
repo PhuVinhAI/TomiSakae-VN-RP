@@ -4,7 +4,7 @@ const TRACKER_RE =
 export const SOLA_NSFW_TRACKER_MEMO = "nsfw-tracker";
 
 export const SOLA_NSFW_TRACKER_REMINDER =
-  "- Telemetry (<nsfw_nsfl_ban_list>): BAN the previous NSFW/NSFL patterns; update the tracker after every response.";
+  "- Telemetry (<nsfw_nsfl_ban_list>): Record ONLY patterns actually written above in THIS response.\n";
 
 export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
@@ -26,7 +26,7 @@ export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): st
         pacing: "Pacing",
         nsfl: "NSFL bodily response / action",
       };
-  return `## ${vietnamese ? "Danh sách cấm NSFW/NSFL" : "NSFW/NSFL Ban List"} 🔥
+  return `## ${vietnamese ? "Ghi chép NSFW/NSFL" : "NSFW/NSFL Usage Record"} 🔥
 Located ${location || "at the end of your response"}, append:
 <nsfw_nsfl_ban_list>
 ${labels.description}: [Distinct NSFW descriptive constructions used this turn]
@@ -47,11 +47,49 @@ ${labels.nsfl}:
 </nsfw_nsfl_ban_list>
 
 Rules:
-- Use the previous <nsfw_nsfl_ban_list> as an ABSOLUTE NSFW/NSFL BAN LIST; replace every previous pattern in this response, then BAN every pattern recorded this turn in the next response. Do not repeat, closely paraphrase, synonym-swap, or reuse its structures, rhythms, or reaction patterns.
+- Record ONLY patterns actually written above in THIS response, including their concrete wording, structures, and rhythms. Do not invent entries.
 - Record shared description, sensory, and pacing patterns once within a SINGLE <nsfw_nsfl_ban_list>. Under each remaining heading, write one [Character]: pattern line per active character.
-- For NSFL scenes, record the concrete bodily reflex, defensive action, persona-true behavior, or immediate survival drive actually used this turn in ${labels.nsfl}, one line per character; change the NSFL bodily response and action drive in the next response.
-- Record concrete NSFW patterns every response; record NSFL only when it occurs, otherwise write ${vietnamese ? "Không có" : "None"} in the NSFL field. Overwrite the tracker with only patterns used this turn.
+- For NSFL scenes, record the concrete bodily reflex, defensive action, persona-true behavior, or immediate survival drive actually used this turn in ${labels.nsfl}, one line per character.
+- Record concrete NSFW patterns used this turn; record NSFL only when it occurs, otherwise write ${vietnamese ? "Không có" : "None"} in the NSFL field.
 `;
+}
+
+/** Remove tracker blocks from a request copy and retain their recorded content. */
+export function splitSolaNsfwTracker(input: string): { content: string; patterns: string } {
+  const records: string[] = [];
+  const content = input.replace(new RegExp(TRACKER_RE.source, TRACKER_RE.flags), (block) => {
+    const body = block
+      .replace(/^<\s{0,8}nsfw_nsfl_ban_list\b[^>]*>/i, "")
+      .replace(/<\s{0,8}\/\s{0,8}nsfw_nsfl_ban_list\s{0,8}>$/i, "")
+      .trim();
+    if (body) records.push(body);
+    return "";
+  });
+  return { content, patterns: records.join("\n\n") };
+}
+
+/** Wrap each recorded item in a system ban for the response about to be written. */
+export function solaNsfwPatternBanPrompt(patterns: string): string {
+  let heading = "";
+  const items: string[] = [];
+  for (const raw of patterns.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line) continue;
+    if (!line.startsWith("[") && /:\s*$/.test(line)) {
+      heading = line;
+      continue;
+    }
+    if (/:\s*\[?\s*(?:None|Không có)\s*\]?[.!]?$/iu.test(line)) continue;
+    if (!line.startsWith("[")) heading = "";
+    const item = heading ? `${heading}\n${line}` : line;
+    items.push(`<banned_pattern>\n${escapeHtml(item)}\n</banned_pattern>`);
+  }
+  if (!items.length) return "";
+  return `## NSFW/NSFL Pattern Ban
+- In THIS response, treat EVERY recorded item below as an ABSOLUTE BAN: replace the previous wording, structures, rhythms, pacing, and reaction patterns.
+- NEVER repeat, closely paraphrase, synonym-swap, or reuse these patterns. Change the way the scene is written, not its established facts.
+
+${items.join("\n\n")}`;
 }
 
 function escapeHtml(value: string): string {
@@ -118,7 +156,7 @@ export function adaptSolaNsfwTrackerForDisplay(input: string, vietnamese: boolea
   return input.replace(
     /<\s{0,8}nsfw_nsfl_ban_list\b[^>]*>([\s\S]*?)<\s{0,8}\/\s{0,8}nsfw_nsfl_ban_list\s{0,8}>/gi,
     (_match, body: string) =>
-      `<div data-sola-ui="nsfw-nsfl-tracker"><details style="margin:12px 0;background:rgba(36,18,20,.86);border:1px solid rgba(214,112,91,.42);border-left:4px solid #D6705B;border-radius:9px;box-shadow:0 3px 16px rgba(0,0,0,.3);overflow:hidden;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"><summary style="cursor:pointer;padding:10px 13px;background:linear-gradient(90deg,rgba(214,112,91,.18),rgba(36,18,20,.25));color:#F6C177;font-weight:800;outline:none;user-select:none;">${vietnamese ? "🔥 Sola: Danh sách cấm NSFW/NSFL" : "🔥 Sola: NSFW/NSFL Ban List"}</summary><div style="padding:9px 13px 12px;line-height:1.5;overflow-wrap:anywhere;">${trackerBodyHtml(body, vietnamese)}</div></details></div>`,
+      `<div data-sola-ui="nsfw-nsfl-tracker"><details style="margin:12px 0;background:rgba(36,18,20,.86);border:1px solid rgba(214,112,91,.42);border-left:4px solid #D6705B;border-radius:9px;box-shadow:0 3px 16px rgba(0,0,0,.3);overflow:hidden;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"><summary style="cursor:pointer;padding:10px 13px;background:linear-gradient(90deg,rgba(214,112,91,.18),rgba(36,18,20,.25));color:#F6C177;font-weight:800;outline:none;user-select:none;">${vietnamese ? "🔥 Sola: Ghi chép NSFW/NSFL" : "🔥 Sola: NSFW/NSFL Usage Record"}</summary><div style="padding:9px 13px 12px;line-height:1.5;overflow-wrap:anywhere;">${trackerBodyHtml(body, vietnamese)}</div></details></div>`,
   );
 }
 

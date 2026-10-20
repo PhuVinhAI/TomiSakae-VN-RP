@@ -595,7 +595,7 @@ async function showSettings(): Promise<void> {
             "sola-nsfw-tracker",
             settings.solaNsfwTrackerEnabled,
             "🔥 Bộ theo dõi NSFW/NSFL",
-            "Cấm cách miêu tả, kiểu thoại, tiếng rên và phản ứng NSFL vừa dùng ở lượt kế; tự ghi đè sau mỗi phản hồi NSFW/NSFL · Mặc định tắt",
+            "Ghi lại cách viết vừa dùng; hệ thống chuyển từng mục thành lệnh cấm lặp trong system của request kế tiếp · Mặc định tắt",
           )
         : ""
     }${
