@@ -4,13 +4,13 @@ const TRACKER_RE =
 export const SOLA_SEX_TRACKER_MEMO = "sex-tracker";
 
 export const SOLA_SEX_TRACKER_REMINDER =
-  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update current stage, cycle state, physical condition, pregnancy likelihood, risk awareness and attitude, and protection measures/actions.";
+  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update stage and discussion status, cycle state, physical condition, pregnancy likelihood, risk awareness and attitude, and protection measures/actions.";
 
 export function solaSexTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
     ? {
         character: "Tên nhân vật",
-        stage: "Giai đoạn",
+        stage: "Giai đoạn và trao đổi",
         cycle: "Chu kỳ kinh nguyệt",
         physicalCondition: "Tình trạng cơ thể",
         pregnancy: "Khả năng mang thai",
@@ -19,7 +19,7 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
       }
     : {
         character: "Character Name",
-        stage: "Stage",
+        stage: "Stage and discussion",
         cycle: "Menstrual cycle",
         physicalCondition: "Physical condition",
         pregnancy: "Pregnancy likelihood",
@@ -29,6 +29,9 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
   const stages = vietnamese
     ? { before: "Trước khi làm", during: "Đang diễn ra", after: "Kết thúc" }
     : { before: "Before", during: "In progress", after: "Finished" };
+  const discussion = vietnamese
+    ? { pending: "Chưa nói", done: "Đã nói về sinh sản" }
+    : { pending: "Not discussed", done: "Discussed reproduction" };
   const none = vietnamese ? "Không có" : "None";
   const unknown = vietnamese ? "chưa rõ" : "unknown";
   const examples = vietnamese
@@ -59,7 +62,7 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
 Located ${location || "at the end of your response"}, append:
 <sex_tracker>
 [${labels.character}]:
-${labels.stage}: [${stages.before} / ${stages.during} / ${stages.after} / ${none}]
+${labels.stage}: [${stages.before} / ${stages.during} / ${stages.after} / ${none}] | [${discussion.pending} / ${discussion.done}]
 ${labels.cycle}: [${examples.cycle}]
 ${labels.physicalCondition}: [${examples.physical}]
 ${labels.pregnancy}: [${examples.pregnancy}]
@@ -68,10 +71,10 @@ ${labels.protection}: [${examples.protection}]
 </sex_tracker>
 
 Rules:
-- Before writing, select EXACTLY ONE ${labels.stage} matching the current scene for each character; use ${none} if the scene has not actually progressed toward sexual activity. Run a Cognitive Check: identify the character's current facts, age, knowledge, experience, and beliefs; then let their established personality and card/lore determine the reaction.
-- Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Fill every field except ${labels.cycle} with a suitable value; record ${labels.cycle} only when the character knows or can reasonably recognize the phase or timing, otherwise write ${unknown}.
+- Before writing, select EXACTLY ONE stage matching the current scene for each character; use ${none} if the scene has not actually progressed toward sexual activity. Run a Cognitive Check: identify the character's current facts, age, knowledge, experience, and beliefs; then let their established personality and card/lore determine the reaction.
+- Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Fill every field except ${labels.cycle} with a suitable value; record ${labels.cycle} only when the character knows or can reasonably recognize the phase or timing, otherwise write ${unknown}. Only mark ${discussion.done} after actual scene dialogue; carry it through the same encounter and reset to ${discussion.pending} for a new encounter.
 - Assess pregnancy likelihood from cycle state, current actions, and protection measures/actions.
-- For the selected active stage, NPCs MUST express reproductive-risk awareness and choices through dialogue and action IN THE SCENE: ${stages.before}, establish intentions and measures; ${stages.during}, express boundaries and current decisions; ${stages.after}, assess remaining risk and subsequent response.
+- If ${discussion.pending} during an active stage, NPCs MUST discuss reproduction immediately IN THE SCENE: ${stages.before}, intentions/protection; ${stages.during}, boundaries/choices; ${stages.after}, risk/response. If unaware, ask according to their knowledge; pleasure, loss of control, or post-climax afterglow MUST NOT excuse skipping the discussion.
 - Let the checked risk awareness, knowledge, experience, beliefs, personality, and card/lore determine how the character avoids, opposes, or accepts risk, including uncertainty or conflict when present.
 - Place characters within a SINGLE <sex_tracker> container, separated by one blank line.`;
 }
@@ -87,8 +90,8 @@ function escapeHtml(value: string): string {
 
 function trackerBodyHtml(body: string, vietnamese: boolean): string {
   const labels = new Map<string, string>([
-    ["stage", vietnamese ? "Giai đoạn" : "Stage"],
-    ["giai đoạn", vietnamese ? "Giai đoạn" : "Stage"],
+    ["stage and discussion", vietnamese ? "Giai đoạn và trao đổi" : "Stage and discussion"],
+    ["giai đoạn và trao đổi", vietnamese ? "Giai đoạn và trao đổi" : "Stage and discussion"],
     ["menstrual cycle", vietnamese ? "Chu kỳ kinh nguyệt" : "Menstrual cycle"],
     ["chu kỳ kinh nguyệt", vietnamese ? "Chu kỳ kinh nguyệt" : "Menstrual cycle"],
     ["physical condition", vietnamese ? "Tình trạng cơ thể" : "Physical condition"],
