@@ -8,7 +8,7 @@ const USER_NSFW_RULES =
 
 // 1. CHUYÊN TRÁCH CƠ HỌC & NHỊP ĐỘ (Đã lược bỏ vế trùng lặp, giữ nhịp mượt mà)
 const KINETIC_NSFW_RULES =
-  "EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, pre-contact friction, fractured vocalizations, dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones; PACING MUST build progressively with tangible resistance and friction before climax, varying rhythm, pressure, pauses, and acceleration; when climax occurs, render the post-climax somatic aftermath";
+  "EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene and card/lore, consistent with established character traits and boundaries; EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, pre-contact friction, fractured vocalizations, dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones; PACING MUST build progressively with tangible resistance and friction before climax, varying rhythm, pressure, pauses, and acceleration; when climax occurs, render the post-climax somatic aftermath";
 
 // 2. CHUYÊN TRÁCH KHÓA NỘI TÂM / NÉ CẢNH (Đảm nhận toàn bộ trọng trách ưu tiên thể xác)
 const SOMATIC_PRIORITY_RULES =

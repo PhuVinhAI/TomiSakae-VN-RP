@@ -192,7 +192,7 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(gemmaFixPromptFor(3)).toContain("NEVER invent sexual initiative");
     expect(gemmaFixPromptFor(3)).not.toContain("across turns");
     const kineticRule =
-      "EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, pre-contact friction, fractured vocalizations, dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones; PACING MUST build progressively with tangible resistance and friction before climax, varying rhythm, pressure, pauses, and acceleration; when climax occurs, render the post-climax somatic aftermath";
+      "EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene and card/lore, consistent with established character traits and boundaries; EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, pre-contact friction, fractured vocalizations, dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones; PACING MUST build progressively with tangible resistance and friction before climax, varying rhythm, pressure, pauses, and acceleration; when climax occurs, render the post-climax somatic aftermath";
     const somaticPriorityRule =
       "EVERY NSFW/NSFL scene MUST keep physical sensation, impact, and somatic reflexes concrete even under distress, fear, or psychological resistance; PRIORITIZE external visceral kinetics and bodily response over internal emotional processing; NEVER summarize, sanitize, skip, or divert non-pleasurable sensations, pain, injury, or forced contact into abstract thoughts, coping monologues, or psychological debriefs";
     const postTraumaAgencyRule =
@@ -208,6 +208,9 @@ describe("TomiSakae VN-RP preset families", () => {
         "in NSFW scenes, INTERLEAVE matching NSFW action images with suitable expression/reaction images",
       );
       expect(gemmaFixPromptFor(level)).toContain("exact image-tag syntax");
+      expect(gemmaFixPromptFor(level)).toContain(
+        "EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat",
+      );
       expect(gemmaFixPromptFor(level)).toContain(kineticRule);
       expect(gemmaFixPromptFor(level)).toContain(somaticPriorityRule);
       expect(gemmaFixPromptFor(level)).toContain(postTraumaAgencyRule);
