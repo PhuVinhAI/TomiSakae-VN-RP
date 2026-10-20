@@ -13,7 +13,7 @@ Rules:
 export const SOLA_IMAGE_OPTIMIZATION_PROMPT = `## Image Coverage
 When card/lore provides images:
 - Use card/lore image syntax and available identifiers. Choose images of the correct character matching their current clothing, state, and setting. Prioritize images of clothing changes, then action/pose/physical state images, then expression images.
-- Every NSFW action that occurs must still use a matching available NSFW image in exact supported image syntax, even if {{char}} refuses or resists; depiction does not imply consent; prioritize NSFW action images over expression images.
+- Every NSFW or NSFL action that occurs must still use a matching available NSFW image in exact supported image syntax, even if {{char}} refuses or resists; depiction does not imply consent; prioritize NSFW or NSFL action images over expression images.
 - Place 1 image immediately before the narration or dialogue it depicts.
 - Use many images throughout the response, reselecting images when the character, action, or state changes.
 - Always output the complete image syntax and the full image name as provided by card/lore.`;
