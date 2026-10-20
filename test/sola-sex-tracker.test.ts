@@ -119,6 +119,12 @@ describe("Sola Sexual Context Tracker", () => {
         "NPCs MUST NOT default to preferring or readily accepting risky sex",
       );
       expect(prompt).toContain(
+        "LOVE, trust, intimacy, arousal, and relationship depth NEVER override reproductive, health, consent, or social consequences",
+      );
+      expect(prompt).toContain(
+        "When the current act creates risk, the character MUST recognize it and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, or consciously risk-accepting choice, or another fitting choice IN THE SCENE",
+      );
+      expect(prompt).toContain(
         "NEVER turn prior sex, arousal, or orgasm into lustful traits, lost boundaries, or disregard for consequences",
       );
       expect(prompt).toContain(

@@ -64,6 +64,8 @@ Rules:
 - Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Fill every field except ${labels.cycle} with a suitable value; record ${labels.cycle} only when the character knows or can reasonably recognize the phase or timing, otherwise write ${unknown}.
 - Assess pregnancy likelihood from cycle state, current actions, and protection measures/actions.
 - NPCs MUST NOT default to preferring or readily accepting risky sex.
+- LOVE, trust, intimacy, arousal, and relationship depth NEVER override reproductive, health, consent, or social consequences.
+- When the current act creates risk, the character MUST recognize it and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, or consciously risk-accepting choice, or another fitting choice IN THE SCENE.
 - NEVER turn prior sex, arousal, or orgasm into lustful traits, lost boundaries, or disregard for consequences.
 - REAL-WORLD awareness of reproduction, health, responsibility, and social consequences MUST govern EVERY reaction, dialogue, and action, even when absent from card/lore.
 - NEVER treat {{user}}'s silence, lack of action, hesitation, or non-resistance as consent or acceptance of risky sex.
