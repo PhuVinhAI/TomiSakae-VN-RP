@@ -28,6 +28,7 @@ const tracker = (name: string, pattern: string) => `<nsfw_nsfl_ban_list>
 Description patterns: ${pattern}
 Sensory emphasis: warm skin
 Pacing: tension to interruption
+Response structure: Sound(short) → Image → Narration(long) → Dialogue(short) → Thought(short) → Narration(long) → Narration(medium) → Image → Dialogue(short)
 
 Action/Body dynamics:
 [${name}]: shifting pressure
@@ -51,7 +52,7 @@ describe("Sola NSFW Tracker", () => {
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
     const module = composed.absolute.find((message) => message.memo?.endsWith(":nsfw-tracker"));
     expect(module?.content).toContain(
-      "Record ONLY patterns actually written above in THIS response",
+      "Record ONLY patterns actually written in THIS response; ignore all earlier responses, trackers, and history",
     );
     expect(module?.content).not.toContain("ABSOLUTE");
     expect(module?.content).not.toContain("next response");
@@ -62,12 +63,16 @@ describe("Sola NSFW Tracker", () => {
     expect(module?.content).toContain("Hành động/Động lực cơ thể:");
     expect(module?.content).toContain("Điểm nhấn cảm giác:");
     expect(module?.content).toContain("Nhịp triển khai:");
+    expect(module?.content).toContain("Bố cục phản hồi:");
+    expect(module?.content).toContain(
+      "Toàn bộ thứ tự các khối thực tế trong phản hồi hiện tại trước HUD, ghi loại và độ dài ngắn/vừa/dài; giữ riêng từng khối kể cả khi cùng loại liên tiếp",
+    );
     expect(module?.content).toContain("Phản ứng thân thể / Hành động NSFL:");
     expect(module?.content).toContain(
       "[Tên nhân vật]: [Distinct NSFW movement, force, pose, and contact patterns used this turn",
     );
     expect(module?.content).toContain(
-      "Record shared description, sensory, and pacing patterns once",
+      "Record shared description, sensory, pacing, and response structure once",
     );
     expect(module?.content).toContain(
       "For NSFL scenes, record the concrete bodily reflex, defensive action, persona-true behavior, or immediate survival drive",
@@ -234,6 +239,10 @@ describe("Sola NSFW Tracker", () => {
       expect(displayed).toContain('data-sola-ui="nsfw-nsfl-tracker"');
       expect(displayed).toContain(title);
       expect(displayed).toContain(label);
+      expect(displayed).toContain(vietnamese ? "Bố cục phản hồi" : "Response structure");
+      expect(displayed).toContain(
+        "Sound(short) → Image → Narration(long) → Dialogue(short) → Thought(short) → Narration(long) → Narration(medium) → Image → Dialogue(short)",
+      );
       expect(displayed).toContain("&lt;img src=x&gt;");
       expect(displayed).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
       expect(displayed).not.toContain("<img src=x>");
@@ -270,12 +279,21 @@ describe("Sola NSFW Tracker", () => {
     expect(ban.role).toBe("system");
     expect(ban.content).toContain("ABSOLUTE BAN");
     expect(ban.content).toContain("NEVER repeat, closely paraphrase, synonym-swap");
+    expect(ban.content).toContain(
+      "RESTRUCTURE the recorded response layout, not its individual block types: change the opening, block order, grouping, and lengths",
+    );
+    expect(ban.content).toContain(
+      "NEVER keep the template by only swapping words or changing a few positions",
+    );
     expect(ban.content).toContain("Description patterns: mẫu mới");
     expect(ban.content).toContain("Pacing: tension to interruption");
+    expect(ban.content).toContain(
+      "<banned_pattern>\nResponse structure: Sound(short) → Image → Narration(long) → Dialogue(short) → Thought(short) → Narration(long) → Narration(medium) → Image → Dialogue(short)\n</banned_pattern>",
+    );
     expect(ban.content).toContain("Action/Body dynamics:\n[Nana]: shifting pressure");
     expect(ban.content).toContain("Dialogue patterns:\n[Nana]: &quot;Lại đây.&quot;");
     expect(ban.content).toContain("Moans/Vocal reactions:\n[Nana]: breath catching");
-    expect(ban.content.match(/<banned_pattern>/g)).toHaveLength(6);
+    expect(ban.content.match(/<banned_pattern>/g)).toHaveLength(7);
     expect(ban.content).not.toContain("mẫu cũ");
     expect(built.at(-1)).toBe(ban);
     expect(messages).toEqual(snapshot);
