@@ -55,7 +55,7 @@ describe("Sola NSFW Tracker", () => {
     expect(module?.content).toContain("Hành động/Động lực cơ thể:");
     expect(module?.content).toContain("Điểm nhấn cảm giác:");
     expect(module?.content).toContain("Nhịp triển khai:");
-    expect(module?.content).toContain("Phản ứng với NSFL:");
+    expect(module?.content).toContain("Phản ứng thân thể / Hành động NSFL:");
     expect(module?.content).toContain(
       "[Tên nhân vật]: [Distinct movement, force, pose, and contact patterns used this turn",
     );
@@ -63,7 +63,7 @@ describe("Sola NSFW Tracker", () => {
       "Record shared description, sensory, and pacing patterns once",
     );
     expect(module?.content).toContain(
-      "For NSFL scenes, the next response MUST use a new bodily or behavioral response/action drive instead of the previous NSFL entry",
+      "For NSFL scenes, record the concrete bodily reflex, defensive action, persona-true behavior, or immediate survival drive",
     );
     expect(module?.content?.match(/\[Tên nhân vật\]:/g)).toHaveLength(4);
     expect(module?.content).not.toContain("<nsfw_nsfl_ban_list>\n[Tên nhân vật]:");

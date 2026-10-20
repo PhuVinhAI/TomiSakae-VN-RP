@@ -4,7 +4,7 @@ const TRACKER_RE =
 export const SOLA_NSFW_TRACKER_MEMO = "nsfw-tracker";
 
 export const SOLA_NSFW_TRACKER_REMINDER =
-  "- Telemetry (<nsfw_nsfl_ban_list>): BAN the previous NSFW/NSFL patterns; record shared description, sensory, and pacing patterns once, then record action, dialogue, vocal, and NSFL-response patterns per character.";
+  "- Telemetry (<nsfw_nsfl_ban_list>): BAN the previous NSFW/NSFL patterns; record shared description, sensory, and pacing patterns once, then record action, dialogue, vocal, and NSFL bodily-response/action patterns per character.";
 
 export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
@@ -15,7 +15,7 @@ export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): st
         dialogue: "Kiểu thoại",
         vocal: "Tiếng rên/Phản ứng giọng",
         pacing: "Nhịp triển khai",
-        nsfl: "Phản ứng với NSFL",
+        nsfl: "Phản ứng thân thể / Hành động NSFL",
       }
     : {
         description: "Description patterns",
@@ -24,7 +24,7 @@ export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): st
         dialogue: "Dialogue patterns",
         vocal: "Moans/Vocal reactions",
         pacing: "Pacing",
-        nsfl: "NSFL response",
+        nsfl: "NSFL bodily response / action",
       };
   return `## ${vietnamese ? "Danh sách cấm NSFW/NSFL" : "NSFW/NSFL Ban List"} 🔥
 Located ${location || "at the end of your response"}, append:
@@ -43,13 +43,13 @@ ${labels.vocal}:
 [${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Exact moans, gasps, stammers, or phonetic reactions used this turn, or ${vietnamese ? "Không có" : "None"}]
 
 ${labels.nsfl}:
-[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Concrete bodily or behavioral response to NSFL used this turn, or ${vietnamese ? "Không có" : "None"}]
+[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Concrete bodily reflex, defensive posture or action, persona-true behavior, or immediate survival drive used this turn, or ${vietnamese ? "Không có" : "None"}]
 </nsfw_nsfl_ban_list>
 
 Rules:
 - Use the previous <nsfw_nsfl_ban_list> as an ABSOLUTE NSFW/NSFL BAN LIST; do not repeat, closely paraphrase, synonym-swap, or reuse its structures, rhythms, or reaction patterns. Create new writing this turn.
 - Record shared description, sensory, and pacing patterns once within a SINGLE <nsfw_nsfl_ban_list>. Under each remaining heading, write one [Character]: pattern line per active character.
-- For NSFL scenes, the next response MUST use a new bodily or behavioral response/action drive instead of the previous NSFL entry; record the concrete response actually used this turn in ${labels.nsfl}, one line per character.
+- For NSFL scenes, record the concrete bodily reflex, defensive action, persona-true behavior, or immediate survival drive actually used this turn in ${labels.nsfl}, one line per character; change the NSFL bodily response and action drive in the next response.
 - Record only distinct patterns actually used in this turn, then overwrite the tracker. When no NSFW/NSFL content occurs this turn, write ${vietnamese ? "Không có" : "None"} in every field.
 `;
 }
@@ -79,8 +79,14 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
     ["moans/vocal reactions", vietnamese ? "Tiếng rên/Phản ứng giọng" : "Moans/Vocal reactions"],
     ["vocal patterns", vietnamese ? "Tiếng rên/Phản ứng giọng" : "Vocal patterns"],
     ["tiếng rên/phản ứng giọng", vietnamese ? "Tiếng rên/Phản ứng giọng" : "Moans/Vocal reactions"],
-    ["nsfl response", vietnamese ? "Phản ứng với NSFL" : "NSFL response"],
-    ["phản ứng với nsfl", vietnamese ? "Phản ứng với NSFL" : "NSFL response"],
+    [
+      "nsfl bodily response / action",
+      vietnamese ? "Phản ứng thân thể / Hành động NSFL" : "NSFL bodily response / action",
+    ],
+    [
+      "phản ứng thân thể / hành động nsfl",
+      vietnamese ? "Phản ứng thân thể / Hành động NSFL" : "NSFL bodily response / action",
+    ],
     ["pacing", vietnamese ? "Nhịp triển khai" : "Pacing"],
     ["nhịp triển khai", vietnamese ? "Nhịp triển khai" : "Pacing"],
   ]);
