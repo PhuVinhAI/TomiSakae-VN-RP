@@ -6,6 +6,7 @@ import { adaptSolaPunctuation } from "./sola-punctuation.js";
 import {
   adaptSolaStyleDependencies,
   adaptSolaHudDependencies,
+  adaptSolaCharacterMatrixSexCheck,
   solaList,
 } from "./sola-prompt-dependencies.js";
 import {
@@ -198,6 +199,11 @@ export function adaptFamilyPrompt(
     if (settings.vietnameseOutputEnabled) {
       content = adaptSolaPromptForVietnamese(content);
     }
+    content = adaptSolaCharacterMatrixSexCheck(
+      content,
+      modules,
+      settings.vietnameseOutputEnabled,
+    );
     // Adapt localized examples and macro reminders together, preserving source comments.
     content = content
       .split(/(\{\{\/\/[\s\S]*?\}\})/g)

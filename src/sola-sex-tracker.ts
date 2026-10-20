@@ -4,35 +4,26 @@ const TRACKER_RE =
 export const SOLA_SEX_TRACKER_MEMO = "sex-tracker";
 
 export const SOLA_SEX_TRACKER_REMINDER =
-  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update stage and discussion status, cycle state, physical condition, pregnancy likelihood, risk awareness and attitude, and protection measures/actions.";
+  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update cycle state, physical condition, pregnancy likelihood, real-world awareness and choice, and protection measures/actions.";
 
 export function solaSexTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
     ? {
         character: "Tên nhân vật",
-        stage: "Giai đoạn và trao đổi",
         cycle: "Chu kỳ kinh nguyệt",
         physicalCondition: "Tình trạng cơ thể",
         pregnancy: "Khả năng mang thai",
-        awareness: "Nhận thức và thái độ với rủi ro",
+        awareness: "Nhận thức thực tế và lựa chọn",
         protection: "Biện pháp và hành động bảo vệ",
       }
     : {
         character: "Character Name",
-        stage: "Stage and discussion",
         cycle: "Menstrual cycle",
         physicalCondition: "Physical condition",
         pregnancy: "Pregnancy likelihood",
-        awareness: "Risk awareness and attitude",
+        awareness: "Real-world awareness and choice",
         protection: "Protection measures/actions",
       };
-  const stages = vietnamese
-    ? { before: "Trước khi làm", during: "Đang diễn ra", after: "Kết thúc" }
-    : { before: "Before", during: "In progress", after: "Finished" };
-  const discussion = vietnamese
-    ? { pending: "Chưa nói", done: "Đã nói về sinh sản" }
-    : { pending: "Not discussed", done: "Discussed reproduction" };
-  const none = vietnamese ? "Không có" : "None";
   const unknown = vietnamese ? "chưa rõ" : "unknown";
   const examples = vietnamese
     ? {
@@ -42,8 +33,7 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
           "Còn trinh/từng quan hệ, tiền sử sinh nở, tổn thương, vừa đạt cực khoái, còn nhạy cảm hoặc ngứa ran, đang hưng phấn, tình trạng hồi phục hoặc tình trạng liên quan khác",
         pregnancy:
           "Thấp, vừa, cao, đã xác nhận hoặc khả năng khác được suy ra từ chu kỳ và hành động hiện tại",
-        awareness:
-          "Đã biết, chưa biết hoặc chưa rõ với nhân vật; điều nhân vật hiểu về nguy cơ sinh sản và cách họ tránh, phản đối hoặc chấp nhận nó",
+        awareness: "Điều nhân vật hiểu về hệ quả cá nhân/xã hội và lựa chọn hiện tại",
         protection:
           "Bao cao su, biện pháp tránh thai, thuốc tránh thai khẩn cấp, xuất ngoài, yêu cầu xuất ngoài, chuyển sang đường miệng/tay/đường khác, dừng hoặc từ chối, chấp nhận rủi ro hoặc hành động bảo vệ khác",
       }
@@ -54,7 +44,7 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
         pregnancy:
           "Low, moderate, high, confirmed, or another likelihood inferred from cycle and current actions",
         awareness:
-          "Known, unknown, or unclear to the character; what they understand about reproductive risk and how they avoid, oppose, or accept it",
+          "What the character understands about personal/social consequences and their current choice",
         protection:
           "Condom, contraception, emergency contraception, withdrawal, requesting external ejaculation, switching to oral/manual/another route, stopping or refusing, accepting risk, or another protective action",
       };
@@ -62,7 +52,6 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
 Located ${location || "at the end of your response"}, append:
 <sex_tracker>
 [${labels.character}]:
-${labels.stage}: [${stages.before} / ${stages.during} / ${stages.after} / ${none}] | [${discussion.pending} / ${discussion.done}]
 ${labels.cycle}: [${examples.cycle}]
 ${labels.physicalCondition}: [${examples.physical}]
 ${labels.pregnancy}: [${examples.pregnancy}]
@@ -71,11 +60,13 @@ ${labels.protection}: [${examples.protection}]
 </sex_tracker>
 
 Rules:
-- Before writing, select EXACTLY ONE stage matching the current scene for each character; use ${none} if the scene has not actually progressed toward sexual activity. Run a Cognitive Check: identify the character's current facts, age, knowledge, experience, and beliefs; then let their established personality and card/lore determine the reaction.
-- Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Fill every field except ${labels.cycle} with a suitable value; record ${labels.cycle} only when the character knows or can reasonably recognize the phase or timing, otherwise write ${unknown}. Only mark ${discussion.done} after actual scene dialogue; carry it through the same encounter and reset to ${discussion.pending} for a new encounter.
+- Before writing, run a Cognitive Check: what does the character understand, which consequences are relevant, and what choice does that understanding produce IN THE SCENE? Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition; NEVER invent ignorance to bypass consequences.
+- Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Fill every field except ${labels.cycle} with a suitable value; record ${labels.cycle} only when the character knows or can reasonably recognize the phase or timing, otherwise write ${unknown}.
 - Assess pregnancy likelihood from cycle state, current actions, and protection measures/actions.
-- If ${discussion.pending} during an active stage, NPCs MUST discuss reproduction immediately IN THE SCENE: ${stages.before}, intentions/protection; ${stages.during}, boundaries/choices; ${stages.after}, risk/response. If unaware, ask according to their knowledge; pleasure, loss of control, or post-climax afterglow MUST NOT excuse skipping the discussion.
-- Let the checked risk awareness, knowledge, experience, beliefs, personality, and card/lore determine how the character avoids, opposes, or accepts risk, including uncertainty or conflict when present.
+- NPCs MUST NOT default to preferring or readily accepting risky sex.
+- NEVER turn prior sex, arousal, or orgasm into lustful traits, lost boundaries, or disregard for consequences.
+- REAL-WORLD awareness of reproduction, health, responsibility, and social consequences MUST govern EVERY reaction, dialogue, and action, even when absent from card/lore.
+- NEVER treat {{user}}'s silence, lack of action, hesitation, or non-resistance as consent or acceptance of risky sex.
 - Place characters within a SINGLE <sex_tracker> container, separated by one blank line.`;
 }
 
@@ -90,8 +81,6 @@ function escapeHtml(value: string): string {
 
 function trackerBodyHtml(body: string, vietnamese: boolean): string {
   const labels = new Map<string, string>([
-    ["stage and discussion", vietnamese ? "Giai đoạn và trao đổi" : "Stage and discussion"],
-    ["giai đoạn và trao đổi", vietnamese ? "Giai đoạn và trao đổi" : "Stage and discussion"],
     ["menstrual cycle", vietnamese ? "Chu kỳ kinh nguyệt" : "Menstrual cycle"],
     ["chu kỳ kinh nguyệt", vietnamese ? "Chu kỳ kinh nguyệt" : "Menstrual cycle"],
     ["physical condition", vietnamese ? "Tình trạng cơ thể" : "Physical condition"],
@@ -103,12 +92,12 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
     ["knows current date", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
     ["biết ngày hiện tại", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
     [
-      "risk awareness and attitude",
-      vietnamese ? "Nhận thức và thái độ với rủi ro" : "Risk awareness and attitude",
+      "real-world awareness and choice",
+      vietnamese ? "Nhận thức thực tế và lựa chọn" : "Real-world awareness and choice",
     ],
     [
-      "nhận thức và thái độ với rủi ro",
-      vietnamese ? "Nhận thức và thái độ với rủi ro" : "Risk awareness and attitude",
+      "nhận thức thực tế và lựa chọn",
+      vietnamese ? "Nhận thức thực tế và lựa chọn" : "Real-world awareness and choice",
     ],
     [
       "protection measures/actions",

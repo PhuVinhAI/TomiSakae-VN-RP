@@ -24,11 +24,10 @@ beforeAll(async () => {
 
 const tracker = (character: string, cycle: string) => `<sex_tracker>
 [${character}]:
-Stage and discussion: None | Not discussed
 Menstrual cycle: ${cycle}
 Physical condition: unknown
 Pregnancy likelihood: unknown
-Risk awareness and attitude: unknown
+Real-world awareness and choice: Considers personal/social consequences
 Protection measure: unknown
 </sex_tracker>`;
 
@@ -40,9 +39,6 @@ describe("Sola Sexual Context Tracker", () => {
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
     const module = composed.absolute.find((message) => message.memo?.endsWith(":sex-tracker"));
     expect(module?.content).toContain("## Sexual Context Tracker");
-    expect(module?.content).toContain(
-      "Giai đoạn và trao đổi: [Trước khi làm / Đang diễn ra / Kết thúc / Không có] | [Chưa nói / Đã nói về sinh sản]",
-    );
     expect(module?.content).toContain("Chu kỳ kinh nguyệt:");
     expect(module?.content).not.toContain("Biết mốc chu kỳ:");
     expect(module?.content).not.toContain("Knows cycle timing:");
@@ -50,7 +46,7 @@ describe("Sola Sexual Context Tracker", () => {
     expect(module?.content).toContain(
       "vừa đạt cực khoái, còn nhạy cảm hoặc ngứa ran, đang hưng phấn",
     );
-    expect(module?.content).toContain("Nhận thức và thái độ với rủi ro:");
+    expect(module?.content).toContain("Nhận thức thực tế và lựa chọn:");
     expect(module?.content).toContain("Biện pháp và hành động bảo vệ:");
     expect(module?.content).toContain(
       "Bao cao su, biện pháp tránh thai, thuốc tránh thai khẩn cấp, xuất ngoài",
@@ -103,51 +99,41 @@ describe("Sola Sexual Context Tracker", () => {
   it.each([
     {
       vietnamese: true,
-      field: "Giai đoạn và trao đổi",
-      stages: ["Trước khi làm", "Đang diễn ra", "Kết thúc"],
-      none: "Không có",
-      pending: "Chưa nói",
-      done: "Đã nói về sinh sản",
+      field: "Nhận thức thực tế và lựa chọn",
+      value: "Điều nhân vật hiểu về hệ quả cá nhân/xã hội và lựa chọn hiện tại",
     },
     {
       vietnamese: false,
-      field: "Stage and discussion",
-      stages: ["Before", "In progress", "Finished"],
-      none: "None",
-      pending: "Not discussed",
-      done: "Discussed reproduction",
+      field: "Real-world awareness and choice",
+      value:
+        "What the character understands about personal/social consequences and their current choice",
     },
   ])(
-    "connects $field to stage-specific scene responses and allows $none",
-    ({ vietnamese, field, stages, none, pending, done }) => {
+    "connects $field to real-world awareness without stage or discussion bookkeeping",
+    ({ vietnamese, field, value }) => {
       const prompt = solaSexTrackerPrompt(vietnamese, "at the end of your response");
+      const body = prompt.match(/<sex_tracker>\n([\s\S]*?)\n<\/sex_tracker>/)?.[1];
+      expect(body?.split("\n")).toHaveLength(6);
+      expect(prompt).toContain(`${field}: [${value}]`);
       expect(prompt).toContain(
-        `${field}: [${[...stages, none].join(" / ")}] | [${pending} / ${done}]`,
+        "NPCs MUST NOT default to preferring or readily accepting risky sex",
       );
       expect(prompt).toContain(
-        "select EXACTLY ONE stage matching the current scene for each character",
+        "NEVER turn prior sex, arousal, or orgasm into lustful traits, lost boundaries, or disregard for consequences",
       );
       expect(prompt).toContain(
-        `use ${none} if the scene has not actually progressed toward sexual activity`,
+        "REAL-WORLD awareness of reproduction, health, responsibility, and social consequences MUST govern EVERY reaction, dialogue, and action, even when absent from card/lore",
       );
       expect(prompt).toContain(
-        `If ${pending} during an active stage, NPCs MUST discuss reproduction immediately IN THE SCENE`,
+        "NEVER treat {{user}}'s silence, lack of action, hesitation, or non-resistance as consent or acceptance of risky sex",
       );
-      expect(prompt).toContain(`${stages[0]}, intentions/protection`);
-      expect(prompt).toContain(`${stages[1]}, boundaries/choices`);
-      expect(prompt).toContain(`${stages[2]}, risk/response`);
-      expect(prompt).toContain(`Only mark ${done} after actual scene dialogue`);
+      expect(prompt).toContain("what choice does that understanding produce IN THE SCENE?");
       expect(prompt).toContain(
-        `carry it through the same encounter and reset to ${pending} for a new encounter`,
+        "Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition",
       );
-      expect(prompt).toContain("If unaware, ask according to their knowledge");
-      expect(prompt).toContain(
-        "pleasure, loss of control, or post-climax afterglow MUST NOT excuse skipping the discussion",
-      );
-      expect(prompt).not.toMatch(/^(?:Trao đổi sinh sản|Reproductive discussion):/m);
-      expect(prompt).toContain("avoids, opposes, or accepts risk");
+      expect(prompt).toContain("NEVER invent ignorance to bypass consequences");
       expect(prompt).not.toMatch(
-        /generic patterns|generic sexual pattern|Do not default a sexual outcome/,
+        /Giai đoạn|Stage|Chưa nói|Đã nói|Not discussed|Discussed reproduction|active stage|reset|MUST discuss/,
       );
     },
   );
@@ -176,6 +162,37 @@ describe("Sola Sexual Context Tracker", () => {
     expect(composed.absolute.filter((message) => message.content.includes(reminder))).toHaveLength(
       2,
     );
+  });
+
+  it("adds a final sex check to Character Matrix only when both modules are enabled", async () => {
+    const settings = createDefaultSettings(sola);
+    settings.solaSexTrackerEnabled = true;
+    settings.vietnameseOutputEnabled = true;
+    const enabled = await composePresetPrompts(sola, settings, async (value) => value);
+    const enabledText = [...enabled.leading, ...enabled.absolute, ...enabled.trailing]
+      .map((message) => message.content)
+      .join("\n");
+    expect(enabledText).toContain(
+      "Kiểm tra tình dục: [Bối cảnh tình dục, ranh giới, nhận thức nguy cơ sinh sản và lựa chọn/hành động hiện tại; đối chiếu <sex_tracker>]",
+    );
+
+    settings.solaSexTrackerEnabled = false;
+    const sexOff = await composePresetPrompts(sola, settings, async (value) => value);
+    expect(
+      [...sexOff.leading, ...sexOff.absolute, ...sexOff.trailing]
+        .map((message) => message.content)
+        .join("\n"),
+    ).not.toContain("Kiểm tra tình dục:");
+
+    settings.solaSexTrackerEnabled = true;
+    const matrix = sola.prompts.find((prompt) => prompt.name?.includes("{{char}} Matrix"))!;
+    settings.promptEnabled[matrix.identifier] = false;
+    const matrixOff = await composePresetPrompts(sola, settings, async (value) => value);
+    expect(
+      [...matrixOff.leading, ...matrixOff.absolute, ...matrixOff.trailing]
+        .map((message) => message.content)
+        .join("\n"),
+    ).not.toContain("Kiểm tra tình dục:");
   });
 
   it("expires the previous assistant tracker after one later response", () => {
@@ -234,7 +251,9 @@ describe("Sola Sexual Context Tracker", () => {
     });
     expect(displayed).toContain('data-sola-ui="sex-tracker"');
     expect(displayed).toContain("🌙 Sola: Bối cảnh tình dục");
-    expect(displayed).toContain("Giai đoạn và trao đổi:</span> None | Not discussed");
+    expect(displayed).toContain(
+      "Nhận thức thực tế và lựa chọn:</span> Considers personal/social consequences",
+    );
     expect(displayed).toContain("Tình trạng cơ thể:</span> unknown");
     expect(displayed).toContain("&lt;img&gt;");
     const estimate = await estimatePluginPromptTokens(sola, settings, {
@@ -246,17 +265,19 @@ describe("Sola Sexual Context Tracker", () => {
     ).toBeGreaterThan(0);
   });
 
-  it("renders the stage with the same HUD styling in English", () => {
+  it("renders real-world awareness with the same HUD styling in English", () => {
     const settings = createDefaultSettings(sola);
     settings.solaSexTrackerEnabled = true;
     settings.vietnameseOutputEnabled = false;
     const displayed = applyRegexScripts(
-      `<sex_tracker>\n[Nana]:\nGiai đoạn và trao đổi: Đang diễn ra | Đã nói về sinh sản\n</sex_tracker>`,
+      `<sex_tracker>\n[Nana]:\nNhận thức thực tế và lựa chọn: Hiểu hệ quả; chọn biện pháp bảo vệ\n</sex_tracker>`,
       sola,
       settings,
       { placement: PLACEMENT_AI_OUTPUT, markdown: true, depth: 0 },
     );
-    expect(displayed).toContain("Stage and discussion:</span> Đang diễn ra | Đã nói về sinh sản");
+    expect(displayed).toContain(
+      "Real-world awareness and choice:</span> Hiểu hệ quả; chọn biện pháp bảo vệ",
+    );
     expect(displayed).toContain("🌙 Sola: Sexual Context");
   });
 });

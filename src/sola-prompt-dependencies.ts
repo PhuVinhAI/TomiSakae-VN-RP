@@ -209,3 +209,23 @@ export function adaptSolaHudDependencies(content: string, modules: ReadonlySet<s
   }
   return content;
 }
+
+/** Add Sex Tracker's final Character Matrix audit without modifying the frozen source JSON. */
+export function adaptSolaCharacterMatrixSexCheck(
+  content: string,
+  modules: ReadonlySet<string>,
+  vietnamese: boolean,
+): string {
+  if (
+    !modules.has("mod_track_charmatrix") ||
+    !modules.has("mod_track_sex") ||
+    !/<char_matrix\b/i.test(content) ||
+    /(?:Sex Check|Kiểm tra tình dục):\s*\[/i.test(content)
+  )
+    return content;
+
+  const field = vietnamese
+    ? "Kiểm tra tình dục: [Bối cảnh tình dục, ranh giới, nhận thức nguy cơ sinh sản và lựa chọn/hành động hiện tại; đối chiếu <sex_tracker>]"
+    : "Sex Check: [Sexual context, boundaries, reproductive-risk awareness, and current sexual choice/action; cross-check <sex_tracker>]";
+  return content.replace(/(\n(?:Audit|Kiểm tra):[^\n]*\n)(<\/char_matrix>)/i, `$1${field}\n$2`);
+}
