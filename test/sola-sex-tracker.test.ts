@@ -26,7 +26,6 @@ const tracker = (character: string, cycle: string) => `<sex_tracker>
 Menstrual cycle: ${cycle}
 Physical condition: unknown
 Pregnancy likelihood: unknown
-Knows cycle timing: Unclear
 Risk awareness and attitude: unknown
 Protection measure: unknown
 </sex_tracker>`;
@@ -40,17 +39,26 @@ describe("Sola Sexual Context Tracker", () => {
     const module = composed.absolute.find((message) => message.memo?.endsWith(":sex-tracker"));
     expect(module?.content).toContain("## Sexual Context Tracker");
     expect(module?.content).toContain("Chu kỳ kinh nguyệt:");
+    expect(module?.content).not.toContain("Biết mốc chu kỳ:");
+    expect(module?.content).not.toContain("Knows cycle timing:");
     expect(module?.content).toContain("Tình trạng cơ thể:");
     expect(module?.content).toContain("recent orgasm, lingering sensitivity or itchiness, arousal");
     expect(module?.content).toContain("Nhận thức và thái độ với rủi ro:");
     expect(module?.content).toContain("Biện pháp và hành động bảo vệ:");
     expect(module?.content).toContain("Protection methods or protective actions");
     expect(module?.content).toContain(
-      "For Chu kỳ kinh nguyệt, always record a suitable phase or timing",
+      "record Chu kỳ kinh nguyệt only when the character knows or can reasonably recognize the phase or timing",
     );
     expect(module?.content).toContain(
-      "use chưa rõ only for the character's limited knowledge of cycle timing or risk",
+      "when data is missing, choose the most plausible development and keep it consistent",
     );
+    expect(module?.content).toContain(
+      "Fill every field except Chu kỳ kinh nguyệt with a suitable value",
+    );
+    expect(module?.content).toContain(
+      "otherwise write chưa rõ",
+    );
+    expect(module?.content).not.toContain("cycle-timing knowledge");
     expect(module?.content).not.toContain("Tình trạng rủi ro:");
     expect(
       [...composed.leading, ...composed.absolute, ...composed.trailing].some((message) =>

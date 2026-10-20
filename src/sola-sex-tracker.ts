@@ -4,7 +4,7 @@ const TRACKER_RE =
 export const SOLA_SEX_TRACKER_MEMO = "sex-tracker";
 
 export const SOLA_SEX_TRACKER_REMINDER =
-  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update cycle state, physical condition, pregnancy likelihood, cycle-timing knowledge, risk awareness and attitude, and protection measures/actions.";
+  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update cycle state, physical condition, pregnancy likelihood, risk awareness and attitude, and protection measures/actions.";
 
 export function solaSexTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
@@ -13,7 +13,6 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
         cycle: "Chu kỳ kinh nguyệt",
         physicalCondition: "Tình trạng cơ thể",
         pregnancy: "Khả năng mang thai",
-        dateKnowledge: "Biết mốc chu kỳ",
         awareness: "Nhận thức và thái độ với rủi ro",
         protection: "Biện pháp và hành động bảo vệ",
       }
@@ -22,27 +21,24 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
         cycle: "Menstrual cycle",
         physicalCondition: "Physical condition",
         pregnancy: "Pregnancy likelihood",
-        dateKnowledge: "Knows cycle timing",
         awareness: "Risk awareness and attitude",
         protection: "Protection measures/actions",
       };
   const unknown = vietnamese ? "chưa rõ" : "unknown";
-  const dateKnowledge = vietnamese ? "Đã biết / Chưa biết / Chưa rõ" : "Known / Unknown / Unclear";
   return `## Sexual Context Tracker 🌙
 Located ${location || "at the end of your response"}, append:
 <sex_tracker>
 [${labels.character}]:
-${labels.cycle}: [Current cycle state]
+${labels.cycle}: [Cycle phase or timing known to the character, or ${unknown}]
 ${labels.physicalCondition}: [No prior/prior intercourse, childbirth history, injuries, recent orgasm, lingering sensitivity or itchiness, arousal, recovery status]
 ${labels.pregnancy}: [Current likelihood]
-${labels.dateKnowledge}: [${dateKnowledge}]
 ${labels.awareness}: [What the character understands about the current reproductive risk and how they avoid, oppose, or accept it]
 ${labels.protection}: [Protection methods or protective actions the character knows and takes, or none / not applicable]
 </sex_tracker>
 
 Rules:
 - Before writing, run a Cognitive Check: identify the character's current facts, age, knowledge, experience, and beliefs; then let their established personality and card/lore determine the reaction.
-- Infer and update tracker values from card/lore, the previous tracker, elapsed time, and current actions; when data is missing, choose the most plausible development and keep it consistent. For ${labels.cycle}, always record a suitable phase or timing; use ${unknown} only for the character's limited knowledge of cycle timing or risk.
+- Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Fill every field except ${labels.cycle} with a suitable value; record ${labels.cycle} only when the character knows or can reasonably recognize the phase or timing, otherwise write ${unknown}.
 - Assess pregnancy likelihood from cycle state, current actions, and protection measures/actions, not from generic patterns or desire.
 - Do not default a sexual outcome or risk response; let the checked risk awareness, personality, card, and lore determine whether the character avoids, opposes, or accepts risk and how they handle it.
 - Do not let a generic sexual pattern decide the outcome. Write the character's response to the checked context, including uncertainty or conflict when present.
