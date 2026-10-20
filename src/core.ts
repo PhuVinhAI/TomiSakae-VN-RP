@@ -127,6 +127,8 @@ export interface FfGlobalSettings {
 
 export interface MacroContext {
   randomInt?: (minimum: number, maximum: number) => number;
+  /** Fresh reproductive roll for the current real generation request. */
+  reproductiveRoll?: string;
   dialogueTheme?: DialogueTheme;
   cardImageCatalog?: CardImageCatalog;
 }
@@ -523,7 +525,11 @@ export function composePresetPrompts(
       const content = await parseHostMacros(
         kind === "nsfw"
           ? solaNsfwTrackerPrompt(settings.vietnameseOutputEnabled, location)
-          : solaSexTrackerPrompt(settings.vietnameseOutputEnabled, location),
+          : solaSexTrackerPrompt(
+              settings.vietnameseOutputEnabled,
+              location,
+              macroContext.reproductiveRoll,
+            ),
         "system",
       );
       const memo = `${memoPrefix}${kind === "nsfw" ? SOLA_NSFW_TRACKER_MEMO : SOLA_SEX_TRACKER_MEMO}`;

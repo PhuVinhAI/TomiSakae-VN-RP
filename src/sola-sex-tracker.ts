@@ -4,55 +4,71 @@ const TRACKER_RE =
 export const SOLA_SEX_TRACKER_MEMO = "sex-tracker";
 
 export const SOLA_SEX_TRACKER_REMINDER =
-  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update cycle state, physical condition, pregnancy likelihood, real-world awareness and choice, and protection measures/actions.";
+  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; simulate cycle state, record cycle knowledge, physical condition, pregnancy likelihood/status, real-world awareness and choice, and protection measures/actions.";
 
-export function solaSexTrackerPrompt(vietnamese: boolean, location: string): string {
+export function solaSexTrackerPrompt(
+  vietnamese: boolean,
+  location: string,
+  reproductiveRoll = "system-provided",
+): string {
   const labels = vietnamese
     ? {
         character: "Tên nhân vật",
         cycle: "Chu kỳ kinh nguyệt",
+        cycleKnowledge: "Nhận biết chu kỳ",
         physicalCondition: "Tình trạng cơ thể",
-        pregnancy: "Khả năng mang thai",
+        pregnancy: "Khả năng và trạng thái mang thai",
         awareness: "Nhận thức thực tế và lựa chọn",
         protection: "Biện pháp và hành động bảo vệ",
       }
     : {
         character: "Character Name",
         cycle: "Menstrual cycle",
+        cycleKnowledge: "Cycle knowledge",
         physicalCondition: "Physical condition",
-        pregnancy: "Pregnancy likelihood",
+        pregnancy: "Pregnancy likelihood/status",
         awareness: "Real-world awareness and choice",
         protection: "Protection measures/actions",
       };
-  const unknown = vietnamese ? "chưa rõ" : "unknown";
   const examples = vietnamese
     ? {
         cycle:
-          "Kinh nguyệt, trước rụng trứng, rụng trứng, sau rụng trứng hoặc giai đoạn/mốc thời gian hợp lý khác mà nhân vật biết, hoặc chưa rõ",
+          "Kinh nguyệt, trước rụng trứng, rụng trứng, sau rụng trứng hoặc giai đoạn/mốc sinh học hợp lý khác được mô phỏng từ dữ liệu hiện có",
+        cycleKnowledge:
+          "Biết, Không biết, Chưa rõ hoặc trạng thái nhận biết phù hợp khác",
         physical:
           "Còn trinh/từng quan hệ, tiền sử sinh nở, tổn thương, vừa đạt cực khoái, còn nhạy cảm hoặc ngứa ran, đang hưng phấn, tình trạng hồi phục hoặc tình trạng liên quan khác",
         pregnancy:
-          "Thấp, vừa, cao, đã xác nhận hoặc khả năng khác được suy ra từ chu kỳ và hành động hiện tại",
+          "00.00% đến 100.00%; Chưa xác nhận, Đã xác nhận, Không thể xảy ra hoặc trạng thái phù hợp khác",
         awareness: "Điều nhân vật hiểu về hệ quả cá nhân/xã hội và lựa chọn hiện tại",
         protection:
           "Bao cao su, biện pháp tránh thai, thuốc tránh thai khẩn cấp, xuất ngoài, yêu cầu xuất ngoài, chuyển sang đường miệng/tay/đường khác, dừng hoặc từ chối, chấp nhận rủi ro hoặc hành động bảo vệ khác",
       }
     : {
-        cycle: `Menstruation, pre-ovulation, ovulation, post-ovulation, or another plausible phase/timing known to the character, or ${unknown}`,
+        cycle: "Menstruation, pre-ovulation, ovulation, post-ovulation, or another plausible biological phase/timing simulated from available data",
+        cycleKnowledge:
+          "Known, Unknown, Unclear, or another fitting awareness state",
         physical:
           "Virginity/prior intercourse, childbirth history, injuries, recent orgasm, lingering sensitivity or itchiness, arousal, recovery status, or another relevant condition",
         pregnancy:
-          "Low, moderate, high, confirmed, or another likelihood inferred from cycle and current actions",
+          "00.00% to 100.00%; Unconfirmed, Confirmed, Impossible, or another fitting status",
         awareness:
           "What the character understands about personal/social consequences and their current choice",
         protection:
           "Condom, contraception, emergency contraception, withdrawal, requesting external ejaculation, switching to oral/manual/another route, stopping or refusing, accepting risk, or another protective action",
       };
+  const cycleKnowledgeValues = vietnamese
+    ? "Biết, Không biết, Chưa rõ hoặc trạng thái nhận biết phù hợp khác"
+    : "Known, Unknown, Unclear, or another fitting awareness state";
+  const confirmed = vietnamese ? "Đã xác nhận" : "Confirmed";
+  const unconfirmed = vietnamese ? "Chưa xác nhận" : "Unconfirmed";
+  const impossible = vietnamese ? "Không thể xảy ra" : "Impossible";
   return `## Sexual Context Tracker 🌙
 Located ${location || "at the end of your response"}, append:
 <sex_tracker>
 [${labels.character}]:
 ${labels.cycle}: [${examples.cycle}]
+${labels.cycleKnowledge}: [${examples.cycleKnowledge}]
 ${labels.physicalCondition}: [${examples.physical}]
 ${labels.pregnancy}: [${examples.pregnancy}]
 ${labels.awareness}: [${examples.awareness}]
@@ -60,12 +76,13 @@ ${labels.protection}: [${examples.protection}]
 </sex_tracker>
 
 Rules:
-- Before writing, run a Cognitive Check: what does the character understand, which consequences are relevant, and what choice does that understanding produce IN THE SCENE? Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition; NEVER invent ignorance to bypass consequences.
-- Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Fill every field except ${labels.cycle} with a suitable value; record ${labels.cycle} only when the character knows or can reasonably recognize the phase or timing, otherwise write ${unknown}.
-- Assess pregnancy likelihood from cycle state, current actions, and protection measures/actions.
+- Before writing, run a Cognitive Check: what does the character understand, which consequences are relevant, and what choice does that understanding produce IN THE SCENE? This check separates objective biological data from character awareness. Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition; NEVER invent ignorance to bypass consequences.
+- Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, relevant RP events, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Always simulate the objective biological menstrual cycle; record ${labels.cycleKnowledge} separately as ${cycleKnowledgeValues}.
+- Assess and update ${labels.pregnancy} from the simulated cycle, physical condition, current reproductive exposure, and ${labels.protection}. Use at least two decimal places and keep the result consistent with the biological conditions and current actions.
+- Reproductive roll this turn: [${reproductiveRoll}/100.00]. When reproductive exposure occurs, compare it with ${labels.pregnancy}; a successful roll means ${confirmed}, a failed roll means ${unconfirmed}, and ${impossible} requires a clear bodily or situational condition preventing pregnancy. Use another fitting status when the situation requires it.
 - NPCs MUST NOT default to preferring or readily accepting risky sex.
 - LOVE, trust, intimacy, arousal, and relationship depth NEVER override reproductive, health, consent, or social consequences.
-- When the current act creates risk, the character MUST recognize it and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, or consciously risk-accepting choice, or another fitting choice IN THE SCENE.
+- When the current act creates risk, the character MUST recognize it and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE when their awareness and ability allow it; lack of awareness does not erase biological or social consequences.
 - NEVER turn prior sex, arousal, or orgasm into lustful traits, lost boundaries, or disregard for consequences.
 - REAL-WORLD awareness of reproduction, health, responsibility, and social consequences MUST govern EVERY reaction, dialogue, and action, even when absent from card/lore.
 - NEVER treat {{user}}'s silence, lack of action, hesitation, or non-resistance as consent or acceptance of risky sex.
@@ -85,10 +102,20 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
   const labels = new Map<string, string>([
     ["menstrual cycle", vietnamese ? "Chu kỳ kinh nguyệt" : "Menstrual cycle"],
     ["chu kỳ kinh nguyệt", vietnamese ? "Chu kỳ kinh nguyệt" : "Menstrual cycle"],
+    ["cycle knowledge", vietnamese ? "Nhận biết chu kỳ" : "Cycle knowledge"],
+    ["nhận biết chu kỳ", vietnamese ? "Nhận biết chu kỳ" : "Cycle knowledge"],
     ["physical condition", vietnamese ? "Tình trạng cơ thể" : "Physical condition"],
     ["tình trạng cơ thể", vietnamese ? "Tình trạng cơ thể" : "Physical condition"],
     ["pregnancy likelihood", vietnamese ? "Khả năng mang thai" : "Pregnancy likelihood"],
     ["khả năng mang thai", vietnamese ? "Khả năng mang thai" : "Pregnancy likelihood"],
+    [
+      "pregnancy likelihood/status",
+      vietnamese ? "Khả năng và trạng thái mang thai" : "Pregnancy likelihood/status",
+    ],
+    [
+      "khả năng và trạng thái mang thai",
+      vietnamese ? "Khả năng và trạng thái mang thai" : "Pregnancy likelihood/status",
+    ],
     ["knows cycle timing", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
     ["biết mốc chu kỳ", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
     ["knows current date", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
@@ -142,7 +169,7 @@ export function adaptSolaSexTrackerForDisplay(input: string, vietnamese: boolean
   return input.replace(
     /<\s{0,8}sex_tracker\b[^>]*>([\s\S]*?)<\s{0,8}\/\s{0,8}sex_tracker\s{0,8}>/gi,
     (_match, body: string) =>
-      `<div data-sola-ui="sex-tracker"><details style="margin:12px 0;background:linear-gradient(135deg,rgba(44,22,38,.96),rgba(22,25,43,.94));border:1px solid rgba(224,137,180,.52);border-left:4px solid #E089B4;border-radius:9px;box-shadow:0 3px 16px rgba(0,0,0,.3);overflow:hidden;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"><summary style="cursor:pointer;padding:10px 13px;background:linear-gradient(90deg,rgba(224,137,180,.2),rgba(22,25,43,.25));color:#FFD4E9;font-weight:800;outline:none;user-select:none;">${vietnamese ? "🌙 Sola: Bối cảnh tình dục" : "🌙 Sola: Sexual Context"}</summary><div style="padding:9px 13px 12px;line-height:1.5;overflow-wrap:anywhere;">${trackerBodyHtml(body, vietnamese)}</div></details></div>`,
+      `<div data-sola-ui="sex-tracker"><details style="margin:12px 0;background:linear-gradient(135deg,rgba(44,22,38,.96),rgba(22,25,43,.94));border:1px solid rgba(224,137,180,.52);border-left:4px solid #E089B4;border-radius:9px;box-shadow:0 3px 16px rgba(0,0,0,.3);overflow:hidden;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"><summary style="cursor:pointer;padding:10px 13px;background:linear-gradient(90deg,rgba(224,137,180,.2),rgba(22,25,43,.25));color:#FFD4E9;font-weight:800;outline:none;user-select:none;">${vietnamese ? "🌙 Sola: Theo dõi sinh sản" : "🌙 Sola: Reproductive Context"}</summary><div style="padding:9px 13px 12px;line-height:1.5;overflow-wrap:anywhere;">${trackerBodyHtml(body, vietnamese)}</div></details></div>`,
   );
 }
 

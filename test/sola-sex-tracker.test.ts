@@ -40,8 +40,8 @@ describe("Sola Sexual Context Tracker", () => {
     const module = composed.absolute.find((message) => message.memo?.endsWith(":sex-tracker"));
     expect(module?.content).toContain("## Sexual Context Tracker");
     expect(module?.content).toContain("Chu kỳ kinh nguyệt:");
-    expect(module?.content).not.toContain("Biết mốc chu kỳ:");
-    expect(module?.content).not.toContain("Knows cycle timing:");
+    expect(module?.content).toContain("Nhận biết chu kỳ:");
+    expect(module?.content).toContain("Nhận biết chu kỳ");
     expect(module?.content).toContain("Tình trạng cơ thể:");
     expect(module?.content).toContain(
       "vừa đạt cực khoái, còn nhạy cảm hoặc ngứa ran, đang hưng phấn",
@@ -52,15 +52,13 @@ describe("Sola Sexual Context Tracker", () => {
       "Bao cao su, biện pháp tránh thai, thuốc tránh thai khẩn cấp, xuất ngoài",
     );
     expect(module?.content).toContain(
-      "record Chu kỳ kinh nguyệt only when the character knows or can reasonably recognize the phase or timing",
+      "Always simulate the objective biological menstrual cycle",
     );
     expect(module?.content).toContain(
       "when data is missing, choose the most plausible development and keep it consistent",
     );
-    expect(module?.content).toContain(
-      "Fill every field except Chu kỳ kinh nguyệt with a suitable value",
-    );
-    expect(module?.content).toContain("otherwise write chưa rõ");
+    expect(module?.content).toContain("Khả năng và trạng thái mang thai:");
+    expect(module?.content).toContain("00.00% đến 100.00%");
     expect(module?.content).not.toContain("cycle-timing knowledge");
     expect(module?.content).not.toContain("Tình trạng rủi ro:");
     expect(
@@ -113,7 +111,7 @@ describe("Sola Sexual Context Tracker", () => {
     ({ vietnamese, field, value }) => {
       const prompt = solaSexTrackerPrompt(vietnamese, "at the end of your response");
       const body = prompt.match(/<sex_tracker>\n([\s\S]*?)\n<\/sex_tracker>/)?.[1];
-      expect(body?.split("\n")).toHaveLength(6);
+      expect(body?.split("\n")).toHaveLength(7);
       expect(prompt).toContain(`${field}: [${value}]`);
       expect(prompt).toContain(
         "NPCs MUST NOT default to preferring or readily accepting risky sex",
@@ -122,7 +120,7 @@ describe("Sola Sexual Context Tracker", () => {
         "LOVE, trust, intimacy, arousal, and relationship depth NEVER override reproductive, health, consent, or social consequences",
       );
       expect(prompt).toContain(
-        "When the current act creates risk, the character MUST recognize it and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, or consciously risk-accepting choice, or another fitting choice IN THE SCENE",
+        "When the current act creates risk, the character MUST recognize it and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE",
       );
       expect(prompt).toContain(
         "NEVER turn prior sex, arousal, or orgasm into lustful traits, lost boundaries, or disregard for consequences",
@@ -256,7 +254,7 @@ describe("Sola Sexual Context Tracker", () => {
       depth: 0,
     });
     expect(displayed).toContain('data-sola-ui="sex-tracker"');
-    expect(displayed).toContain("🌙 Sola: Bối cảnh tình dục");
+    expect(displayed).toContain("🌙 Sola: Theo dõi sinh sản");
     expect(displayed).toContain(
       "Nhận thức thực tế và lựa chọn:</span> Considers personal/social consequences",
     );
@@ -284,6 +282,6 @@ describe("Sola Sexual Context Tracker", () => {
     expect(displayed).toContain(
       "Real-world awareness and choice:</span> Hiểu hệ quả; chọn biện pháp bảo vệ",
     );
-    expect(displayed).toContain("🌙 Sola: Sexual Context");
+    expect(displayed).toContain("🌙 Sola: Reproductive Context");
   });
 });

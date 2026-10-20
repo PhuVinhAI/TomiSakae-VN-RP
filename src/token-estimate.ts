@@ -58,6 +58,7 @@ export async function estimatePluginPromptTokens(
     // Preview must not roll dice or affect the values used for actual generation.
     {
       randomInt: (minimum) => minimum,
+      reproductiveRoll: "system-provided",
       ...(hostContext.dialogueTheme ? { dialogueTheme: hostContext.dialogueTheme } : {}),
     },
     (message, prompt) => {

@@ -1769,7 +1769,7 @@ describe("Sola V2 Flame plugin integration", () => {
     expect(saved.presets[0]!.settings.submodelEditorEnabled).toBe(true);
     expect(saved.presets[0]!.settings.soundNotificationsEnabled).toBe(true);
     expect(plugin.settingsHtml()).toContain("🔥 Bộ theo dõi NSFW");
-    expect(plugin.settingsHtml()).toContain("🌙 Bộ theo dõi bối cảnh tình dục");
+    expect(plugin.settingsHtml()).toContain("🌙 Theo dõi sinh sản");
     expect(plugin.toggle("sola-nsfw-tracker").checked).toBe(false);
     expect(plugin.toggle("sola-sex-tracker").checked).toBe(false);
     plugin.toggle("sola-nsfw-tracker").checked = true;

@@ -265,6 +265,10 @@ const mainCompletionMonitor = createCompletionMonitor(Risuai);
 let notificationAudio: NotificationAudioContext | undefined;
 let pluginUnloaded = false;
 
+function reproductiveRoll(): string {
+  return (Math.random() * 100).toFixed(2);
+}
+
 function playCompletionSound(enabled: boolean, success: boolean): void {
   if (!enabled || pluginUnloaded) return;
   try {
@@ -604,8 +608,8 @@ async function showSettings(): Promise<void> {
             "plugin",
             "sola-sex-tracker",
             settings.solaSexTrackerEnabled,
-            "🌙 Bộ theo dõi bối cảnh tình dục",
-            "Ghi bối cảnh sinh sản, nhận thức thực tế và lựa chọn qua Cognitive Check; tự xóa sau phản hồi kế · Mặc định tắt",
+            "🌙 Theo dõi sinh sản",
+            "Mô phỏng chu kỳ, nhận biết chu kỳ và khả năng mang thai qua Cognitive Check; tự xóa sau phản hồi kế · Mặc định tắt",
           )
         : ""
     }${checkbox(
@@ -1221,6 +1225,9 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
     {
       ...(macroContext.dialogueTheme ? { dialogueTheme: macroContext.dialogueTheme } : {}),
       ...(macroContext.cardImageCatalog ? { cardImageCatalog: macroContext.cardImageCatalog } : {}),
+      ...(familyOf(preset) === "sola" && settings.solaSexTrackerEnabled
+        ? { reproductiveRoll: reproductiveRoll() }
+        : {}),
     },
   );
   if (editorListenerRegistered) {
