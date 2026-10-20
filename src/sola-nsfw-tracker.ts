@@ -31,7 +31,7 @@ Located ${location || "at the end of your response"}, append:
 <nsfw_nsfl_ban_list>
 ${labels.description}: [Distinct NSFW descriptive constructions used this turn]
 ${labels.sensory}: [Distinct NSFW tactile, thermal, fluid, olfactory, or acoustic details used this turn]
-${labels.pacing}: [How this NSFW beat moved from opening to shift and stopping point]
+${labels.pacing}: [How this NSFW beat moved this turn from opening to shift and stopping point]
 
 ${labels.kinetics}:
 [${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Distinct NSFW movement, force, pose, and contact patterns used this turn]
@@ -47,7 +47,7 @@ ${labels.nsfl}:
 </nsfw_nsfl_ban_list>
 
 Rules:
-- Use the previous <nsfw_nsfl_ban_list> as an ABSOLUTE NSFW/NSFL BAN LIST; do not repeat, closely paraphrase, synonym-swap, or reuse its structures, rhythms, or reaction patterns. Create new writing this turn.
+- Use the previous <nsfw_nsfl_ban_list> as an ABSOLUTE NSFW/NSFL BAN LIST; replace every previous pattern in this response, then BAN every pattern recorded this turn in the next response. Do not repeat, closely paraphrase, synonym-swap, or reuse its structures, rhythms, or reaction patterns.
 - Record shared description, sensory, and pacing patterns once within a SINGLE <nsfw_nsfl_ban_list>. Under each remaining heading, write one [Character]: pattern line per active character.
 - For NSFL scenes, record the concrete bodily reflex, defensive action, persona-true behavior, or immediate survival drive actually used this turn in ${labels.nsfl}, one line per character; change the NSFL bodily response and action drive in the next response.
 - Record concrete NSFW patterns every response; record NSFL only when it occurs, otherwise write ${vietnamese ? "Không có" : "None"} in the NSFL field. Overwrite the tracker with only patterns used this turn.

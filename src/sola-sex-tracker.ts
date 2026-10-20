@@ -25,15 +25,36 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
         protection: "Protection measures/actions",
       };
   const unknown = vietnamese ? "chưa rõ" : "unknown";
+  const examples = vietnamese
+    ? {
+        cycle: "Kinh nguyệt, trước rụng trứng, rụng trứng, sau rụng trứng hoặc giai đoạn/mốc thời gian hợp lý khác mà nhân vật biết, hoặc chưa rõ",
+        physical:
+          "Còn trinh/từng quan hệ, tiền sử sinh nở, tổn thương, vừa đạt cực khoái, còn nhạy cảm hoặc ngứa ran, đang hưng phấn, tình trạng hồi phục hoặc tình trạng liên quan khác",
+        pregnancy: "Thấp, vừa, cao, đã xác nhận hoặc khả năng khác được suy ra từ chu kỳ và hành động hiện tại",
+        awareness:
+          "Đã biết, chưa biết hoặc chưa rõ với nhân vật; điều nhân vật hiểu về nguy cơ sinh sản và cách họ tránh, phản đối hoặc chấp nhận nó",
+        protection:
+          "Bao cao su, biện pháp tránh thai, thuốc tránh thai khẩn cấp, xuất ngoài, yêu cầu xuất ngoài, chuyển sang đường miệng/tay/đường khác, dừng hoặc từ chối, chấp nhận rủi ro hoặc hành động bảo vệ khác",
+      }
+    : {
+        cycle: `Menstruation, pre-ovulation, ovulation, post-ovulation, or another plausible phase/timing known to the character, or ${unknown}`,
+        physical:
+          "Virginity/prior intercourse, childbirth history, injuries, recent orgasm, lingering sensitivity or itchiness, arousal, recovery status, or another relevant condition",
+        pregnancy: "Low, moderate, high, confirmed, or another likelihood inferred from cycle and current actions",
+        awareness:
+          "Known, unknown, or unclear to the character; what they understand about reproductive risk and how they avoid, oppose, or accept it",
+        protection:
+          "Condom, contraception, emergency contraception, withdrawal, requesting external ejaculation, switching to oral/manual/another route, stopping or refusing, accepting risk, or another protective action",
+      };
   return `## Sexual Context Tracker 🌙
 Located ${location || "at the end of your response"}, append:
 <sex_tracker>
 [${labels.character}]:
-${labels.cycle}: [Cycle phase or timing known to the character, or ${unknown}]
-${labels.physicalCondition}: [No prior/prior intercourse, childbirth history, injuries, recent orgasm, lingering sensitivity or itchiness, arousal, recovery status]
-${labels.pregnancy}: [Current likelihood]
-${labels.awareness}: [What the character understands about the current reproductive risk and how they avoid, oppose, or accept it]
-${labels.protection}: [Protection methods or protective actions the character knows and takes, or none / not applicable]
+${labels.cycle}: [${examples.cycle}]
+${labels.physicalCondition}: [${examples.physical}]
+${labels.pregnancy}: [${examples.pregnancy}]
+${labels.awareness}: [${examples.awareness}]
+${labels.protection}: [${examples.protection}]
 </sex_tracker>
 
 Rules:

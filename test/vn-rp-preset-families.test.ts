@@ -203,9 +203,11 @@ describe("TomiSakae VN-RP preset families", () => {
       for (const section of commonSections) {
         expect(gemmaFixPromptFor(level)).toContain(`## ${section}\n`);
       }
-      expect(gemmaFixPromptFor(level)).toContain("every NSFW action that occurs");
       expect(gemmaFixPromptFor(level)).toContain(
-        "in NSFW scenes, COVER every distinct NSFW action, body state, and pose with its own matching available NSFW image",
+        "every NSFW or NSFL action, whether initiated by {{char}}, {{user}}, or another NPC",
+      );
+      expect(gemmaFixPromptFor(level)).toContain(
+        "in NSFW or NSFL scenes, COVER every distinct action, body state, and pose with its own matching available NSFW image",
       );
       expect(gemmaFixPromptFor(level)).toContain("exact image-tag syntax");
       expect(gemmaFixPromptFor(level)).toContain(

@@ -42,10 +42,10 @@ describe("Sola Sexual Context Tracker", () => {
     expect(module?.content).not.toContain("Biết mốc chu kỳ:");
     expect(module?.content).not.toContain("Knows cycle timing:");
     expect(module?.content).toContain("Tình trạng cơ thể:");
-    expect(module?.content).toContain("recent orgasm, lingering sensitivity or itchiness, arousal");
+    expect(module?.content).toContain("vừa đạt cực khoái, còn nhạy cảm hoặc ngứa ran, đang hưng phấn");
     expect(module?.content).toContain("Nhận thức và thái độ với rủi ro:");
     expect(module?.content).toContain("Biện pháp và hành động bảo vệ:");
-    expect(module?.content).toContain("Protection methods or protective actions");
+    expect(module?.content).toContain("Bao cao su, biện pháp tránh thai, thuốc tránh thai khẩn cấp, xuất ngoài");
     expect(module?.content).toContain(
       "record Chu kỳ kinh nguyệt only when the character knows or can reasonably recognize the phase or timing",
     );

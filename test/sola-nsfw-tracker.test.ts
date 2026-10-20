@@ -51,6 +51,9 @@ describe("Sola NSFW Tracker", () => {
     expect(module?.content).toContain(
       "Use the previous <nsfw_nsfl_ban_list> as an ABSOLUTE NSFW/NSFL BAN LIST",
     );
+    expect(module?.content).toContain(
+      "replace every previous pattern in this response, then BAN every pattern recorded this turn in the next response",
+    );
     expect(module?.content).toContain("Cách miêu tả:");
     expect(module?.content).toContain("Hành động/Động lực cơ thể:");
     expect(module?.content).toContain("Điểm nhấn cảm giác:");
