@@ -169,6 +169,7 @@ describe("TomiSakae VN-RP preset families", () => {
     const commonSections = [
       "Vietnamese Output",
       "Image Use",
+      "Reproductive Reality",
       "NSFW Mechanics",
       "Somatic Priority",
       "Post-Trauma Agency",
@@ -182,6 +183,13 @@ describe("TomiSakae VN-RP preset families", () => {
     );
     expect(gemmaFixPromptFor(2)).toBe(GEMMA_FIX_PROMPT);
     expect(gemmaFixPromptFor(2)).toContain("## Character Integrity");
+    expect(gemmaFixPromptFor(2)).toContain("## Reproductive Reality");
+    expect(gemmaFixPromptFor(2)).toContain(
+      "In EVERY sexual decision or action, {{char}}'s love, trust, intimacy, arousal, or relationship depth MUST NOT override real-world reproductive, health, consent, or social consequences",
+    );
+    expect(gemmaFixPromptFor(2)).toContain(
+      "{{char}} MUST be EXTREMELY CAUTIOUS about pregnancy before, during, and after EVERY sexual act because the pregnancy system is ALWAYS ACTIVE",
+    );
     expect(gemmaFixPromptFor(2)).not.toContain("## User Agency");
     expect(gemmaFixPromptFor(2)).not.toContain("## Sexual Risk");
     expect(gemmaFixPromptFor(3)).toContain("## User Agency");

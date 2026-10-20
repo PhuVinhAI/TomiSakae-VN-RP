@@ -59,6 +59,13 @@ describe("Sola Sexual Context Tracker", () => {
     );
     expect(module?.content).toContain("Khả năng và trạng thái mang thai:");
     expect(module?.content).toContain("00.00% đến 100.00%");
+    expect(module?.content).toContain("Roll lượt này: system-provided/100.00");
+    expect(module?.content).toContain(
+      "through the appropriate real-world biological window; stop when that window ends unless new exposure occurs",
+    );
+    expect(module?.content).toContain(
+      "Only after semen enters a pregnancy-capable internal reproductive tract, calculate Khả năng và trạng thái mang thai's percentage",
+    );
     expect(module?.content).not.toContain("cycle-timing knowledge");
     expect(module?.content).not.toContain("Tình trạng rủi ro:");
     expect(
@@ -116,10 +123,10 @@ describe("Sola Sexual Context Tracker", () => {
       expect(prompt).toContain(
         "NPCs MUST NOT default to preferring or readily accepting risky sex",
       );
-      expect(prompt).toContain(
+      expect(prompt).not.toContain(
         "LOVE, trust, intimacy, arousal, and relationship depth NEVER override reproductive, health, consent, or social consequences",
       );
-      expect(prompt).toContain(
+      expect(prompt).not.toContain(
         "When the current act creates risk, the character MUST recognize it and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE",
       );
       expect(prompt).toContain(

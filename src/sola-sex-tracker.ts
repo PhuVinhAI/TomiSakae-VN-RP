@@ -39,7 +39,7 @@ export function solaSexTrackerPrompt(
         physical:
           "Còn trinh/từng quan hệ, tiền sử sinh nở, tổn thương, vừa đạt cực khoái, còn nhạy cảm hoặc ngứa ran, đang hưng phấn, tình trạng hồi phục hoặc tình trạng liên quan khác",
         pregnancy:
-          "00.00% đến 100.00%; Chưa xác nhận, Đã xác nhận, Không thể xảy ra hoặc trạng thái phù hợp khác",
+          `00.00% đến 100.00%; Roll lượt này: ${reproductiveRoll}/100.00; Chưa xác nhận, Đã xác nhận, Không thể xảy ra hoặc trạng thái phù hợp khác`,
         awareness: "Điều nhân vật hiểu về hệ quả cá nhân/xã hội và lựa chọn hiện tại",
         protection:
           "Bao cao su, biện pháp tránh thai, thuốc tránh thai khẩn cấp, xuất ngoài, yêu cầu xuất ngoài, chuyển sang đường miệng/tay/đường khác, dừng hoặc từ chối, chấp nhận rủi ro hoặc hành động bảo vệ khác",
@@ -51,7 +51,7 @@ export function solaSexTrackerPrompt(
         physical:
           "Virginity/prior intercourse, childbirth history, injuries, recent orgasm, lingering sensitivity or itchiness, arousal, recovery status, or another relevant condition",
         pregnancy:
-          "00.00% to 100.00%; Unconfirmed, Confirmed, Impossible, or another fitting status",
+          `00.00% to 100.00%; This turn's roll: ${reproductiveRoll}/100.00; Unconfirmed, Confirmed, Impossible, or another fitting status`,
         awareness:
           "What the character understands about personal/social consequences and their current choice",
         protection:
@@ -79,10 +79,8 @@ Rules:
 - Before writing, run a Cognitive Check: what does the character understand, which consequences are relevant, and what choice does that understanding produce IN THE SCENE? This check separates objective biological data from character awareness. Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition; NEVER invent ignorance to bypass consequences.
 - Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, relevant RP events, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Always simulate the objective biological menstrual cycle; record ${labels.cycleKnowledge} separately as ${cycleKnowledgeValues}.
 - Assess and update ${labels.pregnancy} from the simulated cycle, physical condition, current reproductive exposure, and ${labels.protection}. Use at least two decimal places and keep the result consistent with the biological conditions and current actions.
-- Reproductive roll this turn: [${reproductiveRoll}/100.00]. When reproductive exposure occurs, compare it with ${labels.pregnancy}; a successful roll means ${confirmed}, a failed roll means ${unconfirmed}, and ${impossible} requires a clear bodily or situational condition preventing pregnancy. Use another fitting status when the situation requires it.
+- Only after semen enters a pregnancy-capable internal reproductive tract, calculate ${labels.pregnancy}'s percentage and compare the roll EVERY TURN through the appropriate real-world biological window; stop when that window ends unless new exposure occurs. A successful roll means ${confirmed}, a failed roll means ${unconfirmed}, and ${impossible} requires a clear bodily or situational condition preventing pregnancy. Use another fitting status when the situation requires it.
 - NPCs MUST NOT default to preferring or readily accepting risky sex.
-- LOVE, trust, intimacy, arousal, and relationship depth NEVER override reproductive, health, consent, or social consequences.
-- When the current act creates risk, the character MUST recognize it and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE when their awareness and ability allow it; lack of awareness does not erase biological or social consequences.
 - NEVER turn prior sex, arousal, or orgasm into lustful traits, lost boundaries, or disregard for consequences.
 - REAL-WORLD awareness of reproduction, health, responsibility, and social consequences MUST govern EVERY reaction, dialogue, and action, even when absent from card/lore.
 - NEVER treat {{user}}'s silence, lack of action, hesitation, or non-resistance as consent or acceptance of risky sex.
