@@ -855,6 +855,52 @@ describe("Sola saved-history restoration", () => {
     },
   );
 
+  it("waits for an in-flight history revert before building a new request", async () => {
+    vi.useFakeTimers();
+    const plugin = await startPlugin(solaStore(), false, undefined, true);
+    let release!: () => void;
+    const revertFinished = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const setChat = plugin.api.setChatToIndex;
+    const setChatSpy = vi
+      .spyOn(plugin.api, "setChatToIndex")
+      .mockImplementation(async (character, chat, data) => {
+        await revertFinished;
+        await setChat(character, chat, data);
+      });
+    try {
+      const chat: SavedChat = { id: "chat-a", message: history(2) };
+      chat.message[1]!.data = `<think>Khôi phục.</think>\n${chat.message[1]!.data}`;
+      plugin.chats.set("0:0", chat);
+      plugin.selectChat(0);
+
+      // Start the polling revert, then immediately request a new response as
+      // PocketRisu does when a swipe/new branch is submitted.
+      await vi.advanceTimersByTimeAsync(250);
+      expect(setChatSpy).toHaveBeenCalledTimes(1);
+
+      let settled = false;
+      const pending = plugin.request([
+        ...requestOf(chat),
+        { role: "user", content: "Tiếp tục." },
+      ]).then(() => {
+        settled = true;
+      });
+      await Promise.resolve();
+      expect(settled).toBe(false);
+
+      release();
+      await pending;
+      expect(settled).toBe(true);
+      expect(plugin.chats.get("0:0")!.message[1]!.data).not.toContain("<think>");
+    } finally {
+      release();
+      setChatSpy.mockRestore();
+      await plugin.callbacks.unload!();
+    }
+  });
+
   it.each([
     ["delete", "char"],
     ["branch", "char"],

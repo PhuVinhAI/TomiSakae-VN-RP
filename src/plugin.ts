@@ -1052,10 +1052,10 @@ async function cleanSavedHistory(
   characterIndex: number,
   chatIndex: number,
   skipStreaming = false,
-): Promise<void> {
+): Promise<boolean> {
   const preset = sourceForSettings(settings);
   const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
-  if (!chat?.message?.length || (skipStreaming && chat.isStreaming)) return;
+  if (!chat?.message?.length || (skipStreaming && chat.isStreaming)) return true;
   const sourceSignature = savedHistorySignature(chat);
 
   const sourceMessages: ChatMessage[] = chat.message.map((message) => ({
@@ -1123,9 +1123,10 @@ async function cleanSavedHistory(
       (skipStreaming && latest.isStreaming) ||
       savedHistorySignature(latest) !== sourceSignature
     )
-      return;
+      return false;
     await Risuai.setChatToIndex(characterIndex, chatIndex, { ...chat, message });
   }
+  return true;
 }
 
 async function cleanSavedHistoryOnce(
@@ -1135,15 +1136,21 @@ async function cleanSavedHistoryOnce(
   skipStreaming = false,
 ): Promise<void> {
   const key = editorChatKey(characterIndex, chatIndex);
-  if (!historyCleanups.has(key)) {
-    historyCleanups.set(
-      key,
-      cleanSavedHistory(settings, characterIndex, chatIndex, skipStreaming).finally(() => {
-        historyCleanups.delete(key);
-      }),
-    );
-  }
-  await historyCleanups.get(key);
+  const active = historyCleanups.get(key);
+  // A watcher may have started against the pre-swipe snapshot. Wait for it,
+  // then run our own pass against the now-current chat before composing.
+  if (active) await active.catch(() => {});
+  const current = (async () => {
+    // A host swipe/new-message write can land while the snapshot is being
+    // restored. Retry from the newest chat instead of sending a stale request.
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      if (await cleanSavedHistory(settings, characterIndex, chatIndex, skipStreaming)) return;
+    }
+  })().finally(() => {
+    if (historyCleanups.get(key) === current) historyCleanups.delete(key);
+  });
+  historyCleanups.set(key, current);
+  await current;
 }
 
 let historyRestoreTimer: unknown;
