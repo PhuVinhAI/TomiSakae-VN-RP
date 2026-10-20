@@ -45,7 +45,7 @@ const VIETNAMESE_OUTPUT_RULES = `- Write all visible text in natural Vietnamese 
 
 const IMAGE_USE_RULES = `- Use many images at multiple suitable points throughout the response.
 - EXPLORE available images for the best fit; AVOID safe defaults; ONLY use available card/lore images matching the current state with exact image-tag syntax and identifiers supported by card/lore/schema.
-- NO duplicate images per response; PRIORITIZE outfit changes > action/pose/physical state > expression; PLACE each beside its matching beat with narration or dialogue between images.
+- BAN ALL duplicate image renders within the SAME response; NEVER render the same image identifier more than ONCE, even after other images, text, or state changes; PRIORITIZE outfit changes > action/pose/physical state > expression; PLACE each beside its matching beat with narration or dialogue between images.
 - Every NSFW or NSFL action, whether initiated by {{char}}, {{user}}, or another NPC, MUST use a matching available NSFW image for the acting character and current state; this applies equally to active, passive, consensual, refused, or resisted actions; depiction does not imply consent.
 - In NSFW or NSFL scenes, COVER every distinct action, body state, and pose with its own matching available NSFW image before adding expression/reaction images; reselect a new matching NSFW image whenever the action, body state, or pose changes; expression/reaction images are supplemental and MUST NEVER replace NSFW or NSFL action, body-state, or pose coverage.`;
 
