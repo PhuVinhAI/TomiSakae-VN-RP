@@ -11,6 +11,7 @@ import {
 } from "../src/core.js";
 import { estimatePluginPromptTokens } from "../src/token-estimate.js";
 import { restoreSolaHistoryContent } from "../src/sola-history.js";
+import { solaSexTrackerPrompt } from "../src/sola-sex-tracker.js";
 
 let sola: FfPreset;
 let ff54: FfPreset;
@@ -23,6 +24,7 @@ beforeAll(async () => {
 
 const tracker = (character: string, cycle: string) => `<sex_tracker>
 [${character}]:
+Stage: None
 Menstrual cycle: ${cycle}
 Physical condition: unknown
 Pregnancy likelihood: unknown
@@ -38,14 +40,21 @@ describe("Sola Sexual Context Tracker", () => {
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
     const module = composed.absolute.find((message) => message.memo?.endsWith(":sex-tracker"));
     expect(module?.content).toContain("## Sexual Context Tracker");
+    expect(module?.content).toContain(
+      "Giai đoạn: [Trước khi làm / Đang diễn ra / Kết thúc / Không có]",
+    );
     expect(module?.content).toContain("Chu kỳ kinh nguyệt:");
     expect(module?.content).not.toContain("Biết mốc chu kỳ:");
     expect(module?.content).not.toContain("Knows cycle timing:");
     expect(module?.content).toContain("Tình trạng cơ thể:");
-    expect(module?.content).toContain("vừa đạt cực khoái, còn nhạy cảm hoặc ngứa ran, đang hưng phấn");
+    expect(module?.content).toContain(
+      "vừa đạt cực khoái, còn nhạy cảm hoặc ngứa ran, đang hưng phấn",
+    );
     expect(module?.content).toContain("Nhận thức và thái độ với rủi ro:");
     expect(module?.content).toContain("Biện pháp và hành động bảo vệ:");
-    expect(module?.content).toContain("Bao cao su, biện pháp tránh thai, thuốc tránh thai khẩn cấp, xuất ngoài");
+    expect(module?.content).toContain(
+      "Bao cao su, biện pháp tránh thai, thuốc tránh thai khẩn cấp, xuất ngoài",
+    );
     expect(module?.content).toContain(
       "record Chu kỳ kinh nguyệt only when the character knows or can reasonably recognize the phase or timing",
     );
@@ -55,9 +64,7 @@ describe("Sola Sexual Context Tracker", () => {
     expect(module?.content).toContain(
       "Fill every field except Chu kỳ kinh nguyệt with a suitable value",
     );
-    expect(module?.content).toContain(
-      "otherwise write chưa rõ",
-    );
+    expect(module?.content).toContain("otherwise write chưa rõ");
     expect(module?.content).not.toContain("cycle-timing knowledge");
     expect(module?.content).not.toContain("Tình trạng rủi ro:");
     expect(
@@ -92,6 +99,43 @@ describe("Sola Sexual Context Tracker", () => {
       ),
     ).toBe(false);
   });
+
+  it.each([
+    {
+      vietnamese: true,
+      field: "Giai đoạn",
+      stages: ["Trước khi làm", "Đang diễn ra", "Kết thúc"],
+      none: "Không có",
+    },
+    {
+      vietnamese: false,
+      field: "Stage",
+      stages: ["Before", "In progress", "Finished"],
+      none: "None",
+    },
+  ])(
+    "connects $field to stage-specific scene responses and allows $none",
+    ({ vietnamese, field, stages, none }) => {
+      const prompt = solaSexTrackerPrompt(vietnamese, "at the end of your response");
+      expect(prompt).toContain(`${field}: [${[...stages, none].join(" / ")}]`);
+      expect(prompt).toContain(
+        `select EXACTLY ONE ${field} matching the current scene for each character`,
+      );
+      expect(prompt).toContain(
+        `use ${none} if the scene has not actually progressed toward sexual activity`,
+      );
+      expect(prompt).toContain(
+        "For the selected active stage, NPCs MUST express reproductive-risk awareness and choices through dialogue and action IN THE SCENE",
+      );
+      expect(prompt).toContain(`${stages[0]}, establish intentions and measures`);
+      expect(prompt).toContain(`${stages[1]}, express boundaries and current decisions`);
+      expect(prompt).toContain(`${stages[2]}, assess remaining risk and subsequent response`);
+      expect(prompt).toContain("avoids, opposes, or accepts risk");
+      expect(prompt).not.toMatch(
+        /generic patterns|generic sexual pattern|Do not default a sexual outcome/,
+      );
+    },
+  );
 
   it("falls back to trailing output when the Showrunner HUD is disabled", async () => {
     const settings = createDefaultSettings(sola);
@@ -175,6 +219,7 @@ describe("Sola Sexual Context Tracker", () => {
     });
     expect(displayed).toContain('data-sola-ui="sex-tracker"');
     expect(displayed).toContain("🌙 Sola: Bối cảnh tình dục");
+    expect(displayed).toContain("Giai đoạn:</span> None");
     expect(displayed).toContain("Tình trạng cơ thể:</span> unknown");
     expect(displayed).toContain("&lt;img&gt;");
     const estimate = await estimatePluginPromptTokens(sola, settings, {
@@ -184,5 +229,19 @@ describe("Sola Sexual Context Tracker", () => {
     expect(
       estimate.entries.find((entry) => entry.identifier === "sex-tracker")?.tokens,
     ).toBeGreaterThan(0);
+  });
+
+  it("renders the stage with the same HUD styling in English", () => {
+    const settings = createDefaultSettings(sola);
+    settings.solaSexTrackerEnabled = true;
+    settings.vietnameseOutputEnabled = false;
+    const displayed = applyRegexScripts(
+      `<sex_tracker>\n[Nana]:\nGiai đoạn: Đang diễn ra\n</sex_tracker>`,
+      sola,
+      settings,
+      { placement: PLACEMENT_AI_OUTPUT, markdown: true, depth: 0 },
+    );
+    expect(displayed).toContain("Stage:</span> Đang diễn ra");
+    expect(displayed).toContain("🌙 Sola: Sexual Context");
   });
 });

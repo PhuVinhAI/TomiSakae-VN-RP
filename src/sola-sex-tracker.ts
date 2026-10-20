@@ -4,12 +4,13 @@ const TRACKER_RE =
 export const SOLA_SEX_TRACKER_MEMO = "sex-tracker";
 
 export const SOLA_SEX_TRACKER_REMINDER =
-  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update cycle state, physical condition, pregnancy likelihood, risk awareness and attitude, and protection measures/actions.";
+  "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; update current stage, cycle state, physical condition, pregnancy likelihood, risk awareness and attitude, and protection measures/actions.";
 
 export function solaSexTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
     ? {
         character: "Tên nhân vật",
+        stage: "Giai đoạn",
         cycle: "Chu kỳ kinh nguyệt",
         physicalCondition: "Tình trạng cơ thể",
         pregnancy: "Khả năng mang thai",
@@ -18,19 +19,26 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
       }
     : {
         character: "Character Name",
+        stage: "Stage",
         cycle: "Menstrual cycle",
         physicalCondition: "Physical condition",
         pregnancy: "Pregnancy likelihood",
         awareness: "Risk awareness and attitude",
         protection: "Protection measures/actions",
       };
+  const stages = vietnamese
+    ? { before: "Trước khi làm", during: "Đang diễn ra", after: "Kết thúc" }
+    : { before: "Before", during: "In progress", after: "Finished" };
+  const none = vietnamese ? "Không có" : "None";
   const unknown = vietnamese ? "chưa rõ" : "unknown";
   const examples = vietnamese
     ? {
-        cycle: "Kinh nguyệt, trước rụng trứng, rụng trứng, sau rụng trứng hoặc giai đoạn/mốc thời gian hợp lý khác mà nhân vật biết, hoặc chưa rõ",
+        cycle:
+          "Kinh nguyệt, trước rụng trứng, rụng trứng, sau rụng trứng hoặc giai đoạn/mốc thời gian hợp lý khác mà nhân vật biết, hoặc chưa rõ",
         physical:
           "Còn trinh/từng quan hệ, tiền sử sinh nở, tổn thương, vừa đạt cực khoái, còn nhạy cảm hoặc ngứa ran, đang hưng phấn, tình trạng hồi phục hoặc tình trạng liên quan khác",
-        pregnancy: "Thấp, vừa, cao, đã xác nhận hoặc khả năng khác được suy ra từ chu kỳ và hành động hiện tại",
+        pregnancy:
+          "Thấp, vừa, cao, đã xác nhận hoặc khả năng khác được suy ra từ chu kỳ và hành động hiện tại",
         awareness:
           "Đã biết, chưa biết hoặc chưa rõ với nhân vật; điều nhân vật hiểu về nguy cơ sinh sản và cách họ tránh, phản đối hoặc chấp nhận nó",
         protection:
@@ -40,7 +48,8 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
         cycle: `Menstruation, pre-ovulation, ovulation, post-ovulation, or another plausible phase/timing known to the character, or ${unknown}`,
         physical:
           "Virginity/prior intercourse, childbirth history, injuries, recent orgasm, lingering sensitivity or itchiness, arousal, recovery status, or another relevant condition",
-        pregnancy: "Low, moderate, high, confirmed, or another likelihood inferred from cycle and current actions",
+        pregnancy:
+          "Low, moderate, high, confirmed, or another likelihood inferred from cycle and current actions",
         awareness:
           "Known, unknown, or unclear to the character; what they understand about reproductive risk and how they avoid, oppose, or accept it",
         protection:
@@ -50,6 +59,7 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
 Located ${location || "at the end of your response"}, append:
 <sex_tracker>
 [${labels.character}]:
+${labels.stage}: [${stages.before} / ${stages.during} / ${stages.after} / ${none}]
 ${labels.cycle}: [${examples.cycle}]
 ${labels.physicalCondition}: [${examples.physical}]
 ${labels.pregnancy}: [${examples.pregnancy}]
@@ -58,11 +68,11 @@ ${labels.protection}: [${examples.protection}]
 </sex_tracker>
 
 Rules:
-- Before writing, run a Cognitive Check: identify the character's current facts, age, knowledge, experience, and beliefs; then let their established personality and card/lore determine the reaction.
+- Before writing, select EXACTLY ONE ${labels.stage} matching the current scene for each character; use ${none} if the scene has not actually progressed toward sexual activity. Run a Cognitive Check: identify the character's current facts, age, knowledge, experience, and beliefs; then let their established personality and card/lore determine the reaction.
 - Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Fill every field except ${labels.cycle} with a suitable value; record ${labels.cycle} only when the character knows or can reasonably recognize the phase or timing, otherwise write ${unknown}.
-- Assess pregnancy likelihood from cycle state, current actions, and protection measures/actions, not from generic patterns or desire.
-- Do not default a sexual outcome or risk response; let the checked risk awareness, personality, card, and lore determine whether the character avoids, opposes, or accepts risk and how they handle it.
-- Do not let a generic sexual pattern decide the outcome. Write the character's response to the checked context, including uncertainty or conflict when present.
+- Assess pregnancy likelihood from cycle state, current actions, and protection measures/actions.
+- For the selected active stage, NPCs MUST express reproductive-risk awareness and choices through dialogue and action IN THE SCENE: ${stages.before}, establish intentions and measures; ${stages.during}, express boundaries and current decisions; ${stages.after}, assess remaining risk and subsequent response.
+- Let the checked risk awareness, knowledge, experience, beliefs, personality, and card/lore determine how the character avoids, opposes, or accepts risk, including uncertainty or conflict when present.
 - Place characters within a SINGLE <sex_tracker> container, separated by one blank line.`;
 }
 
@@ -77,6 +87,8 @@ function escapeHtml(value: string): string {
 
 function trackerBodyHtml(body: string, vietnamese: boolean): string {
   const labels = new Map<string, string>([
+    ["stage", vietnamese ? "Giai đoạn" : "Stage"],
+    ["giai đoạn", vietnamese ? "Giai đoạn" : "Stage"],
     ["menstrual cycle", vietnamese ? "Chu kỳ kinh nguyệt" : "Menstrual cycle"],
     ["chu kỳ kinh nguyệt", vietnamese ? "Chu kỳ kinh nguyệt" : "Menstrual cycle"],
     ["physical condition", vietnamese ? "Tình trạng cơ thể" : "Physical condition"],

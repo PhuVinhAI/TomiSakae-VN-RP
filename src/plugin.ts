@@ -605,7 +605,7 @@ async function showSettings(): Promise<void> {
             "sola-sex-tracker",
             settings.solaSexTrackerEnabled,
             "🌙 Bộ theo dõi bối cảnh tình dục",
-            "Ghi bối cảnh sinh sản và Cognitive Check cho đúng lượt; tự xóa sau phản hồi kế · Mặc định tắt",
+            "Ghi giai đoạn, bối cảnh sinh sản và Cognitive Check cho đúng lượt; tự xóa sau phản hồi kế · Mặc định tắt",
           )
         : ""
     }${checkbox(
