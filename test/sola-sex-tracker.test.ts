@@ -136,7 +136,7 @@ describe("Sola Sexual Context Tracker", () => {
     const settings = createDefaultSettings(sola);
     settings.solaNsfwTrackerEnabled = true;
     settings.solaSexTrackerEnabled = true;
-    const oldContent = `<sola_hud><nsfw_ban_list>NSFW cũ</nsfw_ban_list><sex_tracker>Sex cũ</sex_tracker></sola_hud>`;
+    const oldContent = `<sola_hud><nsfw_nsfl_ban_list>NSFW cũ</nsfw_nsfl_ban_list><sex_tracker>Sex cũ</sex_tracker></sola_hud>`;
     const messages: ChatMessage[] = [
       { role: "assistant", content: `Cũ.\n${oldContent}` },
       { role: "user", content: "Tiếp." },

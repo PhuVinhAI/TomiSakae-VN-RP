@@ -1,10 +1,10 @@
 const TRACKER_RE =
-  /<\s{0,8}nsfw_ban_list\b(?:"[^"]*"|'[^']*'|[^'">])*(?:\/\s*>|>[\s\S]*?(?:<\s{0,8}\/\s{0,8}nsfw_ban_list\s{0,8}>|(?=<\s{0,8}\/?\s{0,8}(?:sola_hud|scene_header|fengine|thought_engine|wardrobe|inventory|scene_cast|scene_state|bond|date|story_notes|solatag|char_matrix|tempo|cabinet|arrow|omen|sex_tracker)\b|<!--\s{0,8}HTML_(?:START|END)\s{0,8}-->)|$))/gi;
+  /<\s{0,8}nsfw_nsfl_ban_list\b(?:"[^"]*"|'[^']*'|[^'">])*(?:\/\s*>|>[\s\S]*?(?:<\s{0,8}\/\s{0,8}nsfw_nsfl_ban_list\s{0,8}>|(?=<\s{0,8}\/?\s{0,8}(?:sola_hud|scene_header|fengine|thought_engine|wardrobe|inventory|scene_cast|scene_state|bond|date|story_notes|solatag|char_matrix|tempo|cabinet|arrow|omen|sex_tracker)\b|<!--\s{0,8}HTML_(?:START|END)\s{0,8}-->)|$))/gi;
 
 export const SOLA_NSFW_TRACKER_MEMO = "nsfw-tracker";
 
 export const SOLA_NSFW_TRACKER_REMINDER =
-  "- Telemetry (<nsfw_ban_list>): BAN the previous NSFW/NSFL patterns; record shared description, sensory, and pacing patterns once, then record action, dialogue, vocal, and NSFL-response patterns per character.";
+  "- Telemetry (<nsfw_nsfl_ban_list>): BAN the previous NSFW/NSFL patterns; record shared description, sensory, and pacing patterns once, then record action, dialogue, vocal, and NSFL-response patterns per character.";
 
 export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
@@ -28,7 +28,7 @@ export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): st
       };
   return `## ${vietnamese ? "Danh sách cấm NSFW/NSFL" : "NSFW/NSFL Ban List"} 🔥
 Located ${location || "at the end of your response"}, append:
-<nsfw_ban_list>
+<nsfw_nsfl_ban_list>
 ${labels.description}: [Distinct descriptive constructions used this turn, or ${vietnamese ? "Không có" : "None"}]
 ${labels.sensory}: [Distinct tactile, thermal, fluid, olfactory, or acoustic details used this turn, or ${vietnamese ? "Không có" : "None"}]
 ${labels.pacing}: [How this turn moved from opening to shift and stopping point, or ${vietnamese ? "Không có" : "None"}]
@@ -44,12 +44,12 @@ ${labels.vocal}:
 
 ${labels.nsfl}:
 [${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Concrete bodily or behavioral response to NSFL used this turn, or ${vietnamese ? "Không có" : "None"}]
-</nsfw_ban_list>
+</nsfw_nsfl_ban_list>
 
 Rules:
-- Use the previous <nsfw_ban_list> as an ABSOLUTE NSFW/NSFL BAN LIST; do not repeat, closely paraphrase, synonym-swap, or reuse its structures, rhythms, or reaction patterns. Create new writing this turn.
-- Record shared description, sensory, and pacing patterns once within a SINGLE <nsfw_ban_list>. Under each remaining heading, write one [Character]: pattern line per active character.
-- For NSFL scenes, record the concrete bodily or behavioral response actually used this turn in ${labels.nsfl}, one line per character.
+- Use the previous <nsfw_nsfl_ban_list> as an ABSOLUTE NSFW/NSFL BAN LIST; do not repeat, closely paraphrase, synonym-swap, or reuse its structures, rhythms, or reaction patterns. Create new writing this turn.
+- Record shared description, sensory, and pacing patterns once within a SINGLE <nsfw_nsfl_ban_list>. Under each remaining heading, write one [Character]: pattern line per active character.
+- For NSFL scenes, the next response MUST use a new bodily or behavioral response/action drive instead of the previous NSFL entry; record the concrete response actually used this turn in ${labels.nsfl}, one line per character.
 - Record only distinct patterns actually used in this turn, then overwrite the tracker. When no NSFW/NSFL content occurs this turn, write ${vietnamese ? "Không có" : "None"} in every field.
 `;
 }
@@ -110,7 +110,7 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
 /** Render only a display copy; tracker text is escaped and never executed as markup. */
 export function adaptSolaNsfwTrackerForDisplay(input: string, vietnamese: boolean): string {
   return input.replace(
-    /<\s{0,8}nsfw_ban_list\b[^>]*>([\s\S]*?)<\s{0,8}\/\s{0,8}nsfw_ban_list\s{0,8}>/gi,
+    /<\s{0,8}nsfw_nsfl_ban_list\b[^>]*>([\s\S]*?)<\s{0,8}\/\s{0,8}nsfw_nsfl_ban_list\s{0,8}>/gi,
     (_match, body: string) =>
       `<div data-sola-ui="nsfw-nsfl-tracker"><details style="margin:12px 0;background:rgba(36,18,20,.86);border:1px solid rgba(214,112,91,.42);border-left:4px solid #D6705B;border-radius:9px;box-shadow:0 3px 16px rgba(0,0,0,.3);overflow:hidden;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"><summary style="cursor:pointer;padding:10px 13px;background:linear-gradient(90deg,rgba(214,112,91,.18),rgba(36,18,20,.25));color:#F6C177;font-weight:800;outline:none;user-select:none;">${vietnamese ? "🔥 Sola: Danh sách cấm NSFW/NSFL" : "🔥 Sola: NSFW/NSFL Ban List"}</summary><div style="padding:9px 13px 12px;line-height:1.5;overflow-wrap:anywhere;">${trackerBodyHtml(body, vietnamese)}</div></details></div>`,
   );

@@ -1036,7 +1036,7 @@ function syncRestoredStatesToRequest(
         typeof matchedEntry.swipeId === "number" &&
         typeof matchedEntry.swipes[matchedEntry.swipeId] === "string" &&
         matchedEntry.swipes[matchedEntry.swipeId] !== String(matchedEntry.data ?? "") &&
-        /<(?:nsfw_ban_list|sex_tracker)\b/i.test(restored));
+        /<(?:nsfw_nsfl_ban_list|sex_tracker)\b/i.test(restored));
     return restored && (restored !== message.content || restoreTrackers)
       ? {
           ...message,
@@ -1448,7 +1448,7 @@ function completeAutoRewriteResponse(text: string, preset: FfPreset): boolean {
     const body = splitEditorResponse(text, preset).response.trim();
     if (!body) return false;
     const tracked =
-      /<(\/?)(sola_hud|fengine|thought_engine|bond|date|story_notes|wardrobe|inventory|scene_cast|scene_state|char_matrix|solatag|tempo|cabinet|arrow|omen|nsfw_ban_list|sex_tracker)\b[^>]*>/gi;
+      /<(\/?)(sola_hud|fengine|thought_engine|bond|date|story_notes|wardrobe|inventory|scene_cast|scene_state|char_matrix|solatag|tempo|cabinet|arrow|omen|nsfw_nsfl_ban_list|sex_tracker)\b[^>]*>/gi;
     const open: string[] = [];
     for (const match of body.matchAll(tracked)) {
       const tag = match[2]!.toLowerCase();
