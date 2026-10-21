@@ -29,30 +29,30 @@ export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): st
   return `## ${vietnamese ? "Ghi chép NSFW/NSFL" : "NSFW/NSFL Usage Record"} 🔥
 Located ${location || "at the end of your response"}, append:
 <nsfw_nsfl_ban_list>
-${labels.description}: [Distinct NSFW descriptive constructions used this turn, or ${vietnamese ? "Không có" : "None"}]
-${labels.sensory}: [Distinct NSFW tactile, thermal, fluid, olfactory, or acoustic details used this turn, or ${vietnamese ? "Không có" : "None"}]
+${labels.description}: [Distinct NSFW descriptive constructions used this turn]
+${labels.sensory}: [Distinct NSFW tactile, thermal, fluid, olfactory, or acoustic details used this turn]
 
 ${labels.initiation}:
-[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Distinct spatial approach, undressing, foreplay, and pre-contact friction patterns used this turn, or ${vietnamese ? "Không có" : "None"}]
+[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Distinct spatial approach, undressing, foreplay, and pre-contact friction patterns used this turn]
 
 ${labels.variation}:
-[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Distinct pose, angle, action, stimulation method, and fitting erogenous zone patterns used this turn, or ${vietnamese ? "Không có" : "None"}]
+[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Distinct pose, angle, action, stimulation method, and fitting erogenous zone patterns used this turn]
 
 ${labels.dialogue}:
-[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Distinct NSFW dialogue constructions used this turn, or ${vietnamese ? "Không có" : "None"}]
+[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Distinct NSFW dialogue constructions used this turn]
 
 ${labels.vocal}:
-[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Exact NSFW moans, gasps, stammers, or phonetic reactions used this turn, or ${vietnamese ? "Không có" : "None"}]
+[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Exact NSFW moans, gasps, stammers, or phonetic reactions used this turn]
 
 ${labels.nsfl}:
 [${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Concrete bodily reflex, defensive posture or action, persona-true behavior, or immediate survival drive used this turn, or ${vietnamese ? "Không có" : "None"}]
 </nsfw_nsfl_ban_list>
 
 Rules:
-- Record ONLY patterns actually written in THIS response; ignore all earlier responses, trackers, and history. For EACH field, write only applicable patterns; when a field or character-specific category does not apply, write ${vietnamese ? "Không có" : "None"}. Include concrete wording, structures, and rhythms. Do not invent entries.
-- Record shared description and sensory patterns once within a SINGLE <nsfw_nsfl_ban_list>. Under each character-specific heading, write one [Character]: pattern line per active character, using ${vietnamese ? "Không có" : "None"} when that category does not apply.
+- Record ONLY patterns actually written in THIS response; ignore all earlier responses, trackers, and history. Include their concrete wording, structures, and rhythms. Do not invent entries.
+- Record shared description and sensory patterns once within a SINGLE <nsfw_nsfl_ban_list>. Under each character-specific heading, write one [Character]: pattern line per active character.
 - For NSFL scenes, record the concrete bodily reflex, defensive action, persona-true behavior, or immediate survival drive actually used this turn in ${labels.nsfl}, one line per character.
-- Record NSFL only when it occurs; otherwise write ${vietnamese ? "Không có" : "None"} in the NSFL field.
+- Record concrete NSFW patterns used this turn; record NSFL only when it occurs, otherwise write ${vietnamese ? "Không có" : "None"} in the NSFL field.
 `;
 }
 

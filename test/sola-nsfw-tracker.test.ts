@@ -63,9 +63,6 @@ describe("Sola NSFW Tracker", () => {
     expect(module?.content).toContain("Tiếp cận/Dạo đầu:");
     expect(module?.content).toContain("Điểm nhấn cảm giác:");
     expect(module?.content).toContain("Tư thế/Hành động/Kích thích:");
-    expect(module?.content).toContain(
-      "when a field or character-specific category does not apply, write Không có",
-    );
     expect(module?.content).not.toMatch(/Bố cục phản hồi|Response structure|response layout/i);
     expect(module?.content).toContain("Phản ứng thân thể / Hành động NSFL:");
     expect(module?.content).toContain(
@@ -78,7 +75,7 @@ describe("Sola NSFW Tracker", () => {
     expect(module?.content?.match(/\[Tên nhân vật\]:/g)).toHaveLength(5);
     expect(module?.content).not.toContain("<nsfw_nsfl_ban_list>\n[Tên nhân vật]:");
     expect(module?.content).toContain("Distinct NSFW descriptive constructions used this turn");
-    expect(module?.content).toContain("For EACH field, write only applicable patterns");
+    expect(module?.content).toContain("Record concrete NSFW patterns used this turn");
     expect(module?.content).not.toContain("Omit the tracker when no NSFW content occurs");
     expect(module?.content).toContain("Located inside of '<sola_hud>' tags, append:");
     const storyReview = composed.absolute.find((message) =>
