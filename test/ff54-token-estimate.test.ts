@@ -71,14 +71,13 @@ describe("Plugin dashboard token estimates", () => {
   });
 
   it.each([
-    [true, false, 2],
-    [false, false, 1],
-    [true, true, 0],
-    [false, true, 3],
-    [true, false, 3],
+    [true, false],
+    [false, false],
+    [true, true],
+    [false, true],
   ] as const)(
-    "matches the actual injected prompt text with Vietnamese Output %s, Submodel %s and Gemma level %s",
-    async (vietnamese, submodel, level) => {
+    "matches the actual injected prompt text with Vietnamese Output %s and Submodel %s",
+    async (vietnamese, submodel) => {
       const preset = JSON.parse(
         await readFile("source/ff54-sillytavern-preset.json", "utf8"),
       ) as FfPreset;
@@ -87,7 +86,6 @@ describe("Plugin dashboard token estimates", () => {
       settings.submodelEditorEnabled = submodel;
       settings.imageOptimizationEnabled = true;
       settings.gemmaFixEnabled = true;
-      settings.gemmaFixNsfwLevel = level;
       settings.cardImageCatalogEnabled = true;
       const themedHost = {
         ...host,

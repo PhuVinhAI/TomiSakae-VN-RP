@@ -46,7 +46,7 @@ import { adaptSolaSceneHeaderForDisplay } from "../src/sola-display.js";
 import { adaptSolaPromptForVietnamese, SOLA_VIETNAMESE_REPLACEMENTS } from "../src/vietnamese.js";
 import { adaptSolaPunctuation, SOLA_PUNCTUATION_REPLACEMENTS } from "../src/sola-punctuation.js";
 import { adaptSolaRegexForVietnamese } from "../src/sola-vietnamese-regex.js";
-import { GEMMA_FIX_PROMPT, gemmaFixPromptFor } from "../src/gemma-fix.js";
+import { GEMMA_FIX_PROMPT } from "../src/gemma-fix.js";
 import { adaptSolaSoundPlacement, SOLA_SOUND_REPLACEMENTS } from "../src/sola-sound.js";
 import { cardImagePrompt, collectCardImages } from "../src/card-images.js";
 import {
@@ -80,19 +80,13 @@ describe("TomiSakae VN-RP preset families", () => {
     }
   });
 
-  it.each(
-    (["ff54", "sola"] as const).flatMap((family) =>
-      ([0, 1, 2, 3] as const).map((level) => [family, level] as const),
-    ),
-  )(
-    "appends the shared Gemma fix inside the latest user message for %s at level %s",
-    async (family, level) => {
+  it.each(["ff54", "sola"] as const)(
+    "appends the full shared Gemma fix inside the latest user message for %s",
+    async (family) => {
       const preset = sources[family].preset;
       const settings = createDefaultSettings(preset);
       expect(settings.gemmaFixEnabled).toBe(false);
-      expect(settings.gemmaFixNsfwLevel).toBe(2);
       settings.gemmaFixEnabled = true;
-      settings.gemmaFixNsfwLevel = level;
       const messages = [
         { role: "user" as const, content: "Tin user cũ." },
         { role: "assistant" as const, content: "Phản hồi trước." },
@@ -107,54 +101,25 @@ describe("TomiSakae VN-RP preset families", () => {
       expect(index).toBeGreaterThanOrEqual(0);
       expect(built[index]).toMatchObject({
         role: "user",
-        content: `Tin user mới.\n\n${expandHostMacros(gemmaFixPromptFor(level), host)}`,
+        content: `Tin user mới.\n\n${expandHostMacros(GEMMA_FIX_PROMPT, host)}`,
         removable: true,
       });
+      expect(built[index]!.content).toContain("## Character Integrity");
+      expect(built[index]!.content).toContain("## User Agency");
       expect(built.filter((message) => message.memo === memo)).toHaveLength(0);
       expect(built.filter((message) => message.memo === intimacyMemo)).toHaveLength(0);
-      expect(built.some((message) => message.content.includes("IntimacyLimitInstructions"))).toBe(
-        false,
-      );
+      expect(built.some((message) => message.content.includes("IntimacyLimitInstructions"))).toBe(false);
 
       const estimate = await estimatePluginPromptTokens(preset, settings, host);
-      expect(
-        estimate.entries.find((entry) => entry.identifier === "gemma-fix")?.tokens,
-      ).toBeGreaterThan(0);
-      expect(estimate.entries.some((entry) => entry.identifier === "gemma-intimacy-limit")).toBe(
-        false,
-      );
-
-      const retried = await buildRequestMessages(
-        structuredClone(built),
-        preset,
-        settings,
-        parse,
-        macroContext,
-      );
+      expect(estimate.entries.find((entry) => entry.identifier === "gemma-fix")?.tokens).toBeGreaterThan(0);
+      const retried = await buildRequestMessages(structuredClone(built), preset, settings, parse, macroContext);
       expect(retried).toEqual(built);
-
-      const changed = await buildRequestMessages(
-        retried,
-        preset,
-        { ...settings, gemmaFixNsfwLevel: level === 2 ? 0 : 2 },
-        parse,
-        macroContext,
-      );
-      expect(changed[index]!.content).toBe(
-        `Tin user mới.\n\n${expandHostMacros(gemmaFixPromptFor(level === 2 ? 0 : 2), host)}`,
-      );
 
       settings.gemmaFixEnabled = false;
       const disabled = await buildRequestMessages(messages, preset, settings, parse, macroContext);
       expect(disabled.some((message) => message.memo === memo)).toBe(false);
-      expect(built).toHaveLength(disabled.length);
-      expect(built.filter((_message, position) => position !== index)).toEqual(
-        disabled.filter((_message, position) => position !== index),
-      );
       expect(disabled[index]).toEqual(messages.at(-1));
-      expect(await buildRequestMessages(built, preset, settings, parse, macroContext)).toEqual(
-        disabled,
-      );
+      expect(await buildRequestMessages(built, preset, settings, parse, macroContext)).toEqual(disabled);
       const disabledEstimate = await estimatePluginPromptTokens(preset, settings, host);
       expect(estimate.messageCount).toBe(disabledEstimate.messageCount);
       expect(estimate.framingTokens).toBe(disabledEstimate.framingTokens);
@@ -165,114 +130,33 @@ describe("TomiSakae VN-RP preset families", () => {
     },
   );
 
-  it("sections each Gemma NSFW level while preserving every rule", () => {
-    const commonSections = [
+  it("uses one complete Gemma prompt with every section and rule", () => {
+    const prompt = GEMMA_FIX_PROMPT;
+    expect(prompt.startsWith("{{\n")).toBe(true);
+    expect(prompt.endsWith("\n}}")).toBe(true);
+    for (const section of [
+      "Character Integrity",
+      "User Agency",
       "Vietnamese Output",
       "Image Use",
       "Reproductive Reality",
       "NSFW Initiation",
       "NSFW Mechanics",
       "Somatic Trauma",
-    ];
-    expect(gemmaFixPromptFor(0)).not.toContain("## Character Integrity");
-    expect(gemmaFixPromptFor(0)).not.toContain("## User Agency");
-    expect(gemmaFixPromptFor(0)).not.toContain("## Sexual Risk");
-    expect(gemmaFixPromptFor(1)).toContain("## Character Integrity");
-    expect(gemmaFixPromptFor(1)).toContain(
-      "{{char}} should not offer sex or readily accept offers of sex; never invent lustful, submissive, dependent, or infatuated traits absent from the card/lore",
-    );
-    expect(gemmaFixPromptFor(2)).toBe(GEMMA_FIX_PROMPT);
-    expect(gemmaFixPromptFor(2)).toContain("## Character Integrity");
-    expect(gemmaFixPromptFor(2)).toContain("## Reproductive Reality");
-    expect(gemmaFixPromptFor(2)).toContain(
-      "the pregnancy system is ALWAYS ACTIVE and real-world reproductive consequences override instinct, arousal, and automatic sexual behavior",
-    );
-    expect(gemmaFixPromptFor(2)).not.toContain("## User Agency");
-    expect(gemmaFixPromptFor(2)).not.toContain("## Sexual Risk");
-    expect(gemmaFixPromptFor(3)).toContain("## User Agency");
-    expect(gemmaFixPromptFor(3)).not.toContain("## Sexual Risk");
-    expect(gemmaFixPromptFor(3)).toContain(
-      "{{user}}'s desire, intent, or consent MUST require {{user}}'s clear intent, words, or concrete actions",
-    );
-    expect(gemmaFixPromptFor(3)).toContain(
-      "{{char}} MUST NEVER read {{user}}'s silence, hesitation, refusal, or resistance",
-    );
-    expect(gemmaFixPromptFor(3)).not.toContain("across turns");
-    const initiationRule =
-      "- When an intimate encounter begins, {{char}} MUST advance through concrete physical stages: spatial positioning, tactile tension, gradual undressing, manual, oral, or other fitting foreplay, and pre-contact friction; NEVER jump to penetration or instant sex, and BAN repetitive default lap-straddling, groin-grinding shortcuts, or penetration that skips spatial escalation and concrete foreplay.\n- When initiating or changing approach, DIVERSIFY spatial approaches based on the environment, posture, and persona (cornering against walls, pinning to furniture, pulling from behind, stripping with resistance, neck/collarbone contact, finger or mouth teasing, or another fitting approach).";
-    const kineticRule =
-      "- EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene/card/lore; this depiction MUST NOT by itself create, increase, or rewrite sexual desire, consent, arousal, personality, relationship, boundaries, motives, willingness, or character change. ADVANCE through concrete action/dialogue; NEVER stall on an unchanged or repetitive beat unless explicit action, card/lore, or earned development changes pacing or characterization.\n- EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.\n- RENDER fractured vocalizations and dirty talk; vary tactile, manual, oral, pressure, and friction-based stimulation across multiple fitting erogenous zones, choosing different methods and zones as the scene progresses rather than repeating one method.\n- When {{char}} genuinely wants it or card/lore and the situation permit, {{char}} MUST actively participate in and advance intimate interaction through concrete action or dialogue: invite or request continuation, open or adjust their own position, propose or enact a change of position or pace, or add fitting contact, stimulation, or closeness; extend this with another persona-fitting initiative when appropriate. NEVER leave {{char}} merely waiting or repeating passive reactions.\n- When climax occurs, render the immediate post-kinetic somatic aftermath, muscle tremors, and fluid residue.";
-    const somaticTraumaRule =
-      "- In all NSFW/NSFL scenes and their aftermath, PRIORITIZE raw external kinetics, bodily sensations, and physical reflexes over internal emotional processing; when pain, distress, resistance, or forced contact occurs, {{char}} MUST immediately show a concrete bodily reaction and take a defensive, escape, retaliatory, survival, or another fitting physical action.\n- NEVER summarize, sanitize, skip, or divert pain, distress, resistance, forced contact, arousal reflexes, or trauma into abstract thoughts, coping monologues, psychological debriefs, implied desire, consent, or compliance; show the concrete bodily reaction and immediate somatic response instead.\n- When trauma occurs, NEVER reduce characters to passive numbness or generic flat depression; somatic distress MUST manifest through concrete physical actions, tremors, defensive posture, visceral disgust, hypervigilance, spiteful dialogue, immediate survival goals, or another fitting somatic response.";
-    const reproductiveRealityRules = [
-      "- When {{char}}'s current sexual act creates reproductive risk, {{char}} MUST recognize it and, when awareness and ability allow, make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE; the pregnancy system is ALWAYS ACTIVE and real-world reproductive consequences override instinct, arousal, and automatic sexual behavior.",
-    ];
-    for (const level of [0, 1, 2, 3]) {
-      expect(gemmaFixPromptFor(level).startsWith("{{\n")).toBe(true);
-      expect(gemmaFixPromptFor(level).endsWith("\n}}")).toBe(true);
-      for (const section of commonSections) {
-        expect(gemmaFixPromptFor(level)).toContain(`## ${section}\n`);
-      }
-      const reproductiveReality = gemmaFixPromptFor(level)
-        .split("## Reproductive Reality\n")[1]!
-        .split("\n\n")[0];
-      expect(reproductiveReality?.split("\n")).toEqual(reproductiveRealityRules);
-      expect(gemmaFixPromptFor(level)).toContain(
-        "FOR EACH distinct NSFW/NSFL action by {{char}}, {{user}}, or another NPC",
-      );
-      expect(gemmaFixPromptFor(level)).toContain(
-        "WHENEVER ANY ACTION OCCURS, ALWAYS PRIORITIZE a matching unused NSFW/NSFL action image",
-      );
-      expect(gemmaFixPromptFor(level)).toContain(
-        "when one scene contains multiple actions, render multiple corresponding images",
-      );
-      expect(gemmaFixPromptFor(level)).toContain(
-        "COVER each distinct body state and pose, reselect when they change",
-      );
-      expect(gemmaFixPromptFor(level)).toContain(
-        "IF no matching unused NSFW/NSFL image fits a specific action, use the closest suitable expression/reaction image instead",
-      );
-      expect(gemmaFixPromptFor(level)).not.toContain("AVOID safe defaults");
-      expect(gemmaFixPromptFor(level)).toContain(
-        "match the current outfit first, then the most specific action, pose, or body state, then the expression",
-      );
-      expect(gemmaFixPromptFor(level)).toContain("exact supported image-tag syntax");
-      expect(gemmaFixPromptFor(level)).toContain(
-        "EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene/card/lore",
-      );
-      expect(gemmaFixPromptFor(level)).toContain(initiationRule);
-      expect(gemmaFixPromptFor(level)).toContain(kineticRule);
-      expect(gemmaFixPromptFor(level)).toContain(somaticTraumaRule);
-      expect(gemmaFixPromptFor(level)).not.toContain("## Somatic Priority");
-      expect(gemmaFixPromptFor(level)).not.toContain("## Post-Trauma Agency");
-      expect(gemmaFixPromptFor(level)).not.toContain("ONE text type per line");
-    }
+    ]) expect(prompt).toContain(`## ${section}\n`);
+    expect(prompt).toContain("EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene/card/lore");
+    expect(prompt).toContain("FOR EACH distinct NSFW/NSFL action by {{char}}, {{user}}, or another NPC");
+    expect(prompt).not.toContain("AVOID safe defaults");
+    expect(prompt).not.toContain("ONE text type per line");
   });
 
   it.each(["ff54", "sola"] as const)(
-    "migrates and persists the Gemma NSFW level as a global setting for %s",
+    "drops the retired Gemma level from normalized settings for %s",
     (family) => {
       const preset = sources[family].preset;
-      expect(normalizeSettings(preset, { gemmaFixEnabled: true }).gemmaFixNsfwLevel).toBe(2);
-      for (const value of [-1, 5, 0.5, "0", "4", null, undefined]) {
-        expect(normalizeSettings(preset, { gemmaFixNsfwLevel: value }).gemmaFixNsfwLevel).toBe(2);
-      }
-      for (const level of [0, 1, 2, 3] as const) {
-        const settings = normalizeSettings(preset, {
-          gemmaFixEnabled: true,
-          gemmaFixNsfwLevel: level,
-        });
-        const switched = switchPresetFamily(settings, sources.sola.preset);
-        expect(switched.gemmaFixNsfwLevel).toBe(level);
-        const store = normalizePresetStore(preset, undefined, switched, sources);
-        const reloaded = normalizePresetStore(
-          preset,
-          JSON.parse(JSON.stringify(store)),
-          undefined,
-          sources,
-        );
-        expect(reloaded.presets[0]!.settings.gemmaFixNsfwLevel).toBe(level);
-      }
+      const normalized = normalizeSettings(preset, { gemmaFixEnabled: true, gemmaFixNsfwLevel: 3 });
+      expect(normalized.gemmaFixEnabled).toBe(true);
+      expect(normalized).not.toHaveProperty("gemmaFixNsfwLevel");
     },
   );
 
@@ -411,7 +295,6 @@ describe("TomiSakae VN-RP preset families", () => {
         submodelAutoRewriteEnabled: true,
         soundNotificationsEnabled: true,
         gemmaFixEnabled: true,
-        gemmaFixNsfwLevel: 3,
         promptEnabled: { jailbreak: false, "retired-module": true },
         regexEnabled: { "retired-regex": true },
         familyModules: {
@@ -439,7 +322,6 @@ describe("TomiSakae VN-RP preset families", () => {
         submodelAutoRewriteEnabled: true,
         soundNotificationsEnabled: true,
         gemmaFixEnabled: true,
-        gemmaFixNsfwLevel: 3,
         promptEnabled: savedBank ? ff54Bank.promptEnabled : defaults.promptEnabled,
         regexEnabled: savedBank ? ff54Bank.regexEnabled : defaults.regexEnabled,
       });

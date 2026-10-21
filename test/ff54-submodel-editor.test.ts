@@ -1113,14 +1113,13 @@ describe("Named presets in plugin UI and requests", () => {
     await plugin.callbacks.unload!();
   });
 
-  it.each(["sound-notifications", "submodel-editor", "master", "gemma-nsfw-level"])(
+  it.each(["sound-notifications", "submodel-editor", "master"])(
     "warns before discarding changes to %s without saving them",
     async (id) => {
       const plugin = await startPlugin(false);
       await plugin.settingsUi();
       const stored = structuredClone(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
-      if (id === "gemma-nsfw-level") plugin.ui(id).value = "3";
-      else {
+      {
         const input = id === "master" ? plugin.ui(id) : plugin.toggle(id);
         input.checked = !input.checked;
       }

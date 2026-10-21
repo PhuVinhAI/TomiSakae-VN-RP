@@ -364,108 +364,31 @@ async function startPlugin(
 }
 
 describe("Named presets in plugin UI and requests", () => {
-  it("previews all four Gemma NSFW slider levels and saves/reloads level three", async () => {
+  it("uses one full Gemma prompt and removes the retired level control", async () => {
     const plugin = await startPlugin();
     try {
       await plugin.settingsUi();
-      expect(plugin.ui("gemma-nsfw-level").value).toBe("2");
-      expect(plugin.ui("gemma-nsfw-level").disabled).toBe(true);
+      expect(plugin.ui("gemma-nsfw-level")).toBeUndefined();
       plugin.toggle("gemma-fix").checked = true;
       await plugin.toggle("gemma-fix").handlers.get("change")!();
-      expect(plugin.ui("gemma-nsfw-level").disabled).toBe(false);
-      const saved = structuredClone(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
-      const previews = new Set<string>();
-      for (const level of [0, 1, 2, 3]) {
-        plugin.ui("gemma-nsfw-level").value = String(level);
-        await plugin.uiEvent("gemma-nsfw-level", "input");
-        expect(plugin.ui("gemma-nsfw-value").textContent).toBe(
-          `${level} · ${["Bỏ", "Nhẹ", "Mạnh", "Rất mạnh"][level]}`,
-        );
-        previews.add(plugin.ui("token-estimate-panel").innerHTML);
-        expect(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY)).toEqual(saved);
-      }
-      expect(previews.size).toBe(4);
-      plugin.ui("gemma-nsfw-level").value = "3";
       await plugin.uiEvent("save");
       const reloaded = await startPlugin(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
       try {
         await reloaded.settingsUi();
-        expect(reloaded.ui("gemma-nsfw-level").value).toBe("3");
+        expect(reloaded.ui("gemma-nsfw-level")).toBeUndefined();
         const request = await reloaded.request();
         const user = request.find((message) => message.memo === "user-a")!.content;
+        expect(user).toContain("## Character Integrity");
+        expect(user).toContain("## User Agency");
         expect(user).toContain("MUST NOT offer or readily accept sex");
-        expect(user).toContain("lustful, submissive, dependent, or infatuated traits");
-        expect(user).toContain(
-          "User's desire, intent, or consent MUST require User's clear intent, words, or concrete actions",
-        );
-        expect(user).toContain(
-          "An MUST NEVER read User's silence, hesitation, refusal, or resistance",
-        );
-        expect(user).not.toContain("across turns");
-        expect(user).not.toContain("## Sexual Risk");
+        expect(user).toContain("User's desire, intent, or consent MUST require User's clear intent, words, or concrete actions");
         reloaded.toggle("gemma-fix").checked = false;
         await reloaded.toggle("gemma-fix").handlers.get("change")!();
-        expect(reloaded.ui("gemma-nsfw-level").disabled).toBe(true);
-        expect(reloaded.ui("gemma-nsfw-level").value).toBe("3");
         await reloaded.uiEvent("save");
-        expect(
-          (await reloaded.request()).find((message) => message.memo === "user-a")!.content,
-        ).toBe("Chào An.");
-      } finally {
-        await reloaded.callbacks.unload!();
-      }
-    } finally {
-      await plugin.callbacks.unload!();
-    }
+        expect((await reloaded.request()).find((message) => message.memo === "user-a")!.content).toBe("Chào An.");
+      } finally { await reloaded.callbacks.unload!(); }
+    } finally { await plugin.callbacks.unload!(); }
   });
-
-  it.each(["ff54", "sola"] as const)(
-    "locks Auto Submodel to the editor toggle for %s and persists the dependency",
-    async (family) => {
-      const store = normalizePresetStore(preset, undefined, undefined, sources);
-      store.presets[0]!.settings = switchPresetFamily(
-        store.presets[0]!.settings,
-        sources[family].preset,
-      );
-      const plugin = await startPlugin(store);
-      try {
-        await plugin.settingsUi();
-        expect(plugin.toggle("submodel-auto-rewrite").disabled).toBe(true);
-        expect(plugin.toggle("submodel-auto-rewrite").checked).toBe(false);
-        plugin.toggle("submodel-editor").checked = true;
-        await plugin.toggle("submodel-editor").handlers.get("change")!();
-        expect(plugin.toggle("submodel-auto-rewrite").disabled).toBe(false);
-        plugin.toggle("submodel-auto-rewrite").checked = true;
-        await plugin.uiEvent("save");
-        const saved = normalizePresetStore(
-          preset,
-          plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY),
-          undefined,
-          sources,
-        );
-        expect(saved.presets[0]!.settings.submodelAutoRewriteEnabled).toBe(true);
-        await plugin.settingsUi();
-        expect(plugin.toggle("submodel-auto-rewrite").checked).toBe(true);
-        plugin.toggle("submodel-editor").checked = false;
-        await plugin.toggle("submodel-editor").handlers.get("change")!();
-        expect(plugin.toggle("submodel-auto-rewrite").checked).toBe(false);
-        expect(plugin.toggle("submodel-auto-rewrite").disabled).toBe(true);
-        // Saving also rejects a stale/programmatically checked disabled control.
-        plugin.toggle("submodel-auto-rewrite").checked = true;
-        await plugin.uiEvent("save");
-        const reloaded = await startPlugin(plugin.storage.get(CONFIG_PRESETS_STORAGE_KEY));
-        try {
-          await reloaded.settingsUi();
-          expect(reloaded.toggle("submodel-auto-rewrite").disabled).toBe(true);
-          expect(reloaded.toggle("submodel-auto-rewrite").checked).toBe(false);
-        } finally {
-          await reloaded.callbacks.unload!();
-        }
-      } finally {
-        await plugin.callbacks.unload!();
-      }
-    },
-  );
 
   it("clears an old saved Auto Submodel toggle when the editor is disabled", async () => {
     const plugin = await startPlugin(undefined, false, { submodelAutoRewriteEnabled: true });

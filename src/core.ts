@@ -24,7 +24,7 @@ import {
 } from "./sola-vietnamese-regex.js";
 import { SOLA_HEADER_SAVER_ID } from "./sola-history.js";
 import { adaptSolaCardContentForDisplay, adaptSolaDisplayReplacement } from "./sola-display.js";
-import { gemmaFixPromptFor, normalizeGemmaNsfwLevel, type GemmaNsfwLevel } from "./gemma-fix.js";
+import { GEMMA_FIX_PROMPT } from "./gemma-fix.js";
 import { cardImagePrompt, type CardImageCatalog } from "./card-images.js";
 import {
   adaptSolaNsfwTrackerForDisplay,
@@ -122,7 +122,6 @@ export interface FfGlobalSettings {
   submodelEditorEnabled: boolean;
   submodelAutoRewriteEnabled: boolean;
   gemmaFixEnabled: boolean;
-  gemmaFixNsfwLevel: GemmaNsfwLevel;
 }
 
 export interface MacroContext {
@@ -218,7 +217,6 @@ export function createDefaultSettings(preset: FfPreset): FfGlobalSettings {
     submodelEditorEnabled: false,
     submodelAutoRewriteEnabled: false,
     gemmaFixEnabled: false,
-    gemmaFixNsfwLevel: 2,
     ...(familyOf(preset) !== "ff54" ? { presetFamily: familyOf(preset) } : {}),
   };
 }
@@ -290,7 +288,6 @@ export function normalizeSettings(preset: FfPreset, value: unknown): FfGlobalSet
   }
   if (typeof record.gemmaFixEnabled === "boolean")
     defaults.gemmaFixEnabled = record.gemmaFixEnabled;
-  defaults.gemmaFixNsfwLevel = normalizeGemmaNsfwLevel(record.gemmaFixNsfwLevel);
   return defaults;
 }
 
@@ -1150,7 +1147,7 @@ export async function buildRequestMessages(
     for (let index = requestHistory.length - 1; index >= 0; index -= 1) {
       const message = requestHistory[index]!;
       if (message.role !== "user") continue;
-      const suffix = `\n\n${await parseHostMacros(gemmaFixPromptFor(settings.gemmaFixNsfwLevel), "user")}`;
+      const suffix = `\n\n${await parseHostMacros(GEMMA_FIX_PROMPT, "user")}`;
       requestHistory[index] = {
         ...message,
         content: `${message.content}${suffix}`,
