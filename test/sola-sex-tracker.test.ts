@@ -57,7 +57,7 @@ describe("Sola Sexual Context Tracker", () => {
     );
     expect(module?.content).toContain("Khả năng và trạng thái mang thai:");
     expect(module?.content).toContain('<pregnancy chance="00.00%" status="" />');
-    expect(module?.content).toContain("viable semen inside a pregnancy-capable reproductive tract");
+    expect(module?.content).toContain("infer the current conception chance");
     expect(module?.content).toContain(
       "use 0.00% to 100.00% with two decimal places and the % sign",
     );
