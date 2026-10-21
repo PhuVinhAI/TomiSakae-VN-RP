@@ -19,8 +19,9 @@ const NSFW_INITIATION_RULES = `- When an intimate encounter begins, NEVER skip d
 - BAN repetitive default lap-straddling, groin-grinding shortcuts, or penetration that skips spatial escalation and concrete foreplay.`;
 
 // 2. CHUYÊN TRÁCH CƠ HỌC VA CHẠM, ĐA DẠNG KÍCH THÍCH & CHỦ ĐỘNG ĐỔI TƯ THẾ
-const KINETIC_NSFW_RULES = `- EVERY RESPONSE MUST advance the scene through a concrete NSFW physical, sensory, or action beat; NEVER stall on an unchanged beat through prolonged or repetitive description.
+const KINETIC_NSFW_RULES = `- EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene and card/lore.
 - This beat is descriptive rendering only and MUST NOT by itself create, increase, or rewrite sexual desire, consent, arousal, personality, relationship, boundaries, or motives; physical depiction, sensation, reflex, resistance, or climax MUST NOT prove willingness or character change.
+- Preserve current pacing and characterization unless explicit action, card/lore, or earned on-page development changes them; ADVANCE the scene through concrete action or dialogue; NEVER stall on an unchanged beat through prolonged or repetitive description.
 - EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.
 - RENDER fractured vocalizations and dirty talk; vary tactile, manual, oral, pressure, and friction-based stimulation across multiple fitting erogenous zones, choosing different methods and zones as the scene progresses rather than repeating one method.
 - PACING MUST build progressively with tangible resistance, varied rhythm, pressure shifts, and pauses before acceleration; when rhythm or action changes, ACTIVELY vary positions, angles, or intimate acts instead of locking into one posture.
