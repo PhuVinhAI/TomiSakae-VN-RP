@@ -58,7 +58,6 @@ export async function estimatePluginPromptTokens(
     // Preview must not roll dice or affect the values used for actual generation.
     {
       randomInt: (minimum) => minimum,
-      reproductiveRoll: "system-provided",
       ...(hostContext.dialogueTheme ? { dialogueTheme: hostContext.dialogueTheme } : {}),
     },
     (message, prompt) => {
@@ -74,14 +73,14 @@ export async function estimatePluginPromptTokens(
   if (imagePrompt) {
     estimate.entries.push({ identifier: "image-optimization", tokens: count(imagePrompt.content) });
   }
-  const nsfwTrackerPrompt = [...composed.leading, ...composed.absolute, ...composed.trailing].find((message) =>
-    String(message.memo).endsWith(":nsfw-tracker"),
+  const nsfwTrackerPrompt = [...composed.leading, ...composed.absolute, ...composed.trailing].find(
+    (message) => String(message.memo).endsWith(":nsfw-tracker"),
   );
   if (nsfwTrackerPrompt) {
     estimate.entries.push({ identifier: "nsfw-tracker", tokens: count(nsfwTrackerPrompt.content) });
   }
-  const sexTrackerPrompt = [...composed.leading, ...composed.absolute, ...composed.trailing].find((message) =>
-    String(message.memo).endsWith(":sex-tracker"),
+  const sexTrackerPrompt = [...composed.leading, ...composed.absolute, ...composed.trailing].find(
+    (message) => String(message.memo).endsWith(":sex-tracker"),
   );
   if (sexTrackerPrompt) {
     estimate.entries.push({

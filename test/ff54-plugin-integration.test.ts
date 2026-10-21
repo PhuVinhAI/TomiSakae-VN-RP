@@ -79,6 +79,7 @@ async function startPlugin(
   sound = false,
   legacySettings?: unknown,
   watchHistory = false,
+  pregnancyRandom?: () => number,
 ) {
   const callbacks = {
     beforeRequest: undefined as
@@ -277,7 +278,13 @@ async function startPlugin(
     setTimeout,
     clearTimeout,
     ...(watchHistory ? { setInterval, clearInterval } : {}),
-    crypto: { randomUUID: () => `test-${storage.size}-${Math.random()}` },
+    crypto: {
+      randomUUID: () => `test-${storage.size}-${Math.random()}`,
+      getRandomValues: (values: Uint32Array) => {
+        values[0] = Math.floor((pregnancyRandom ?? Math.random)() * 0x100000000);
+        return values;
+      },
+    },
     document: uiDocument,
     AudioContext: FakeAudioContext,
     console: { warn: vi.fn() },
@@ -1131,6 +1138,261 @@ describe("Sola saved-history restoration", () => {
     const request = await plugin.request(requestOf(plugin.chats.get("0:0")!));
     expect(plugin.chats.get("0:0")!.message[1]!.data).toBe(reply(0));
     expect(request.find((message) => message.memo === "sola-a-0")?.content).toBe(reply(0));
+  });
+});
+
+describe("Sola silent reproductive state", () => {
+  const storeWithTracker = () => {
+    const store = normalizePresetStore(preset, undefined, undefined, sources);
+    store.presets[0]!.settings = switchPresetFamily(
+      store.presets[0]!.settings,
+      sources.sola.preset,
+    );
+    store.presets[0]!.settings.solaSexTrackerEnabled = true;
+    return store;
+  };
+  const pregnancy = (chance: string, status = "") =>
+    `<pregnancy chance="${chance}%" status="${status}" />`;
+  const reply = (chance: string, status = "", name = "Nana") =>
+    `Diễn biến.\n<sex_tracker>\n[${name}]:\nKhả năng và trạng thái mang thai: ${pregnancy(chance, status)}\n</sex_tracker>`;
+  const history = (content: string): SavedChat => ({
+    id: "chat-a",
+    message: [
+      { role: "char", chatId: "state", data: content },
+      { role: "user", chatId: "next", data: "Tiếp tục." },
+    ],
+  });
+  const requestOf = (chat: SavedChat): ChatMessage[] =>
+    chat.message.map((entry) => ({
+      role: entry.role === "char" ? "assistant" : "user",
+      content: entry.data,
+      memo: entry.chatId,
+    }));
+
+  it("resolves each character before sending, saves successes and keeps randomness out of prompts", async () => {
+    const random = vi.fn().mockReturnValueOnce(0.1).mockReturnValueOnce(0.8);
+    const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
+    const content = `<sex_tracker>\n[Nana]:\nPregnancy likelihood/status: ${pregnancy("25.00")}\n[Mina]:\nPregnancy likelihood/status: ${pregnancy("70.00")}\n</sex_tracker>`;
+    const chat = history(content);
+    plugin.chats.set("0:0", chat);
+    const built = await plugin.request(requestOf(chat));
+    const resolved = built.find((message) => message.memo === "state")!.content;
+    expect(resolved).toContain(pregnancy("25.00", "Đã thụ thai"));
+    expect(resolved).toContain(pregnancy("70.00"));
+    expect(plugin.chats.get("0:0")!.message[0]!.data).toBe(resolved);
+    expect(random).toHaveBeenCalledTimes(2);
+    expect(built.map((message) => message.content).join("\n")).not.toMatch(
+      /Reproductive roll|system roll|Roll hệ thống|system-provided/i,
+    );
+  });
+
+  it("retries pending probability every request while keeping confirmed results across stale retries and reloads", async () => {
+    const store = storeWithTracker();
+    const random = vi.fn().mockReturnValueOnce(0.9).mockReturnValueOnce(0.1);
+    const plugin = await startPlugin(store, false, undefined, false, random);
+    const chat = history(reply("50.00"));
+    const stale = requestOf(chat);
+    plugin.chats.set("0:0", chat);
+    await plugin.request(stale);
+    expect(plugin.chats.get("0:0")!.message[0]!.data).toContain(pregnancy("50.00"));
+    await plugin.request(stale);
+    await plugin.request(stale);
+    expect(random).toHaveBeenCalledTimes(2);
+    expect(plugin.chats.get("0:0")!.message[0]!.data).toContain(pregnancy("50.00", "Đã thụ thai"));
+    const reloadedRandom = vi.fn(() => 0);
+    const reloaded = await startPlugin(store, false, undefined, false, reloadedRandom);
+    reloaded.chats.set("0:0", structuredClone(plugin.chats.get("0:0")!));
+    const built = await reloaded.request(stale);
+    expect(built.find((message) => message.memo === "state")!.content).toContain(
+      'status="Đã thụ thai"',
+    );
+    expect(reloadedRandom).not.toHaveBeenCalled();
+  });
+
+  it("uses only the latest tracker and honors changed probability, a cleared result, and pregnancy stages", async () => {
+    const random = vi.fn(() => 0);
+    const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
+    const chat = history(reply("100.00"));
+    chat.message.push(
+      { role: "char", chatId: "reset", data: reply("0.00") },
+      { role: "user", chatId: "next-2", data: "Tiếp." },
+    );
+    plugin.chats.set("0:0", chat);
+    await plugin.request(requestOf(chat));
+    expect(random).not.toHaveBeenCalled();
+    const changed = plugin.chats.get("0:0")!;
+    changed.message[2]!.data = reply("12.34");
+    plugin.chats.set("0:0", changed);
+    await plugin.request(requestOf(changed));
+    expect(random).toHaveBeenCalledTimes(1);
+    expect(plugin.chats.get("0:0")!.message[2]!.data).toContain(pregnancy("12.34", "Đã thụ thai"));
+    for (const [chance, status] of [
+      ["12.34", "tam cá nguyệt hai"],
+      ["0.00", ""],
+    ]) {
+      const updated = plugin.chats.get("0:0")!;
+      updated.message[2]!.data = reply(chance!, status!);
+      await plugin.request(requestOf(updated));
+      expect(plugin.chats.get("0:0")!.message[2]!.data).toBe(reply(chance!, status!));
+    }
+    const noTracker = plugin.chats.get("0:0")!;
+    noTracker.message[2]!.data = "Diễn biến không có tracker.";
+    await plugin.request(requestOf(noTracker));
+    expect(random).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(["delete", "branch"] as const)(
+    "resolves the selected archived swipe after %s without changing another swipe",
+    async (action) => {
+      const random = vi.fn(() => 0);
+      const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
+      const chat = history(reply("100.00"));
+      chat.message[0]!.swipes = [reply("100.00"), reply("75.00")];
+      chat.message[0]!.swipeId = 0;
+      chat.message.push({ role: "char", data: "Mới hơn.", chatId: "newer" });
+      plugin.chats.set("0:0", chat);
+      await plugin.request(requestOf(chat));
+      const saved = structuredClone(plugin.chats.get("0:0")!);
+      expect(saved.message[0]!.data).not.toContain("<sex_tracker>");
+      expect(random).not.toHaveBeenCalled();
+      const shortened = structuredClone(saved);
+      shortened.message = shortened.message.slice(0, 2);
+      shortened.message[0]!.swipeId = 1;
+      shortened.message[0]!.data = reply("75.00");
+      if (action === "branch") shortened.id = "branch-a";
+      const index = action === "branch" ? 1 : 0;
+      plugin.chats.set(`0:${index}`, shortened);
+      plugin.selectChat(index);
+      const built = await plugin.request(requestOf(shortened));
+      const updated = plugin.chats.get(`0:${index}`)!.message[0]!;
+      expect(updated.data).toContain(pregnancy("75.00", "Đã thụ thai"));
+      expect(updated.swipes?.[1]).toBe(updated.data);
+      expect(updated.swipes?.[0]).toBe(reply("100.00"));
+      expect(built.find((message) => message.memo === "state")!.content).toContain(
+        pregnancy("75.00", "Đã thụ thai"),
+      );
+      expect(random).toHaveBeenCalledTimes(1);
+      if (action === "branch") expect(plugin.chats.get("0:0")).toEqual(saved);
+    },
+  );
+
+  it("awaits the pregnancy write and reuses its samples when a concurrent host edit requires retry", async () => {
+    const random = vi.fn(() => 0.2);
+    const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
+    const chat = history(reply("50.00"));
+    plugin.chats.set("0:0", chat);
+    const getChat = plugin.api.getChatFromIndex;
+    const getSpy = vi
+      .spyOn(plugin.api, "getChatFromIndex")
+      .mockImplementation(async (character, index) => {
+        if (
+          random.mock.calls.length === 1 &&
+          !plugin.chats.get("0:0")!.message[1]!.data.endsWith("!")
+        )
+          plugin.chats.get("0:0")!.message[1]!.data += "!";
+        return getChat(character, index);
+      });
+    let release!: () => void;
+    const pendingWrite = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const setChat = plugin.api.setChatToIndex;
+    const setSpy = vi
+      .spyOn(plugin.api, "setChatToIndex")
+      .mockImplementation(async (character, index, data) => {
+        await pendingWrite;
+        await setChat(character, index, data);
+      });
+    let settled = false;
+    const pending = plugin.request(requestOf(chat)).then((result) => {
+      settled = true;
+      return result;
+    });
+    await vi.waitFor(() => expect(setSpy).toHaveBeenCalledTimes(1));
+    expect(settled).toBe(false);
+    release();
+    await pending;
+    expect(random).toHaveBeenCalledTimes(1);
+    expect(plugin.chats.get("0:0")!.message[1]!.data).toBe("Tiếp tục.!");
+    getSpy.mockRestore();
+    setSpy.mockRestore();
+  });
+
+  it("saves a reroll's result inside the active swipe archive when later replies are still in history", async () => {
+    const random = vi.fn(() => 0);
+    const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
+    const chat = history(reply("100.00"));
+    chat.message[0]!.swipeId = 0;
+    chat.message[0]!.swipes = [reply("100.00"), reply("10.00")];
+    const stale = requestOf(chat);
+    chat.message.push({ role: "char", data: "Phản hồi sau.", chatId: "newer" });
+    plugin.chats.set("0:0", chat);
+    await plugin.request(stale);
+    const entry = plugin.chats.get("0:0")!.message[0]!;
+    expect(entry.data).not.toContain("<sex_tracker>");
+    expect(restoreSolaHistoryContent(entry.data, entry.solaHistory?.["swipe:0"])).toContain(
+      pregnancy("100.00", "Đã thụ thai"),
+    );
+    expect(entry.swipes?.[0]).toContain(pregnancy("100.00", "Đã thụ thai"));
+    expect(entry.swipes?.[1]).toBe(reply("10.00"));
+    const built = await plugin.request(stale);
+    expect(built.find((message) => message.memo === "state")!.content).toContain(
+      pregnancy("100.00", "Đã thụ thai"),
+    );
+    expect(random).toHaveBeenCalledTimes(1);
+  });
+
+  it("serializes simultaneous requests so an established result is never sampled again", async () => {
+    const random = vi.fn(() => 0);
+    const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
+    const chat = history(reply("100.00"));
+    plugin.chats.set("0:0", chat);
+    const requests = await Promise.all([
+      plugin.request(requestOf(chat)),
+      plugin.request(requestOf(chat)),
+    ]);
+    for (const built of requests)
+      expect(built.find((message) => message.memo === "state")!.content).toContain(
+        pregnancy("100.00", "Đã thụ thai"),
+      );
+    expect(random).toHaveBeenCalledTimes(1);
+  });
+
+  it("never samples during history polling, display, or auxiliary requests", async () => {
+    vi.useFakeTimers();
+    const random = vi.fn(() => 0);
+    const plugin = await startPlugin(storeWithTracker(), false, undefined, true, random);
+    try {
+      const chat = history(reply("100.00"));
+      plugin.chats.set("0:0", chat);
+      await vi.advanceTimersByTimeAsync(750);
+      await plugin.callbacks.display!(chat.message[0]!.data);
+      await plugin.callbacks.beforeRequest!(requestOf(chat), "submodel");
+      expect(random).not.toHaveBeenCalled();
+      await plugin.request(requestOf(chat));
+      expect(random).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(500);
+      expect(random).toHaveBeenCalledTimes(1);
+    } finally {
+      await plugin.callbacks.unload!();
+    }
+  });
+
+  it.each(["disabled", "ff54"])("does not resolve when the tracker is %s", async (mode) => {
+    const store = storeWithTracker();
+    if (mode === "disabled") store.presets[0]!.settings.solaSexTrackerEnabled = false;
+    else
+      store.presets[0]!.settings = switchPresetFamily(
+        store.presets[0]!.settings,
+        sources.ff54.preset,
+      );
+    const random = vi.fn(() => 0);
+    const plugin = await startPlugin(store, false, undefined, false, random);
+    const chat = history(reply("100.00"));
+    plugin.chats.set("0:0", chat);
+    await plugin.request(requestOf(chat));
+    expect(random).not.toHaveBeenCalled();
+    expect(plugin.chats.get("0:0")!.message[0]!.data).not.toContain('status="Đã thụ thai"');
   });
 });
 

@@ -46,6 +46,7 @@ import {
 import { insertSubmodelEditorSystem, editorUserFor } from "./editor-prompts.js";
 import { adaptSolaSceneHeaderForDisplay } from "./sola-display.js";
 import { splitSolaReasoning } from "./sola-reasoning.js";
+import { resolveSolaPregnancy } from "./sola-sex-tracker.js";
 import { SETTINGS_STYLES } from "./ui-style.js";
 import {
   createRewriteButton,
@@ -264,10 +265,6 @@ const editorChatKey = (characterIndex: number, chatIndex: number) =>
 const mainCompletionMonitor = createCompletionMonitor(Risuai);
 let notificationAudio: NotificationAudioContext | undefined;
 let pluginUnloaded = false;
-
-function reproductiveRoll(): string {
-  return (Math.random() * 100).toFixed(2);
-}
 
 function playCompletionSound(enabled: boolean, success: boolean): void {
   if (!enabled || pluginUnloaded) return;
@@ -599,7 +596,7 @@ async function showSettings(): Promise<void> {
             "sola-nsfw-tracker",
             settings.solaNsfwTrackerEnabled,
             "🔥 Bộ theo dõi NSFW/NSFL",
-            "Ghi lại cách viết vừa dùng; hệ thống chuyển từng mục thành lệnh cấm lặp trong system của request kế tiếp · Mặc định tắt",
+            "Ghi lại cách viết vừa dùng; hệ thống chuyển từng mục thành lệnh cấm lặp sau tin user ở request kế tiếp · Mặc định tắt",
           )
         : ""
     }${
@@ -609,7 +606,7 @@ async function showSettings(): Promise<void> {
             "sola-sex-tracker",
             settings.solaSexTrackerEnabled,
             "🌙 Theo dõi sinh sản",
-            "Mô phỏng chu kỳ, nhận biết chu kỳ và khả năng mang thai qua Cognitive Check; tự xóa sau phản hồi kế · Mặc định tắt",
+            "Mô phỏng chu kỳ, nhận biết và thai kỳ; plugin tự xét xác suất riêng cho từng nhân vật trước lượt kế · Mặc định tắt",
           )
         : ""
     }${checkbox(
@@ -963,6 +960,7 @@ function syncRestoredStatesToRequest(
   chat: HostChatSnapshot,
   preset: FfPreset,
   settings: FfGlobalSettings,
+  onMatch?: (message: ChatMessage, entry: HostChatMessage) => ChatMessage,
 ): ChatMessage[] {
   const assistantHistory = (chat.message ?? []).filter(
     (entry) => entry.role === "char" && !isHistoryComment(entry),
@@ -1041,13 +1039,112 @@ function syncRestoredStatesToRequest(
         typeof matchedEntry.swipes[matchedEntry.swipeId] === "string" &&
         matchedEntry.swipes[matchedEntry.swipeId] !== String(matchedEntry.data ?? "") &&
         /<(?:nsfw_nsfl_ban_list|sex_tracker)\b/i.test(restored));
-    return restored && (restored !== message.content || restoreTrackers)
-      ? {
-          ...message,
-          ...(restored !== message.content ? { content: restored } : {}),
-          ...(restoreTrackers ? { vnRpRestoreSolaTrackers: true } : {}),
+    const synced =
+      restored && (restored !== message.content || restoreTrackers)
+        ? {
+            ...message,
+            ...(restored !== message.content ? { content: restored } : {}),
+            ...(restoreTrackers ? { vnRpRestoreSolaTrackers: true } : {}),
+          }
+        : message;
+    return onMatch ? onMatch(synced, matchedEntry!) : synced;
+  });
+}
+
+/** Serialize request updates with the background history restorer. */
+function updateSavedHistory<T>(
+  characterIndex: number,
+  chatIndex: number,
+  update: () => Promise<T>,
+): Promise<T> {
+  const key = editorChatKey(characterIndex, chatIndex);
+  const active = historyCleanups.get(key);
+  const current = (async () => {
+    await active?.catch(() => {});
+    return update();
+  })().finally(() => {
+    if (historyCleanups.get(key) === lock) historyCleanups.delete(key);
+  });
+  const lock = current.then(
+    () => {},
+    () => {},
+  );
+  historyCleanups.set(key, lock);
+  return current;
+}
+
+async function prepareRestoredRequest(
+  messages: ChatMessage[],
+  preset: FfPreset,
+  settings: FfGlobalSettings,
+  characterIndex: number,
+  chatIndex: number,
+): Promise<ChatMessage[]> {
+  return updateSavedHistory(characterIndex, chatIndex, async () => {
+    // Reuse the same samples if a concurrent host edit requires a write retry.
+    const samples: number[] = [];
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
+      const matched = new Map<ChatMessage, HostChatMessage>();
+      const synced = chat
+        ? syncRestoredStatesToRequest(messages, chat, preset, settings, (message, entry) => {
+            matched.set(message, entry);
+            return message;
+          })
+        : messages;
+      if (familyOf(preset) !== "sola" || !settings.solaSexTrackerEnabled) return synced;
+      const previous = [...synced]
+        .reverse()
+        .find(
+          (message) =>
+            message.role === "assistant" && !isChatComment(message) && !isPluginMemo(message.memo),
+        );
+      if (!previous) return synced;
+      let sampleIndex = 0;
+      const content = resolveSolaPregnancy(
+        previous.content,
+        settings.vietnameseOutputEnabled,
+        () => {
+          const index = sampleIndex++;
+          if (samples[index] === undefined) {
+            const crypto = globalThis.crypto;
+            samples[index] = crypto?.getRandomValues
+              ? crypto.getRandomValues(new Uint32Array(1))[0]! / 0x100000000
+              : Math.random();
+          }
+          return samples[index]!;
+        },
+      );
+      if (content === previous.content) return synced;
+      const entry = matched.get(previous);
+      if (chat && entry) {
+        const latest = await Risuai.getChatFromIndex(characterIndex, chatIndex);
+        if (!latest || savedHistorySignature(latest) !== savedHistorySignature(chat)) continue;
+        const swipeKey = solaHistorySwipeKey(entry.swipeId);
+        const archive = { ...entry.solaHistory };
+        delete archive[swipeKey];
+        const updated: HostChatMessage = { ...entry, data: content, solaHistory: archive };
+        if (
+          Array.isArray(entry.swipes) &&
+          typeof entry.swipeId === "number" &&
+          typeof entry.swipes[entry.swipeId] === "string"
+        ) {
+          updated.swipes = [...entry.swipes];
+          updated.swipes[entry.swipeId] = content;
         }
-      : message;
+        await Risuai.setChatToIndex(characterIndex, chatIndex, {
+          ...chat,
+          message: chat.message!.map((message) => (message === entry ? updated : message)),
+        });
+        // A reroll may use an older saved reply: retain its normal saver depth
+        // and rebuild its archive with the new result before releasing the lock.
+        for (let cleanup = 0; cleanup < 4; cleanup += 1) {
+          if (await cleanSavedHistory(settings, characterIndex, chatIndex)) break;
+        }
+      }
+      return synced.map((message) => (message === previous ? { ...message, content } : message));
+    }
+    throw new Error("History changed while updating reproductive state; retry the request.");
   });
 }
 
@@ -1139,22 +1236,13 @@ async function cleanSavedHistoryOnce(
   chatIndex: number,
   skipStreaming = false,
 ): Promise<void> {
-  const key = editorChatKey(characterIndex, chatIndex);
-  const active = historyCleanups.get(key);
-  // A watcher may have started against the pre-swipe snapshot. Wait for it,
-  // then run our own pass against the now-current chat before composing.
-  if (active) await active.catch(() => {});
-  const current = (async () => {
+  await updateSavedHistory(characterIndex, chatIndex, async () => {
     // A host swipe/new-message write can land while the snapshot is being
     // restored. Retry from the newest chat instead of sending a stale request.
     for (let attempt = 0; attempt < 4; attempt += 1) {
       if (await cleanSavedHistory(settings, characterIndex, chatIndex, skipStreaming)) return;
     }
-  })().finally(() => {
-    if (historyCleanups.get(key) === current) historyCleanups.delete(key);
   });
-  historyCleanups.set(key, current);
-  await current;
 }
 
 let historyRestoreTimer: unknown;
@@ -1212,10 +1300,13 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
   if (!settings.enabled) return messages;
   const preset = sourceForSettings(settings);
   await cleanSavedHistoryOnce(settings, characterIndex, chatIndex);
-  const restoredChat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
-  const requestMessages = restoredChat
-    ? syncRestoredStatesToRequest(messages, restoredChat, preset, settings)
-    : messages;
+  const requestMessages = await prepareRestoredRequest(
+    messages,
+    preset,
+    settings,
+    characterIndex,
+    chatIndex,
+  );
   const macroContext = await getHostMacroContext(character);
   const built = await buildRequestMessages(
     requestMessages,
@@ -1225,9 +1316,6 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
     {
       ...(macroContext.dialogueTheme ? { dialogueTheme: macroContext.dialogueTheme } : {}),
       ...(macroContext.cardImageCatalog ? { cardImageCatalog: macroContext.cardImageCatalog } : {}),
-      ...(familyOf(preset) === "sola" && settings.solaSexTrackerEnabled
-        ? { reproductiveRoll: reproductiveRoll() }
-        : {}),
     },
   );
   if (editorListenerRegistered) {

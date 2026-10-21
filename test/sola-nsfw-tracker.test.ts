@@ -28,7 +28,6 @@ const tracker = (name: string, pattern: string) => `<nsfw_nsfl_ban_list>
 Description patterns: ${pattern}
 Sensory emphasis: warm skin
 Pacing: tension to interruption
-Response structure: Sound(short) → Image → Narration(long) → Dialogue(short) → Thought(short) → Narration(long) → Narration(medium) → Image → Dialogue(short)
 
 Action/Body dynamics:
 [${name}]: shifting pressure
@@ -63,17 +62,12 @@ describe("Sola NSFW Tracker", () => {
     expect(module?.content).toContain("Hành động/Động lực cơ thể:");
     expect(module?.content).toContain("Điểm nhấn cảm giác:");
     expect(module?.content).toContain("Nhịp triển khai:");
-    expect(module?.content).toContain("Bố cục phản hồi:");
-    expect(module?.content).toContain(
-      "Toàn bộ thứ tự các khối thực tế trong phản hồi hiện tại trước HUD, ghi loại và độ dài ngắn/vừa/dài; giữ riêng từng khối kể cả khi cùng loại liên tiếp",
-    );
+    expect(module?.content).not.toMatch(/Bố cục phản hồi|Response structure|response layout/i);
     expect(module?.content).toContain("Phản ứng thân thể / Hành động NSFL:");
     expect(module?.content).toContain(
       "[Tên nhân vật]: [Distinct NSFW movement, force, pose, and contact patterns used this turn",
     );
-    expect(module?.content).toContain(
-      "Record shared description, sensory, pacing, and response structure once",
-    );
+    expect(module?.content).toContain("Record shared description, sensory, and pacing once");
     expect(module?.content).toContain(
       "For NSFL scenes, record the concrete bodily reflex, defensive action, persona-true behavior, or immediate survival drive",
     );
@@ -239,10 +233,7 @@ describe("Sola NSFW Tracker", () => {
       expect(displayed).toContain('data-sola-ui="nsfw-nsfl-tracker"');
       expect(displayed).toContain(title);
       expect(displayed).toContain(label);
-      expect(displayed).toContain(vietnamese ? "Bố cục phản hồi" : "Response structure");
-      expect(displayed).toContain(
-        "Sound(short) → Image → Narration(long) → Dialogue(short) → Thought(short) → Narration(long) → Narration(medium) → Image → Dialogue(short)",
-      );
+      expect(displayed).not.toMatch(/Bố cục phản hồi|Response structure/);
       expect(displayed).toContain("&lt;img src=x&gt;");
       expect(displayed).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
       expect(displayed).not.toContain("<img src=x>");
@@ -289,21 +280,13 @@ describe("Sola NSFW Tracker", () => {
     expect(ban.content).toContain("ABSOLUTE BAN");
     expect(ban.content).toContain("NEVER repeat, closely paraphrase, synonym-swap");
     expect(ban.content).toContain("NEVER copy them into the new tracker");
-    expect(ban.content).toContain(
-      "RESTRUCTURE the recorded response layout, not its individual block types: change the opening, block order, grouping, and lengths",
-    );
-    expect(ban.content).toContain(
-      "NEVER keep the template by only swapping words or changing a few positions",
-    );
+    expect(ban.content).not.toMatch(/RESTRUCTURE|response layout|block order/);
     expect(ban.content).toContain("Description patterns: mẫu mới");
     expect(ban.content).toContain("Pacing: tension to interruption");
-    expect(ban.content).toContain(
-      "<banned_pattern>\nResponse structure: Sound(short) → Image → Narration(long) → Dialogue(short) → Thought(short) → Narration(long) → Narration(medium) → Image → Dialogue(short)\n</banned_pattern>",
-    );
     expect(ban.content).toContain("Action/Body dynamics:\n[Nana]: shifting pressure");
     expect(ban.content).toContain("Dialogue patterns:\n[Nana]: &quot;Lại đây.&quot;");
     expect(ban.content).toContain("Moans/Vocal reactions:\n[Nana]: breath catching");
-    expect(ban.content.match(/<banned_pattern>/g)).toHaveLength(7);
+    expect(ban.content.match(/<banned_pattern>/g)).toHaveLength(6);
     expect(ban.content).not.toContain("mẫu cũ");
     const userIndex = built.findIndex((message) => message.memo === "latest-user");
     expect(built[userIndex]!.content).toContain("Tiếp tục.\n\n{{\n");
@@ -318,6 +301,24 @@ describe("Sola NSFW Tracker", () => {
     ).toBe(false);
     expect(messages).toEqual(snapshot);
   });
+
+  it.each(["Response structure", "Bố cục phản hồi"])(
+    "ignores the removed %s field in saved trackers",
+    (label) => {
+      const legacy = tracker("Nana", "mẫu").replace("Pacing:", `${label}: old layout\nPacing:`);
+      const settings = createDefaultSettings(sola);
+      settings.solaNsfwTrackerEnabled = true;
+      const ban = solaNsfwPatternBanPrompt(splitSolaNsfwTracker(legacy).patterns);
+      expect(ban).not.toContain("old layout");
+      expect(ban).toContain("Description patterns: mẫu");
+      const displayed = applyRegexScripts(legacy, sola, settings, {
+        placement: PLACEMENT_AI_OUTPUT,
+        markdown: true,
+        depth: 0,
+      });
+      expect(displayed).not.toContain("old layout");
+    },
+  );
 
   it("rebuilds a single ban on retry and uses only the selected latest response after a branch or swipe", async () => {
     const settings = createDefaultSettings(sola);

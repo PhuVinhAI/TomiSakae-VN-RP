@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { loadPresetSources } from "../scripts/build-tomisakae-vn-rp-plugin.js";
 import {
   applyPromptRegexToMessages,
@@ -11,7 +11,7 @@ import {
 } from "../src/core.js";
 import { estimatePluginPromptTokens } from "../src/token-estimate.js";
 import { restoreSolaHistoryContent } from "../src/sola-history.js";
-import { solaSexTrackerPrompt } from "../src/sola-sex-tracker.js";
+import { resolveSolaPregnancy, solaSexTrackerPrompt } from "../src/sola-sex-tracker.js";
 
 let sola: FfPreset;
 let ff54: FfPreset;
@@ -56,14 +56,13 @@ describe("Sola Sexual Context Tracker", () => {
       "when data is missing, choose the most plausible development and keep it consistent",
     );
     expect(module?.content).toContain("Khả năng và trạng thái mang thai:");
-    expect(module?.content).toContain("00.00% đến 100.00%");
-    expect(module?.content).toContain("Roll hệ thống, chỉ để so sánh: system-provided/100.00");
+    expect(module?.content).toContain('<pregnancy chance="00.00%" status="" />');
+    expect(module?.content).toContain("viable semen inside a pregnancy-capable reproductive tract");
     expect(module?.content).toContain(
-      "through the appropriate real-world biological window; stop when that window ends unless new exposure occurs",
+      "use 0.00% to 100.00% with two decimal places and the % sign",
     );
-    expect(module?.content).toContain(
-      "ONLY after semen enters a pregnancy-capable internal reproductive tract, compare the system roll with that inferred percentage EVERY TURN",
-    );
+    expect(module?.content).toContain("after its biological window ends");
+    expect(module?.content).not.toMatch(/roll|system-provided/i);
     expect(module?.content).not.toContain("cycle-timing knowledge");
     expect(module?.content).not.toContain("Tình trạng rủi ro:");
     expect(
@@ -141,6 +140,14 @@ describe("Sola Sexual Context Tracker", () => {
         "Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition",
       );
       expect(prompt).toContain("NEVER invent ignorance to bypass consequences");
+      expect(prompt).toContain('Clear status to "" and set chance to 0.00% ONLY');
+      expect(prompt).toContain("effective prevention before conception");
+      expect(prompt).toContain("otherwise maintain its progression");
+      expect(prompt).toContain(
+        vietnamese ? "tam cá nguyệt một/hai/ba" : "first/second/third trimester",
+      );
+      expect(prompt).toContain(vietnamese ? "sinh con, hậu sản" : "childbirth, postpartum");
+      expect(prompt).not.toMatch(/roll|system-provided/i);
       expect(prompt).not.toMatch(
         /Giai đoạn|Stage|Chưa nói|Đã nói|Not discussed|Discussed reproduction|active stage|reset|MUST discuss/,
       );
@@ -288,5 +295,95 @@ describe("Sola Sexual Context Tracker", () => {
       "Real-world awareness and choice:</span> Hiểu hệ quả; chọn biện pháp bảo vệ",
     );
     expect(displayed).toContain("🌙 Sola: Reproductive Context");
+  });
+
+  it.each([true, false])(
+    "displays pregnancy values safely without exposing markup (%s)",
+    (vietnamese) => {
+      const settings = createDefaultSettings(sola);
+      settings.solaSexTrackerEnabled = true;
+      settings.vietnameseOutputEnabled = vietnamese;
+      const displayed = applyRegexScripts(
+        '<sex_tracker>\n[Nana]:\nPregnancy likelihood/status: <pregnancy chance="25.00%" status="" />\n[Mina]:\nPregnancy likelihood/status: <pregnancy chance="18.50%" status="Conceived" />\n</sex_tracker>',
+        sola,
+        settings,
+        { placement: PLACEMENT_AI_OUTPUT, markdown: true, depth: 0 },
+      );
+      expect(displayed).toContain(`25.00% · ${vietnamese ? "Chưa có kết quả" : "No result"}`);
+      expect(displayed).toContain("18.50% · Conceived");
+      expect(displayed).not.toContain("&lt;pregnancy");
+      expect(displayed).not.toContain("<pregnancy");
+    },
+  );
+});
+
+describe("silent pregnancy resolution", () => {
+  const pregnancy = (chance: string, status = "") =>
+    `<pregnancy chance="${chance}" status="${status}" />`;
+  const record = (body: string) => `<sex_tracker>\n${body}\n</sex_tracker>`;
+
+  it("samples each pending character independently, preserving their own probability", () => {
+    const random = vi.fn().mockReturnValueOnce(0.1).mockReturnValueOnce(0.75);
+    const input = record(`[Nana]:\n${pregnancy("25.00%")}\n[Mina]:\n${pregnancy("70.00%")}`);
+    const output = resolveSolaPregnancy(input, true, random);
+    expect(output).toContain(`[Nana]:\n${pregnancy("25.00%", "Đã thụ thai")}`);
+    expect(output).toContain(`[Mina]:\n${pregnancy("70.00%")}`);
+    expect(random).toHaveBeenCalledTimes(2);
+  });
+
+  it("tries again after a miss and preserves success and pregnancy progression", () => {
+    const random = vi.fn().mockReturnValueOnce(0.8).mockReturnValueOnce(0.1);
+    const input = record(pregnancy("50.00%"));
+    expect(resolveSolaPregnancy(input, false, random)).toBe(input);
+    const success = resolveSolaPregnancy(input, false, random);
+    expect(success).toBe(record(pregnancy("50.00%", "Conceived")));
+    expect(resolveSolaPregnancy(success, false, random)).toBe(success);
+    const progressed = record(pregnancy("50.00%", "second trimester"));
+    expect(resolveSolaPregnancy(progressed, false, random)).toBe(progressed);
+    expect(random).toHaveBeenCalledTimes(2);
+  });
+
+  it("ignores zero, out of range, malformed percentages and markup outside the tracker", () => {
+    const random = vi.fn(() => 0);
+    const outside = pregnancy("100.00%");
+    const input = `${outside}\n${record(
+      [
+        pregnancy("0.00%"),
+        pregnancy("100.01%"),
+        pregnancy("101.00%"),
+        pregnancy("25%"),
+        pregnancy("25.0%"),
+        pregnancy("25.00"),
+        pregnancy("-1.00%"),
+        pregnancy("NaN%"),
+        pregnancy("0.00%", "postpartum"),
+      ].join("\n"),
+    )}`;
+    expect(resolveSolaPregnancy(input, true, random)).toBe(input);
+    expect(random).not.toHaveBeenCalled();
+  });
+
+  it("uses the percentage boundary consistently, including 100% and low probabilities", () => {
+    const random = vi
+      .fn()
+      .mockReturnValueOnce(0.25)
+      .mockReturnValueOnce(0.999999)
+      .mockReturnValueOnce(0.000099)
+      .mockReturnValueOnce(0.0001);
+    const input = record(
+      ["25.00%", "100.00%", "0.01%", "0.01%"].map((value) => pregnancy(value)).join("\n"),
+    );
+    const output = resolveSolaPregnancy(input, false, random);
+    expect(output).toBe(
+      record(
+        [
+          pregnancy("25.00%"),
+          pregnancy("100.00%", "Conceived"),
+          pregnancy("0.01%", "Conceived"),
+          pregnancy("0.01%"),
+        ].join("\n"),
+      ),
+    );
+    expect(random).toHaveBeenCalledTimes(4);
   });
 });

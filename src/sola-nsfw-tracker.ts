@@ -15,7 +15,6 @@ export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): st
         dialogue: "Kiểu thoại",
         vocal: "Tiếng rên/Phản ứng giọng",
         pacing: "Nhịp triển khai",
-        structure: "Bố cục phản hồi",
         nsfl: "Phản ứng thân thể / Hành động NSFL",
       }
     : {
@@ -25,7 +24,6 @@ export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): st
         dialogue: "Dialogue patterns",
         vocal: "Moans/Vocal reactions",
         pacing: "Pacing",
-        structure: "Response structure",
         nsfl: "NSFL bodily response / action",
       };
   return `## ${vietnamese ? "Ghi chép NSFW/NSFL" : "NSFW/NSFL Usage Record"} 🔥
@@ -34,7 +32,6 @@ Located ${location || "at the end of your response"}, append:
 ${labels.description}: [Distinct NSFW descriptive constructions used this turn]
 ${labels.sensory}: [Distinct NSFW tactile, thermal, fluid, olfactory, or acoustic details used this turn]
 ${labels.pacing}: [How this NSFW beat moved this turn from opening to shift and stopping point]
-${labels.structure}: [${vietnamese ? "Toàn bộ thứ tự các khối thực tế trong phản hồi hiện tại trước HUD, ghi loại và độ dài ngắn/vừa/dài; giữ riêng từng khối kể cả khi cùng loại liên tiếp" : "Full sequence of actual blocks in THIS response before the HUD, recording each block's type and short/medium/long length; keep consecutive same-type blocks separate"}]
 
 ${labels.kinetics}:
 [${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Distinct NSFW movement, force, pose, and contact patterns used this turn]
@@ -51,7 +48,7 @@ ${labels.nsfl}:
 
 Rules:
 - Record ONLY patterns actually written in THIS response; ignore all earlier responses, trackers, and history. Include their concrete wording, structures, and rhythms. Do not invent entries.
-- Record shared description, sensory, pacing, and response structure once within a SINGLE <nsfw_nsfl_ban_list>. Under each remaining heading, write one [Character]: pattern line per active character.
+- Record shared description, sensory, and pacing once within a SINGLE <nsfw_nsfl_ban_list>. Under each remaining heading, write one [Character]: pattern line per active character.
 - For NSFL scenes, record the concrete bodily reflex, defensive action, persona-true behavior, or immediate survival drive actually used this turn in ${labels.nsfl}, one line per character.
 - Record concrete NSFW patterns used this turn; record NSFL only when it occurs, otherwise write ${vietnamese ? "Không có" : "None"} in the NSFL field.
 `;
@@ -78,6 +75,7 @@ export function solaNsfwPatternBanPrompt(patterns: string): string {
   for (const raw of patterns.split(/\r?\n/)) {
     const line = raw.trim();
     if (!line) continue;
+    if (/^(?:Response structure|Bố cục phản hồi)\s*:/iu.test(line)) continue;
     if (!line.startsWith("[") && /:\s*$/.test(line)) {
       heading = line;
       continue;
@@ -91,7 +89,6 @@ export function solaNsfwPatternBanPrompt(patterns: string): string {
   return `## NSFW/NSFL Pattern Ban
 - In THIS response, treat EVERY recorded item below as an ABSOLUTE BAN: replace the previous wording, structures, rhythms, pacing, and reaction patterns.
 - NEVER repeat, closely paraphrase, synonym-swap, or reuse these patterns; NEVER copy them into the new tracker. Change the writing, not established facts.
-- RESTRUCTURE the recorded response layout, not its individual block types: change the opening, block order, grouping, and lengths; NEVER keep the template by only swapping words or changing a few positions.
 
 ${items.join("\n\n")}`;
 }
@@ -131,12 +128,11 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
     ],
     ["pacing", vietnamese ? "Nhịp triển khai" : "Pacing"],
     ["nhịp triển khai", vietnamese ? "Nhịp triển khai" : "Pacing"],
-    ["response structure", vietnamese ? "Bố cục phản hồi" : "Response structure"],
-    ["bố cục phản hồi", vietnamese ? "Bố cục phản hồi" : "Response structure"],
   ]);
   return body
     .trim()
     .split(/\r?\n/)
+    .filter((source) => !/^\s*(?:Response structure|Bố cục phản hồi)\s*:/iu.test(source))
     .map((source) => {
       const line = source.trim();
       if (!line) return '<div style="height:5px;"></div>';

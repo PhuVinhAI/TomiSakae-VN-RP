@@ -6,11 +6,7 @@ export const SOLA_SEX_TRACKER_MEMO = "sex-tracker";
 export const SOLA_SEX_TRACKER_REMINDER =
   "- Telemetry (<sex_tracker>): Run the sexual-context Cognitive Check before writing; simulate cycle state, record cycle knowledge, physical condition, pregnancy likelihood/status, real-world awareness and choice, and protection measures/actions.";
 
-export function solaSexTrackerPrompt(
-  vietnamese: boolean,
-  location: string,
-  reproductiveRoll = "system-provided",
-): string {
+export function solaSexTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
     ? {
         character: "Tên nhân vật",
@@ -37,7 +33,6 @@ export function solaSexTrackerPrompt(
         cycleKnowledge: "Biết, Không biết, Chưa rõ hoặc trạng thái nhận biết phù hợp khác",
         physical:
           "Còn trinh/từng quan hệ, tiền sử sinh nở, tổn thương, vừa đạt cực khoái, còn nhạy cảm hoặc ngứa ran, đang hưng phấn, tình trạng hồi phục hoặc tình trạng liên quan khác",
-        pregnancy: `Khả năng: 00.00% đến 100.00%; Roll hệ thống, chỉ để so sánh: ${reproductiveRoll}/100.00; Trạng thái: Chưa xác nhận, Đã xác nhận, Không thể xảy ra hoặc trạng thái phù hợp khác`,
         awareness: "Điều nhân vật hiểu về hệ quả cá nhân/xã hội và lựa chọn hiện tại",
         protection:
           "Bao cao su, biện pháp tránh thai, thuốc tránh thai khẩn cấp, xuất ngoài, yêu cầu xuất ngoài, chuyển sang đường miệng/tay/đường khác, dừng hoặc từ chối, chấp nhận rủi ro hoặc hành động bảo vệ khác",
@@ -48,7 +43,6 @@ export function solaSexTrackerPrompt(
         cycleKnowledge: "Known, Unknown, Unclear, or another fitting awareness state",
         physical:
           "Virginity/prior intercourse, childbirth history, injuries, recent orgasm, lingering sensitivity or itchiness, arousal, recovery status, or another relevant condition",
-        pregnancy: `Likelihood: 00.00% to 100.00%; System roll, comparison only: ${reproductiveRoll}/100.00; Status: Unconfirmed, Confirmed, Impossible, or another fitting status`,
         awareness:
           "What the character understands about personal/social consequences and their current choice",
         protection:
@@ -57,9 +51,9 @@ export function solaSexTrackerPrompt(
   const cycleKnowledgeValues = vietnamese
     ? "Biết, Không biết, Chưa rõ hoặc trạng thái nhận biết phù hợp khác"
     : "Known, Unknown, Unclear, or another fitting awareness state";
-  const confirmed = vietnamese ? "Đã xác nhận" : "Confirmed";
-  const unconfirmed = vietnamese ? "Chưa xác nhận" : "Unconfirmed";
-  const impossible = vietnamese ? "Không thể xảy ra" : "Impossible";
+  const pregnancyStages = vietnamese
+    ? "Đã thụ thai, thai kỳ đầu, tam cá nguyệt một/hai/ba, chuyển dạ, sinh con, hậu sản hoặc trạng thái phù hợp khác"
+    : "Conceived, early pregnancy, first/second/third trimester, labor, childbirth, postpartum, or another fitting state";
   return `## Sexual Context Tracker 🌙
 Located ${location || "at the end of your response"}, append:
 <sex_tracker>
@@ -67,7 +61,7 @@ Located ${location || "at the end of your response"}, append:
 ${labels.cycle}: [${examples.cycle}]
 ${labels.cycleKnowledge}: [${examples.cycleKnowledge}]
 ${labels.physicalCondition}: [${examples.physical}]
-${labels.pregnancy}: [${examples.pregnancy}]
+${labels.pregnancy}: <pregnancy chance="00.00%" status="" />
 ${labels.awareness}: [${examples.awareness}]
 ${labels.protection}: [${examples.protection}]
 </sex_tracker>
@@ -75,13 +69,36 @@ ${labels.protection}: [${examples.protection}]
 Rules:
 - Before writing, run a Cognitive Check: what does the character understand, which consequences are relevant, and what choice does that understanding produce IN THE SCENE? This check separates objective biological data from character awareness. Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition; NEVER invent ignorance to bypass consequences.
 - Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, relevant RP events, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Always simulate the objective biological menstrual cycle; record ${labels.cycleKnowledge} separately as ${cycleKnowledgeValues}.
-- Independently infer ${labels.pregnancy}'s percentage from the simulated cycle, physical condition, reproductive exposure, and ${labels.protection}, with at least two decimal places; NEVER use the system roll as this percentage.
-- ONLY after semen enters a pregnancy-capable internal reproductive tract, compare the system roll with that inferred percentage EVERY TURN through the appropriate real-world biological window; stop when that window ends unless new exposure occurs. A successful roll means ${confirmed}, a failed roll means ${unconfirmed}, and ${impossible} requires a clear bodily or situational condition preventing pregnancy. Use another fitting status when the situation requires it.
+- For EACH character, use EXACTLY <pregnancy chance="00.00%" status="" />: infer chance from the simulated cycle, physical condition, viable semen inside a pregnancy-capable reproductive tract, and ${labels.protection}; use 0.00% to 100.00% with two decimal places and the % sign. Adjust chance as RP develops; use 0.00% without viable reproductive exposure or after its biological window ends. Leave an empty status untouched.
+- Preserve an established status and develop it with elapsed RP time: ${pregnancyStages}. Clear status to "" and set chance to 0.00% ONLY after effective prevention before conception or an established bodily/situational event ends the pregnancy; otherwise maintain its progression.
 - NPCs MUST NOT default to preferring or readily accepting risky sex.
 - NEVER turn prior sex, arousal, or orgasm into lustful traits, lost boundaries, or disregard for consequences.
 - REAL-WORLD awareness of reproduction, health, responsibility, and social consequences MUST govern EVERY reaction, dialogue, and action, even when absent from card/lore.
 - NEVER treat {{user}}'s silence, lack of action, hesitation, or non-resistance as consent or acceptance of risky sex.
 - Place characters within a SINGLE <sex_tracker> container, separated by one blank line.`;
+}
+
+const PREGNANCY_TAG_RE = /<pregnancy\s+chance="(\d{1,3}\.\d{2})%"\s+status="([^"<>&]*)"\s*\/>/g;
+
+/** Resolve each pending character independently; randomness never enters the prompt. */
+export function resolveSolaPregnancy(
+  input: string,
+  vietnamese: boolean,
+  random: () => number = Math.random,
+): string {
+  return input.replace(new RegExp(TRACKER_RE.source, TRACKER_RE.flags), (block) =>
+    block.replace(
+      new RegExp(PREGNANCY_TAG_RE.source, PREGNANCY_TAG_RE.flags),
+      (tag, value: string, status: string) => {
+        const chance = Number(value);
+        if (status.trim() || chance <= 0 || chance > 100 || random() * 100 >= chance) return tag;
+        return tag.replace(
+          /status="[^"]*"/,
+          `status="${vietnamese ? "Đã thụ thai" : "Conceived"}"`,
+        );
+      },
+    ),
+  );
 }
 
 function escapeHtml(value: string): string {
@@ -152,8 +169,14 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
       const field = line.match(/^([^:]{1,80})\s*:\s*(.*)$/);
       if (field) {
         const label = labels.get(field[1]!.trim().toLocaleLowerCase("vi"));
-        if (label)
-          return `<div style="padding:3px 0;color:#E7DED7;"><span style="color:#E8A87C;font-weight:750;">${escapeHtml(label)}:</span> ${escapeHtml(field[2]!)}</div>`;
+        if (label) {
+          const value = field[2]!.replace(
+            new RegExp(PREGNANCY_TAG_RE.source, PREGNANCY_TAG_RE.flags),
+            (_tag, chance: string, status: string) =>
+              `${chance}% · ${status || (vietnamese ? "Chưa có kết quả" : "No result")}`,
+          );
+          return `<div style="padding:3px 0;color:#E7DED7;"><span style="color:#E8A87C;font-weight:750;">${escapeHtml(label)}:</span> ${escapeHtml(value)}</div>`;
+        }
       }
       return `<div style="color:#E7DED7;">${escapeHtml(line)}</div>`;
     })
