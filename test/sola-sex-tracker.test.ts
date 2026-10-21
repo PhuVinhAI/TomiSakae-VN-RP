@@ -53,12 +53,17 @@ describe("Sola Sexual Context Tracker", () => {
     );
     expect(module?.content).toContain("Always simulate the objective biological menstrual cycle");
     expect(module?.content).toContain(
+      "record that awareness and choice instead of leaving them abstract or omitted",
+    );
+    expect(module?.content).toContain(
       "when data is missing, choose the most plausible development and keep it consistent",
     );
     expect(module?.content).toContain("Khả năng và trạng thái mang thai:");
     expect(module?.content).toContain("Giai đoạn thai kỳ:");
     expect(module?.content).toContain('<pregnancy chance="00.00%" status="" />');
     expect(module?.content).toContain("infer the current conception chance");
+    expect(module?.content).toContain("infer the current conception chance independently");
+    expect(module?.content).toContain("NEVER copy or substitute the Sola roll as the percentage");
     expect(module?.content).toContain(
       "use 0.00% to 100.00% with two decimal places and the % sign",
     );

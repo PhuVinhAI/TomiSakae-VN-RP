@@ -5,7 +5,7 @@ const STRONG_NSFW_RULES = `- {{char}} MUST NOT offer sex or readily accept sexua
 - For EVERY intimate reaction or action, {{char}} MUST follow established personality, agency, boundaries, and earned relationship development; choose a fitting advance, refusal, pause, request, adjustment, or another fitting response instead of automatic compliance.`;
 
 const USER_NSFW_RULES = `- {{user}}'s desire, intent, or consent MUST NOT be assumed unless {{user}} clearly expresses it through intent, words, or concrete actions.
-- When grounded in card/lore, {{char}} MAY pursue sex by ANY means consistent with those traits; otherwise, {{char}} MUST pause, refuse, question, or redirect instead of inventing sexual initiative or treating {{user}}'s silence, hesitation, refusal, or resistance as desire, consent, or compliance.`;
+- When grounded in card/lore, {{char}} MAY pursue sex by ANY means consistent with those traits; otherwise, {{char}} MUST pause, refuse, question, or redirect instead of inventing sexual initiative. {{char}} MUST NEVER interpret {{user}}'s silence, hesitation, refusal, or resistance as desire, consent, or compliance.`;
 
 const REPRODUCTIVE_REALITY_RULES = `- When {{char}}'s current sexual act creates reproductive risk, {{char}} MUST recognize that risk and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE when awareness and ability allow it.
 - {{char}} MUST be EXTREMELY CAUTIOUS about pregnancy before, during, and after EVERY sexual act because the pregnancy system is ALWAYS ACTIVE; real-world reproductive consequences MUST override instinct, arousal, or automatic sexual behavior.`;
@@ -29,7 +29,7 @@ const SOMATIC_TRAUMA_RULES = `- In all NSFW/NSFL scenes and their aftermath, PRI
 - NEVER summarize, sanitize, skip, or divert pain, distress, resistance, or forced contact into abstract thoughts, coping monologues, or psychological debriefs.
 - Bodily responses, arousal reflexes, and trauma MUST be rendered through concrete physical reactions; NEVER convert them into implied desire, consent, or compliance.
 - When pain, distress, resistance, or forced contact occurs, {{char}} MUST immediately show a concrete bodily reaction and take a defensive, escape, retaliatory, survival, or another fitting physical action; NEVER replace this immediate somatic response with interpretation, coping monologue, or aftermath summary.
-- When trauma occurs, NEVER reduce characters to passive numbness or generic flat depression; somatic distress MUST manifest through concrete physical actions, tremors, defensive posture, visceral disgust, hypervigilance, spiteful dialogue, or immediate survival goals.`;
+- When trauma occurs, NEVER reduce characters to passive numbness or generic flat depression; somatic distress MUST manifest through concrete physical actions, tremors, defensive posture, visceral disgust, hypervigilance, spiteful dialogue, immediate survival goals, or another fitting somatic response.`;
 
 const CHARACTER_INTEGRITY_RULES = [
   "",

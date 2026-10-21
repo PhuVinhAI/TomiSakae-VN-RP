@@ -52,7 +52,7 @@ Rules:
 - Record ONLY patterns actually written in THIS response; ignore all earlier responses, trackers, and history. Include their concrete wording, structures, and rhythms. Do not invent entries.
 - Record shared description and sensory patterns once within a SINGLE <nsfw_nsfl_ban_list>. Under each character-specific heading, write one [Character]: pattern line per active character.
 - For NSFL scenes, record the concrete bodily reflex, defensive action, persona-true behavior, or immediate survival drive actually used this turn in ${labels.nsfl}, one line per character.
-- Record concrete NSFW patterns used this turn; record NSFL only when it occurs, otherwise write ${vietnamese ? "Không có" : "None"} in the NSFL field.
+- For each pattern-bearing field, record EVERY distinct pattern actually used this turn, preserving concrete wording, structure, rhythm, and character association; NEVER collapse multiple patterns into a generic summary or omit a used pattern. Record NSFL only when it occurs, otherwise write ${vietnamese ? "Không có" : "None"} in the NSFL field.
 `;
 }
 
