@@ -1134,9 +1134,9 @@ export async function buildRequestMessages(
     });
   let nsfwPatternBan = "";
   if (familyOf(preset) === "sola" && settings.solaNsfwTrackerEnabled) {
-    const latestResponse = [...hostMessages].reverse().find(
-      (message) => message.role === "assistant" && !isChatComment(message),
-    );
+    const latestResponse = [...hostMessages]
+      .reverse()
+      .find((message) => message.role === "assistant" && !isChatComment(message));
     for (let index = 0; index < hostMessages.length; index += 1) {
       const message = hostMessages[index]!;
       if (message.role !== "assistant" || isChatComment(message)) continue;
@@ -1181,6 +1181,22 @@ export async function buildRequestMessages(
       }
     }
   }
+  if (nsfwPatternBan) {
+    // Keep the ban adjacent to the real user message, after its Gemma suffix,
+    // even when a card-image catalog or absolute prompts are also injected.
+    let index = historyWithPrompts.length;
+    for (let candidate = historyWithPrompts.length - 1; candidate >= 0; candidate -= 1) {
+      const message = historyWithPrompts[candidate]!;
+      if (message.role !== "user" || isPluginMemo(message.memo)) continue;
+      index = candidate + 1;
+      break;
+    }
+    historyWithPrompts.splice(index, 0, {
+      role: "user",
+      content: nsfwPatternBan,
+      memo: `${pluginMemoPrefix(preset)}nsfw-pattern-ban`,
+    });
+  }
   const requestHistoryWithoutInternalMarkers = historyWithPrompts.map((message) => {
     const publicMessage = { ...message };
     delete publicMessage.vnRpRestoreSolaTrackers;
@@ -1199,14 +1215,5 @@ export async function buildRequestMessages(
       : []),
     ...requestHistoryWithoutInternalMarkers,
     ...composed.trailing,
-    ...(nsfwPatternBan
-      ? [
-          {
-            role: "system" as const,
-            content: nsfwPatternBan,
-            memo: `${pluginMemoPrefix(preset)}nsfw-pattern-ban`,
-          },
-        ]
-      : []),
   ];
 }

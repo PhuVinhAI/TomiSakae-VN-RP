@@ -51,20 +51,18 @@ describe("Sola Sexual Context Tracker", () => {
     expect(module?.content).toContain(
       "Bao cao su, biện pháp tránh thai, thuốc tránh thai khẩn cấp, xuất ngoài",
     );
-    expect(module?.content).toContain(
-      "Always simulate the objective biological menstrual cycle",
-    );
+    expect(module?.content).toContain("Always simulate the objective biological menstrual cycle");
     expect(module?.content).toContain(
       "when data is missing, choose the most plausible development and keep it consistent",
     );
     expect(module?.content).toContain("Khả năng và trạng thái mang thai:");
     expect(module?.content).toContain("00.00% đến 100.00%");
-    expect(module?.content).toContain("Roll lượt này: system-provided/100.00");
+    expect(module?.content).toContain("Roll hệ thống, chỉ để so sánh: system-provided/100.00");
     expect(module?.content).toContain(
       "through the appropriate real-world biological window; stop when that window ends unless new exposure occurs",
     );
     expect(module?.content).toContain(
-      "Only after semen enters a pregnancy-capable internal reproductive tract, calculate Khả năng và trạng thái mang thai's percentage",
+      "ONLY after semen enters a pregnancy-capable internal reproductive tract, compare the system roll with that inferred percentage EVERY TURN",
     );
     expect(module?.content).not.toContain("cycle-timing knowledge");
     expect(module?.content).not.toContain("Tình trạng rủi ro:");

@@ -71,7 +71,7 @@ export function splitSolaNsfwTracker(input: string): { content: string; patterns
   return { content, patterns: records.join("\n\n") };
 }
 
-/** Wrap each recorded item in a system ban for the response about to be written. */
+/** Wrap each recorded item in a request-only ban for the response about to be written. */
 export function solaNsfwPatternBanPrompt(patterns: string): string {
   let heading = "";
   const items: string[] = [];
@@ -90,7 +90,7 @@ export function solaNsfwPatternBanPrompt(patterns: string): string {
   if (!items.length) return "";
   return `## NSFW/NSFL Pattern Ban
 - In THIS response, treat EVERY recorded item below as an ABSOLUTE BAN: replace the previous wording, structures, rhythms, pacing, and reaction patterns.
-- NEVER repeat, closely paraphrase, synonym-swap, or reuse these patterns. Change the way the scene is written, not its established facts.
+- NEVER repeat, closely paraphrase, synonym-swap, or reuse these patterns; NEVER copy them into the new tracker. Change the writing, not established facts.
 - RESTRUCTURE the recorded response layout, not its individual block types: change the opening, block order, grouping, and lengths; NEVER keep the template by only swapping words or changing a few positions.
 
 ${items.join("\n\n")}`;

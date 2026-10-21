@@ -881,12 +881,11 @@ describe("Sola saved-history restoration", () => {
       expect(setChatSpy).toHaveBeenCalledTimes(1);
 
       let settled = false;
-      const pending = plugin.request([
-        ...requestOf(chat),
-        { role: "user", content: "Tiếp tục." },
-      ]).then(() => {
-        settled = true;
-      });
+      const pending = plugin
+        .request([...requestOf(chat), { role: "user", content: "Tiếp tục." }])
+        .then(() => {
+          settled = true;
+        });
       await Promise.resolve();
       expect(settled).toBe(false);
 
@@ -1055,7 +1054,7 @@ describe("Sola saved-history restoration", () => {
   });
 
   it.each(["delete", "branch"] as const)(
-    "wraps the active swipe's restored tracker in a system ban after %s",
+    "wraps the active swipe's restored tracker in a user ban after %s",
     async (action) => {
       const store = solaStore();
       store.presets[0]!.settings.solaNsfwTrackerEnabled = true;
@@ -1091,7 +1090,8 @@ describe("Sola saved-history restoration", () => {
       const request = await plugin.request([...staleRequest, { role: "user", content: "Tiếp." }]);
       const bans = request.filter((message) => message.memo?.endsWith(":nsfw-pattern-ban"));
       expect(bans).toHaveLength(1);
-      expect(bans[0]!.role).toBe("system");
+      expect(bans[0]!.role).toBe("user");
+      expect(request[request.indexOf(bans[0]!) - 1]?.content).toBe("Tiếp.");
       expect(bans[0]!.content).toContain("mẫu swipe đang chọn");
       expect(bans[0]!.content).not.toContain("mẫu ban đầu");
       expect(request.find((message) => message.memo === "sola-a-0")?.content).not.toContain(

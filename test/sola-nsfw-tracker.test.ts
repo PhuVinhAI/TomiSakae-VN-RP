@@ -252,10 +252,12 @@ describe("Sola NSFW Tracker", () => {
     }
   });
 
-  it("moves the latest response's recorded items into one system ban without changing saved history", async () => {
+  it("places the latest response's ban immediately after the real user message and Gemma fix", async () => {
     const settings = createDefaultSettings(sola);
     settings.solaNsfwTrackerEnabled = true;
     settings.solaSexTrackerEnabled = true;
+    settings.gemmaFixEnabled = true;
+    settings.cardImageCatalogEnabled = true;
     const messages: ChatMessage[] = [
       { role: "assistant", content: `Cũ.\n${tracker("Mina", "mẫu cũ")}` },
       { role: "user", content: "Lượt trước." },
@@ -264,10 +266,17 @@ describe("Sola NSFW Tracker", () => {
         content: `Mới.\n<sola_hud>${tracker("Nana", "mẫu mới")}<sex_tracker>Trạng thái hiện tại</sex_tracker></sola_hud>`,
         memo: "latest-response",
       },
-      { role: "user", content: "Tiếp tục." },
+      { role: "user", content: "Tiếp tục.", memo: "latest-user" },
     ];
     const snapshot = structuredClone(messages);
-    const built = await buildRequestMessages(messages, sola, settings, async (value) => value);
+    const built = await buildRequestMessages(messages, sola, settings, async (value) => value, {
+      cardImageCatalog: {
+        assets: ["Nana_casual_smile"],
+        emotions: [],
+        imageCount: 1,
+        unavailable: false,
+      },
+    });
     const assistants = built.filter((message) => message.role === "assistant");
     expect(assistants.every((message) => !message.content.includes("<nsfw_nsfl_ban_list>"))).toBe(
       true,
@@ -276,9 +285,10 @@ describe("Sola NSFW Tracker", () => {
     const bans = built.filter((message) => message.memo?.endsWith(":nsfw-pattern-ban"));
     expect(bans).toHaveLength(1);
     const ban = bans[0]!;
-    expect(ban.role).toBe("system");
+    expect(ban.role).toBe("user");
     expect(ban.content).toContain("ABSOLUTE BAN");
     expect(ban.content).toContain("NEVER repeat, closely paraphrase, synonym-swap");
+    expect(ban.content).toContain("NEVER copy them into the new tracker");
     expect(ban.content).toContain(
       "RESTRUCTURE the recorded response layout, not its individual block types: change the opening, block order, grouping, and lengths",
     );
@@ -295,13 +305,24 @@ describe("Sola NSFW Tracker", () => {
     expect(ban.content).toContain("Moans/Vocal reactions:\n[Nana]: breath catching");
     expect(ban.content.match(/<banned_pattern>/g)).toHaveLength(7);
     expect(ban.content).not.toContain("mẫu cũ");
-    expect(built.at(-1)).toBe(ban);
+    const userIndex = built.findIndex((message) => message.memo === "latest-user");
+    expect(built[userIndex]!.content).toContain("Tiếp tục.\n\n{{\n");
+    expect(built[userIndex]!.content).toContain("## Reproductive Reality");
+    expect(built[userIndex + 1]).toBe(ban);
+    expect(built[userIndex + 2]?.memo).toBe("vn-rp:sola:card-image-catalog");
+    expect(
+      built.some(
+        (message) =>
+          message.role === "system" && message.content.includes("## NSFW/NSFL Pattern Ban"),
+      ),
+    ).toBe(false);
     expect(messages).toEqual(snapshot);
   });
 
   it("rebuilds a single ban on retry and uses only the selected latest response after a branch or swipe", async () => {
     const settings = createDefaultSettings(sola);
     settings.solaNsfwTrackerEnabled = true;
+    settings.gemmaFixEnabled = true;
     const parse = async (value: string) => value;
     const macro = { randomInt: (minimum: number) => minimum };
     const history: ChatMessage[] = [
@@ -320,8 +341,10 @@ describe("Sola NSFW Tracker", () => {
       parse,
       macro,
     );
-    expect(swipe.at(-1)?.content).toContain("swipe được chọn");
-    expect(swipe.at(-1)?.content).not.toContain("nhánh đầu");
+    const swipeBan = swipe.find((message) => message.memo?.endsWith(":nsfw-pattern-ban"));
+    expect(swipeBan?.content).toContain("swipe được chọn");
+    expect(swipeBan?.content).not.toContain("nhánh đầu");
+    expect(swipeBan?.role).toBe("user");
 
     const continued = await buildRequestMessages(
       [
@@ -335,8 +358,18 @@ describe("Sola NSFW Tracker", () => {
       macro,
     );
     expect(continued.some((message) => message.memo?.endsWith(":nsfw-pattern-ban"))).toBe(false);
+    const disabled = await buildRequestMessages(
+      built,
+      sola,
+      { ...settings, solaNsfwTrackerEnabled: false },
+      parse,
+      macro,
+    );
+    expect(disabled.some((message) => message.memo?.endsWith(":nsfw-pattern-ban"))).toBe(false);
     const branch = await buildRequestMessages(history.slice(0, 1), sola, settings, parse, macro);
-    expect(branch.at(-1)?.content).toContain("nhánh đầu");
+    const branchBan = branch.find((message) => message.memo?.endsWith(":nsfw-pattern-ban"));
+    expect(branchBan?.content).toContain("nhánh đầu");
+    expect(branchBan?.role).toBe("user");
   });
 
   it("does not convert user trackers, disabled trackers, or FF5.4 history into bans", async () => {
