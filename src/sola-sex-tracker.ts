@@ -54,9 +54,6 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
         protection:
           "Condom, contraception, emergency contraception, withdrawal, requesting external ejaculation, switching to oral/manual/another route, stopping or refusing, accepting risk, or another protective action",
       };
-  const cycleKnowledgeValues = vietnamese
-    ? "Biết, Không biết, Chưa rõ hoặc trạng thái nhận biết phù hợp khác"
-    : "Known, Unknown, Unclear, or another fitting awareness state";
   return `## Sexual Context Tracker 🌙
 Located ${location || "at the end of your response"}, append:
 <sex_tracker>
@@ -71,8 +68,7 @@ ${labels.protection}: [${examples.protection}]
 </sex_tracker>
 
 Rules:
-- Before writing, run a Cognitive Check: determine what {{char}} understands, which consequences apply, and what concrete choice or response follows IN THE SCENE; record that awareness and choice instead of leaving them abstract or omitted. This check separates objective biological data from character awareness. Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition; NEVER invent ignorance to bypass consequences.
-- Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, relevant RP events, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Always simulate the objective biological menstrual cycle; record ${labels.cycleKnowledge} separately as ${cycleKnowledgeValues}.
+- Before writing, run a Cognitive Check and update tracker values from card/lore, the previous tracker, elapsed time, current actions/events, and knowledge: simulate the objective biological menstrual cycle separately, determine what {{char}} understands, which consequences apply, and the concrete IN THE SCENE choice; record awareness separately and choose plausible, consistent missing values. Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition; NEVER invent ignorance to bypass consequences.
 - For EACH character, use EXACTLY <pregnancy chance="00.00%" status="" />: infer the current conception chance independently from the simulated cycle, physical condition, reproductive exposure, and the timing/effectiveness of ${labels.protection}; NEVER copy or substitute the Sola roll as the percentage. Use 0.00% to 100.00% with two decimal places and the % sign. Adjust chance as RP develops; use 0.00% without viable reproductive exposure or after its biological window ends. The Sola system tests EVERY positive chance after EACH response unless status already records CONCEIVED, replacing previous results with "00.00%|MISS" or "00.00%|CONCEIVED" using its sampled percentage; NEVER generate that result yourself.
 - After a MISS, return status="" EACH turn. For a CONCEIVED status, PRESERVE the exact sampled code; update ${labels.stage} with elapsed RP time. NEVER write prose in status. Clear status to "" and set chance to "0.00%" ONLY after effective prevention before conception or a clear physical/situational event ends the pregnancy; otherwise maintain its progression.
 - Place characters within a SINGLE <sex_tracker> container, separated by one blank line.`;

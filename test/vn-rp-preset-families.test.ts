@@ -185,16 +185,18 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(gemmaFixPromptFor(2)).toContain("## Character Integrity");
     expect(gemmaFixPromptFor(2)).toContain("## Reproductive Reality");
     expect(gemmaFixPromptFor(2)).toContain(
-      "{{char}} MUST be EXTREMELY CAUTIOUS about pregnancy before, during, and after EVERY sexual act because the pregnancy system is ALWAYS ACTIVE",
+      "the pregnancy system is ALWAYS ACTIVE and real-world reproductive consequences override instinct, arousal, and automatic sexual behavior",
     );
     expect(gemmaFixPromptFor(2)).not.toContain("## User Agency");
     expect(gemmaFixPromptFor(2)).not.toContain("## Sexual Risk");
     expect(gemmaFixPromptFor(3)).toContain("## User Agency");
     expect(gemmaFixPromptFor(3)).not.toContain("## Sexual Risk");
     expect(gemmaFixPromptFor(3)).toContain(
-      "{{user}}'s desire, intent, or consent MUST NOT be assumed",
+      "{{user}}'s desire, intent, or consent MUST come only from clear intent, words, or concrete actions",
     );
-    expect(gemmaFixPromptFor(3)).toContain("{{char}} MUST NEVER interpret {{user}}'s silence, hesitation, refusal, or resistance");
+    expect(gemmaFixPromptFor(3)).toContain(
+      "MUST NEVER read {{user}}'s silence, hesitation, refusal, or resistance",
+    );
     expect(gemmaFixPromptFor(3)).not.toContain("across turns");
     const initiationRule =
       "- When an intimate encounter begins, {{char}} MUST NOT skip directly to penetration or instant sex; {{char}} MUST advance through concrete physical stages: spatial positioning, tactile tension, gradual undressing, manual, oral, or other fitting foreplay, and pre-contact friction.\n- When initiating or changing approach, DIVERSIFY spatial approaches based on the environment, posture, and persona (cornering against walls, pinning to furniture, pulling from behind, stripping with resistance, neck/collarbone contact, finger or mouth teasing, or another fitting approach).\n- BAN repetitive default lap-straddling, groin-grinding shortcuts, or penetration that skips spatial escalation and concrete foreplay.";
@@ -203,8 +205,7 @@ describe("TomiSakae VN-RP preset families", () => {
     const somaticTraumaRule =
       "- In all NSFW/NSFL scenes and their aftermath, PRIORITIZE raw external kinetics, bodily sensations, and physical reflexes over internal emotional processing.\n- NEVER summarize, sanitize, skip, or divert pain, distress, resistance, or forced contact into abstract thoughts, coping monologues, or psychological debriefs.\n- Bodily responses, arousal reflexes, and trauma MUST be rendered through concrete physical reactions; NEVER convert them into implied desire, consent, or compliance.\n- When pain, distress, resistance, or forced contact occurs, {{char}} MUST immediately show a concrete bodily reaction and take a defensive, escape, retaliatory, survival, or another fitting physical action; NEVER replace this immediate somatic response with interpretation, coping monologue, or aftermath summary.\n- When trauma occurs, NEVER reduce characters to passive numbness or generic flat depression; somatic distress MUST manifest through concrete physical actions, tremors, defensive posture, visceral disgust, hypervigilance, spiteful dialogue, immediate survival goals, or another fitting somatic response.";
     const reproductiveRealityRules = [
-      "- When {{char}}'s current sexual act creates reproductive risk, {{char}} MUST recognize that risk and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE when awareness and ability allow it.",
-      "- {{char}} MUST be EXTREMELY CAUTIOUS about pregnancy before, during, and after EVERY sexual act because the pregnancy system is ALWAYS ACTIVE; real-world reproductive consequences MUST override instinct, arousal, or automatic sexual behavior.",
+      "- When {{char}}'s current sexual act creates reproductive risk, {{char}} MUST recognize it and, when awareness and ability allow, make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE; the pregnancy system is ALWAYS ACTIVE and real-world reproductive consequences override instinct, arousal, and automatic sexual behavior.",
     ];
     for (const level of [0, 1, 2, 3]) {
       expect(gemmaFixPromptFor(level).startsWith("{{\n")).toBe(true);

@@ -395,8 +395,12 @@ describe("Named presets in plugin UI and requests", () => {
         const user = request.find((message) => message.memo === "user-a")!.content;
         expect(user).toContain("MUST NOT offer sex");
         expect(user).toContain("lustful, submissive, dependent, or infatuated traits");
-        expect(user).toContain("User's desire, intent, or consent MUST NOT be assumed");
-        expect(user).toContain("An MUST NEVER interpret User's silence, hesitation, refusal, or resistance");
+        expect(user).toContain(
+          "User's desire, intent, or consent MUST come only from clear intent, words, or concrete actions",
+        );
+        expect(user).toContain(
+          "MUST NEVER read User's silence, hesitation, refusal, or resistance",
+        );
         expect(user).not.toContain("across turns");
         expect(user).not.toContain("## Sexual Risk");
         reloaded.toggle("gemma-fix").checked = false;

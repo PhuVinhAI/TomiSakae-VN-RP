@@ -51,13 +51,11 @@ describe("Sola Sexual Context Tracker", () => {
     expect(module?.content).toContain(
       "Bao cao su, biện pháp tránh thai, thuốc tránh thai khẩn cấp, xuất ngoài",
     );
-    expect(module?.content).toContain("Always simulate the objective biological menstrual cycle");
     expect(module?.content).toContain(
-      "record that awareness and choice instead of leaving them abstract or omitted",
+      "simulate the objective biological menstrual cycle separately",
     );
-    expect(module?.content).toContain(
-      "when data is missing, choose the most plausible development and keep it consistent",
-    );
+    expect(module?.content).toContain("record awareness separately");
+    expect(module?.content).toContain("choose plausible, consistent missing values");
     expect(module?.content).toContain("Khả năng và trạng thái mang thai:");
     expect(module?.content).toContain("Giai đoạn thai kỳ:");
     expect(module?.content).toContain('<pregnancy chance="00.00%" status="" />');
@@ -145,7 +143,8 @@ describe("Sola Sexual Context Tracker", () => {
       expect(prompt).not.toContain(
         "NEVER treat {{user}}'s silence, lack of action, hesitation, or non-resistance as consent or acceptance of risky sex",
       );
-      expect(prompt).toContain("what concrete choice or response follows IN THE SCENE");
+      expect(prompt).toContain("determine what {{char}} understands, which consequences apply");
+      expect(prompt).toContain("the concrete IN THE SCENE choice");
       expect(prompt).toContain(
         "Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition",
       );

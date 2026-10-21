@@ -9,23 +9,23 @@ export const SOLA_NSFW_TRACKER_REMINDER =
 export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): string {
   const labels = vietnamese
     ? {
-        description: "Cách miêu tả",
-        initiation: "Tiếp cận/Dạo đầu",
-        sensory: "Điểm nhấn cảm giác",
-        dialogue: "Kiểu thoại",
-        vocal: "Tiếng rên/Phản ứng giọng",
-        variation: "Tư thế/Hành động/Kích thích",
-        nsfl: "Phản ứng thân thể / Hành động NSFL",
-      }
+      description: "Cách miêu tả",
+      initiation: "Tiếp cận/Dạo đầu",
+      sensory: "Điểm nhấn cảm giác",
+      dialogue: "Kiểu thoại",
+      vocal: "Tiếng rên/Phản ứng giọng",
+      variation: "Tư thế/Hành động/Kích thích",
+      nsfl: "Phản ứng thân thể / Hành động NSFL",
+    }
     : {
-        description: "Description patterns",
-        initiation: "Initiation/Foreplay",
-        sensory: "Sensory emphasis",
-        dialogue: "Dialogue patterns",
-        vocal: "Moans/Vocal reactions",
-        variation: "Pose/Action/Stimulation",
-        nsfl: "NSFL bodily response / action",
-      };
+      description: "Description patterns",
+      initiation: "Initiation/Foreplay",
+      sensory: "Sensory emphasis",
+      dialogue: "Dialogue patterns",
+      vocal: "Moans/Vocal reactions",
+      variation: "Pose/Action/Stimulation",
+      nsfl: "NSFL bodily response / action",
+    };
   return `## ${vietnamese ? "Ghi chép NSFW/NSFL" : "NSFW/NSFL Usage Record"} 🔥
 Located ${location || "at the end of your response"}, append:
 <nsfw_nsfl_ban_list>
@@ -49,10 +49,9 @@ ${labels.nsfl}:
 </nsfw_nsfl_ban_list>
 
 Rules:
-- Record ONLY patterns actually written in THIS response; ignore all earlier responses, trackers, and history. Include their concrete wording, structures, and rhythms. Do not invent entries.
+- Record ONLY EVERY distinct pattern actually written in THIS response, including concrete wording, structure, rhythm, and character association; ignore earlier responses, trackers, and history, NEVER invent, summarize, collapse, or omit used patterns, and record NSFL only when it occurs, otherwise write ${vietnamese ? "Không có" : "None"}.
 - Record shared description and sensory patterns once within a SINGLE <nsfw_nsfl_ban_list>. Under each character-specific heading, write one [Character]: pattern line per active character.
 - For NSFL scenes, record the concrete bodily reflex, defensive action, persona-true behavior, or immediate survival drive actually used this turn in ${labels.nsfl}, one line per character.
-- For each pattern-bearing field, record EVERY distinct pattern actually used this turn, preserving concrete wording, structure, rhythm, and character association; NEVER collapse multiple patterns into a generic summary or omit a used pattern. Record NSFL only when it occurs, otherwise write ${vietnamese ? "Không có" : "None"} in the NSFL field.
 `;
 }
 
@@ -89,8 +88,7 @@ export function solaNsfwPatternBanPrompt(patterns: string): string {
   }
   if (!items.length) return "";
   return `## NSFW/NSFL Pattern Ban
-- In the next generated response, treat EVERY recorded item below as an ABSOLUTE WRITING BAN: do not reuse its wording, structure, rhythm, pacing, or reaction pattern; replace it with a new compatible construction.
-- NEVER repeat, closely paraphrase, synonym-swap, or copy any recorded pattern into the new response or tracker.
+- In the next generated response and tracker, treat EVERY recorded item below as an ABSOLUTE WRITING BAN: NEVER reuse, closely paraphrase, synonym-swap, or copy its wording, structure, rhythm, pacing, or reaction pattern; replace each with a new compatible construction.
 
 ${items.join("\n\n")}`;
 }
