@@ -221,13 +221,20 @@ describe("TomiSakae VN-RP preset families", () => {
         "FOR EACH distinct NSFW/NSFL action by {{char}}, {{user}}, or another NPC",
       );
       expect(gemmaFixPromptFor(level)).toContain(
+        "WHENEVER ANY ACTION OCCURS, ALWAYS PRIORITIZE a matching unused NSFW/NSFL action image",
+      );
+      expect(gemmaFixPromptFor(level)).toContain(
         "when one scene contains multiple actions, render multiple corresponding images",
       );
       expect(gemmaFixPromptFor(level)).toContain(
         "COVER each distinct body state and pose, reselect when they change",
       );
       expect(gemmaFixPromptFor(level)).toContain(
-        "when no matching unused NSFW image fits an action, use the closest suitable expression/reaction image instead",
+        "IF no matching unused NSFW/NSFL image fits a specific action, use the closest suitable expression/reaction image instead",
+      );
+      expect(gemmaFixPromptFor(level)).not.toContain("AVOID safe defaults");
+      expect(gemmaFixPromptFor(level)).toContain(
+        "match the current outfit first, then the most specific action, pose, or body state, then the expression",
       );
       expect(gemmaFixPromptFor(level)).toContain("exact supported image-tag syntax");
       expect(gemmaFixPromptFor(level)).toContain(
