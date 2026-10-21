@@ -253,6 +253,8 @@ interface PendingEditorRequest {
   responseIndex?: number;
   autoRewriteAttempted?: boolean;
   outputHandled?: boolean;
+  pregnancyHandled?: boolean;
+  previousOutput?: { id: unknown; swipeId: number | undefined; content: string };
 }
 
 const editorRequests = new Map<string, PendingEditorRequest>();
@@ -606,7 +608,7 @@ async function showSettings(): Promise<void> {
             "sola-sex-tracker",
             settings.solaSexTrackerEnabled,
             "🌙 Theo dõi sinh sản",
-            "Mô phỏng chu kỳ, nhận biết và thai kỳ; plugin tự xét xác suất riêng cho từng nhân vật trước lượt kế · Mặc định tắt",
+            "Mô phỏng chu kỳ, nhận biết và thai kỳ; plugin tự xét xác suất riêng từng nhân vật khi phản hồi mới hoàn tất · Mặc định tắt",
           )
         : ""
     }${checkbox(
@@ -960,7 +962,6 @@ function syncRestoredStatesToRequest(
   chat: HostChatSnapshot,
   preset: FfPreset,
   settings: FfGlobalSettings,
-  onMatch?: (message: ChatMessage, entry: HostChatMessage) => ChatMessage,
 ): ChatMessage[] {
   const assistantHistory = (chat.message ?? []).filter(
     (entry) => entry.role === "char" && !isHistoryComment(entry),
@@ -1039,15 +1040,13 @@ function syncRestoredStatesToRequest(
         typeof matchedEntry.swipes[matchedEntry.swipeId] === "string" &&
         matchedEntry.swipes[matchedEntry.swipeId] !== String(matchedEntry.data ?? "") &&
         /<(?:nsfw_nsfl_ban_list|sex_tracker)\b/i.test(restored));
-    const synced =
-      restored && (restored !== message.content || restoreTrackers)
-        ? {
-            ...message,
-            ...(restored !== message.content ? { content: restored } : {}),
-            ...(restoreTrackers ? { vnRpRestoreSolaTrackers: true } : {}),
-          }
-        : message;
-    return onMatch ? onMatch(synced, matchedEntry!) : synced;
+    return restored && (restored !== message.content || restoreTrackers)
+      ? {
+          ...message,
+          ...(restored !== message.content ? { content: restored } : {}),
+          ...(restoreTrackers ? { vnRpRestoreSolaTrackers: true } : {}),
+        }
+      : message;
   });
 }
 
@@ -1081,70 +1080,8 @@ async function prepareRestoredRequest(
   chatIndex: number,
 ): Promise<ChatMessage[]> {
   return updateSavedHistory(characterIndex, chatIndex, async () => {
-    // Reuse the same samples if a concurrent host edit requires a write retry.
-    const samples: number[] = [];
-    for (let attempt = 0; attempt < 4; attempt += 1) {
-      const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
-      const matched = new Map<ChatMessage, HostChatMessage>();
-      const synced = chat
-        ? syncRestoredStatesToRequest(messages, chat, preset, settings, (message, entry) => {
-            matched.set(message, entry);
-            return message;
-          })
-        : messages;
-      if (familyOf(preset) !== "sola" || !settings.solaSexTrackerEnabled) return synced;
-      const previous = [...synced]
-        .reverse()
-        .find(
-          (message) =>
-            message.role === "assistant" && !isChatComment(message) && !isPluginMemo(message.memo),
-        );
-      if (!previous) return synced;
-      let sampleIndex = 0;
-      const content = resolveSolaPregnancy(
-        previous.content,
-        settings.vietnameseOutputEnabled,
-        () => {
-          const index = sampleIndex++;
-          if (samples[index] === undefined) {
-            const crypto = globalThis.crypto;
-            samples[index] = crypto?.getRandomValues
-              ? crypto.getRandomValues(new Uint32Array(1))[0]! / 0x100000000
-              : Math.random();
-          }
-          return samples[index]!;
-        },
-      );
-      if (content === previous.content) return synced;
-      const entry = matched.get(previous);
-      if (chat && entry) {
-        const latest = await Risuai.getChatFromIndex(characterIndex, chatIndex);
-        if (!latest || savedHistorySignature(latest) !== savedHistorySignature(chat)) continue;
-        const swipeKey = solaHistorySwipeKey(entry.swipeId);
-        const archive = { ...entry.solaHistory };
-        delete archive[swipeKey];
-        const updated: HostChatMessage = { ...entry, data: content, solaHistory: archive };
-        if (
-          Array.isArray(entry.swipes) &&
-          typeof entry.swipeId === "number" &&
-          typeof entry.swipes[entry.swipeId] === "string"
-        ) {
-          updated.swipes = [...entry.swipes];
-          updated.swipes[entry.swipeId] = content;
-        }
-        await Risuai.setChatToIndex(characterIndex, chatIndex, {
-          ...chat,
-          message: chat.message!.map((message) => (message === entry ? updated : message)),
-        });
-        // A reroll may use an older saved reply: retain its normal saver depth
-        // and rebuild its archive with the new result before releasing the lock.
-        for (let cleanup = 0; cleanup < 4; cleanup += 1) {
-          if (await cleanSavedHistory(settings, characterIndex, chatIndex)) break;
-        }
-      }
-      return synced.map((message) => (message === previous ? { ...message, content } : message));
-    }
-    throw new Error("History changed while updating reproductive state; retry the request.");
+    const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
+    return chat ? syncRestoredStatesToRequest(messages, chat, preset, settings) : messages;
   });
 }
 
@@ -1325,6 +1262,9 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
       editorRequests.delete(key);
       const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
       if (chat) {
+        const previousOutput = [...(chat.message ?? [])]
+          .reverse()
+          .find((message) => message.role === "char" && !isHistoryComment(message));
         const context: PendingEditorRequest = {
           cardId: character?.chaId,
           presetFamily: familyOf(preset),
@@ -1333,6 +1273,18 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
           historyMessageIds: (chat.message ?? []).flatMap((message) =>
             typeof message.chatId === "string" ? [message.chatId] : [],
           ),
+          ...(previousOutput
+            ? {
+                previousOutput: {
+                  id: previousOutput.chatId,
+                  swipeId: previousOutput.swipeId,
+                  content: restoreSolaHistoryContent(
+                    String(previousOutput.data ?? ""),
+                    previousOutput.solaHistory?.[solaHistorySwipeKey(previousOutput.swipeId)],
+                  ),
+                },
+              }
+            : {}),
         };
         editorRequests.set(key, context);
         if (settings.soundNotificationsEnabled) {
@@ -1487,12 +1439,113 @@ async function runSubmodelEditor(
   }
 }
 
-const submodelOutputListener = async ({
-  characterIndex,
-  chatIndex,
-  messageIndex,
-  chat,
-}: ChatOutputListenerArgument): Promise<void> => {
+/** Resolve only the completed main reply, once per generation (including misses). */
+async function resolveCompletedPregnancy(
+  event: ChatOutputListenerArgument,
+  context: PendingEditorRequest,
+): Promise<void> {
+  const { characterIndex, chatIndex, messageIndex } = event;
+  const key = editorChatKey(characterIndex, chatIndex);
+  if (context.pregnancyHandled) return;
+  await updateSavedHistory(characterIndex, chatIndex, async () => {
+    const settings = presetForCard(configPresets, context.cardId).settings;
+    const preset = sourceForSettings(settings);
+    if (
+      pluginUnloaded ||
+      editorRequests.get(key) !== context ||
+      context.pregnancyHandled ||
+      !settings.enabled ||
+      !settings.solaSexTrackerEnabled ||
+      familyOf(preset) !== "sola" ||
+      context.presetFamily !== "sola"
+    )
+      return;
+    const samples: number[] = [];
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
+      const entry = chat?.message?.[messageIndex];
+      const output = event.chat.message?.[messageIndex];
+      if (
+        editorRequests.get(key) !== context ||
+        !chat ||
+        chat.isStreaming ||
+        chat.id !== event.chat.id ||
+        context.chatId !== chat.id ||
+        messageIndex !== (chat.message?.length ?? 0) - 1 ||
+        !output ||
+        entry?.role !== "char" ||
+        isHistoryComment(entry) ||
+        entry.chatId !== output?.chatId ||
+        entry.swipeId !== output.swipeId
+      )
+        return;
+      const swipeKey = solaHistorySwipeKey(entry.swipeId);
+      const original = String(entry.data ?? "");
+      const source = restoreSolaHistoryContent(original, entry.solaHistory?.[swipeKey]);
+      const response = splitEditorResponse(source, preset);
+      if (
+        (context.previousOutput !== undefined &&
+          entry.chatId === context.previousOutput.id &&
+          entry.swipeId === context.previousOutput.swipeId &&
+          source === context.previousOutput.content) ||
+        splitEditorResponse(String(output.data ?? ""), preset).response.trimStart() !==
+          response.response.trimStart() ||
+        !completeAutoRewriteResponse(source, preset)
+      )
+        return;
+      let sampleIndex = 0;
+      const resolved = resolveSolaPregnancy(
+        response.response,
+        settings.vietnameseOutputEnabled,
+        () => {
+          const index = sampleIndex++;
+          if (samples[index] === undefined) {
+            const crypto = globalThis.crypto;
+            samples[index] = crypto?.getRandomValues
+              ? crypto.getRandomValues(new Uint32Array(1))[0]! / 0x100000000
+              : Math.random();
+          }
+          return samples[index]!;
+        },
+      );
+      const content = response.prefix + resolved;
+      if (content === source) {
+        context.pregnancyHandled = true;
+        return;
+      }
+      const latest = await Risuai.getChatFromIndex(characterIndex, chatIndex);
+      if (editorRequests.get(key) !== context) return;
+      if (!latest || savedHistorySignature(latest) !== savedHistorySignature(chat)) continue;
+      const archive = { ...entry.solaHistory };
+      delete archive[swipeKey];
+      const updated: HostChatMessage = { ...entry, data: content, solaHistory: archive };
+      if (
+        Array.isArray(entry.swipes) &&
+        typeof entry.swipeId === "number" &&
+        typeof entry.swipes[entry.swipeId] === "string"
+      ) {
+        updated.swipes = [...entry.swipes];
+        updated.swipes[entry.swipeId] = content;
+      }
+      // Mark before writing: a host may emit another output event for this save.
+      context.pregnancyHandled = true;
+      try {
+        await Risuai.setChatToIndex(characterIndex, chatIndex, {
+          ...chat,
+          message: chat.message!.map((message) => (message === entry ? updated : message)),
+        });
+      } catch (error) {
+        context.pregnancyHandled = false;
+        throw error;
+      }
+      return;
+    }
+    throw new Error("History changed while saving reproductive state.");
+  });
+}
+
+const submodelOutputListener = async (event: ChatOutputListenerArgument): Promise<void> => {
+  const { characterIndex, chatIndex, messageIndex, chat } = event;
   const key = editorChatKey(characterIndex, chatIndex);
   const context = editorRequests.get(key);
   const target = chat.message?.[messageIndex];
@@ -1501,6 +1554,8 @@ const submodelOutputListener = async ({
     await editorButton?.refresh();
     return;
   }
+  if (settings.enabled && settings.solaSexTrackerEnabled && context.presetFamily === "sola")
+    await resolveCompletedPregnancy(event, context);
   const firstOutput = !context.outputHandled;
   context.outputHandled = true;
   mainCompletionMonitor.finish(key);

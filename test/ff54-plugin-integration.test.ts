@@ -1168,81 +1168,103 @@ describe("Sola silent reproductive state", () => {
       content: entry.data,
       memo: entry.chatId,
     }));
+  const outputOf = (chat: SavedChat, chatIndex = 0, characterIndex = 0): OutputEvent => ({
+    characterIndex,
+    chatIndex,
+    messageIndex: chat.message.length - 1,
+    chat: structuredClone(chat),
+    char: {},
+  });
 
-  it("resolves each character before sending, saves successes and keeps randomness out of prompts", async () => {
+  it("uses the new response's independent probabilities, saves only that response and sends the saved result next turn", async () => {
     const random = vi.fn().mockReturnValueOnce(0.1).mockReturnValueOnce(0.8);
     const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
-    const content = `<sex_tracker>\n[Nana]:\nPregnancy likelihood/status: ${pregnancy("25.00")}\n[Mina]:\nPregnancy likelihood/status: ${pregnancy("70.00")}\n</sex_tracker>`;
-    const chat = history(content);
+    const chat = history(reply("100.00"));
     plugin.chats.set("0:0", chat);
     const built = await plugin.request(requestOf(chat));
-    const resolved = built.find((message) => message.memo === "state")!.content;
-    expect(resolved).toContain(pregnancy("25.00", "Đã thụ thai"));
-    expect(resolved).toContain(pregnancy("70.00"));
-    expect(plugin.chats.get("0:0")!.message[0]!.data).toBe(resolved);
+    expect(random).not.toHaveBeenCalled();
+    expect(built.find((message) => message.memo === "state")!.content).toContain(
+      pregnancy("100.00"),
+    );
+    const content = `<sex_tracker>\n[Nana]:\nPregnancy likelihood/status: ${pregnancy("25.00")}\n[Mina]:\nPregnancy likelihood/status: ${pregnancy("70.00")}\n</sex_tracker>`;
+    await plugin.complete(content);
+    const saved = plugin.chats.get("0:0")!;
+    expect(saved.message[0]!.data).toBe(chat.message[0]!.data);
+    expect(saved.message[2]!.data).toContain(pregnancy("25.00", "Đã thụ thai"));
+    expect(saved.message[2]!.data).toContain(pregnancy("70.00"));
     expect(random).toHaveBeenCalledTimes(2);
-    expect(built.map((message) => message.content).join("\n")).not.toMatch(
+    const next = await plugin.request(requestOf(saved));
+    expect(next.find((message) => message.memo === saved.message[2]!.chatId)!.content).toBe(
+      saved.message[2]!.data,
+    );
+    expect(random).toHaveBeenCalledTimes(2);
+    expect(next.map((message) => message.content).join("\n")).not.toMatch(
       /Reproductive roll|system roll|Roll hệ thống|system-provided/i,
     );
   });
 
-  it("retries pending probability every request while keeping confirmed results across stale retries and reloads", async () => {
+  it("uses contraception-adjusted probability after the current scene, never the earlier exposure probability", async () => {
+    const random = vi.fn(() => 0.5);
+    const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
+    const chat = history(reply("95.00"));
+    chat.message[1]!.data = "Nhân vật dùng thuốc tránh thai theo tình huống.";
+    plugin.chats.set("0:0", chat);
+    await plugin.request(requestOf(chat));
+    expect(random).not.toHaveBeenCalled();
+    const reduced = reply("1.50").replace(
+      "</sex_tracker>",
+      "Biện pháp và hành động bảo vệ: Thuốc tránh thai; hiệu lực và thời điểm đã được tính vào xác suất.\n</sex_tracker>",
+    );
+    await plugin.complete(reduced);
+    expect(plugin.chats.get("0:0")!.message[2]!.data).toBe(reduced);
+    expect(plugin.chats.get("0:0")!.message[0]!.data).toBe(reply("95.00"));
+    expect(random).toHaveBeenCalledTimes(1);
+  });
+
+  it("processes misses once per completed turn and preserves success across duplicates, retries and reloads", async () => {
     const store = storeWithTracker();
     const random = vi.fn().mockReturnValueOnce(0.9).mockReturnValueOnce(0.1);
     const plugin = await startPlugin(store, false, undefined, false, random);
-    const chat = history(reply("50.00"));
-    const stale = requestOf(chat);
-    plugin.chats.set("0:0", chat);
-    await plugin.request(stale);
-    expect(plugin.chats.get("0:0")!.message[0]!.data).toContain(pregnancy("50.00"));
-    await plugin.request(stale);
-    await plugin.request(stale);
+    plugin.chats.set("0:0", history(reply("50.00")));
+    await plugin.request(requestOf(plugin.chats.get("0:0")!));
+    await plugin.complete(reply("50.00"));
+    const miss = outputOf(plugin.chats.get("0:0")!);
+    await Promise.all([plugin.callbacks.output!(miss), plugin.callbacks.output!(miss)]);
+    expect(random).toHaveBeenCalledTimes(1);
+    expect(plugin.chats.get("0:0")!.message[2]!.data).toBe(reply("50.00"));
+    await plugin.request(requestOf(plugin.chats.get("0:0")!));
+    await plugin.complete(reply("50.00"));
+    const success = structuredClone(plugin.chats.get("0:0")!);
+    await plugin.callbacks.output!(outputOf(success));
+    expect(success.message[3]!.data).toBe(reply("50.00", "Đã thụ thai"));
     expect(random).toHaveBeenCalledTimes(2);
-    expect(plugin.chats.get("0:0")!.message[0]!.data).toContain(pregnancy("50.00", "Đã thụ thai"));
     const reloadedRandom = vi.fn(() => 0);
     const reloaded = await startPlugin(store, false, undefined, false, reloadedRandom);
-    reloaded.chats.set("0:0", structuredClone(plugin.chats.get("0:0")!));
-    const built = await reloaded.request(stale);
-    expect(built.find((message) => message.memo === "state")!.content).toContain(
-      'status="Đã thụ thai"',
+    reloaded.chats.set("0:0", success);
+    await reloaded.callbacks.output!(outputOf(success));
+    await reloaded.request(requestOf(success));
+    expect(reloadedRandom).not.toHaveBeenCalled();
+    await reloaded.complete(reply("50.00", "tam cá nguyệt hai"));
+    expect(reloaded.chats.get("0:0")!.message.at(-1)!.data).toBe(
+      reply("50.00", "tam cá nguyệt hai"),
     );
     expect(reloadedRandom).not.toHaveBeenCalled();
   });
 
-  it("uses only the latest tracker and honors changed probability, a cleared result, and pregnancy stages", async () => {
+  it("honors cleared results, zero probability, missing trackers and independently updated probabilities", async () => {
     const random = vi.fn(() => 0);
     const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
-    const chat = history(reply("100.00"));
-    chat.message.push(
-      { role: "char", chatId: "reset", data: reply("0.00") },
-      { role: "user", chatId: "next-2", data: "Tiếp." },
-    );
-    plugin.chats.set("0:0", chat);
-    await plugin.request(requestOf(chat));
-    expect(random).not.toHaveBeenCalled();
-    const changed = plugin.chats.get("0:0")!;
-    changed.message[2]!.data = reply("12.34");
-    plugin.chats.set("0:0", changed);
-    await plugin.request(requestOf(changed));
-    expect(random).toHaveBeenCalledTimes(1);
-    expect(plugin.chats.get("0:0")!.message[2]!.data).toContain(pregnancy("12.34", "Đã thụ thai"));
-    for (const [chance, status] of [
-      ["12.34", "tam cá nguyệt hai"],
-      ["0.00", ""],
-    ]) {
-      const updated = plugin.chats.get("0:0")!;
-      updated.message[2]!.data = reply(chance!, status!);
-      await plugin.request(requestOf(updated));
-      expect(plugin.chats.get("0:0")!.message[2]!.data).toBe(reply(chance!, status!));
+    plugin.chats.set("0:0", history(reply("50.00", "Đã thụ thai")));
+    for (const content of [reply("0.00"), "Diễn biến không có tracker.", reply("12.34")]) {
+      await plugin.request(requestOf(plugin.chats.get("0:0")!));
+      await plugin.complete(content);
     }
-    const noTracker = plugin.chats.get("0:0")!;
-    noTracker.message[2]!.data = "Diễn biến không có tracker.";
-    await plugin.request(requestOf(noTracker));
     expect(random).toHaveBeenCalledTimes(1);
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("12.34", "Đã thụ thai"));
   });
 
   it.each(["delete", "branch"] as const)(
-    "resolves the selected archived swipe after %s without changing another swipe",
+    "does not roll restored history after %s; resolves only the newly generated swipe",
     async (action) => {
       const random = vi.fn(() => 0);
       const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
@@ -1254,33 +1276,38 @@ describe("Sola silent reproductive state", () => {
       await plugin.request(requestOf(chat));
       const saved = structuredClone(plugin.chats.get("0:0")!);
       expect(saved.message[0]!.data).not.toContain("<sex_tracker>");
-      expect(random).not.toHaveBeenCalled();
       const shortened = structuredClone(saved);
       shortened.message = shortened.message.slice(0, 2);
       shortened.message[0]!.swipeId = 1;
       shortened.message[0]!.data = reply("75.00");
       if (action === "branch") shortened.id = "branch-a";
-      const index = action === "branch" ? 1 : 0;
-      plugin.chats.set(`0:${index}`, shortened);
-      plugin.selectChat(index);
-      const built = await plugin.request(requestOf(shortened));
-      const updated = plugin.chats.get(`0:${index}`)!.message[0]!;
-      expect(updated.data).toContain(pregnancy("75.00", "Đã thụ thai"));
-      expect(updated.swipes?.[1]).toBe(updated.data);
-      expect(updated.swipes?.[0]).toBe(reply("100.00"));
-      expect(built.find((message) => message.memo === "state")!.content).toContain(
-        pregnancy("75.00", "Đã thụ thai"),
-      );
+      const chatIndex = action === "branch" ? 1 : 0;
+      plugin.chats.set(`0:${chatIndex}`, shortened);
+      plugin.selectChat(chatIndex);
+      await plugin.request(requestOf(shortened));
+      expect(random).not.toHaveBeenCalled();
+      const active = plugin.chats.get(`0:${chatIndex}`)!;
+      active.message.pop(); // reroll the selected reply as a fresh alternative
+      const target = active.message[0]!;
+      target.data = reply("20.00");
+      target.swipes!.push(target.data);
+      target.swipeId = 2;
+      await plugin.callbacks.output!(outputOf(active, chatIndex));
+      const updated = plugin.chats.get(`0:${chatIndex}`)!.message[0]!;
+      expect(updated.data).toBe(reply("20.00", "Đã thụ thai"));
+      expect(updated.swipes?.[2]).toBe(updated.data);
+      expect(updated.swipes?.slice(0, 2)).toEqual([reply("100.00"), reply("75.00")]);
       expect(random).toHaveBeenCalledTimes(1);
       if (action === "branch") expect(plugin.chats.get("0:0")).toEqual(saved);
     },
   );
 
-  it("awaits the pregnancy write and reuses its samples when a concurrent host edit requires retry", async () => {
+  it("awaits the completed response's save before the next request and reuses samples on a concurrent host edit", async () => {
     const random = vi.fn(() => 0.2);
     const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
     const chat = history(reply("50.00"));
     plugin.chats.set("0:0", chat);
+    await plugin.request(requestOf(chat));
     const getChat = plugin.api.getChatFromIndex;
     const getSpy = vi
       .spyOn(plugin.api, "getChatFromIndex")
@@ -1303,62 +1330,40 @@ describe("Sola silent reproductive state", () => {
         await pendingWrite;
         await setChat(character, index, data);
       });
+    const completed = plugin.complete(reply("50.00"));
+    await vi.waitFor(() => expect(setSpy).toHaveBeenCalledTimes(1));
     let settled = false;
-    const pending = plugin.request(requestOf(chat)).then((result) => {
+    const pending = plugin.request(requestOf(plugin.chats.get("0:0")!)).then((result) => {
       settled = true;
       return result;
     });
-    await vi.waitFor(() => expect(setSpy).toHaveBeenCalledTimes(1));
+    await Promise.resolve();
     expect(settled).toBe(false);
     release();
-    await pending;
+    const [, built] = await Promise.all([completed, pending]);
     expect(random).toHaveBeenCalledTimes(1);
     expect(plugin.chats.get("0:0")!.message[1]!.data).toBe("Tiếp tục.!");
+    const newest = plugin.chats.get("0:0")!.message[2]!;
+    expect(built.find((message) => message.memo === newest.chatId)!.content).toContain(
+      pregnancy("50.00", "Đã thụ thai"),
+    );
     getSpy.mockRestore();
     setSpy.mockRestore();
   });
 
-  it("saves a reroll's result inside the active swipe archive when later replies are still in history", async () => {
-    const random = vi.fn(() => 0);
+  it("serializes simultaneous completion events even when the attempt fails", async () => {
+    const random = vi.fn(() => 0.99);
     const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
-    const chat = history(reply("100.00"));
-    chat.message[0]!.swipeId = 0;
-    chat.message[0]!.swipes = [reply("100.00"), reply("10.00")];
-    const stale = requestOf(chat);
-    chat.message.push({ role: "char", data: "Phản hồi sau.", chatId: "newer" });
-    plugin.chats.set("0:0", chat);
-    await plugin.request(stale);
-    const entry = plugin.chats.get("0:0")!.message[0]!;
-    expect(entry.data).not.toContain("<sex_tracker>");
-    expect(restoreSolaHistoryContent(entry.data, entry.solaHistory?.["swipe:0"])).toContain(
-      pregnancy("100.00", "Đã thụ thai"),
-    );
-    expect(entry.swipes?.[0]).toContain(pregnancy("100.00", "Đã thụ thai"));
-    expect(entry.swipes?.[1]).toBe(reply("10.00"));
-    const built = await plugin.request(stale);
-    expect(built.find((message) => message.memo === "state")!.content).toContain(
-      pregnancy("100.00", "Đã thụ thai"),
-    );
+    await plugin.request();
+    const chat = plugin.chats.get("0:0")!;
+    chat.message.push({ role: "char", data: reply("50.00"), chatId: "completed" });
+    const event = outputOf(chat);
+    await Promise.all([plugin.callbacks.output!(event), plugin.callbacks.output!(event)]);
     expect(random).toHaveBeenCalledTimes(1);
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("50.00"));
   });
 
-  it("serializes simultaneous requests so an established result is never sampled again", async () => {
-    const random = vi.fn(() => 0);
-    const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
-    const chat = history(reply("100.00"));
-    plugin.chats.set("0:0", chat);
-    const requests = await Promise.all([
-      plugin.request(requestOf(chat)),
-      plugin.request(requestOf(chat)),
-    ]);
-    for (const built of requests)
-      expect(built.find((message) => message.memo === "state")!.content).toContain(
-        pregnancy("100.00", "Đã thụ thai"),
-      );
-    expect(random).toHaveBeenCalledTimes(1);
-  });
-
-  it("never samples during history polling, display, or auxiliary requests", async () => {
+  it("ignores streaming, partial/stale outputs, history polling, display and auxiliary requests", async () => {
     vi.useFakeTimers();
     const random = vi.fn(() => 0);
     const plugin = await startPlugin(storeWithTracker(), false, undefined, true, random);
@@ -1368,14 +1373,107 @@ describe("Sola silent reproductive state", () => {
       await vi.advanceTimersByTimeAsync(750);
       await plugin.callbacks.display!(chat.message[0]!.data);
       await plugin.callbacks.beforeRequest!(requestOf(chat), "submodel");
-      expect(random).not.toHaveBeenCalled();
       await plugin.request(requestOf(chat));
+      plugin.chats.get("0:0")!.isStreaming = true;
+      await plugin.complete(reply("100.00").replace("</sex_tracker>", ""));
+      const active = plugin.chats.get("0:0")!;
+      active.isStreaming = false;
+      await plugin.callbacks.output!(outputOf(active));
+      expect(random).not.toHaveBeenCalled();
+      const stale = outputOf(active);
+      active.message.at(-1)!.data = reply("0.00");
+      await plugin.callbacks.output!(stale);
+      expect(random).not.toHaveBeenCalled();
+      active.message.at(-1)!.data = reply("100.00");
+      await plugin.callbacks.output!(outputOf(active));
       expect(random).toHaveBeenCalledTimes(1);
       await vi.advanceTimersByTimeAsync(500);
       expect(random).toHaveBeenCalledTimes(1);
     } finally {
       await plugin.callbacks.unload!();
     }
+  });
+
+  it("keeps output attached to its originating chat after navigation", async () => {
+    const random = vi.fn(() => 0);
+    const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
+    await plugin.request();
+    plugin.selectChat(1);
+    const other = structuredClone(plugin.chats.get("0:1")!);
+    await plugin.complete(reply("100.00"), 0, 0);
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("100.00", "Đã thụ thai"));
+    expect(plugin.chats.get("0:1")).toEqual(other);
+    expect(random).toHaveBeenCalledTimes(1);
+  });
+
+  it("ignores tracker examples inside provider reasoning and resolves only the actual response", async () => {
+    const random = vi.fn(() => 0);
+    const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
+    await plugin.request();
+    const reasoning = `<think>${reply("100.00", "", "Example")}</think>\n`;
+    await plugin.complete(reasoning + reply("25.00"));
+    const saved = plugin.chats.get("0:0")!.message.at(-1)!.data;
+    expect(saved).toBe(reasoning + reply("25.00", "Đã thụ thai"));
+    expect(random).toHaveBeenCalledTimes(1);
+  });
+
+  it("still resolves the actual tracker when history cleanup removes provider reasoning before completion", async () => {
+    vi.useFakeTimers();
+    const random = vi.fn(() => 0);
+    const plugin = await startPlugin(storeWithTracker(), false, undefined, true, random);
+    try {
+      await plugin.request();
+      const chat = plugin.chats.get("0:0")!;
+      chat.message.push({
+        role: "char",
+        data: `<think>Plan.</think>\n${reply("25.00")}`,
+        chatId: "completed",
+      });
+      const event = outputOf(chat);
+      await vi.advanceTimersByTimeAsync(250);
+      expect(plugin.chats.get("0:0")!.message.at(-1)!.data).not.toContain("<think>");
+      await plugin.callbacks.output!(event);
+      expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toContain(
+        pregnancy("25.00", "Đã thụ thai"),
+      );
+      expect(random).toHaveBeenCalledTimes(1);
+    } finally {
+      await plugin.callbacks.unload!();
+    }
+  });
+
+  it("ignores a late completion of the previous reply after the next request has started", async () => {
+    const random = vi.fn(() => 0);
+    const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
+    const chat = history(reply("100.00"));
+    chat.message.pop();
+    plugin.chats.set("0:0", chat);
+    await plugin.request(requestOf(chat));
+    await plugin.callbacks.output!(outputOf(plugin.chats.get("0:0")!));
+    expect(random).not.toHaveBeenCalled();
+    expect(plugin.chats.get("0:0")!.message[0]!.data).toBe(reply("100.00"));
+    await plugin.complete(reply("25.00"));
+    expect(random).toHaveBeenCalledTimes(1);
+    expect(plugin.chats.get("0:0")!.message[1]!.data).toBe(reply("25.00", "Đã thụ thai"));
+  });
+
+  it("does not roll again when automatic or manual Submodel editing creates another swipe", async () => {
+    const store = storeWithTracker();
+    store.presets[0]!.settings.submodelEditorEnabled = true;
+    store.presets[0]!.settings.submodelAutoRewriteEnabled = true;
+    const random = vi.fn(() => 0.1);
+    const plugin = await startPlugin(store, false, undefined, false, random);
+    plugin.runModel.mockResolvedValue({ type: "success", result: reply("50.00", "Đã thụ thai") });
+    await plugin.request();
+    await plugin.complete(reply("50.00"));
+    expect(plugin.runModel).toHaveBeenCalledTimes(1);
+    expect(plugin.runModel.mock.calls[0]![0].messages.at(-2).content).toContain(
+      'status="Đã thụ thai"',
+    );
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("50.00", "Đã thụ thai"));
+    await plugin.callbacks.output!(outputOf(plugin.chats.get("0:0")!));
+    expect(random).toHaveBeenCalledTimes(1);
+    expect(plugin.runModel).toHaveBeenCalledTimes(1);
   });
 
   it.each(["disabled", "ff54"])("does not resolve when the tracker is %s", async (mode) => {
@@ -1388,11 +1486,10 @@ describe("Sola silent reproductive state", () => {
       );
     const random = vi.fn(() => 0);
     const plugin = await startPlugin(store, false, undefined, false, random);
-    const chat = history(reply("100.00"));
-    plugin.chats.set("0:0", chat);
-    await plugin.request(requestOf(chat));
+    await plugin.request();
+    await plugin.complete(reply("100.00"));
     expect(random).not.toHaveBeenCalled();
-    expect(plugin.chats.get("0:0")!.message[0]!.data).not.toContain('status="Đã thụ thai"');
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).not.toContain('status="Đã thụ thai"');
   });
 });
 
