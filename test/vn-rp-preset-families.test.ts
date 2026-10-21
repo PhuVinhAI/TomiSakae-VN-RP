@@ -171,8 +171,7 @@ describe("TomiSakae VN-RP preset families", () => {
       "Image Use",
       "Reproductive Reality",
       "NSFW Mechanics",
-      "Somatic Priority",
-      "Post-Trauma Agency",
+      "Somatic Trauma",
     ];
     expect(gemmaFixPromptFor(0)).not.toContain("## Character Integrity");
     expect(gemmaFixPromptFor(0)).not.toContain("## User Agency");
@@ -200,10 +199,8 @@ describe("TomiSakae VN-RP preset families", () => {
       "- When NPCs initiate contact, DIVERSIFY spatial approaches, action sequences, and opening rhythms to fit the environment and persona; NEVER reuse the same opening sequence from previous scenes.";
     const kineticRule =
       "- EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene and card/lore.\n- This beat is descriptive rendering only and MUST NOT by itself create, increase, or rewrite sexual desire, consent, arousal, personality, relationship, boundaries, or motives.\n- Physical depiction, sensation, reflex, resistance, or climax MUST NOT be treated as proof of willingness or character change.\n- Preserve current pacing and characterization unless explicit action, card/lore, or earned on-page development changes them; ADVANCE the scene through concrete action or dialogue; NEVER stall on an unchanged beat through prolonged or repetitive description.\n- EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, and tissue deformation.\n- EVERY NSFW/NSFL scene MUST render thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.\n- EVERY NSFW/NSFL scene MUST render fractured vocalizations, dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones.\n- PACING MUST build progressively with tangible resistance and friction before climax, varying rhythm, pressure, pauses, and acceleration.\n- When climax occurs, render the post-climax somatic aftermath.";
-    const somaticPriorityRule =
-      "- EVERY NSFW/NSFL scene MUST keep physical sensation, impact, and somatic reflexes concrete even under distress, fear, or psychological resistance.\n- PRIORITIZE external visceral kinetics and bodily response over internal emotional processing.\n- Keep bodily sensation separate from interpretation.\n- NEVER convert pain, arousal, reflex, resistance, or forced contact into desire, consent, submission, affection, trauma, or personality change.\n- NEVER summarize, sanitize, skip, or divert non-pleasurable sensations, pain, injury, or forced contact into abstract thoughts, coping monologues, or psychological debriefs.";
-    const postTraumaAgencyRule =
-      "- AFTER an actual traumatic NSFW/NSFL event, NPCs MUST preserve distinct agency, core persona traits, active grudges, and embodied defensive behavior.\n- A described NSFW beat alone MUST NOT create trauma, recovery, personality change, or a new relationship dynamic.\n- NEVER collapse into passive numbness, generic depression, or hollow psychological monologues.\n- EXPRESS somatic distress through persona-true physical action, bodily tremors, defensive posture, visceral disgust, hypervigilance, spiteful dialogue, or immediate survival goals.";
+    const somaticTraumaRule =
+      "- In all NSFW/NSFL scenes and their aftermath, PRIORITIZE raw external kinetics, bodily sensations, and physical reflexes over internal emotional processing.\n- NEVER summarize, sanitize, skip, or divert pain, distress, resistance, or forced contact into abstract thoughts, coping monologues, or psychological debriefs.\n- Bodily responses, arousal reflexes, and trauma MUST be rendered through concrete physical reactions; NEVER convert them into implied desire, consent, or compliance.\n- When trauma occurs, NEVER reduce characters to passive numbness or generic flat depression; somatic distress MUST manifest through concrete physical actions, tremors, defensive posture, visceral disgust, hypervigilance, spiteful dialogue, or immediate survival goals.";
     const reproductiveRealityRules = [
       "- {{char}} MUST NOT default to preferring or readily accepting risky sex.",
       "- NEVER turn {{char}}'s prior sex, arousal, or orgasm into lustful traits, lost boundaries, or disregard for consequences.",
@@ -235,8 +232,9 @@ describe("TomiSakae VN-RP preset families", () => {
       expect(gemmaFixPromptFor(level).replace(`${openingVarietyRule}\n`, "")).toContain(
         kineticRule,
       );
-      expect(gemmaFixPromptFor(level)).toContain(somaticPriorityRule);
-      expect(gemmaFixPromptFor(level)).toContain(postTraumaAgencyRule);
+      expect(gemmaFixPromptFor(level)).toContain(somaticTraumaRule);
+      expect(gemmaFixPromptFor(level)).not.toContain("## Somatic Priority");
+      expect(gemmaFixPromptFor(level)).not.toContain("## Post-Trauma Agency");
       expect(gemmaFixPromptFor(level)).not.toContain("ONE text type per line");
     }
   });

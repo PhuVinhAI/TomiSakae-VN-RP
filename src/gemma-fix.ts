@@ -25,18 +25,11 @@ const KINETIC_NSFW_RULES = `- EVERY RESPONSE MUST contain a concrete NSFW physic
 - PACING MUST build progressively with tangible resistance and friction before climax, varying rhythm, pressure, pauses, and acceleration.
 - When climax occurs, render the post-climax somatic aftermath.`;
 
-// 2. CHUYÊN TRÁCH KHÓA NỘI TÂM / NÉ CẢNH (Đảm nhận toàn bộ trọng trách ưu tiên thể xác)
-const SOMATIC_PRIORITY_RULES = `- EVERY NSFW/NSFL scene MUST keep physical sensation, impact, and somatic reflexes concrete even under distress, fear, or psychological resistance.
-- PRIORITIZE external visceral kinetics and bodily response over internal emotional processing.
-- Keep bodily sensation separate from interpretation.
-- NEVER convert pain, arousal, reflex, resistance, or forced contact into desire, consent, submission, affection, trauma, or personality change.
-- NEVER summarize, sanitize, skip, or divert non-pleasurable sensations, pain, injury, or forced contact into abstract thoughts, coping monologues, or psychological debriefs.`;
-
-// 3. CHUYÊN TRÁCH BẢO TOÀN CÁ TÍNH HẬU NSFL (Chống NPC mất hồn/tê liệt)
-const POST_TRAUMA_AGENCY_RULES = `- AFTER an actual traumatic NSFW/NSFL event, NPCs MUST preserve distinct agency, core persona traits, active grudges, and embodied defensive behavior.
-- A described NSFW beat alone MUST NOT create trauma, recovery, personality change, or a new relationship dynamic.
-- NEVER collapse into passive numbness, generic depression, or hollow psychological monologues.
-- EXPRESS somatic distress through persona-true physical action, bodily tremors, defensive posture, visceral disgust, hypervigilance, spiteful dialogue, or immediate survival goals.`;
+// 2. CHUYÊN TRÁCH KHÓA NỘI TÂM TRONG CẢNH & HẬU CHẤN THƯƠNG THỰC THỂ
+const SOMATIC_TRAUMA_RULES = `- In all NSFW/NSFL scenes and their aftermath, PRIORITIZE raw external kinetics, bodily sensations, and physical reflexes over internal emotional processing.
+- NEVER summarize, sanitize, skip, or divert pain, distress, resistance, or forced contact into abstract thoughts, coping monologues, or psychological debriefs.
+- Bodily responses, arousal reflexes, and trauma MUST be rendered through concrete physical reactions; NEVER convert them into implied desire, consent, or compliance.
+- When trauma occurs, NEVER reduce characters to passive numbness or generic flat depression; somatic distress MUST manifest through concrete physical actions, tremors, defensive posture, visceral disgust, hypervigilance, spiteful dialogue, or immediate survival goals.`;
 
 const CHARACTER_INTEGRITY_RULES = [
   "",
@@ -73,8 +66,7 @@ export function gemmaFixPromptFor(level: unknown = 2): string {
     ["Image Use", IMAGE_USE_RULES],
     ["Reproductive Reality", REPRODUCTIVE_REALITY_RULES],
     ["NSFW Mechanics", KINETIC_NSFW_RULES],
-    ["Somatic Priority", SOMATIC_PRIORITY_RULES],
-    ["Post-Trauma Agency", POST_TRAUMA_AGENCY_RULES],
+    ["Somatic Trauma", SOMATIC_TRAUMA_RULES],
   );
 
   return `{{\n${sections.map(([title, rules]) => `## ${title}\n${rules}`).join("\n\n")}\n}}`;
