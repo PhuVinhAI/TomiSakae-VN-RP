@@ -89,8 +89,8 @@ export function solaNsfwPatternBanPrompt(patterns: string): string {
   }
   if (!items.length) return "";
   return `## NSFW/NSFL Pattern Ban
-- In THIS response, treat EVERY recorded item below as an ABSOLUTE BAN: replace the previous wording, structures, rhythms, pacing, and reaction patterns.
-- NEVER repeat, closely paraphrase, synonym-swap, or reuse these patterns; NEVER copy them into the new tracker. Change the writing, not established facts.
+- In the next generated response, treat EVERY recorded item below as an ABSOLUTE WRITING BAN: do not reuse its wording, structure, rhythm, pacing, or reaction pattern; replace it with a new compatible construction.
+- NEVER repeat, closely paraphrase, synonym-swap, or copy any recorded pattern into the new response or tracker.
 
 ${items.join("\n\n")}`;
 }

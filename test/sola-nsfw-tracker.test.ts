@@ -278,9 +278,12 @@ describe("Sola NSFW Tracker", () => {
     expect(bans).toHaveLength(1);
     const ban = bans[0]!;
     expect(ban.role).toBe("system");
-    expect(ban.content).toContain("ABSOLUTE BAN");
+    expect(ban.content).toContain("ABSOLUTE WRITING BAN");
+    expect(ban.content).toContain("In the next generated response");
     expect(ban.content).toContain("NEVER repeat, closely paraphrase, synonym-swap");
-    expect(ban.content).toContain("NEVER copy them into the new tracker");
+    expect(ban.content).toContain(
+      "NEVER repeat, closely paraphrase, synonym-swap, or copy any recorded pattern into the new response or tracker",
+    );
     expect(ban.content).not.toMatch(/RESTRUCTURE|response layout|block order/);
     expect(ban.content).toContain("Description patterns: mẫu mới");
     expect(ban.content).toContain("Initiation/Foreplay:\n[Nana]: gradual undressing");
