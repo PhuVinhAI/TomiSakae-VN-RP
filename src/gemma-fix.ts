@@ -18,11 +18,11 @@ const NSFW_INITIATION_RULES = `- When an intimate encounter begins, NEVER skip d
 - When initiating or changing approach, DIVERSIFY spatial approaches based on the environment, posture, and persona (cornering against walls, pinning to furniture, pulling from behind, stripping with resistance, neck/collarbone contact, finger or mouth teasing).
 - BAN repetitive default lap-straddling, groin-grinding shortcuts, or penetration that skips spatial escalation and concrete foreplay.`;
 
-// 2. CHUYÊN TRÁCH CƠ HỌC VA CHẠM, ĐA ĐIỂM & CHỦ ĐỘNG ĐỔI TƯ THẾ
+// 2. CHUYÊN TRÁCH CƠ HỌC VA CHẠM, ĐA DẠNG KÍCH THÍCH & CHỦ ĐỘNG ĐỔI TƯ THẾ
 const KINETIC_NSFW_RULES = `- EVERY RESPONSE MUST advance the scene through a concrete NSFW physical, sensory, or action beat; NEVER stall on an unchanged beat through prolonged or repetitive description.
 - This beat is descriptive rendering only and MUST NOT by itself create, increase, or rewrite sexual desire, consent, arousal, personality, relationship, boundaries, or motives; physical depiction, sensation, reflex, resistance, or climax MUST NOT prove willingness or character change.
 - EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.
-- RENDER fractured vocalizations, dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones.
+- RENDER fractured vocalizations and dirty talk; vary tactile, manual, oral, pressure, and friction-based stimulation across multiple fitting erogenous zones, choosing different methods and zones as the scene progresses rather than repeating one method.
 - PACING MUST build progressively with tangible resistance, varied rhythm, pressure shifts, and pauses before acceleration; when rhythm or action changes, ACTIVELY vary positions, angles, or intimate acts instead of locking into one posture.
 - When climax occurs, render the immediate post-kinetic somatic aftermath, muscle tremors, and fluid residue.`;
 
