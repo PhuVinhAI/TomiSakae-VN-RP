@@ -170,6 +170,7 @@ describe("TomiSakae VN-RP preset families", () => {
       "Vietnamese Output",
       "Image Use",
       "Reproductive Reality",
+      "NSFW Initiation",
       "NSFW Mechanics",
       "Somatic Trauma",
     ];
@@ -195,10 +196,10 @@ describe("TomiSakae VN-RP preset families", () => {
     );
     expect(gemmaFixPromptFor(3)).toContain("NEVER invent sexual initiative");
     expect(gemmaFixPromptFor(3)).not.toContain("across turns");
-    const openingVarietyRule =
-      "- When NPCs initiate contact, DIVERSIFY spatial approaches, action sequences, and opening rhythms to fit the environment and persona; NEVER reuse the same opening sequence from previous scenes.";
+    const initiationRule =
+      "- When an intimate encounter begins, NEVER skip directly to penetration or instant sex; build through concrete physical stages: spatial positioning, tactile tension, gradual undressing, manual, oral, or other fitting foreplay, and pre-contact friction.\n- When initiating or changing approach, DIVERSIFY spatial approaches based on the environment, posture, and persona (cornering against walls, pinning to furniture, pulling from behind, stripping with resistance, neck/collarbone contact, finger or mouth teasing).\n- BAN repetitive default lap-straddling, groin-grinding shortcuts, or penetration that skips spatial escalation and concrete foreplay.";
     const kineticRule =
-      "- EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene and card/lore.\n- This beat is descriptive rendering only and MUST NOT by itself create, increase, or rewrite sexual desire, consent, arousal, personality, relationship, boundaries, or motives.\n- Physical depiction, sensation, reflex, resistance, or climax MUST NOT be treated as proof of willingness or character change.\n- Preserve current pacing and characterization unless explicit action, card/lore, or earned on-page development changes them; ADVANCE the scene through concrete action or dialogue; NEVER stall on an unchanged beat through prolonged or repetitive description.\n- EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, and tissue deformation.\n- EVERY NSFW/NSFL scene MUST render thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.\n- EVERY NSFW/NSFL scene MUST render fractured vocalizations, dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones.\n- PACING MUST build progressively with tangible resistance and friction before climax, varying rhythm, pressure, pauses, and acceleration.\n- When climax occurs, render the post-climax somatic aftermath.";
+      "- EVERY RESPONSE MUST advance the scene through a concrete NSFW physical, sensory, or action beat; NEVER stall on an unchanged beat through prolonged or repetitive description.\n- This beat is descriptive rendering only and MUST NOT by itself create, increase, or rewrite sexual desire, consent, arousal, personality, relationship, boundaries, or motives; physical depiction, sensation, reflex, resistance, or climax MUST NOT prove willingness or character change.\n- EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.\n- RENDER fractured vocalizations, dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones.\n- PACING MUST build progressively with tangible resistance, varied rhythm, pressure shifts, and pauses before acceleration; when rhythm or action changes, ACTIVELY vary positions, angles, or intimate acts instead of locking into one posture.\n- When climax occurs, render the immediate post-kinetic somatic aftermath, muscle tremors, and fluid residue.";
     const somaticTraumaRule =
       "- In all NSFW/NSFL scenes and their aftermath, PRIORITIZE raw external kinetics, bodily sensations, and physical reflexes over internal emotional processing.\n- NEVER summarize, sanitize, skip, or divert pain, distress, resistance, or forced contact into abstract thoughts, coping monologues, or psychological debriefs.\n- Bodily responses, arousal reflexes, and trauma MUST be rendered through concrete physical reactions; NEVER convert them into implied desire, consent, or compliance.\n- When trauma occurs, NEVER reduce characters to passive numbness or generic flat depression; somatic distress MUST manifest through concrete physical actions, tremors, defensive posture, visceral disgust, hypervigilance, spiteful dialogue, or immediate survival goals.";
     const reproductiveRealityRules = [
@@ -226,12 +227,10 @@ describe("TomiSakae VN-RP preset families", () => {
       );
       expect(gemmaFixPromptFor(level)).toContain("exact supported image-tag syntax");
       expect(gemmaFixPromptFor(level)).toContain(
-        "EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat",
+        "EVERY RESPONSE MUST advance the scene through a concrete NSFW physical, sensory, or action beat",
       );
-      expect(gemmaFixPromptFor(level)).toContain(openingVarietyRule);
-      expect(gemmaFixPromptFor(level).replace(`${openingVarietyRule}\n`, "")).toContain(
-        kineticRule,
-      );
+      expect(gemmaFixPromptFor(level)).toContain(initiationRule);
+      expect(gemmaFixPromptFor(level)).toContain(kineticRule);
       expect(gemmaFixPromptFor(level)).toContain(somaticTraumaRule);
       expect(gemmaFixPromptFor(level)).not.toContain("## Somatic Priority");
       expect(gemmaFixPromptFor(level)).not.toContain("## Post-Trauma Agency");
