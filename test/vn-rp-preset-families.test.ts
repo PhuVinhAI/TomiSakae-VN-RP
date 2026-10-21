@@ -199,6 +199,8 @@ describe("TomiSakae VN-RP preset families", () => {
     );
     expect(gemmaFixPromptFor(3)).toContain("NEVER invent sexual initiative");
     expect(gemmaFixPromptFor(3)).not.toContain("across turns");
+    const openingVarietyRule =
+      "- When NPCs initiate contact, DIVERSIFY spatial approaches, action sequences, and opening rhythms to fit the environment and persona; NEVER reuse the same opening sequence from previous scenes.";
     const kineticRule =
       "- EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene and card/lore.\n- This beat is descriptive rendering only and MUST NOT by itself create, increase, or rewrite sexual desire, consent, arousal, personality, relationship, boundaries, or motives.\n- Physical depiction, sensation, reflex, resistance, or climax MUST NOT be treated as proof of willingness or character change.\n- Preserve current pacing and characterization unless explicit action, card/lore, or earned on-page development changes them; ADVANCE the scene through concrete action or dialogue; NEVER stall on an unchanged beat through prolonged or repetitive description.\n- EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, and tissue deformation.\n- EVERY NSFW/NSFL scene MUST render thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.\n- EVERY NSFW/NSFL scene MUST render fractured vocalizations, dirty talk, multi-partner choreography, and simultaneous multi-point stimulation across all erogenous zones.\n- PACING MUST build progressively with tangible resistance and friction before climax, varying rhythm, pressure, pauses, and acceleration.\n- When climax occurs, render the post-climax somatic aftermath.";
     const somaticPriorityRule =
@@ -221,7 +223,10 @@ describe("TomiSakae VN-RP preset families", () => {
       expect(gemmaFixPromptFor(level)).toContain(
         "EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat",
       );
-      expect(gemmaFixPromptFor(level)).toContain(kineticRule);
+      expect(gemmaFixPromptFor(level)).toContain(openingVarietyRule);
+      expect(gemmaFixPromptFor(level).replace(`${openingVarietyRule}\n`, "")).toContain(
+        kineticRule,
+      );
       expect(gemmaFixPromptFor(level)).toContain(somaticPriorityRule);
       expect(gemmaFixPromptFor(level)).toContain(postTraumaAgencyRule);
       expect(gemmaFixPromptFor(level)).not.toContain("ONE text type per line");
