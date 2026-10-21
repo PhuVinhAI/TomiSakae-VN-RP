@@ -396,11 +396,9 @@ describe("Named presets in plugin UI and requests", () => {
         expect(user).toContain("MUST NOT offer sex");
         expect(user).toContain("lustful, submissive, dependent, or infatuated traits");
         expect(user).toContain(
-          "User's desire, intent, or consent MUST come only from clear intent, words, or concrete actions",
+          "User's desire, intent, or consent MUST come only from User's clear intent, words, or concrete actions",
         );
-        expect(user).toContain(
-          "MUST NEVER read User's silence, hesitation, refusal, or resistance",
-        );
+        expect(user).toContain("NEVER read User's silence, hesitation, refusal, or resistance");
         expect(user).not.toContain("across turns");
         expect(user).not.toContain("## Sexual Risk");
         reloaded.toggle("gemma-fix").checked = false;

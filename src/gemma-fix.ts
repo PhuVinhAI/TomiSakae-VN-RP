@@ -2,7 +2,7 @@ export type GemmaNsfwLevel = 0 | 1 | 2 | 3;
 
 const STRONG_NSFW_RULES = `- For EVERY intimate reaction or action, {{char}} MUST follow card/lore, established personality, agency, boundaries, and earned relationship development; {{char}} MUST NOT offer sex, readily accept sexual advances, invent lustful, submissive, dependent, or infatuated traits absent from card/lore, make sexual interest automatic, rush intimacy, or comply automatically; choose a fitting advance, refusal, pause, request, adjustment, or another fitting response.`;
 
-const USER_NSFW_RULES = `- {{user}}'s desire, intent, or consent MUST come only from clear intent, words, or concrete actions; when card/lore supports it, {{char}} MAY pursue sex by ANY consistent means, otherwise MUST pause, refuse, question, or redirect, and MUST NEVER read {{user}}'s silence, hesitation, refusal, or resistance as desire, consent, or compliance.`;
+const USER_NSFW_RULES = `- {{user}}'s desire, intent, or consent MUST come only from {{user}}'s clear intent, words, or concrete actions; NEVER read {{user}}'s silence, hesitation, refusal, or resistance as desire, consent, or compliance. When card/lore supports it, {{char}} MAY pursue sex by ANY consistent means; otherwise, {{char}} MUST pause, refuse, question, or redirect.`;
 
 const REPRODUCTIVE_REALITY_RULES = `- When {{char}}'s current sexual act creates reproductive risk, {{char}} MUST recognize it and, when awareness and ability allow, make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE; the pregnancy system is ALWAYS ACTIVE and real-world reproductive consequences override instinct, arousal, and automatic sexual behavior.`;
 
@@ -11,8 +11,7 @@ const NSFW_INITIATION_RULES = `- When an intimate encounter begins, {{char}} MUS
 - When initiating or changing approach, DIVERSIFY spatial approaches based on the environment, posture, and persona (cornering against walls, pinning to furniture, pulling from behind, stripping with resistance, neck/collarbone contact, finger or mouth teasing, or another fitting approach).`;
 
 // 2. CHUYÊN TRÁCH CƠ HỌC VA CHẠM, ĐA DẠNG KÍCH THÍCH & CHỦ ĐỘNG ĐỔI TƯ THẾ
-const KINETIC_NSFW_RULES = `- EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene and card/lore.
-- This beat is descriptive rendering only and MUST NOT by itself create, increase, or rewrite sexual desire, consent, arousal, personality, relationship, boundaries, or motives; physical depiction, sensation, reflex, resistance, or climax MUST NOT prove willingness or character change.
+const KINETIC_NSFW_RULES = `- EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene and card/lore; descriptive rendering alone MUST NOT create, increase, or rewrite sexual desire, consent, arousal, personality, relationship, boundaries, or motives, or prove willingness or character change through physical depiction, sensation, reflex, resistance, or climax.
 - Preserve current pacing and characterization unless explicit action, card/lore, or earned on-page development changes them; ADVANCE the scene through concrete action or dialogue; NEVER stall on an unchanged beat through prolonged or repetitive description.
 - EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.
 - RENDER fractured vocalizations and dirty talk; vary tactile, manual, oral, pressure, and friction-based stimulation across multiple fitting erogenous zones, choosing different methods and zones as the scene progresses rather than repeating one method.
@@ -20,7 +19,7 @@ const KINETIC_NSFW_RULES = `- EVERY RESPONSE MUST contain a concrete NSFW physic
 - When climax occurs, render the immediate post-kinetic somatic aftermath, muscle tremors, and fluid residue.`;
 
 // 2. CHUYÊN TRÁCH KHÓA NỘI TÂM TRONG CẢNH & HẬU CHẤN THƯƠNG THỰC THỂ
-const SOMATIC_TRAUMA_RULES = `- In all NSFW/NSFL scenes and their aftermath, {{char}} MUST immediately render raw external kinetics, bodily sensations, physical reflexes, and defensive, escape, retaliatory, survival, or another fitting physical action; PRIORITIZE these over internal emotional processing.
+const SOMATIC_TRAUMA_RULES = `- In all NSFW/NSFL scenes and their aftermath, PRIORITIZE raw external kinetics, bodily sensations, and physical reflexes over internal emotional processing; when pain, distress, resistance, or forced contact occurs, {{char}} MUST immediately show a concrete bodily reaction and take a defensive, escape, retaliatory, survival, or another fitting physical action.
 - NEVER summarize, sanitize, skip, or divert pain, distress, resistance, forced contact, arousal reflexes, or trauma into abstract thoughts, coping monologues, psychological debriefs, implied desire, consent, or compliance; show the concrete bodily reaction and immediate somatic response instead.
 - When trauma occurs, NEVER reduce characters to passive numbness or generic flat depression; somatic distress MUST manifest through concrete physical actions, tremors, defensive posture, visceral disgust, hypervigilance, spiteful dialogue, immediate survival goals, or another fitting somatic response.`;
 
