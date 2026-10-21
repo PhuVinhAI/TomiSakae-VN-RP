@@ -10,20 +10,20 @@ export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): st
   const labels = vietnamese
     ? {
         description: "Cách miêu tả",
-        kinetics: "Hành động/Động lực cơ thể",
+        initiation: "Tiếp cận/Dạo đầu",
         sensory: "Điểm nhấn cảm giác",
         dialogue: "Kiểu thoại",
         vocal: "Tiếng rên/Phản ứng giọng",
-        pacing: "Nhịp triển khai",
+        variation: "Tư thế/Hành động/Kích thích",
         nsfl: "Phản ứng thân thể / Hành động NSFL",
       }
     : {
         description: "Description patterns",
-        kinetics: "Action/Body dynamics",
+        initiation: "Initiation/Foreplay",
         sensory: "Sensory emphasis",
         dialogue: "Dialogue patterns",
         vocal: "Moans/Vocal reactions",
-        pacing: "Pacing",
+        variation: "Pose/Action/Stimulation",
         nsfl: "NSFL bodily response / action",
       };
   return `## ${vietnamese ? "Ghi chép NSFW/NSFL" : "NSFW/NSFL Usage Record"} 🔥
@@ -31,10 +31,12 @@ Located ${location || "at the end of your response"}, append:
 <nsfw_nsfl_ban_list>
 ${labels.description}: [Distinct NSFW descriptive constructions used this turn]
 ${labels.sensory}: [Distinct NSFW tactile, thermal, fluid, olfactory, or acoustic details used this turn]
-${labels.pacing}: [How this NSFW beat moved this turn from opening to shift and stopping point]
 
-${labels.kinetics}:
-[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Distinct NSFW movement, force, pose, and contact patterns used this turn]
+${labels.initiation}:
+[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Distinct spatial approach, undressing, foreplay, and pre-contact friction patterns used this turn]
+
+${labels.variation}:
+[${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Distinct pose, angle, action, stimulation method, and fitting erogenous zone patterns used this turn]
 
 ${labels.dialogue}:
 [${vietnamese ? "Tên nhân vật" : "Character Name"}]: [Distinct NSFW dialogue constructions used this turn]
@@ -48,7 +50,7 @@ ${labels.nsfl}:
 
 Rules:
 - Record ONLY patterns actually written in THIS response; ignore all earlier responses, trackers, and history. Include their concrete wording, structures, and rhythms. Do not invent entries.
-- Record shared description, sensory, and pacing once within a SINGLE <nsfw_nsfl_ban_list>. Under each remaining heading, write one [Character]: pattern line per active character.
+- Record shared description and sensory patterns once within a SINGLE <nsfw_nsfl_ban_list>. Under each character-specific heading, write one [Character]: pattern line per active character.
 - For NSFL scenes, record the concrete bodily reflex, defensive action, persona-true behavior, or immediate survival drive actually used this turn in ${labels.nsfl}, one line per character.
 - Record concrete NSFW patterns used this turn; record NSFL only when it occurs, otherwise write ${vietnamese ? "Không có" : "None"} in the NSFL field.
 `;
@@ -106,11 +108,8 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
   const groups = new Map<string, string>([
     ["description patterns", vietnamese ? "Cách miêu tả" : "Description patterns"],
     ["cách miêu tả", vietnamese ? "Cách miêu tả" : "Description patterns"],
-    ["action/body dynamics", vietnamese ? "Hành động/Động lực cơ thể" : "Action/Body dynamics"],
-    [
-      "hành động/động lực cơ thể",
-      vietnamese ? "Hành động/Động lực cơ thể" : "Action/Body dynamics",
-    ],
+    ["initiation/foreplay", vietnamese ? "Tiếp cận/Dạo đầu" : "Initiation/Foreplay"],
+    ["tiếp cận/dạo đầu", vietnamese ? "Tiếp cận/Dạo đầu" : "Initiation/Foreplay"],
     ["sensory emphasis", vietnamese ? "Điểm nhấn cảm giác" : "Sensory emphasis"],
     ["điểm nhấn cảm giác", vietnamese ? "Điểm nhấn cảm giác" : "Sensory emphasis"],
     ["dialogue patterns", vietnamese ? "Kiểu thoại" : "Dialogue patterns"],
@@ -126,8 +125,14 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
       "phản ứng thân thể / hành động nsfl",
       vietnamese ? "Phản ứng thân thể / Hành động NSFL" : "NSFL bodily response / action",
     ],
-    ["pacing", vietnamese ? "Nhịp triển khai" : "Pacing"],
-    ["nhịp triển khai", vietnamese ? "Nhịp triển khai" : "Pacing"],
+    [
+      "pose/action/stimulation",
+      vietnamese ? "Tư thế/Hành động/Kích thích" : "Pose/Action/Stimulation",
+    ],
+    [
+      "tư thế/hành động/kích thích",
+      vietnamese ? "Tư thế/Hành động/Kích thích" : "Pose/Action/Stimulation",
+    ],
   ]);
   return body
     .trim()
