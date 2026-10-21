@@ -65,7 +65,7 @@ describe("Sola Sexual Context Tracker", () => {
     expect(module?.content).toContain("infer the current conception chance independently");
     expect(module?.content).toContain("NEVER copy or substitute the Sola roll as the percentage");
     expect(module?.content).toContain(
-      "use 0.00% to 100.00% with two decimal places and the % sign",
+      "Use 0.00% to 100.00% with two decimal places and the % sign",
     );
     expect(module?.content).toContain("after its biological window ends");
     expect(module?.content).toContain(
@@ -145,7 +145,7 @@ describe("Sola Sexual Context Tracker", () => {
       expect(prompt).not.toContain(
         "NEVER treat {{user}}'s silence, lack of action, hesitation, or non-resistance as consent or acceptance of risky sex",
       );
-      expect(prompt).toContain("what choice does that understanding produce IN THE SCENE?");
+      expect(prompt).toContain("what concrete choice or response follows IN THE SCENE");
       expect(prompt).toContain(
         "Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition",
       );
