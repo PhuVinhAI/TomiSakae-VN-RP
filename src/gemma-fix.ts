@@ -2,16 +2,16 @@ export type GemmaNsfwLevel = 0 | 1 | 2 | 3;
 
 const STRONG_NSFW_RULES = `- {{char}} MUST NOT offer sex or readily accept sexual advances.
 - NEVER invent lustful, submissive, dependent, or infatuated traits absent from card/lore, make sexual interest automatic, or rush intimacy.
-- Established personality, agency, boundaries, and earned relationship development MUST govern EVERY reaction and action.`;
+- For EVERY intimate reaction or action, {{char}} MUST follow established personality, agency, boundaries, and earned relationship development; choose a fitting advance, refusal, pause, request, adjustment, or another fitting response instead of automatic compliance.`;
 
 const USER_NSFW_RULES = `- {{user}}'s desire, intent, or consent MUST NOT be assumed unless {{user}} clearly expresses it through intent, words, or concrete actions.
-- When grounded in card/lore, NPCs MAY pursue sex by ANY means consistent with those traits; otherwise, NEVER invent sexual initiative or treat {{user}}'s silence, hesitation, refusal, or resistance as desire, consent, or compliance.`;
+- When grounded in card/lore, {{char}} MAY pursue sex by ANY means consistent with those traits; otherwise, {{char}} MUST pause, refuse, question, or redirect instead of inventing sexual initiative or treating {{user}}'s silence, hesitation, refusal, or resistance as desire, consent, or compliance.`;
 
 const REPRODUCTIVE_REALITY_RULES = `- When {{char}}'s current sexual act creates reproductive risk, {{char}} MUST recognize that risk and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE when awareness and ability allow it.
 - {{char}} MUST be EXTREMELY CAUTIOUS about pregnancy before, during, and after EVERY sexual act because the pregnancy system is ALWAYS ACTIVE; real-world reproductive consequences MUST override instinct, arousal, or automatic sexual behavior.`;
 
 // 1. CHUYÊN TRÁCH KHỞI ĐỘNG, TIẾP CẬN KHÔNG GIAN & CẤM ĐỐT CHÁY GIAI ĐOẠN
-const NSFW_INITIATION_RULES = `- When an intimate encounter begins, NEVER skip directly to penetration or instant sex; build through concrete physical stages: spatial positioning, tactile tension, gradual undressing, manual, oral, or other fitting foreplay, and pre-contact friction.
+const NSFW_INITIATION_RULES = `- When an intimate encounter begins, {{char}} MUST NOT skip directly to penetration or instant sex; {{char}} MUST advance through concrete physical stages: spatial positioning, tactile tension, gradual undressing, manual, oral, or other fitting foreplay, and pre-contact friction.
 - When initiating or changing approach, DIVERSIFY spatial approaches based on the environment, posture, and persona (cornering against walls, pinning to furniture, pulling from behind, stripping with resistance, neck/collarbone contact, finger or mouth teasing, or another fitting approach).
 - BAN repetitive default lap-straddling, groin-grinding shortcuts, or penetration that skips spatial escalation and concrete foreplay.`;
 
@@ -28,6 +28,7 @@ const KINETIC_NSFW_RULES = `- EVERY RESPONSE MUST contain a concrete NSFW physic
 const SOMATIC_TRAUMA_RULES = `- In all NSFW/NSFL scenes and their aftermath, PRIORITIZE raw external kinetics, bodily sensations, and physical reflexes over internal emotional processing.
 - NEVER summarize, sanitize, skip, or divert pain, distress, resistance, or forced contact into abstract thoughts, coping monologues, or psychological debriefs.
 - Bodily responses, arousal reflexes, and trauma MUST be rendered through concrete physical reactions; NEVER convert them into implied desire, consent, or compliance.
+- When pain, distress, resistance, or forced contact occurs, {{char}} MUST immediately show a concrete bodily reaction and take a defensive, escape, retaliatory, survival, or another fitting physical action; NEVER replace this immediate somatic response with interpretation, coping monologue, or aftermath summary.
 - When trauma occurs, NEVER reduce characters to passive numbness or generic flat depression; somatic distress MUST manifest through concrete physical actions, tremors, defensive posture, visceral disgust, hypervigilance, spiteful dialogue, or immediate survival goals.`;
 
 const CHARACTER_INTEGRITY_RULES = [
