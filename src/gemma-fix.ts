@@ -43,11 +43,10 @@ const VIETNAMESE_OUTPUT_RULES = `- Write all visible text in natural Vietnamese 
 - BAN ALL em-dashes.
 - NEVER repeat or rephrase {{user}}'s words or write {{user}}'s dialogue.`;
 
-const IMAGE_USE_RULES = `- Use many images at multiple suitable points throughout the response.
-- EXPLORE available images for the best fit; AVOID safe defaults; ONLY use available card/lore images matching the current state with exact image-tag syntax and identifiers supported by card/lore/schema.
-- BAN ALL duplicate image renders within the SAME response; NEVER render the same image identifier more than ONCE, even after other images, text, or state changes; PRIORITIZE outfit changes > action/pose/physical state > expression; PLACE each beside its matching beat with narration or dialogue between images.
-- Every NSFW or NSFL action, whether initiated by {{char}}, {{user}}, or another NPC, MUST use a matching available NSFW image for the acting character and current state; this applies equally to active, passive, consensual, refused, or resisted actions; depiction does not imply consent.
-- In NSFW or NSFL scenes, COVER every distinct action, body state, and pose with its own matching available NSFW image before adding expression/reaction images; reselect a new matching NSFW image whenever the action, body state, or pose changes; expression/reaction images are supplemental and MUST NEVER replace NSFW or NSFL action, body-state, or pose coverage.`;
+const IMAGE_USE_RULES = `- Render many images throughout the response, placing each beside its matching beat with narration or dialogue between images.
+- ONLY use available card/lore images matching the current state; AVOID safe defaults; PRIORITIZE outfit > action/pose/body state > expression; use exact supported image-tag syntax and identifiers.
+- BAN ALL duplicate image identifiers within the SAME response; NEVER render one identifier more than ONCE, including after other images, text, or state changes.
+- EVERY NSFW/NSFL action by {{char}}, {{user}}, or another NPC, whether active, passive, consensual, refused, or resisted, MUST use a matching NSFW image; COVER each distinct action, body state, and pose before supplemental expression/reaction images, reselect when they change, and NEVER let expression images replace that coverage; depiction does not imply consent.`;
 
 export function normalizeGemmaNsfwLevel(value: unknown): GemmaNsfwLevel {
   return value === 0 || value === 1 || value === 3 ? value : 2;
