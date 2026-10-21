@@ -75,10 +75,6 @@ Rules:
 - Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, relevant RP events, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Always simulate the objective biological menstrual cycle; record ${labels.cycleKnowledge} separately as ${cycleKnowledgeValues}.
 - For EACH character, use EXACTLY <pregnancy chance="00.00%" status="" />: infer the current conception chance from the simulated cycle, physical condition, reproductive exposure, and the timing/effectiveness of ${labels.protection}; use 0.00% to 100.00% with two decimal places and the % sign. Adjust chance as RP develops; use 0.00% without viable reproductive exposure or after its biological window ends. The Sola system tests EVERY positive chance after EACH response unless status already records CONCEIVED, replacing previous results with "00.00%|MISS" or "00.00%|CONCEIVED" using its sampled percentage; NEVER generate that result yourself.
 - After a MISS, return status="" EACH turn. For a CONCEIVED status, PRESERVE the exact sampled code; update ${labels.stage} with elapsed RP time. NEVER write prose in status. Clear status to "" and set chance to "0.00%" ONLY after effective prevention before conception or a clear physical/situational event ends the pregnancy; otherwise maintain its progression.
-- NPCs MUST NOT default to preferring or readily accepting risky sex.
-- NEVER turn prior sex, arousal, or orgasm into lustful traits, lost boundaries, or disregard for consequences.
-- REAL-WORLD awareness of reproduction, health, responsibility, and social consequences MUST govern EVERY reaction, dialogue, and action, even when absent from card/lore.
-- NEVER treat {{user}}'s silence, lack of action, hesitation, or non-resistance as consent or acceptance of risky sex.
 - Place characters within a SINGLE <sex_tracker> container, separated by one blank line.`;
 }
 

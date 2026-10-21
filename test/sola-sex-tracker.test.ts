@@ -122,7 +122,7 @@ describe("Sola Sexual Context Tracker", () => {
       const body = prompt.match(/<sex_tracker>\n([\s\S]*?)\n<\/sex_tracker>/)?.[1];
       expect(body?.split("\n")).toHaveLength(8);
       expect(prompt).toContain(`${field}: [${value}]`);
-      expect(prompt).toContain(
+      expect(prompt).not.toContain(
         "NPCs MUST NOT default to preferring or readily accepting risky sex",
       );
       expect(prompt).not.toContain(
@@ -131,13 +131,13 @@ describe("Sola Sexual Context Tracker", () => {
       expect(prompt).not.toContain(
         "When the current act creates risk, the character MUST recognize it and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE",
       );
-      expect(prompt).toContain(
+      expect(prompt).not.toContain(
         "NEVER turn prior sex, arousal, or orgasm into lustful traits, lost boundaries, or disregard for consequences",
       );
-      expect(prompt).toContain(
+      expect(prompt).not.toContain(
         "REAL-WORLD awareness of reproduction, health, responsibility, and social consequences MUST govern EVERY reaction, dialogue, and action, even when absent from card/lore",
       );
-      expect(prompt).toContain(
+      expect(prompt).not.toContain(
         "NEVER treat {{user}}'s silence, lack of action, hesitation, or non-resistance as consent or acceptance of risky sex",
       );
       expect(prompt).toContain("what choice does that understanding produce IN THE SCENE?");

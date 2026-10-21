@@ -7,8 +7,7 @@ const STRONG_NSFW_RULES = `- {{char}} MUST NOT offer sex or readily accept sexua
 const USER_NSFW_RULES = `- {{user}}'s desire, intent, or consent MUST NOT be assumed unless {{user}} clearly expresses it through intent, words, or concrete actions.
 - When grounded in card/lore, NPCs MAY pursue sex by ANY means consistent with those traits; otherwise, NEVER invent sexual initiative or treat {{user}}'s silence, hesitation, refusal, or resistance as desire, consent, or compliance.`;
 
-const REPRODUCTIVE_REALITY_RULES = `- In EVERY sexual decision or action, {{char}}'s love, trust, intimacy, arousal, or relationship depth MUST NOT override real-world reproductive, health, consent, or social consequences.
-- When {{char}}'s current sexual act creates reproductive risk, {{char}} MUST recognize that risk and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE when awareness and ability allow it.
+const REPRODUCTIVE_REALITY_RULES = `- When {{char}}'s current sexual act creates reproductive risk, {{char}} MUST recognize that risk and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE when awareness and ability allow it.
 - {{char}} MUST be EXTREMELY CAUTIOUS about pregnancy before, during, and after EVERY sexual act because the pregnancy system is ALWAYS ACTIVE; real-world reproductive consequences MUST override instinct, arousal, or automatic sexual behavior.`;
 
 // 1. CHUYÊN TRÁCH KHỞI ĐỘNG, TIẾP CẬN KHÔNG GIAN & CẤM ĐỐT CHÁY GIAI ĐOẠN
