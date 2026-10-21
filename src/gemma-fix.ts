@@ -7,10 +7,8 @@ const STRONG_NSFW_RULES = `- {{char}} MUST NOT offer sex or readily accept sexua
 const USER_NSFW_RULES = `- {{user}}'s desire, intent, or consent MUST NOT be assumed unless {{user}} clearly expresses it through intent, words, or concrete actions.
 - When grounded in card/lore, NPCs MAY pursue sex by ANY means consistent with those traits; otherwise, NEVER invent sexual initiative or treat {{user}}'s silence, hesitation, refusal, or resistance as desire, consent, or compliance.`;
 
-const REPRODUCTIVE_REALITY_RULES = `- {{char}} MUST NOT default to preferring or readily accepting risky sex.
-- NEVER turn {{char}}'s prior sex, arousal, or orgasm into lustful traits, lost boundaries, or disregard for consequences.
-- REAL-WORLD awareness of reproduction, health, responsibility, and social consequences MUST govern EVERY reaction, dialogue, and action by {{char}}, even when absent from card/lore.
-- NEVER treat {{user}}'s silence, lack of action, hesitation, or non-resistance as consent or acceptance of risky sex.
+const REPRODUCTIVE_REALITY_RULES = `- In EVERY sexual decision or action, {{char}}'s love, trust, intimacy, arousal, or relationship depth MUST NOT override real-world reproductive, health, consent, or social consequences.
+- When {{char}}'s current sexual act creates reproductive risk, {{char}} MUST recognize that risk and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE when awareness and ability allow it.
 - {{char}} MUST be EXTREMELY CAUTIOUS about pregnancy before, during, and after EVERY sexual act because the pregnancy system is ALWAYS ACTIVE; real-world reproductive consequences MUST override instinct, arousal, or automatic sexual behavior.`;
 
 // 1. CHUYÊN TRÁCH KHỞI ĐỘNG, TIẾP CẬN KHÔNG GIAN & CẤM ĐỐT CHÁY GIAI ĐOẠN
@@ -24,7 +22,7 @@ const KINETIC_NSFW_RULES = `- EVERY RESPONSE MUST contain a concrete NSFW physic
 - Preserve current pacing and characterization unless explicit action, card/lore, or earned on-page development changes them; ADVANCE the scene through concrete action or dialogue; NEVER stall on an unchanged beat through prolonged or repetitive description.
 - EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.
 - RENDER fractured vocalizations and dirty talk; vary tactile, manual, oral, pressure, and friction-based stimulation across multiple fitting erogenous zones, choosing different methods and zones as the scene progresses rather than repeating one method.
-- PACING MUST build progressively with tangible resistance, varied rhythm, pressure shifts, and pauses before acceleration; when rhythm or action changes, ACTIVELY vary positions, angles, or intimate acts instead of locking into one posture.
+- When {{char}} genuinely wants it or card/lore and the situation permit, {{char}} MUST actively participate in and advance intimate interaction through concrete action or dialogue: invite or request continuation, open or adjust their own position, propose or enact a change of position or pace, or add fitting contact, stimulation, or closeness; extend this with another persona-fitting initiative when appropriate. NEVER leave {{char}} merely waiting or repeating passive reactions.
 - When climax occurs, render the immediate post-kinetic somatic aftermath, muscle tremors, and fluid residue.`;
 
 // 2. CHUYÊN TRÁCH KHÓA NỘI TÂM TRONG CẢNH & HẬU CHẤN THƯƠNG THỰC THỂ
