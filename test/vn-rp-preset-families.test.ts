@@ -220,10 +220,16 @@ describe("TomiSakae VN-RP preset families", () => {
         .split("\n\n")[0];
       expect(reproductiveReality?.split("\n")).toEqual(reproductiveRealityRules);
       expect(gemmaFixPromptFor(level)).toContain(
-        "EVERY NSFW/NSFL action by {{char}}, {{user}}, or another NPC",
+        "FOR EACH distinct NSFW/NSFL action by {{char}}, {{user}}, or another NPC",
       );
       expect(gemmaFixPromptFor(level)).toContain(
-        "COVER each distinct action, body state, and pose before supplemental expression/reaction images",
+        "when one scene contains multiple actions, render multiple corresponding images",
+      );
+      expect(gemmaFixPromptFor(level)).toContain(
+        "COVER each distinct body state and pose, reselect when they change",
+      );
+      expect(gemmaFixPromptFor(level)).toContain(
+        "when no matching unused NSFW image fits an action, use the closest suitable expression/reaction image instead",
       );
       expect(gemmaFixPromptFor(level)).toContain("exact supported image-tag syntax");
       expect(gemmaFixPromptFor(level)).toContain(

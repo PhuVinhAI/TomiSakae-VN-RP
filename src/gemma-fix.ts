@@ -47,7 +47,7 @@ const VIETNAMESE_OUTPUT_RULES = `- Write all visible text in natural Vietnamese 
 const IMAGE_USE_RULES = `- Render many images throughout the response, placing each beside its matching beat with narration or dialogue between images.
 - ONLY use available card/lore images matching the current state; AVOID safe defaults; PRIORITIZE outfit > action/pose/body state > expression; use exact supported image-tag syntax and identifiers.
 - BAN ALL duplicate image identifiers within the SAME response; NEVER render one identifier more than ONCE, including after other images, text, or state changes.
-- EVERY NSFW/NSFL action by {{char}}, {{user}}, or another NPC, whether active, passive, consensual, refused, or resisted, MUST use a matching NSFW image; COVER each distinct action, body state, and pose before supplemental expression/reaction images, reselect when they change, and NEVER let expression images replace that coverage; depiction does not imply consent.`;
+- FOR EACH distinct NSFW/NSFL action by {{char}}, {{user}}, or another NPC, whether active, passive, consensual, refused, or resisted, use its own matching unused NSFW image; when one scene contains multiple actions, render multiple corresponding images; COVER each distinct body state and pose, reselect when they change, and when no matching unused NSFW image fits an action, use the closest suitable expression/reaction image instead; depiction does not imply consent.`;
 
 export function normalizeGemmaNsfwLevel(value: unknown): GemmaNsfwLevel {
   return value === 0 || value === 1 || value === 3 ? value : 2;
