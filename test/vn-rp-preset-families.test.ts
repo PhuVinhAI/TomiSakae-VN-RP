@@ -185,9 +185,6 @@ describe("TomiSakae VN-RP preset families", () => {
     expect(gemmaFixPromptFor(2)).toContain("## Character Integrity");
     expect(gemmaFixPromptFor(2)).toContain("## Reproductive Reality");
     expect(gemmaFixPromptFor(2)).toContain(
-      "In EVERY sexual decision or action, {{char}}'s love, trust, intimacy, arousal, or relationship depth MUST NOT override real-world reproductive, health, consent, or social consequences",
-    );
-    expect(gemmaFixPromptFor(2)).toContain(
       "{{char}} MUST be EXTREMELY CAUTIOUS about pregnancy before, during, and after EVERY sexual act because the pregnancy system is ALWAYS ACTIVE",
     );
     expect(gemmaFixPromptFor(2)).not.toContain("## User Agency");
@@ -207,12 +204,23 @@ describe("TomiSakae VN-RP preset families", () => {
       "- EVERY NSFW/NSFL scene MUST keep physical sensation, impact, and somatic reflexes concrete even under distress, fear, or psychological resistance.\n- PRIORITIZE external visceral kinetics and bodily response over internal emotional processing.\n- Keep bodily sensation separate from interpretation.\n- NEVER convert pain, arousal, reflex, resistance, or forced contact into desire, consent, submission, affection, trauma, or personality change.\n- NEVER summarize, sanitize, skip, or divert non-pleasurable sensations, pain, injury, or forced contact into abstract thoughts, coping monologues, or psychological debriefs.";
     const postTraumaAgencyRule =
       "- AFTER an actual traumatic NSFW/NSFL event, NPCs MUST preserve distinct agency, core persona traits, active grudges, and embodied defensive behavior.\n- A described NSFW beat alone MUST NOT create trauma, recovery, personality change, or a new relationship dynamic.\n- NEVER collapse into passive numbness, generic depression, or hollow psychological monologues.\n- EXPRESS somatic distress through persona-true physical action, bodily tremors, defensive posture, visceral disgust, hypervigilance, spiteful dialogue, or immediate survival goals.";
+    const reproductiveRealityRules = [
+      "- {{char}} MUST NOT default to preferring or readily accepting risky sex.",
+      "- NEVER turn {{char}}'s prior sex, arousal, or orgasm into lustful traits, lost boundaries, or disregard for consequences.",
+      "- REAL-WORLD awareness of reproduction, health, responsibility, and social consequences MUST govern EVERY reaction, dialogue, and action by {{char}}, even when absent from card/lore.",
+      "- NEVER treat {{user}}'s silence, lack of action, hesitation, or non-resistance as consent or acceptance of risky sex.",
+      "- {{char}} MUST be EXTREMELY CAUTIOUS about pregnancy before, during, and after EVERY sexual act because the pregnancy system is ALWAYS ACTIVE; real-world reproductive consequences MUST override instinct, arousal, or automatic sexual behavior.",
+    ];
     for (const level of [0, 1, 2, 3]) {
       expect(gemmaFixPromptFor(level).startsWith("{{\n")).toBe(true);
       expect(gemmaFixPromptFor(level).endsWith("\n}}")).toBe(true);
       for (const section of commonSections) {
         expect(gemmaFixPromptFor(level)).toContain(`## ${section}\n`);
       }
+      const reproductiveReality = gemmaFixPromptFor(level)
+        .split("## Reproductive Reality\n")[1]!
+        .split("\n\n")[0];
+      expect(reproductiveReality?.split("\n")).toEqual(reproductiveRealityRules);
       expect(gemmaFixPromptFor(level)).toContain(
         "Every NSFW or NSFL action, whether initiated by {{char}}, {{user}}, or another NPC",
       );
