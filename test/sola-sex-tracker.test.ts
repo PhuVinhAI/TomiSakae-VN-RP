@@ -191,7 +191,7 @@ describe("Sola Sexual Context Tracker", () => {
     );
   });
 
-  it("adds a final sex check to Character Matrix only when both modules are enabled", async () => {
+  it("does not add a sex check to Character Matrix", async () => {
     const settings = createDefaultSettings(sola);
     settings.solaSexTrackerEnabled = true;
     settings.vietnameseOutputEnabled = true;
@@ -199,24 +199,13 @@ describe("Sola Sexual Context Tracker", () => {
     const enabledText = [...enabled.leading, ...enabled.absolute, ...enabled.trailing]
       .map((message) => message.content)
       .join("\n");
-    expect(enabledText).toContain(
-      "Kiểm tra tình dục: [Bối cảnh tình dục, ranh giới, nhận thức nguy cơ sinh sản và lựa chọn/hành động hiện tại; đối chiếu <sex_tracker>]",
-    );
+    expect(enabledText).not.toContain("Kiểm tra tình dục:");
+    expect(enabledText).not.toContain("Sex Check:");
 
     settings.solaSexTrackerEnabled = false;
     const sexOff = await composePresetPrompts(sola, settings, async (value) => value);
     expect(
       [...sexOff.leading, ...sexOff.absolute, ...sexOff.trailing]
-        .map((message) => message.content)
-        .join("\n"),
-    ).not.toContain("Kiểm tra tình dục:");
-
-    settings.solaSexTrackerEnabled = true;
-    const matrix = sola.prompts.find((prompt) => prompt.name?.includes("{{char}} Matrix"))!;
-    settings.promptEnabled[matrix.identifier] = false;
-    const matrixOff = await composePresetPrompts(sola, settings, async (value) => value);
-    expect(
-      [...matrixOff.leading, ...matrixOff.absolute, ...matrixOff.trailing]
         .map((message) => message.content)
         .join("\n"),
     ).not.toContain("Kiểm tra tình dục:");
