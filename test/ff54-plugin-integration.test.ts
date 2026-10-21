@@ -1190,8 +1190,8 @@ describe("Sola silent reproductive state", () => {
     await plugin.complete(content);
     const saved = plugin.chats.get("0:0")!;
     expect(saved.message[0]!.data).toBe(chat.message[0]!.data);
-    expect(saved.message[2]!.data).toContain(pregnancy("25.00", "Đã thụ thai"));
-    expect(saved.message[2]!.data).toContain(pregnancy("70.00"));
+    expect(saved.message[2]!.data).toContain(pregnancy("25.00", "9.99%|CONCEIVED"));
+    expect(saved.message[2]!.data).toContain(pregnancy("70.00", "79.99%|MISS"));
     expect(random).toHaveBeenCalledTimes(2);
     const next = await plugin.request(requestOf(saved));
     expect(next.find((message) => message.memo === saved.message[2]!.chatId)!.content).toBe(
@@ -1216,7 +1216,9 @@ describe("Sola silent reproductive state", () => {
       "Biện pháp và hành động bảo vệ: Thuốc tránh thai; hiệu lực và thời điểm đã được tính vào xác suất.\n</sex_tracker>",
     );
     await plugin.complete(reduced);
-    expect(plugin.chats.get("0:0")!.message[2]!.data).toBe(reduced);
+    expect(plugin.chats.get("0:0")!.message[2]!.data).toBe(
+      reduced.replace('status=""', 'status="50.00%|MISS"'),
+    );
     expect(plugin.chats.get("0:0")!.message[0]!.data).toBe(reply("95.00"));
     expect(random).toHaveBeenCalledTimes(1);
   });
@@ -1231,12 +1233,12 @@ describe("Sola silent reproductive state", () => {
     const miss = outputOf(plugin.chats.get("0:0")!);
     await Promise.all([plugin.callbacks.output!(miss), plugin.callbacks.output!(miss)]);
     expect(random).toHaveBeenCalledTimes(1);
-    expect(plugin.chats.get("0:0")!.message[2]!.data).toBe(reply("50.00"));
+    expect(plugin.chats.get("0:0")!.message[2]!.data).toBe(reply("50.00", "89.99%|MISS"));
     await plugin.request(requestOf(plugin.chats.get("0:0")!));
     await plugin.complete(reply("50.00"));
     const success = structuredClone(plugin.chats.get("0:0")!);
     await plugin.callbacks.output!(outputOf(success));
-    expect(success.message[3]!.data).toBe(reply("50.00", "Đã thụ thai"));
+    expect(success.message[3]!.data).toBe(reply("50.00", "9.99%|CONCEIVED"));
     expect(random).toHaveBeenCalledTimes(2);
     const reloadedRandom = vi.fn(() => 0);
     const reloaded = await startPlugin(store, false, undefined, false, reloadedRandom);
@@ -1244,10 +1246,12 @@ describe("Sola silent reproductive state", () => {
     await reloaded.callbacks.output!(outputOf(success));
     await reloaded.request(requestOf(success));
     expect(reloadedRandom).not.toHaveBeenCalled();
-    await reloaded.complete(reply("50.00", "tam cá nguyệt hai"));
-    expect(reloaded.chats.get("0:0")!.message.at(-1)!.data).toBe(
-      reply("50.00", "tam cá nguyệt hai"),
+    const progressed = reply("50.00", "9.99%|CONCEIVED").replace(
+      "</sex_tracker>",
+      "Giai đoạn thai kỳ: Tam cá nguyệt hai, tuần 16.\n</sex_tracker>",
     );
+    await reloaded.complete(progressed);
+    expect(reloaded.chats.get("0:0")!.message.at(-1)!.data).toBe(progressed);
     expect(reloadedRandom).not.toHaveBeenCalled();
   });
 
@@ -1260,7 +1264,7 @@ describe("Sola silent reproductive state", () => {
       await plugin.complete(content);
     }
     expect(random).toHaveBeenCalledTimes(1);
-    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("12.34", "Đã thụ thai"));
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("12.34", "0.00%|CONCEIVED"));
   });
 
   it.each(["delete", "branch"] as const)(
@@ -1294,7 +1298,7 @@ describe("Sola silent reproductive state", () => {
       target.swipeId = 2;
       await plugin.callbacks.output!(outputOf(active, chatIndex));
       const updated = plugin.chats.get(`0:${chatIndex}`)!.message[0]!;
-      expect(updated.data).toBe(reply("20.00", "Đã thụ thai"));
+      expect(updated.data).toBe(reply("20.00", "0.00%|CONCEIVED"));
       expect(updated.swipes?.[2]).toBe(updated.data);
       expect(updated.swipes?.slice(0, 2)).toEqual([reply("100.00"), reply("75.00")]);
       expect(random).toHaveBeenCalledTimes(1);
@@ -1345,7 +1349,7 @@ describe("Sola silent reproductive state", () => {
     expect(plugin.chats.get("0:0")!.message[1]!.data).toBe("Tiếp tục.!");
     const newest = plugin.chats.get("0:0")!.message[2]!;
     expect(built.find((message) => message.memo === newest.chatId)!.content).toContain(
-      pregnancy("50.00", "Đã thụ thai"),
+      pregnancy("50.00", "19.99%|CONCEIVED"),
     );
     getSpy.mockRestore();
     setSpy.mockRestore();
@@ -1360,7 +1364,7 @@ describe("Sola silent reproductive state", () => {
     const event = outputOf(chat);
     await Promise.all([plugin.callbacks.output!(event), plugin.callbacks.output!(event)]);
     expect(random).toHaveBeenCalledTimes(1);
-    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("50.00"));
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("50.00", "98.99%|MISS"));
   });
 
   it("ignores streaming, partial/stale outputs, history polling, display and auxiliary requests", async () => {
@@ -1401,7 +1405,7 @@ describe("Sola silent reproductive state", () => {
     plugin.selectChat(1);
     const other = structuredClone(plugin.chats.get("0:1")!);
     await plugin.complete(reply("100.00"), 0, 0);
-    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("100.00", "Đã thụ thai"));
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("100.00", "0.00%|CONCEIVED"));
     expect(plugin.chats.get("0:1")).toEqual(other);
     expect(random).toHaveBeenCalledTimes(1);
   });
@@ -1413,7 +1417,7 @@ describe("Sola silent reproductive state", () => {
     const reasoning = `<think>${reply("100.00", "", "Example")}</think>\n`;
     await plugin.complete(reasoning + reply("25.00"));
     const saved = plugin.chats.get("0:0")!.message.at(-1)!.data;
-    expect(saved).toBe(reasoning + reply("25.00", "Đã thụ thai"));
+    expect(saved).toBe(reasoning + reply("25.00", "0.00%|CONCEIVED"));
     expect(random).toHaveBeenCalledTimes(1);
   });
 
@@ -1434,7 +1438,7 @@ describe("Sola silent reproductive state", () => {
       expect(plugin.chats.get("0:0")!.message.at(-1)!.data).not.toContain("<think>");
       await plugin.callbacks.output!(event);
       expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toContain(
-        pregnancy("25.00", "Đã thụ thai"),
+        pregnancy("25.00", "0.00%|CONCEIVED"),
       );
       expect(random).toHaveBeenCalledTimes(1);
     } finally {
@@ -1454,7 +1458,7 @@ describe("Sola silent reproductive state", () => {
     expect(plugin.chats.get("0:0")!.message[0]!.data).toBe(reply("100.00"));
     await plugin.complete(reply("25.00"));
     expect(random).toHaveBeenCalledTimes(1);
-    expect(plugin.chats.get("0:0")!.message[1]!.data).toBe(reply("25.00", "Đã thụ thai"));
+    expect(plugin.chats.get("0:0")!.message[1]!.data).toBe(reply("25.00", "0.00%|CONCEIVED"));
   });
 
   it("does not roll again when automatic or manual Submodel editing creates another swipe", async () => {
@@ -1463,14 +1467,17 @@ describe("Sola silent reproductive state", () => {
     store.presets[0]!.settings.submodelAutoRewriteEnabled = true;
     const random = vi.fn(() => 0.1);
     const plugin = await startPlugin(store, false, undefined, false, random);
-    plugin.runModel.mockResolvedValue({ type: "success", result: reply("50.00", "Đã thụ thai") });
+    plugin.runModel.mockResolvedValue({
+      type: "success",
+      result: reply("50.00", "9.99%|CONCEIVED"),
+    });
     await plugin.request();
     await plugin.complete(reply("50.00"));
     expect(plugin.runModel).toHaveBeenCalledTimes(1);
     expect(plugin.runModel.mock.calls[0]![0].messages.at(-2).content).toContain(
-      'status="Đã thụ thai"',
+      'status="9.99%|CONCEIVED"',
     );
-    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("50.00", "Đã thụ thai"));
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("50.00", "9.99%|CONCEIVED"));
     await plugin.callbacks.output!(outputOf(plugin.chats.get("0:0")!));
     expect(random).toHaveBeenCalledTimes(1);
     expect(plugin.runModel).toHaveBeenCalledTimes(1);
@@ -1489,7 +1496,7 @@ describe("Sola silent reproductive state", () => {
     await plugin.request();
     await plugin.complete(reply("100.00"));
     expect(random).not.toHaveBeenCalled();
-    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).not.toContain('status="Đã thụ thai"');
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).not.toContain("|CONCEIVED");
   });
 });
 

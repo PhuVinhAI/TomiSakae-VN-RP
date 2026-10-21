@@ -56,13 +56,15 @@ describe("Sola Sexual Context Tracker", () => {
       "when data is missing, choose the most plausible development and keep it consistent",
     );
     expect(module?.content).toContain("Khả năng và trạng thái mang thai:");
+    expect(module?.content).toContain("Giai đoạn thai kỳ:");
     expect(module?.content).toContain('<pregnancy chance="00.00%" status="" />');
     expect(module?.content).toContain("infer the current conception chance");
     expect(module?.content).toContain(
       "use 0.00% to 100.00% with two decimal places and the % sign",
     );
     expect(module?.content).toContain("after its biological window ends");
-    expect(module?.content).not.toMatch(/roll|system-provided/i);
+    expect(module?.content).toContain('fill "00.00%|MISS" or "00.00%|CONCEIVED"');
+    expect(module?.content).toContain("NEVER generate that result yourself");
     expect(module?.content).not.toContain("cycle-timing knowledge");
     expect(module?.content).not.toContain("Tình trạng rủi ro:");
     expect(
@@ -115,7 +117,7 @@ describe("Sola Sexual Context Tracker", () => {
     ({ vietnamese, field, value }) => {
       const prompt = solaSexTrackerPrompt(vietnamese, "at the end of your response");
       const body = prompt.match(/<sex_tracker>\n([\s\S]*?)\n<\/sex_tracker>/)?.[1];
-      expect(body?.split("\n")).toHaveLength(7);
+      expect(body?.split("\n")).toHaveLength(8);
       expect(prompt).toContain(`${field}: [${value}]`);
       expect(prompt).toContain(
         "NPCs MUST NOT default to preferring or readily accepting risky sex",
@@ -140,16 +142,22 @@ describe("Sola Sexual Context Tracker", () => {
         "Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition",
       );
       expect(prompt).toContain("NEVER invent ignorance to bypass consequences");
-      expect(prompt).toContain('Clear status to "" and set chance to 0.00% ONLY');
-      expect(prompt).toContain("effective prevention before conception");
+      expect(prompt).toContain('After a MISS, return status="" EACH turn');
+      expect(prompt).toContain(
+        'Clear status to "" and set chance to "0.00%" ONLY after effective prevention before conception',
+      );
+      expect(prompt).toContain("a clear physical/situational event ends the pregnancy");
       expect(prompt).toContain("otherwise maintain its progression");
       expect(prompt).toContain(
         vietnamese ? "tam cá nguyệt một/hai/ba" : "first/second/third trimester",
       );
       expect(prompt).toContain(vietnamese ? "sinh con, hậu sản" : "childbirth, postpartum");
-      expect(prompt).not.toMatch(/roll|system-provided/i);
+      expect(prompt).toContain("PRESERVE the exact sampled code");
+      expect(prompt).toContain("with elapsed RP time");
+      expect(prompt).toContain("NEVER write prose in status");
+      expect(prompt).not.toContain("TRIMESTER_1");
       expect(prompt).not.toMatch(
-        /Giai đoạn|Stage|Chưa nói|Đã nói|Not discussed|Discussed reproduction|active stage|reset|MUST discuss/,
+        /Giai đoạn và trao đổi|Stage and discussion|Chưa nói|Đã nói|Not discussed|Discussed reproduction|active stage|MUST discuss/,
       );
     },
   );
@@ -304,13 +312,25 @@ describe("Sola Sexual Context Tracker", () => {
       settings.solaSexTrackerEnabled = true;
       settings.vietnameseOutputEnabled = vietnamese;
       const displayed = applyRegexScripts(
-        '<sex_tracker>\n[Nana]:\nPregnancy likelihood/status: <pregnancy chance="25.00%" status="" />\n[Mina]:\nPregnancy likelihood/status: <pregnancy chance="18.50%" status="Conceived" />\n</sex_tracker>',
+        '<sex_tracker>\n[Nana]:\nPregnancy likelihood/status: <pregnancy chance="25.00%" status="" />\n[Mina]:\nPregnancy likelihood/status: <pregnancy chance="18.50%" status="12.34%|CONCEIVED" />\nPregnancy stage: Tuần 14 <script>\n[Lina]:\nPregnancy likelihood/status: <pregnancy chance="10.00%" status="45.34%|MISS" />\n</sex_tracker>',
         sola,
         settings,
         { placement: PLACEMENT_AI_OUTPUT, markdown: true, depth: 0 },
       );
-      expect(displayed).toContain(`25.00% · ${vietnamese ? "Chưa có kết quả" : "No result"}`);
-      expect(displayed).toContain("18.50% · Conceived");
+      expect(displayed).toContain(
+        `${vietnamese ? "Xác suất" : "Chance"}: 25.00% · ${vietnamese ? "Chưa có kết quả" : "No result"}`,
+      );
+      expect(displayed).toContain(
+        `18.50% · Roll: 12.34% - ${vietnamese ? "Đã thụ thai" : "Conceived"}`,
+      );
+      expect(displayed).toContain(
+        `10.00% · Roll: 45.34% - ${vietnamese ? "Chưa thụ thai" : "No conception"}`,
+      );
+      expect(displayed).not.toContain("|CONCEIVED");
+      expect(displayed).not.toContain("|MISS");
+      expect(displayed).toContain(
+        `${vietnamese ? "Giai đoạn thai kỳ" : "Pregnancy stage"}:</span> Tuần 14 &lt;script&gt;`,
+      );
       expect(displayed).not.toContain("&lt;pregnancy");
       expect(displayed).not.toContain("<pregnancy");
     },
@@ -325,21 +345,26 @@ describe("silent pregnancy resolution", () => {
   it("samples each pending character independently, preserving their own probability", () => {
     const random = vi.fn().mockReturnValueOnce(0.1).mockReturnValueOnce(0.75);
     const input = record(`[Nana]:\n${pregnancy("25.00%")}\n[Mina]:\n${pregnancy("70.00%")}`);
-    const output = resolveSolaPregnancy(input, true, random);
-    expect(output).toContain(`[Nana]:\n${pregnancy("25.00%", "Đã thụ thai")}`);
-    expect(output).toContain(`[Mina]:\n${pregnancy("70.00%")}`);
+    const output = resolveSolaPregnancy(input, random);
+    expect(output).toContain(`[Nana]:\n${pregnancy("25.00%", "10.00%|CONCEIVED")}`);
+    expect(output).toContain(`[Mina]:\n${pregnancy("70.00%", "75.00%|MISS")}`);
     expect(random).toHaveBeenCalledTimes(2);
   });
 
   it("tries again after a miss and preserves success and pregnancy progression", () => {
     const random = vi.fn().mockReturnValueOnce(0.8).mockReturnValueOnce(0.1);
     const input = record(pregnancy("50.00%"));
-    expect(resolveSolaPregnancy(input, false, random)).toBe(input);
-    const success = resolveSolaPregnancy(input, false, random);
-    expect(success).toBe(record(pregnancy("50.00%", "Conceived")));
-    expect(resolveSolaPregnancy(success, false, random)).toBe(success);
-    const progressed = record(pregnancy("50.00%", "second trimester"));
-    expect(resolveSolaPregnancy(progressed, false, random)).toBe(progressed);
+    const miss = resolveSolaPregnancy(input, random);
+    expect(miss).toBe(record(pregnancy("50.00%", "80.00%|MISS")));
+    const success = resolveSolaPregnancy(record(pregnancy("50.00%")), random);
+    expect(success).toBe(record(pregnancy("50.00%", "10.00%|CONCEIVED")));
+    expect(resolveSolaPregnancy(success, random)).toBe(success);
+    const progressed = record(
+      `${pregnancy("50.00%", "10.00%|CONCEIVED")}\nPregnancy stage: Second trimester, week 16`,
+    );
+    expect(resolveSolaPregnancy(progressed, random)).toBe(progressed);
+    const legacy = record(pregnancy("50.00%", "Đã thụ thai"));
+    expect(resolveSolaPregnancy(legacy, random)).toBe(legacy);
     expect(random).toHaveBeenCalledTimes(2);
   });
 
@@ -359,7 +384,7 @@ describe("silent pregnancy resolution", () => {
         pregnancy("0.00%", "postpartum"),
       ].join("\n"),
     )}`;
-    expect(resolveSolaPregnancy(input, true, random)).toBe(input);
+    expect(resolveSolaPregnancy(input, random)).toBe(input);
     expect(random).not.toHaveBeenCalled();
   });
 
@@ -373,14 +398,14 @@ describe("silent pregnancy resolution", () => {
     const input = record(
       ["25.00%", "100.00%", "0.01%", "0.01%"].map((value) => pregnancy(value)).join("\n"),
     );
-    const output = resolveSolaPregnancy(input, false, random);
+    const output = resolveSolaPregnancy(input, random);
     expect(output).toBe(
       record(
         [
-          pregnancy("25.00%"),
-          pregnancy("100.00%", "Conceived"),
-          pregnancy("0.01%", "Conceived"),
-          pregnancy("0.01%"),
+          pregnancy("25.00%", "25.00%|MISS"),
+          pregnancy("100.00%", "99.99%|CONCEIVED"),
+          pregnancy("0.01%", "0.00%|CONCEIVED"),
+          pregnancy("0.01%", "0.01%|MISS"),
         ].join("\n"),
       ),
     );

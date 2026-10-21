@@ -14,6 +14,7 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
         cycleKnowledge: "Nhận biết chu kỳ",
         physicalCondition: "Tình trạng cơ thể",
         pregnancy: "Khả năng và trạng thái mang thai",
+        stage: "Giai đoạn thai kỳ",
         awareness: "Nhận thức thực tế và lựa chọn",
         protection: "Biện pháp và hành động bảo vệ",
       }
@@ -23,6 +24,7 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
         cycleKnowledge: "Cycle knowledge",
         physicalCondition: "Physical condition",
         pregnancy: "Pregnancy likelihood/status",
+        stage: "Pregnancy stage",
         awareness: "Real-world awareness and choice",
         protection: "Protection measures/actions",
       };
@@ -33,6 +35,8 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
         cycleKnowledge: "Biết, Không biết, Chưa rõ hoặc trạng thái nhận biết phù hợp khác",
         physical:
           "Còn trinh/từng quan hệ, tiền sử sinh nở, tổn thương, vừa đạt cực khoái, còn nhạy cảm hoặc ngứa ran, đang hưng phấn, tình trạng hồi phục hoặc tình trạng liên quan khác",
+        stage:
+          "Chưa thụ thai, đã thụ thai, thai kỳ đầu, tam cá nguyệt một/hai/ba, chuyển dạ, sinh con, hậu sản hoặc trạng thái phù hợp khác",
         awareness: "Điều nhân vật hiểu về hệ quả cá nhân/xã hội và lựa chọn hiện tại",
         protection:
           "Bao cao su, biện pháp tránh thai, thuốc tránh thai khẩn cấp, xuất ngoài, yêu cầu xuất ngoài, chuyển sang đường miệng/tay/đường khác, dừng hoặc từ chối, chấp nhận rủi ro hoặc hành động bảo vệ khác",
@@ -43,6 +47,8 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
         cycleKnowledge: "Known, Unknown, Unclear, or another fitting awareness state",
         physical:
           "Virginity/prior intercourse, childbirth history, injuries, recent orgasm, lingering sensitivity or itchiness, arousal, recovery status, or another relevant condition",
+        stage:
+          "Not conceived, conceived, early pregnancy, first/second/third trimester, labor, childbirth, postpartum, or another fitting state",
         awareness:
           "What the character understands about personal/social consequences and their current choice",
         protection:
@@ -51,9 +57,7 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
   const cycleKnowledgeValues = vietnamese
     ? "Biết, Không biết, Chưa rõ hoặc trạng thái nhận biết phù hợp khác"
     : "Known, Unknown, Unclear, or another fitting awareness state";
-  const pregnancyStages = vietnamese
-    ? "Đã thụ thai, thai kỳ đầu, tam cá nguyệt một/hai/ba, chuyển dạ, sinh con, hậu sản hoặc trạng thái phù hợp khác"
-    : "Conceived, early pregnancy, first/second/third trimester, labor, childbirth, postpartum, or another fitting state";
+  const pregnancyStages = examples.stage;
   return `## Sexual Context Tracker 🌙
 Located ${location || "at the end of your response"}, append:
 <sex_tracker>
@@ -62,6 +66,7 @@ ${labels.cycle}: [${examples.cycle}]
 ${labels.cycleKnowledge}: [${examples.cycleKnowledge}]
 ${labels.physicalCondition}: [${examples.physical}]
 ${labels.pregnancy}: <pregnancy chance="00.00%" status="" />
+${labels.stage}: [${examples.stage}]
 ${labels.awareness}: [${examples.awareness}]
 ${labels.protection}: [${examples.protection}]
 </sex_tracker>
@@ -69,8 +74,8 @@ ${labels.protection}: [${examples.protection}]
 Rules:
 - Before writing, run a Cognitive Check: what does the character understand, which consequences are relevant, and what choice does that understanding produce IN THE SCENE? This check separates objective biological data from character awareness. Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition; NEVER invent ignorance to bypass consequences.
 - Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, relevant RP events, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Always simulate the objective biological menstrual cycle; record ${labels.cycleKnowledge} separately as ${cycleKnowledgeValues}.
-- For EACH character, use EXACTLY <pregnancy chance="00.00%" status="" />: infer the current conception chance from the simulated cycle, physical condition, reproductive exposure, and the timing/effectiveness of ${labels.protection}; use 0.00% to 100.00% with two decimal places and the % sign. Adjust chance as RP develops; use 0.00% without viable reproductive exposure or after its biological window ends. After EACH response, the Sola system tests EVERY positive chance with an empty status and fills it on success; leave that result to the Sola system.
-- Preserve an established status and develop it with elapsed RP time: ${pregnancyStages}. Clear status to "" and set chance to 0.00% ONLY after effective prevention before conception or an established bodily/situational event ends the pregnancy; otherwise maintain its progression.
+- For EACH character, use EXACTLY <pregnancy chance="00.00%" status="" />: infer the current conception chance from the simulated cycle, physical condition, reproductive exposure, and the timing/effectiveness of ${labels.protection}; use 0.00% to 100.00% with two decimal places and the % sign. Adjust chance as RP develops; use 0.00% without viable reproductive exposure or after its biological window ends. Leave status="" for the Sola system to test EVERY positive chance after EACH response and fill "00.00%|MISS" or "00.00%|CONCEIVED" with its sampled percentage; NEVER generate that result yourself.
+- After a MISS, return status="" EACH turn so the Sola system can roll again. For a CONCEIVED status, PRESERVE the exact sampled code; update ${labels.stage} with elapsed RP time: ${pregnancyStages}. NEVER write prose in status. Clear status to "" and set chance to "0.00%" ONLY after effective prevention before conception or a clear physical/situational event ends the pregnancy; otherwise maintain its progression.
 - NPCs MUST NOT default to preferring or readily accepting risky sex.
 - NEVER turn prior sex, arousal, or orgasm into lustful traits, lost boundaries, or disregard for consequences.
 - REAL-WORLD awareness of reproduction, health, responsibility, and social consequences MUST govern EVERY reaction, dialogue, and action, even when absent from card/lore.
@@ -79,26 +84,35 @@ Rules:
 }
 
 const PREGNANCY_TAG_RE = /<pregnancy\s+chance="(\d{1,3}\.\d{2})%"\s+status="([^"<>&]*)"\s*\/>/g;
+const PREGNANCY_STATUS_RE = /^(\d{1,3}\.\d{2})%\|(MISS|CONCEIVED)$/;
+const PREGNANCY_STATE_LABELS: Record<string, { en: string; vi: string }> = {
+  MISS: { en: "No conception", vi: "Chưa thụ thai" },
+  CONCEIVED: { en: "Conceived", vi: "Đã thụ thai" },
+};
 
-/** Resolve each pending character independently; randomness never enters the prompt. */
-export function resolveSolaPregnancy(
-  input: string,
-  vietnamese: boolean,
-  random: () => number = Math.random,
-): string {
+/** Resolve each pending character independently and record the sampled outcome. */
+export function resolveSolaPregnancy(input: string, random: () => number = Math.random): string {
   return input.replace(new RegExp(TRACKER_RE.source, TRACKER_RE.flags), (block) =>
     block.replace(
       new RegExp(PREGNANCY_TAG_RE.source, PREGNANCY_TAG_RE.flags),
       (tag, value: string, status: string) => {
         const chance = Number(value);
-        if (status.trim() || chance <= 0 || chance > 100 || random() * 100 >= chance) return tag;
+        if (status.trim() || chance <= 0 || chance > 100) return tag;
+        const roll = Math.floor(random() * 10000) / 100;
         return tag.replace(
           /status="[^"]*"/,
-          `status="${vietnamese ? "Đã thụ thai" : "Conceived"}"`,
+          `status="${roll.toFixed(2)}%|${roll < chance ? "CONCEIVED" : "MISS"}"`,
         );
       },
     ),
   );
+}
+
+function pregnancyStatusLabel(status: string, vietnamese: boolean): string {
+  const result = status.match(PREGNANCY_STATUS_RE);
+  if (!result) return status || (vietnamese ? "Chưa có kết quả" : "No result");
+  const label = PREGNANCY_STATE_LABELS[result[2]!]!;
+  return `Roll: ${result[1]}% - ${vietnamese ? label.vi : label.en}`;
 }
 
 function escapeHtml(value: string): string {
@@ -128,6 +142,8 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
       "khả năng và trạng thái mang thai",
       vietnamese ? "Khả năng và trạng thái mang thai" : "Pregnancy likelihood/status",
     ],
+    ["pregnancy stage", vietnamese ? "Giai đoạn thai kỳ" : "Pregnancy stage"],
+    ["giai đoạn thai kỳ", vietnamese ? "Giai đoạn thai kỳ" : "Pregnancy stage"],
     ["knows cycle timing", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
     ["biết mốc chu kỳ", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
     ["knows current date", vietnamese ? "Biết mốc chu kỳ" : "Knows cycle timing"],
@@ -173,7 +189,7 @@ function trackerBodyHtml(body: string, vietnamese: boolean): string {
           const value = field[2]!.replace(
             new RegExp(PREGNANCY_TAG_RE.source, PREGNANCY_TAG_RE.flags),
             (_tag, chance: string, status: string) =>
-              `${chance}% · ${status || (vietnamese ? "Chưa có kết quả" : "No result")}`,
+              `${vietnamese ? "Xác suất" : "Chance"}: ${chance}% · ${pregnancyStatusLabel(status, vietnamese)}`,
           );
           return `<div style="padding:3px 0;color:#E7DED7;"><span style="color:#E8A87C;font-weight:750;">${escapeHtml(label)}:</span> ${escapeHtml(value)}</div>`;
         }

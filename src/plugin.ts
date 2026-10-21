@@ -1494,20 +1494,16 @@ async function resolveCompletedPregnancy(
       )
         return;
       let sampleIndex = 0;
-      const resolved = resolveSolaPregnancy(
-        response.response,
-        settings.vietnameseOutputEnabled,
-        () => {
-          const index = sampleIndex++;
-          if (samples[index] === undefined) {
-            const crypto = globalThis.crypto;
-            samples[index] = crypto?.getRandomValues
-              ? crypto.getRandomValues(new Uint32Array(1))[0]! / 0x100000000
-              : Math.random();
-          }
-          return samples[index]!;
-        },
-      );
+      const resolved = resolveSolaPregnancy(response.response, () => {
+        const index = sampleIndex++;
+        if (samples[index] === undefined) {
+          const crypto = globalThis.crypto;
+          samples[index] = crypto?.getRandomValues
+            ? crypto.getRandomValues(new Uint32Array(1))[0]! / 0x100000000
+            : Math.random();
+        }
+        return samples[index]!;
+      });
       const content = response.prefix + resolved;
       if (content === source) {
         context.pregnancyHandled = true;
