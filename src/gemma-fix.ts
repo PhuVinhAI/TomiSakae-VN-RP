@@ -15,7 +15,7 @@ const REPRODUCTIVE_REALITY_RULES = `- {{char}} MUST NOT default to preferring or
 
 // 1. CHUYÊN TRÁCH KHỞI ĐỘNG, TIẾP CẬN KHÔNG GIAN & CẤM ĐỐT CHÁY GIAI ĐOẠN
 const NSFW_INITIATION_RULES = `- When an intimate encounter begins, NEVER skip directly to penetration or instant sex; build through concrete physical stages: spatial positioning, tactile tension, gradual undressing, manual, oral, or other fitting foreplay, and pre-contact friction.
-- When initiating or changing approach, DIVERSIFY spatial approaches based on the environment, posture, and persona (cornering against walls, pinning to furniture, pulling from behind, stripping with resistance, neck/collarbone contact, finger or mouth teasing).
+- When initiating or changing approach, DIVERSIFY spatial approaches based on the environment, posture, and persona (cornering against walls, pinning to furniture, pulling from behind, stripping with resistance, neck/collarbone contact, finger or mouth teasing, or another fitting approach).
 - BAN repetitive default lap-straddling, groin-grinding shortcuts, or penetration that skips spatial escalation and concrete foreplay.`;
 
 // 2. CHUYÊN TRÁCH CƠ HỌC VA CHẠM, ĐA DẠNG KÍCH THÍCH & CHỦ ĐỘNG ĐỔI TƯ THẾ
