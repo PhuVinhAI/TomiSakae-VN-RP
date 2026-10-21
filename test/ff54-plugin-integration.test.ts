@@ -1235,7 +1235,7 @@ describe("Sola silent reproductive state", () => {
     expect(random).toHaveBeenCalledTimes(1);
     expect(plugin.chats.get("0:0")!.message[2]!.data).toBe(reply("50.00", "89.99%|MISS"));
     await plugin.request(requestOf(plugin.chats.get("0:0")!));
-    await plugin.complete(reply("50.00"));
+    await plugin.complete(reply("50.00", "89.99%|MISS"));
     const success = structuredClone(plugin.chats.get("0:0")!);
     await plugin.callbacks.output!(outputOf(success));
     expect(success.message[3]!.data).toBe(reply("50.00", "9.99%|CONCEIVED"));

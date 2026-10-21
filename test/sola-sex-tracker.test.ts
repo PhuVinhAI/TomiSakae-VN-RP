@@ -63,7 +63,10 @@ describe("Sola Sexual Context Tracker", () => {
       "use 0.00% to 100.00% with two decimal places and the % sign",
     );
     expect(module?.content).toContain("after its biological window ends");
-    expect(module?.content).toContain('fill "00.00%|MISS" or "00.00%|CONCEIVED"');
+    expect(module?.content).toContain(
+      'replacing previous results with "00.00%|MISS" or "00.00%|CONCEIVED"',
+    );
+    expect(module?.content).toContain("unless status already records CONCEIVED");
     expect(module?.content).toContain("NEVER generate that result yourself");
     expect(module?.content).not.toContain("cycle-timing knowledge");
     expect(module?.content).not.toContain("Tình trạng rủi ro:");
@@ -356,16 +359,24 @@ describe("silent pregnancy resolution", () => {
     const input = record(pregnancy("50.00%"));
     const miss = resolveSolaPregnancy(input, random);
     expect(miss).toBe(record(pregnancy("50.00%", "80.00%|MISS")));
-    const success = resolveSolaPregnancy(record(pregnancy("50.00%")), random);
+    const success = resolveSolaPregnancy(miss, random);
     expect(success).toBe(record(pregnancy("50.00%", "10.00%|CONCEIVED")));
     expect(resolveSolaPregnancy(success, random)).toBe(success);
     const progressed = record(
       `${pregnancy("50.00%", "10.00%|CONCEIVED")}\nPregnancy stage: Second trimester, week 16`,
     );
     expect(resolveSolaPregnancy(progressed, random)).toBe(progressed);
-    const legacy = record(pregnancy("50.00%", "Đã thụ thai"));
-    expect(resolveSolaPregnancy(legacy, random)).toBe(legacy);
     expect(random).toHaveBeenCalledTimes(2);
+  });
+
+  it("rerolls non-positive statuses instead of letting copied or invented text block resolution", () => {
+    const random = vi.fn(() => 0.75);
+    const statuses = [" ", "80.00%|MISS", "MISS", "75.00%", "Chưa thụ thai", "NOT_CONCEIVED"];
+    const input = record(statuses.map((status) => pregnancy("50.00%", status)).join("\n"));
+    expect(resolveSolaPregnancy(input, random)).toBe(
+      record(statuses.map(() => pregnancy("50.00%", "75.00%|MISS")).join("\n")),
+    );
+    expect(random).toHaveBeenCalledTimes(statuses.length);
   });
 
   it("ignores zero, out of range, malformed percentages and markup outside the tracker", () => {
