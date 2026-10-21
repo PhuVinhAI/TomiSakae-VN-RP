@@ -380,8 +380,8 @@ describe("Named presets in plugin UI and requests", () => {
         const user = request.find((message) => message.memo === "user-a")!.content;
         expect(user).toContain("## Character Integrity");
         expect(user).toContain("## User Agency");
-        expect(user).toContain("MUST NOT offer sex or readily accept sexual advances");
-        expect(user).toContain("User's desire, intent, or consent MUST NOT be assumed unless User clearly expresses it");
+        expect(user).toContain("MUST NOT offer or readily accept sex");
+        expect(user).toContain("User's desire, intent, or consent MUST require User's clear intent, words, or concrete actions");
         reloaded.toggle("gemma-fix").checked = false;
         await reloaded.toggle("gemma-fix").handlers.get("change")!();
         await reloaded.uiEvent("save");
