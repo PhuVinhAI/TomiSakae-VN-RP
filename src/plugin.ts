@@ -978,65 +978,33 @@ function syncRestoredStatesToRequest(
     const matchIndex = assistantHistory.findIndex((entry, index) => {
       if (used.has(index)) return false;
       const data = String(entry.data ?? "");
-      const swipeData =
-        Array.isArray(entry.swipes) &&
-        typeof entry.swipeId === "number" &&
-        typeof entry.swipes[entry.swipeId] === "string"
-          ? entry.swipes[entry.swipeId]!
-          : undefined;
-      const activeData = swipeData ?? data;
       if (familyOf(preset) === "sola") {
-        const snapshot = entry.solaHistory?.[solaHistorySwipeKey(entry.swipeId)];
-        const restoredSnapshot = snapshot
-          ? restoreSolaHistoryContent(snapshot.visible, snapshot)
-          : undefined;
-        if (
-          snapshot &&
-          (message.content === snapshot.visible || message.content === restoredSnapshot)
-        )
-          return true;
         if (
           message.memo !== undefined &&
           message.memo === entry.chatId &&
-          solaBody(message.content) === solaBody(activeData)
+          solaBody(message.content) === solaBody(data)
+        )
+          return true;
+        const snapshot = entry.solaHistory?.[solaHistorySwipeKey(entry.swipeId)];
+        if (
+          snapshot &&
+          (message.content === snapshot.visible ||
+            message.content === restoreSolaHistoryContent(snapshot.visible, snapshot))
         )
           return true;
       }
-      if (activeData === message.content) return true;
-      const state = extractInternalStateBlock(activeData);
-      return (
-        state !== undefined && activeData.replace(state, "").trimEnd() === message.content.trimEnd()
-      );
+      if (data === message.content) return true;
+      const state = extractInternalStateBlock(data);
+      return state !== undefined && data.replace(state, "").trimEnd() === message.content.trimEnd();
     });
     if (matchIndex < 0) return message;
     used.add(matchIndex);
-    const matchedEntry = assistantHistory[matchIndex];
-    const matchedSnapshot = matchedEntry?.solaHistory?.[solaHistorySwipeKey(matchedEntry.swipeId)];
-    const restored = matchedSnapshot
-      ? restoreSolaHistoryContent(matchedSnapshot.visible, matchedSnapshot)
-      : Array.isArray(matchedEntry?.swipes) &&
-          typeof matchedEntry.swipeId === "number" &&
-          typeof matchedEntry.swipes[matchedEntry.swipeId] === "string"
-        ? matchedEntry.swipes[matchedEntry.swipeId]!
-        : String(matchedEntry?.data ?? "");
-    const restoreTrackers =
-      matchedSnapshot !== undefined ||
-      (Array.isArray(matchedEntry?.swipes) &&
-        typeof matchedEntry.swipeId === "number" &&
-        typeof matchedEntry.swipes[matchedEntry.swipeId] === "string" &&
-        matchedEntry.swipes[matchedEntry.swipeId] !== String(matchedEntry.data ?? "") &&
-        /<(?:nsfw_nsfl_tracker|sex_tracker)\b/i.test(restored));
-    return restored && (restored !== message.content || restoreTrackers)
-      ? {
-          ...message,
-          ...(restored !== message.content ? { content: restored } : {}),
-          ...(restoreTrackers ? { vnRpRestoreSolaTrackers: true } : {}),
-        }
-      : message;
+    const restored = String(assistantHistory[matchIndex]?.data ?? "");
+    return restored && restored !== message.content ? { ...message, content: restored } : message;
   });
 }
 
-/** Serialize request updates with the background history restorer. */
+/** Serialize completed-output updates with the background history restorer. */
 function updateSavedHistory<T>(
   characterIndex: number,
   chatIndex: number,
@@ -1058,28 +1026,15 @@ function updateSavedHistory<T>(
   return current;
 }
 
-async function prepareRestoredRequest(
-  messages: ChatMessage[],
-  preset: FfPreset,
-  settings: FfGlobalSettings,
-  characterIndex: number,
-  chatIndex: number,
-): Promise<ChatMessage[]> {
-  return updateSavedHistory(characterIndex, chatIndex, async () => {
-    const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
-    return chat ? syncRestoredStatesToRequest(messages, chat, preset, settings) : messages;
-  });
-}
-
 async function cleanSavedHistory(
   settings: FfGlobalSettings,
   characterIndex: number,
   chatIndex: number,
   skipStreaming = false,
-): Promise<boolean> {
+): Promise<void> {
   const preset = sourceForSettings(settings);
   const chat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
-  if (!chat?.message?.length || (skipStreaming && chat.isStreaming)) return true;
+  if (!chat?.message?.length || (skipStreaming && chat.isStreaming)) return;
   const sourceSignature = savedHistorySignature(chat);
 
   const sourceMessages: ChatMessage[] = chat.message.map((message) => ({
@@ -1147,10 +1102,9 @@ async function cleanSavedHistory(
       (skipStreaming && latest.isStreaming) ||
       savedHistorySignature(latest) !== sourceSignature
     )
-      return false;
+      return;
     await Risuai.setChatToIndex(characterIndex, chatIndex, { ...chat, message });
   }
-  return true;
 }
 
 async function cleanSavedHistoryOnce(
@@ -1159,13 +1113,16 @@ async function cleanSavedHistoryOnce(
   chatIndex: number,
   skipStreaming = false,
 ): Promise<void> {
-  await updateSavedHistory(characterIndex, chatIndex, async () => {
-    // A host swipe/new-message write can land while the snapshot is being
-    // restored. Retry from the newest chat instead of sending a stale request.
-    for (let attempt = 0; attempt < 4; attempt += 1) {
-      if (await cleanSavedHistory(settings, characterIndex, chatIndex, skipStreaming)) return;
-    }
-  });
+  const key = editorChatKey(characterIndex, chatIndex);
+  if (!historyCleanups.has(key)) {
+    const current = cleanSavedHistory(settings, characterIndex, chatIndex, skipStreaming).finally(
+      () => {
+        if (historyCleanups.get(key) === current) historyCleanups.delete(key);
+      },
+    );
+    historyCleanups.set(key, current);
+  }
+  await historyCleanups.get(key);
 }
 
 let historyRestoreTimer: unknown;
@@ -1223,13 +1180,10 @@ const beforeRequest = async (messages: ChatMessage[], type: string): Promise<Cha
   if (!settings.enabled) return messages;
   const preset = sourceForSettings(settings);
   await cleanSavedHistoryOnce(settings, characterIndex, chatIndex);
-  const requestMessages = await prepareRestoredRequest(
-    messages,
-    preset,
-    settings,
-    characterIndex,
-    chatIndex,
-  );
+  const restoredChat = await Risuai.getChatFromIndex(characterIndex, chatIndex);
+  const requestMessages = restoredChat
+    ? syncRestoredStatesToRequest(messages, restoredChat, preset, settings)
+    : messages;
   const macroContext = await getHostMacroContext(character);
   const built = await buildRequestMessages(
     requestMessages,

@@ -53,8 +53,6 @@ export interface ChatMessage {
   vnRpGemmaFixSuffix?: string;
   /** Request-only record retained when rebuilding a request without raw tracker blocks. */
   vnRpNsfwTracker?: string;
-  /** Internal request marker: retain restored Sola trackers during a reroll/swipe. */
-  vnRpRestoreSolaTrackers?: boolean;
   [key: string]: unknown;
 }
 
@@ -1058,8 +1056,7 @@ export function applyPromptRegexToMessages(
     if (
       settings.solaNsfwTrackerEnabled &&
       familyOf(preset) === "sola" &&
-      placement === PLACEMENT_AI_OUTPUT &&
-      message.vnRpRestoreSolaTrackers !== true
+      placement === PLACEMENT_AI_OUTPUT
     )
       content = expireSolaNsfwTracker(content, solaDepths?.get(message), (offset, text) =>
         options.onHistoryRemoval?.(message, offset, text),
@@ -1067,8 +1064,7 @@ export function applyPromptRegexToMessages(
     if (
       settings.solaSexTrackerEnabled &&
       familyOf(preset) === "sola" &&
-      placement === PLACEMENT_AI_OUTPUT &&
-      message.vnRpRestoreSolaTrackers !== true
+      placement === PLACEMENT_AI_OUTPUT
     )
       content = expireSolaSexTracker(content, solaDepths?.get(message), (offset, text) =>
         options.onHistoryRemoval?.(message, offset, text),
@@ -1172,11 +1168,6 @@ export async function buildRequestMessages(
       }
     }
   }
-  const requestHistoryWithoutInternalMarkers = historyWithPrompts.map((message) => {
-    const publicMessage = { ...message };
-    delete publicMessage.vnRpRestoreSolaTrackers;
-    return publicMessage;
-  });
   return [
     ...composed.leading,
     ...(settings.vietnameseOutputEnabled
@@ -1188,7 +1179,7 @@ export async function buildRequestMessages(
           },
         ]
       : []),
-    ...requestHistoryWithoutInternalMarkers,
+    ...historyWithPrompts,
     ...composed.trailing,
     ...(nsfwPatternBan
       ? [

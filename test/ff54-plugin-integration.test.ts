@@ -791,7 +791,7 @@ describe("Sola saved-history restoration", () => {
     },
   );
 
-  it("waits for an in-flight history revert before building a new request", async () => {
+  it("reuses an in-flight history cleanup without starting an extra cleanup pass", async () => {
     vi.useFakeTimers();
     const plugin = await startPlugin(solaStore(), false, undefined, true);
     let release!: () => void;
@@ -805,14 +805,13 @@ describe("Sola saved-history restoration", () => {
         await revertFinished;
         await setChat(character, chat, data);
       });
+    const getChatSpy = vi.spyOn(plugin.api, "getChatFromIndex");
     try {
       const chat: SavedChat = { id: "chat-a", message: history(2) };
       chat.message[1]!.data = `<think>Khôi phục.</think>\n${chat.message[1]!.data}`;
       plugin.chats.set("0:0", chat);
       plugin.selectChat(0);
 
-      // Start the polling revert, then immediately request a new response as
-      // PocketRisu does when a swipe/new branch is submitted.
       await vi.advanceTimersByTimeAsync(250);
       expect(setChatSpy).toHaveBeenCalledTimes(1);
 
@@ -825,13 +824,39 @@ describe("Sola saved-history restoration", () => {
       await Promise.resolve();
       expect(settled).toBe(false);
 
+      const readsBeforeRelease = getChatSpy.mock.calls.length;
       release();
       await pending;
       expect(settled).toBe(true);
+      // Only request synchronization and output-listener context read the chat again.
+      expect(getChatSpy).toHaveBeenCalledTimes(readsBeforeRelease + 2);
       expect(plugin.chats.get("0:0")!.message[1]!.data).not.toContain("<think>");
     } finally {
       release();
       setChatSpy.mockRestore();
+      getChatSpy.mockRestore();
+      await plugin.callbacks.unload!();
+    }
+  });
+
+  it("leaves concurrent host changes for the next cleanup instead of retrying in the request", async () => {
+    const plugin = await startPlugin(solaStore());
+    const chat: SavedChat = { id: "chat-a", message: history(4) };
+    plugin.chats.set("0:0", chat);
+    const getChat = plugin.api.getChatFromIndex;
+    let reads = 0;
+    const getChatSpy = vi
+      .spyOn(plugin.api, "getChatFromIndex")
+      .mockImplementation(async (character, index) => {
+        if (++reads === 2) plugin.chats.get("0:0")!.message.at(-1)!.data += " Host edit.";
+        return getChat(character, index);
+      });
+    try {
+      await plugin.request(requestOf(chat));
+      expect(plugin.writes).not.toHaveBeenCalled();
+      expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toContain("Host edit.");
+    } finally {
+      getChatSpy.mockRestore();
       await plugin.callbacks.unload!();
     }
   });
@@ -954,7 +979,7 @@ describe("Sola saved-history restoration", () => {
     expect(reloaded.chats.get("0:0")!.message[1]!.data).toBe(reply(0));
   });
 
-  it("restores a rerolled response's sex tracker while removing its raw NSFW tracker from the request", async () => {
+  it("applies normal tracker expiry to rerolled responses outside the retained window", async () => {
     const store = solaStore();
     store.presets[0]!.settings.solaNsfwTrackerEnabled = true;
     store.presets[0]!.settings.solaSexTrackerEnabled = true;
@@ -983,7 +1008,8 @@ describe("Sola saved-history restoration", () => {
     const rerolledRequest = await plugin.request(requestOf(cleaned));
     const rerolledResponse = rerolledRequest.find((message) => message.memo === "sola-a-0");
     expect(rerolledResponse?.content).not.toContain("<nsfw_nsfl_tracker>");
-    expect(rerolledResponse?.content).toContain("<sex_tracker>");
+    expect(rerolledResponse?.content).not.toContain("<sex_tracker>");
+    expect(rerolledResponse?.content).toContain("bản swipe mới.");
     expect(rerolledRequest.some((message) => message.memo?.endsWith(":nsfw-pattern-ban"))).toBe(
       false,
     );
