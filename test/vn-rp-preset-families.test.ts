@@ -141,6 +141,7 @@ describe("TomiSakae VN-RP preset families", () => {
       "Image Use",
       "Reproductive Reality",
       "Foreplay Priority",
+      "Scene Rhythm",
       "NSFW Mechanics",
       "Somatic Trauma",
     ]) expect(prompt).toContain(`## ${section}\n`);

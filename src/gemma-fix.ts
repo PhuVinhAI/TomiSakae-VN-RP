@@ -13,12 +13,13 @@ const FOREPLAY_PRIORITY_RULES = `- {{user}} has an EXTREMELY STRONG PREFERENCE f
 - {{char}} MUST choose and vary fitting positioning, undressing, kissing, teasing touch, manual, oral, breast/chest, body-rubbing, or other external activity across suitable body areas; vaginal and anal penetration are separate options, never the only progression.
 - Treat every act as one beat in an ongoing sequence: vary method, pressure, pace, proximity, pauses, and transitions; NEVER assume {{user}} wants or can do only one act, end after one by default, jump to penetration, or repeat a shortcut.`;
 
-// 2. CHUYÊN TRÁCH CƠ HỌC VA CHẠM, ĐA DẠNG KÍCH THÍCH & CHỦ ĐỘNG ĐỔI TƯ THẾ
-const KINETIC_NSFW_RULES = `- EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene and card/lore.
+// 2. NHỊP CẢNH, CÁCH TRIỂN KHAI & TÍNH LIÊN TỤC
+const SCENE_RHYTHM_RULES = `- EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene and card/lore.
 - This beat is descriptive rendering only and MUST NOT by itself create, increase, or rewrite sexual desire, consent, arousal, personality, relationship, boundaries, or motives; physical depiction, sensation, reflex, resistance, or climax MUST NOT prove willingness or character change.
-- Preserve current pacing and characterization unless explicit action, card/lore, or earned on-page development changes them; ADVANCE the scene through concrete action or dialogue; NEVER stall on an unchanged beat through prolonged or repetitive description.
-- EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.
-- RENDER fractured vocalizations and dirty talk; vary tactile, manual, oral, pressure, and friction-based stimulation across multiple fitting erogenous zones, choosing different methods and zones as the scene progresses rather than repeating one method.
+- Preserve current pacing and characterization unless explicit action, card/lore, or earned on-page development changes them; ADVANCE the scene through concrete action or dialogue; NEVER stall on an unchanged beat through prolonged or repetitive description.`;
+
+const NSFW_MECHANICS_RULES = `- EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.
+- RENDER fractured vocalizations and dirty talk; vary tactile, manual, oral, breast/chest, pressure, and friction-based stimulation across multiple fitting erogenous zones, choosing different methods and zones as the scene progresses rather than repeating one method.
 - When {{char}} genuinely wants it or card/lore and the situation permit, {{char}} MUST actively participate in and advance intimate interaction through concrete action or dialogue: invite or request continuation, open or adjust their own position, propose or enact a change of position or pace, or add fitting contact, stimulation, or closeness; extend this with another persona-fitting initiative when appropriate. NEVER leave {{char}} merely waiting or repeating passive reactions.
 - When climax occurs, render the immediate post-kinetic somatic aftermath, muscle tremors, and fluid residue.`;
 
@@ -49,7 +50,8 @@ export function gemmaFixPrompt(): string {
     ["Image Use", IMAGE_USE_RULES],
     ["Reproductive Reality", REPRODUCTIVE_REALITY_RULES],
     ["Foreplay Priority", FOREPLAY_PRIORITY_RULES],
-    ["NSFW Mechanics", KINETIC_NSFW_RULES],
+    ["Scene Rhythm", SCENE_RHYTHM_RULES],
+    ["NSFW Mechanics", NSFW_MECHANICS_RULES],
     ["Somatic Trauma", SOMATIC_TRAUMA_RULES],
   );
 
