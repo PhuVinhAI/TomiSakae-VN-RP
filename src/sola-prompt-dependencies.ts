@@ -175,7 +175,7 @@ export function adaptSolaHudDependencies(content: string, modules: ReadonlySet<s
     ["mod_track_arrow", "arrow"],
     ["mod_track_omen", "omen"],
     ["mod_track_dossier", "scene_state"],
-    ["mod_track_nsfw", "nsfw_nsfl_ban_list"],
+    ["mod_track_nsfw", "nsfw_nsfl_tracker"],
     ["mod_track_sex", "sex_tracker"],
   ];
   const tags = trackerTags.filter(([key]) => modules.has(key)).map(([, tag]) => `<${tag}>`);

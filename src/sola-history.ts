@@ -28,10 +28,10 @@ const SAVER_TAGS: Readonly<Record<string, string>> = {
   "Sola Saver: Tempo": "tempo",
   "Sola Saver: Showrunner HUD": "sola_hud",
   "Sola Saver: Master Telemetry (All Trackers)":
-    "fengine|wardrobe|inventory|scene_cast|scene_state|cabinet|arrow|omen|date|story_notes|solatag|char_matrix|nsfw_nsfl_ban_list|sex_tracker",
+    "fengine|wardrobe|inventory|scene_cast|scene_state|cabinet|arrow|omen|date|story_notes|solatag|char_matrix|nsfw_nsfl_tracker|sex_tracker",
 };
 const TRACKER_TAGS =
-  "sola_hud|fengine|thought_engine|wardrobe|inventory|scene_cast|scene_state|bond|date|story_notes|solatag|char_matrix|tempo|cabinet|arrow|omen|nsfw_nsfl_ban_list|sex_tracker|scene_header";
+  "sola_hud|fengine|thought_engine|wardrobe|inventory|scene_cast|scene_state|bond|date|story_notes|solatag|char_matrix|tempo|cabinet|arrow|omen|nsfw_nsfl_tracker|sex_tracker|scene_header";
 
 /** Keep native saver scope/depth; stop a broken block at the next boundary. */
 export function adaptSolaSaver(script: FfRegexScript): FfRegexScript {

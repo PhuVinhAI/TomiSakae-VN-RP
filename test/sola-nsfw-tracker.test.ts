@@ -24,7 +24,7 @@ beforeAll(async () => {
   ff54 = sources.ff54.preset;
 });
 
-const tracker = (name: string, pattern: string) => `<nsfw_nsfl_ban_list>
+const tracker = (name: string, pattern: string) => `<nsfw_nsfl_tracker>
 Description patterns: ${pattern}
 Sensory emphasis: warm skin
 Initiation/Foreplay:
@@ -38,7 +38,7 @@ Dialogue patterns:
 
 Moans/Vocal reactions:
 [${name}]: breath catching
-</nsfw_nsfl_ban_list>`;
+</nsfw_nsfl_tracker>`;
 
 describe("Sola NSFW Tracker", () => {
   it("is off by default, normalizes saved state, and injects only for Sola", async () => {
@@ -73,7 +73,7 @@ describe("Sola NSFW Tracker", () => {
       "Concrete bodily reflex, defensive posture or action, persona-true behavior, or immediate survival drive used this turn",
     );
     expect(module?.content?.match(/\[Tên nhân vật\]:/g)).toHaveLength(5);
-    expect(module?.content).not.toContain("<nsfw_nsfl_ban_list>\n[Tên nhân vật]:");
+    expect(module?.content).not.toContain("<nsfw_nsfl_tracker>\n[Tên nhân vật]:");
     expect(module?.content).toContain("Distinct NSFW descriptive constructions used this turn");
     expect(module?.content).toContain(
       "preserving concrete wording, structure, rhythm, and character association",
@@ -85,11 +85,11 @@ describe("Sola NSFW Tracker", () => {
     const storyReview = composed.absolute.find((message) =>
       message.content.includes("## Story Review"),
     );
-    expect(storyReview?.content).toContain("Telemetry (<nsfw_nsfl_ban_list>)");
+    expect(storyReview?.content).toContain("Telemetry (<nsfw_nsfl_tracker>)");
     expect(
       composed.absolute.find((message) => message.content.includes("## Showrunner Master HUD"))
         ?.content,
-    ).toContain("<nsfw_nsfl_ban_list>");
+    ).toContain("<nsfw_nsfl_tracker>");
 
     const showrunnerIndex = composed.absolute.findIndex((message) =>
       message.content.includes("## Showrunner Master HUD"),
@@ -111,7 +111,7 @@ describe("Sola NSFW Tracker", () => {
     const ff = await composePresetPrompts(ff54, other, async (value) => value);
     expect(
       [...ff.leading, ...ff.trailing].some((message) =>
-        message.content.includes("nsfw_nsfl_ban_list"),
+        message.content.includes("nsfw_nsfl_tracker"),
       ),
     ).toBe(false);
   });
@@ -139,7 +139,7 @@ describe("Sola NSFW Tracker", () => {
       settings.promptEnabled[id] = true;
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
     const reminder =
-      "Telemetry (<nsfw_nsfl_ban_list>): Record ONLY patterns actually written above in THIS response";
+      "Telemetry (<nsfw_nsfl_tracker>): Record ONLY patterns actually written above in THIS response";
     expect(composed.absolute.filter((message) => message.content.includes(reminder))).toHaveLength(
       2,
     );
@@ -176,7 +176,7 @@ describe("Sola NSFW Tracker", () => {
       { role: "user", content: "Lượt hiện tại." },
     ];
     const first = applyPromptRegexToMessages(messages, sola, settings);
-    expect(first[0]!.content).not.toContain("<nsfw_nsfl_ban_list>");
+    expect(first[0]!.content).not.toContain("<nsfw_nsfl_tracker>");
     expect(first[2]!.content).toContain("mẫu mới");
     const repeated = applyPromptRegexToMessages(
       [...messages, { role: "user", content: "OOC." }],
@@ -190,7 +190,7 @@ describe("Sola NSFW Tracker", () => {
       sola,
       settings,
     );
-    expect(afterNextResponse[2]!.content).not.toContain("<nsfw_nsfl_ban_list>");
+    expect(afterNextResponse[2]!.content).not.toContain("<nsfw_nsfl_tracker>");
   });
 
   it("archives expired tracker text for branch and swipe restoration", () => {
@@ -274,7 +274,7 @@ describe("Sola NSFW Tracker", () => {
       },
     });
     const assistants = built.filter((message) => message.role === "assistant");
-    expect(assistants.every((message) => !message.content.includes("<nsfw_nsfl_ban_list>"))).toBe(
+    expect(assistants.every((message) => !message.content.includes("<nsfw_nsfl_tracker>"))).toBe(
       true,
     );
     expect(assistants.at(-1)?.content).toContain("<sex_tracker>Trạng thái hiện tại</sex_tracker>");
@@ -407,14 +407,14 @@ describe("Sola NSFW Tracker", () => {
       );
       expect(request.some((message) => message.memo?.endsWith(":nsfw-pattern-ban"))).toBe(false);
       expect(request.find((message) => message.memo === "host-response")?.content).toContain(
-        "<nsfw_nsfl_ban_list>",
+        "<nsfw_nsfl_tracker>",
       );
     }
   });
 
   it("extracts open trackers without swallowing another tracker and wraps localized items without treating None as a pattern", () => {
     const raw =
-      "<sola_hud><nsfw_nsfl_ban_list>Tiếp cận/Dạo đầu: chậm rồi ngắt\nPhản ứng thân thể / Hành động NSFL:\n[Nana]: Không có<sex_tracker>Giữ lại</sex_tracker></sola_hud>";
+      "<sola_hud><nsfw_nsfl_tracker>Tiếp cận/Dạo đầu: chậm rồi ngắt\nPhản ứng thân thể / Hành động NSFL:\n[Nana]: Không có<sex_tracker>Giữ lại</sex_tracker></sola_hud>";
     const extracted = splitSolaNsfwTracker(raw);
     expect(extracted.content).toBe("<sola_hud><sex_tracker>Giữ lại</sex_tracker></sola_hud>");
     const ban = solaNsfwPatternBanPrompt(extracted.patterns);
