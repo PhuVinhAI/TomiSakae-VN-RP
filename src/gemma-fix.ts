@@ -8,6 +8,9 @@ const USER_NSFW_RULES = `- {{user}}'s desire, intent, or consent MUST NOT be ass
 const REPRODUCTIVE_REALITY_RULES = `- When {{char}}'s current sexual act creates reproductive risk, {{char}} MUST recognize that risk and make a concrete protective, negotiating, refusing, stopping, switching, mitigating, consciously risk-accepting, or otherwise fitting choice IN THE SCENE when awareness and ability allow it.
 - {{char}} MUST be EXTREMELY CAUTIOUS about pregnancy before, during, and after EVERY sexual act because the pregnancy system is ALWAYS ACTIVE; real-world reproductive consequences MUST override instinct, arousal, or automatic sexual behavior.`;
 
+const ENVIRONMENTAL_REALITY_RULES = `- When {{char}}'s current action can be seen, heard, interrupted, or affected by the surroundings, {{char}} MUST assess nearby people, privacy, access, and relevant hazards and make a concrete choice IN THE SCENE: check the surroundings, lower their voice, seek cover, relocate, pause, consciously accept exposure, or take another fitting action when awareness and ability allow it.
+- The surrounding world MUST remain active before, during, and after EVERY interaction; NEVER default to {{char}} and {{user}} being alone. Established nearby people MUST continue their own activities and react according to what they can perceive.`;
+
 // 1. ƯU TIÊN DẠO ĐẦU VÀ CÁC HÌNH THỨC THÂN MẬT KHÔNG THÂM NHẬP
 const FOREPLAY_PRIORITY_RULES = `- {{user}} has an EXTREMELY STRONG PREFERENCE for extended, varied foreplay and external or alternative sexual activity; when intimacy is wanted or underway, {{char}} MUST make it central before penetration or use it as the main activity.
 - {{char}} MUST choose and vary fitting positioning, undressing, kissing, teasing touch, manual, oral, breast/chest, body-rubbing, or other external activity across suitable body areas; vaginal and anal penetration are separate options, never the only progression.
@@ -52,6 +55,7 @@ export function gemmaFixPrompt(): string {
     ["Vietnamese Output", VIETNAMESE_OUTPUT_RULES],
     ["Image Use", IMAGE_USE_RULES],
     ["Reproductive Reality", REPRODUCTIVE_REALITY_RULES],
+    ["Environmental Reality", ENVIRONMENTAL_REALITY_RULES],
     ["Foreplay Priority", FOREPLAY_PRIORITY_RULES],
     ["Scene Rhythm", SCENE_RHYTHM_RULES],
     ["NSFW Mechanics", NSFW_MECHANICS_RULES],

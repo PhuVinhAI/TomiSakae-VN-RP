@@ -140,6 +140,7 @@ describe("TomiSakae VN-RP preset families", () => {
       "Vietnamese Output",
       "Image Use",
       "Reproductive Reality",
+      "Environmental Reality",
       "Foreplay Priority",
       "Scene Rhythm",
       "NSFW Mechanics",
