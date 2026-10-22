@@ -51,9 +51,9 @@ describe("Sola Sexual Context Tracker", () => {
     expect(module?.content).toContain(
       "Bao cao su, biện pháp tránh thai, thuốc tránh thai khẩn cấp, xuất ngoài",
     );
-    expect(module?.content).toContain("simulate the objective cycle separately");
-    expect(module?.content).toContain("record {{char}}'s awareness, applicable consequences");
-    expect(module?.content).toContain("fill gaps plausibly and consistently");
+    expect(module?.content).toContain("Always simulate the objective biological menstrual cycle");
+    expect(module?.content).toContain("record that awareness and choice");
+    expect(module?.content).toContain("choose the most plausible development and keep it consistent");
     expect(module?.content).toContain("Khả năng và trạng thái mang thai:");
     expect(module?.content).toContain("Giai đoạn thai kỳ:");
     expect(module?.content).toContain('<pregnancy chance="00.00%" status="" />');
@@ -141,10 +141,10 @@ describe("Sola Sexual Context Tracker", () => {
       expect(prompt).not.toContain(
         "NEVER treat {{user}}'s silence, lack of action, hesitation, or non-resistance as consent or acceptance of risky sex",
       );
-      expect(prompt).toContain("record {{char}}'s awareness, applicable consequences");
-      expect(prompt).toContain("concrete choice IN THE SCENE");
+      expect(prompt).toContain("record that awareness and choice");
+      expect(prompt).toContain("what concrete choice or response follows IN THE SCENE");
       expect(prompt).toContain(
-        "Limit knowledge ONLY by concrete evidence of missing knowledge or impaired cognition",
+        "Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition",
       );
       expect(prompt).toContain("NEVER invent ignorance to bypass consequences");
       expect(prompt).toContain('Carry forward the recorded hit count in status as "1/3" or "2/3"');

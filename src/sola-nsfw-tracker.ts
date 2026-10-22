@@ -49,8 +49,10 @@ ${labels.nsfl}:
 </nsfw_nsfl_tracker>
 
 Rules:
-- Record EVERY distinct pattern actually written in THIS response ONLY, preserving concrete wording, structure, rhythm, and character association; IGNORE earlier responses, trackers, and history; NEVER invent, summarize, collapse, or omit used patterns. Record NSFL only when it occurs; otherwise write ${vietnamese ? "Không có" : "None"}.
+- Record ONLY patterns actually written in THIS response; ignore all earlier responses, trackers, and history. Include their concrete wording, structures, and rhythms. Do not invent entries.
 - Record shared description and sensory patterns once within a SINGLE <nsfw_nsfl_tracker>. Under each character-specific heading, write one [Character]: pattern line per active character.
+- For NSFL scenes, record the concrete bodily reflex, defensive action, persona-true behavior, or immediate survival drive actually used this turn in ${labels.nsfl}, one line per character.
+- For each pattern-bearing field, record EVERY distinct pattern actually used this turn, preserving concrete wording, structure, rhythm, and character association; NEVER collapse multiple patterns into a generic summary or omit a used pattern. Record NSFL only when it occurs, otherwise write ${vietnamese ? "Không có" : "None"} in the NSFL field.
 `;
 }
 
@@ -87,7 +89,8 @@ export function solaNsfwPatternBanPrompt(patterns: string): string {
   }
   if (!items.length) return "";
   return `## NSFW/NSFL Pattern Ban
-- In the next generated response and tracker, treat EVERY recorded item below as an ABSOLUTE WRITING BAN: NEVER reuse, closely paraphrase, synonym-swap, or copy its wording, structure, rhythm, pacing, or reaction pattern; replace each with a new compatible construction.
+- In the next generated response, treat EVERY recorded item below as an ABSOLUTE WRITING BAN: do not reuse its wording, structure, rhythm, pacing, or reaction pattern; replace it with a new compatible construction.
+- NEVER repeat, closely paraphrase, synonym-swap, or copy any recorded pattern into the new response or tracker.
 
 ${items.join("\n\n")}`;
 }

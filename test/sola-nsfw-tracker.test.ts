@@ -52,11 +52,11 @@ describe("Sola NSFW Tracker", () => {
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
     const module = composed.absolute.find((message) => message.memo?.endsWith(":nsfw-tracker"));
     expect(module?.content).toContain(
-      "Record EVERY distinct pattern actually written in THIS response",
+      "Record ONLY patterns actually written in THIS response",
     );
     expect(module?.content).not.toContain("ABSOLUTE");
     expect(module?.content).not.toContain("next response");
-    expect(module?.content).toContain("IGNORE earlier responses, trackers, and history");
+    expect(module?.content).toContain("ignore all earlier responses, trackers, and history");
     expect(module?.content).not.toContain("previous tracker");
     expect(module?.content).not.toContain("Overwrite");
     expect(module?.content).toContain("Cách miêu tả:");
@@ -78,8 +78,11 @@ describe("Sola NSFW Tracker", () => {
     expect(module?.content).toContain(
       "preserving concrete wording, structure, rhythm, and character association",
     );
-    expect(module?.content).toContain("NEVER invent, summarize, collapse, or omit used patterns");
-    expect(module?.content).toContain("Record NSFL only when it occurs; otherwise write Không có");
+    expect(module?.content).toContain("Do not invent entries");
+    expect(module?.content).toContain(
+      "NEVER collapse multiple patterns into a generic summary or omit a used pattern",
+    );
+    expect(module?.content).toContain("Record NSFL only when it occurs, otherwise write Không có");
     expect(module?.content).not.toContain("Omit the tracker when no NSFW content occurs");
     expect(module?.content).toContain("Located inside of '<sola_hud>' tags, append:");
     const storyReview = composed.absolute.find((message) =>
@@ -284,11 +287,11 @@ describe("Sola NSFW Tracker", () => {
     expect(ban.role).toBe("system");
     expect(ban.content).toContain("ABSOLUTE WRITING BAN");
     expect(ban.content).toContain("In the next generated response");
-    expect(ban.content).toContain("In the next generated response and tracker");
+    expect(ban.content).toContain("into the new response or tracker");
     expect(ban.content).toContain(
-      "NEVER reuse, closely paraphrase, synonym-swap, or copy its wording, structure, rhythm, pacing, or reaction pattern",
+      "NEVER repeat, closely paraphrase, synonym-swap, or copy any recorded pattern",
     );
-    expect(ban.content).toContain("replace each with a new compatible construction");
+    expect(ban.content).toContain("replace it with a new compatible construction");
     expect(ban.content).not.toMatch(/RESTRUCTURE|response layout|block order/);
     expect(ban.content).toContain("Description patterns: mẫu mới");
     expect(ban.content).toContain("Initiation/Foreplay:\n[Nana]: gradual undressing");
