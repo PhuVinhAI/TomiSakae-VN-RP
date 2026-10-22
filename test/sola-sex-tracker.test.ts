@@ -65,7 +65,7 @@ describe("Sola Sexual Context Tracker", () => {
     );
     expect(module?.content).toContain("after its biological window ends");
     expect(module?.content).toContain(
-      'replacing previous results with "00.00%|MISS" or "00.00%|CONCEIVED"',
+      '"00.00%|HIT|n/3", "00.00%|MISS|n/3", or "00.00%|CONCEIVED|3/3"',
     );
     expect(module?.content).toContain("unless status already records CONCEIVED");
     expect(module?.content).toContain("NEVER generate that result yourself");
@@ -147,11 +147,13 @@ describe("Sola Sexual Context Tracker", () => {
         "Limit knowledge ONLY by concrete evidence of missing knowledge or impaired cognition",
       );
       expect(prompt).toContain("NEVER invent ignorance to bypass consequences");
-      expect(prompt).toContain('After a MISS, return status="" EACH turn');
+      expect(prompt).toContain('Carry forward the recorded hit count in status as "1/3" or "2/3"');
+      expect(prompt).toContain("even after a MISS; NEVER increment it yourself");
+      expect(prompt).toContain("ONLY 3 cumulative hits confirm conception");
       expect(prompt).toContain(
-        'Clear status to "" and set chance to "0.00%" ONLY after effective prevention before conception',
+        'Before conception, reset status to "" and chance to "0.00%" when the exposure window ends or suitable prevention/actions avert conception',
       );
-      expect(prompt).toContain("a clear physical/situational event ends the pregnancy");
+      expect(prompt).toContain("clear CONCEIVED ONLY when a concrete RP event ends pregnancy");
       expect(prompt).toContain("otherwise maintain its progression");
       expect(prompt).toContain(
         vietnamese ? "tam cá nguyệt một/hai/ba" : "first/second/third trimester",
@@ -306,7 +308,7 @@ describe("Sola Sexual Context Tracker", () => {
       settings.solaSexTrackerEnabled = true;
       settings.vietnameseOutputEnabled = vietnamese;
       const displayed = applyRegexScripts(
-        '<sex_tracker>\n[Nana]:\nPregnancy likelihood/status: <pregnancy chance="25.00%" status="" />\n[Mina]:\nPregnancy likelihood/status: <pregnancy chance="18.50%" status="12.34%|CONCEIVED" />\nPregnancy stage: Tuần 14 <script>\n[Lina]:\nPregnancy likelihood/status: <pregnancy chance="10.00%" status="45.34%|MISS" />\n</sex_tracker>',
+        '<sex_tracker>\n[Nana]:\nPregnancy likelihood/status: <pregnancy chance="25.00%" status="" />\n[Mina]:\nPregnancy likelihood/status: <pregnancy chance="18.50%" status="12.34%|CONCEIVED|3/3" />\nPregnancy stage: Tuần 14 <script>\n[Lina]:\nPregnancy likelihood/status: <pregnancy chance="10.00%" status="45.34%|MISS|1/3" />\n[Ana]:\nPregnancy likelihood/status: <pregnancy chance="25.00%" status="12.34%|HIT|2/3" />\n[Mai]:\nPregnancy likelihood/status: <pregnancy chance="10.00%" status="1/3" />\n</sex_tracker>',
         sola,
         settings,
         { placement: PLACEMENT_AI_OUTPUT, markdown: true, depth: 0 },
@@ -315,13 +317,20 @@ describe("Sola Sexual Context Tracker", () => {
         `${vietnamese ? "Xác suất" : "Chance"}: 25.00% · ${vietnamese ? "Chưa có kết quả" : "No result"}`,
       );
       expect(displayed).toContain(
-        `18.50% · Roll: 12.34% - ${vietnamese ? "Đã thụ thai" : "Conceived"}`,
+        `18.50% · Roll: 12.34% - ${vietnamese ? "Đã thụ thai" : "Conceived"} (3/3)`,
       );
       expect(displayed).toContain(
-        `10.00% · Roll: 45.34% - ${vietnamese ? "Chưa thụ thai" : "No conception"}`,
+        `10.00% · Roll: 45.34% - ${vietnamese ? "Chưa thụ thai" : "No conception"} (1/3)`,
+      );
+      expect(displayed).toContain(
+        `25.00% · Roll: 12.34% - ${vietnamese ? "Trúng, chưa thụ thai" : "Hit, not yet conceived"} (2/3)`,
+      );
+      expect(displayed).toContain(
+        `10.00% · ${vietnamese ? "Chưa thụ thai" : "No conception"} (1/3)`,
       );
       expect(displayed).not.toContain("|CONCEIVED");
       expect(displayed).not.toContain("|MISS");
+      expect(displayed).not.toContain("|HIT");
       expect(displayed).toContain(
         `${vietnamese ? "Giai đoạn thai kỳ" : "Pregnancy stage"}:</span> Tuần 14 &lt;script&gt;`,
       );
@@ -340,24 +349,69 @@ describe("silent pregnancy resolution", () => {
     const random = vi.fn().mockReturnValueOnce(0.1).mockReturnValueOnce(0.75);
     const input = record(`[Nana]:\n${pregnancy("25.00%")}\n[Mina]:\n${pregnancy("70.00%")}`);
     const output = resolveSolaPregnancy(input, random);
-    expect(output).toContain(`[Nana]:\n${pregnancy("25.00%", "10.00%|CONCEIVED")}`);
-    expect(output).toContain(`[Mina]:\n${pregnancy("70.00%", "75.00%|MISS")}`);
+    expect(output).toContain(`[Nana]:\n${pregnancy("25.00%", "10.00%|HIT|1/3")}`);
+    expect(output).toContain(`[Mina]:\n${pregnancy("70.00%", "75.00%|MISS|0/3")}`);
     expect(random).toHaveBeenCalledTimes(2);
   });
 
-  it("tries again after a miss and preserves success and pregnancy progression", () => {
-    const random = vi.fn().mockReturnValueOnce(0.8).mockReturnValueOnce(0.1);
+  it("accumulates three hits across misses and preserves conception and pregnancy progression", () => {
+    const random = vi
+      .fn()
+      .mockReturnValueOnce(0.8)
+      .mockReturnValueOnce(0.1)
+      .mockReturnValueOnce(0.9)
+      .mockReturnValueOnce(0.2)
+      .mockReturnValueOnce(0.3);
     const input = record(pregnancy("50.00%"));
     const miss = resolveSolaPregnancy(input, random);
-    expect(miss).toBe(record(pregnancy("50.00%", "80.00%|MISS")));
-    const success = resolveSolaPregnancy(miss, random);
-    expect(success).toBe(record(pregnancy("50.00%", "10.00%|CONCEIVED")));
+    expect(miss).toBe(record(pregnancy("50.00%", "80.00%|MISS|0/3")));
+    const firstHit = resolveSolaPregnancy(miss, random);
+    expect(firstHit).toBe(record(pregnancy("50.00%", "10.00%|HIT|1/3")));
+    const laterMiss = resolveSolaPregnancy(firstHit, random);
+    expect(laterMiss).toBe(record(pregnancy("50.00%", "90.00%|MISS|1/3")));
+    const secondHit = resolveSolaPregnancy(laterMiss, random);
+    expect(secondHit).toBe(record(pregnancy("50.00%", "20.00%|HIT|2/3")));
+    const success = resolveSolaPregnancy(secondHit, random);
+    expect(success).toBe(record(pregnancy("50.00%", "30.00%|CONCEIVED|3/3")));
     expect(resolveSolaPregnancy(success, random)).toBe(success);
     const progressed = record(
-      `${pregnancy("50.00%", "10.00%|CONCEIVED")}\nPregnancy stage: Second trimester, week 16`,
+      `${pregnancy("50.00%", "30.00%|CONCEIVED|3/3")}\nPregnancy stage: Second trimester, week 16`,
     );
     expect(resolveSolaPregnancy(progressed, random)).toBe(progressed);
-    expect(random).toHaveBeenCalledTimes(2);
+    expect(random).toHaveBeenCalledTimes(5);
+  });
+
+  it("continues independent counts copied by the AI and preserves legacy confirmed pregnancies", () => {
+    const random = vi.fn(() => 0.1);
+    const input = record(
+      [
+        pregnancy("50.00%", "1/3"),
+        pregnancy("50.00%", "2/3"),
+        pregnancy("50.00%", "70.00%|MISS|1/3"),
+        pregnancy("50.00%", "10.00%|CONCEIVED"),
+      ].join("\n"),
+    );
+    expect(resolveSolaPregnancy(input, random)).toBe(
+      record(
+        [
+          pregnancy("50.00%", "10.00%|HIT|2/3"),
+          pregnancy("50.00%", "10.00%|CONCEIVED|3/3"),
+          pregnancy("50.00%", "10.00%|HIT|2/3"),
+          pregnancy("50.00%", "10.00%|CONCEIVED"),
+        ].join("\n"),
+      ),
+    );
+    expect(random).toHaveBeenCalledTimes(3);
+  });
+
+  it("pauses at zero chance and starts a fresh count after an explicit reset", () => {
+    const random = vi.fn(() => 0);
+    const paused = record(pregnancy("0.00%", "2/3"));
+    expect(resolveSolaPregnancy(paused, random)).toBe(paused);
+    expect(random).not.toHaveBeenCalled();
+    expect(resolveSolaPregnancy(record(pregnancy("50.00%")), random)).toBe(
+      record(pregnancy("50.00%", "0.00%|HIT|1/3")),
+    );
   });
 
   it("rerolls non-positive statuses instead of letting copied or invented text block resolution", () => {
@@ -365,7 +419,7 @@ describe("silent pregnancy resolution", () => {
     const statuses = [" ", "80.00%|MISS", "MISS", "75.00%", "Chưa thụ thai", "NOT_CONCEIVED"];
     const input = record(statuses.map((status) => pregnancy("50.00%", status)).join("\n"));
     expect(resolveSolaPregnancy(input, random)).toBe(
-      record(statuses.map(() => pregnancy("50.00%", "75.00%|MISS")).join("\n")),
+      record(statuses.map(() => pregnancy("50.00%", "75.00%|MISS|0/3")).join("\n")),
     );
     expect(random).toHaveBeenCalledTimes(statuses.length);
   });
@@ -404,10 +458,10 @@ describe("silent pregnancy resolution", () => {
     expect(output).toBe(
       record(
         [
-          pregnancy("25.00%", "25.00%|MISS"),
-          pregnancy("100.00%", "99.99%|CONCEIVED"),
-          pregnancy("0.01%", "0.00%|CONCEIVED"),
-          pregnancy("0.01%", "0.01%|MISS"),
+          pregnancy("25.00%", "25.00%|MISS|0/3"),
+          pregnancy("100.00%", "99.99%|HIT|1/3"),
+          pregnancy("0.01%", "0.00%|HIT|1/3"),
+          pregnancy("0.01%", "0.01%|MISS|0/3"),
         ].join("\n"),
       ),
     );
