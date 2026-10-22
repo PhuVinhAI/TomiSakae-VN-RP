@@ -143,6 +143,7 @@ describe("TomiSakae VN-RP preset families", () => {
       "Foreplay Priority",
       "Scene Rhythm",
       "NSFW Mechanics",
+      "Active Intimacy",
       "Somatic Trauma",
     ]) expect(prompt).toContain(`## ${section}\n`);
     expect(prompt).toContain("EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene and card/lore");

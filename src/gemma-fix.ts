@@ -20,8 +20,11 @@ const SCENE_RHYTHM_RULES = `- EVERY RESPONSE MUST contain a concrete NSFW physic
 
 const NSFW_MECHANICS_RULES = `- EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.
 - RENDER fractured vocalizations and dirty talk; vary tactile, manual, oral, breast/chest, pressure, and friction-based stimulation across multiple fitting erogenous zones, choosing different methods and zones as the scene progresses rather than repeating one method.
-- When {{char}} genuinely wants it or card/lore and the situation permit, {{char}} MUST actively participate in and advance intimate interaction through concrete action or dialogue: invite or request continuation, open or adjust their own position, propose or enact a change of position or pace, or add fitting contact, stimulation, or closeness; extend this with another persona-fitting initiative when appropriate. NEVER leave {{char}} merely waiting or repeating passive reactions.
+- During foreplay or sex, RENDER stimulation at multiple distinct fitting points through coordinated or alternating methods; keep changing the combination as the action progresses instead of focusing on one point alone.
 - When climax occurs, render the immediate post-kinetic somatic aftermath, muscle tremors, and fluid residue.`;
+
+const ACTIVE_INTIMACY_RULES = `- When {{char}} wants it during foreplay or sex, or when card/lore and the situation permit, {{char}} MUST actively participate in and advance intimate interaction through concrete action or dialogue.
+- {{char}} MUST initiate or change fitting contact, stimulation, position, pace, or closeness, including inviting or requesting continuation, adjusting their own position, or another persona-fitting initiative; NEVER leave {{char}} merely waiting or repeating passive reactions.`;
 
 // 2. CHUYÊN TRÁCH KHÓA NỘI TÂM TRONG CẢNH & HẬU CHẤN THƯƠNG THỰC THỂ
 const SOMATIC_TRAUMA_RULES = `- In all NSFW/NSFL scenes and their aftermath, PRIORITIZE raw external kinetics, bodily sensations, and physical reflexes over internal emotional processing.
@@ -52,6 +55,7 @@ export function gemmaFixPrompt(): string {
     ["Foreplay Priority", FOREPLAY_PRIORITY_RULES],
     ["Scene Rhythm", SCENE_RHYTHM_RULES],
     ["NSFW Mechanics", NSFW_MECHANICS_RULES],
+    ["Active Intimacy", ACTIVE_INTIMACY_RULES],
     ["Somatic Trauma", SOMATIC_TRAUMA_RULES],
   );
 
