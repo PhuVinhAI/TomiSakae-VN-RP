@@ -430,6 +430,52 @@ describe("Sola NSFW Tracker", () => {
     );
   });
 
+  it.each([
+    ["Initiation/Foreplay", "Nana: stepping closer", "Mina: stepping back"],
+    ["Tiếp cận/Dạo đầu", "- [Nana]: bước tới", "- [Mina]: lùi lại"],
+    ["**Kiểu thoại**", "**Nana:** câu hỏi ngắt quãng", "**Mina:** câu trả lời ngắn"],
+  ])("keeps the %s heading with every character's banned pattern", (heading, first, second) => {
+    const ban = solaNsfwPatternBanPrompt(
+      `${heading}:\n${first}\n${second}\nSensory emphasis: warmth`,
+    );
+    expect(ban).toContain(`<banned_pattern>\n${heading}:\n${first}\n</banned_pattern>`);
+    expect(ban).toContain(`<banned_pattern>\n${heading}:\n${second}\n</banned_pattern>`);
+    expect(ban).toContain("<banned_pattern>\nSensory emphasis: warmth\n</banned_pattern>");
+    expect(ban.match(/<banned_pattern>/g)).toHaveLength(3);
+  });
+
+  it.each([
+    "Không có",
+    "[Không có]",
+    "- Không có.",
+    "[Nana]: **Không có**",
+    "Nana: [Không có].",
+    "None",
+    "- [Nana]: `None`",
+  ])("omits empty patterns written as %s", (empty) => {
+    expect(solaNsfwPatternBanPrompt(`Phản ứng thân thể / Hành động NSFL:\n${empty}`)).toBe("");
+    const ban = solaNsfwPatternBanPrompt(`Kiểu thoại:\n${empty}\nMina: câu hỏi ngắt quãng`);
+    expect(ban).toBe(solaNsfwPatternBanPrompt("Kiểu thoại:\nMina: câu hỏi ngắt quãng"));
+  });
+
+  it("omits empty inline fields without carrying a previous heading into the next item", () => {
+    expect(solaNsfwPatternBanPrompt("NSFL bodily response / action: **None**")).toBe("");
+    const ban = solaNsfwPatternBanPrompt(
+      "Kiểu thoại:\nNana: câu hỏi ngắn\nĐiểm nhấn cảm giác: Không có\nTư thế/Hành động/Kích thích:\n[Mina]: lùi lại",
+    );
+    expect(ban).not.toContain("Không có");
+    expect(ban).not.toContain("Điểm nhấn cảm giác");
+    expect(ban).toContain("<banned_pattern>\nKiểu thoại:\nNana: câu hỏi ngắn\n</banned_pattern>");
+    expect(ban).toContain(
+      "<banned_pattern>\nTư thế/Hành động/Kích thích:\n[Mina]: lùi lại\n</banned_pattern>",
+    );
+  });
+
+  it("keeps meaningful patterns that contain the words Không có", () => {
+    const ban = solaNsfwPatternBanPrompt("Kiểu thoại:\nNana: Không có câu trả lời trọn vẹn");
+    expect(ban).toContain("Kiểu thoại:\nNana: Không có câu trả lời trọn vẹn");
+  });
+
   it("counts the injected module in token estimates", async () => {
     const settings = createDefaultSettings(sola);
     settings.solaNsfwTrackerEnabled = true;

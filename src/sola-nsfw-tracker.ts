@@ -70,6 +70,24 @@ export function splitSolaNsfwTracker(input: string): { content: string; patterns
   return { content, patterns: records.join("\n\n") };
 }
 
+const PATTERN_FIELDS = new Set([
+  "description patterns",
+  "cách miêu tả",
+  "sensory emphasis",
+  "điểm nhấn cảm giác",
+  "initiation/foreplay",
+  "tiếp cận/dạo đầu",
+  "pose/action/stimulation",
+  "tư thế/hành động/kích thích",
+  "dialogue patterns",
+  "kiểu thoại",
+  "moans/vocal reactions",
+  "vocal patterns",
+  "tiếng rên/phản ứng giọng",
+  "nsfl bodily response / action",
+  "phản ứng thân thể / hành động nsfl",
+]);
+
 /** Wrap each recorded item in a request-only ban for the response about to be written. */
 export function solaNsfwPatternBanPrompt(patterns: string): string {
   let heading = "";
@@ -77,13 +95,19 @@ export function solaNsfwPatternBanPrompt(patterns: string): string {
   for (const raw of patterns.split(/\r?\n/)) {
     const line = raw.trim();
     if (!line) continue;
-    if (/^(?:Response structure|Bố cục phản hồi)\s*:/iu.test(line)) continue;
-    if (!line.startsWith("[") && /:\s*$/.test(line)) {
+    // Normalize formatting for classification while retaining the recorded wording.
+    const plainLine = line.replace(/^(?:[-*+]|\d+\.)\s+/u, "").replace(/[*_`]/g, "");
+    if (/^(?:Response structure|Bố cục phản hồi)\s*:/iu.test(plainLine)) continue;
+    const field = plainLine.match(/^([^:]+):\s*(.*)$/u);
+    if (field && PATTERN_FIELDS.has(field[1]!.trim().toLocaleLowerCase("vi"))) heading = "";
+    if (!plainLine.startsWith("[") && /:\s*$/.test(plainLine)) {
       heading = line;
       continue;
     }
-    if (/:\s*\[?\s*(?:None|Không có)\s*\]?[.!]?$/iu.test(line)) continue;
-    if (!line.startsWith("[")) heading = "";
+    const value = (field?.[2] ?? plainLine)
+      .trim()
+      .replace(/^[[\]"'“”‘’\s]+|[[\]"'“”‘’\s.!]+$/gu, "");
+    if (/^(?:None|Không có)$/iu.test(value)) continue;
     const item = heading ? `${heading}\n${line}` : line;
     items.push(`<banned_pattern>\n${escapeHtml(item)}\n</banned_pattern>`);
   }
