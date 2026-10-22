@@ -1,6 +1,6 @@
 {
   "name": "tomisakae-vn-rp-plugin",
-  "version": "2.0.2",
+  "version": "2.2.2",
   "description": "Vietnamese-first RisuAI roleplay plugin for Freaky Frankenstein 5.4 and Sola V2 Flame.",
   "private": true,
   "type": "module",

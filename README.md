@@ -6,7 +6,7 @@
 
 Freaky Frankenstein 5.4 · Sola V2 Flame
 
-[![Phiên bản 2.0.2](https://img.shields.io/badge/phi%C3%AAn_b%E1%BA%A3n-2.0.2-285a45?style=flat-square)](package.json)
+[![Phiên bản 2.2.2](https://img.shields.io/badge/phi%C3%AAn_b%E1%BA%A3n-2.2.2-285a45?style=flat-square)](package.json)
 [![Plugin API 3.0](https://img.shields.io/badge/RisuAI-Plugin_API_3.0-d54b31?style=flat-square)](#cài-đặt)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?style=flat-square)](src/)
 [![Tài liệu tiếng Việt](https://img.shields.io/badge/t%C3%A0i_li%E1%BB%87u-ti%E1%BA%BFng_Vi%E1%BB%87t-285a45?style=flat-square)](#bắt-đầu-sử-dụng)
@@ -33,18 +33,22 @@ nguyên, còn prompt hỗ trợ tự chuyển sang phiên bản phù hợp.
 
 ## Tính năng
 
-| Tính năng                        | Hoạt động                                                                                                           | Mặc định           |
-| :------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :----------------- |
-| **Đầu ra tiếng Việt**            | Điều chỉnh prompt, ví dụ đầu ra và nhãn hiển thị theo từng bộ nền; giữ khóa, thẻ và cú pháp cần cho xử lý kỹ thuật. | Bật                |
-| **Màu hội thoại theo giao diện** | Điều chỉnh bảng màu theo nền sáng/tối, giữ tên màu và hiệu ứng riêng của preset.                                    | Bật                |
-| **Tối ưu hình ảnh theo card**    | Ưu tiên ảnh trang phục, tư thế/trạng thái rồi đến biểu cảm; dùng ảnh có sẵn và phân bố theo diễn biến.              | Tắt · Thử nghiệm   |
-| **Danh sách ảnh của card**       | Đếm ảnh/token và gửi từ khóa ảnh bằng tin user riêng ngay sau tin user mới nhất.                                    | Tắt                |
-| **Fix Gemma 4**                  | Ghép lời nhắc ngắn về tiếng Việt, cú pháp ảnh và kiểm soát NSFW mức 0–4 vào cuối tin user mới nhất trong request.   | Tắt                |
-| **Biên tập bằng Submodel**       | Viết lại phản hồi AI cuối theo bộ nền đang dùng; lưu thành swipe mới để giữ bản gốc.                                | Tắt · Thử nghiệm   |
-| **Tự động biên tập**             | Chạy Submodel sau khi phản hồi hoàn tất; cần bật Biên tập bằng Submodel.                                            | Tắt · Thử nghiệm   |
-| **Âm báo hoàn tất**              | Báo thành công hoặc thất bại; khi tự biên tập, chờ Submodel kết thúc.                                               | Tắt                |
-| **Ước tính token**               | Tính cục bộ lượng prompt plugin chèn thêm và chi tiết theo module.                                                  | Có sẵn             |
-| **Dọn ngữ cảnh & phục hồi**      | Lưu ẩn state/tracker bị cắt theo độ sâu, phục hồi khi xóa tin, đổi swipe hoặc rẽ nhánh.                             | Theo bộ lọc đã bật |
+| Tính năng                        | Hoạt động                                                                                                                 | Mặc định           |
+| :------------------------------- | :------------------------------------------------------------------------------------------------------------------------ | :----------------- |
+| **Đầu ra tiếng Việt**            | Điều chỉnh prompt, ví dụ đầu ra và nhãn hiển thị theo từng bộ nền; giữ khóa, thẻ và cú pháp cần cho xử lý kỹ thuật.       | Bật                |
+| **Màu hội thoại theo giao diện** | Điều chỉnh bảng màu theo nền sáng/tối, giữ tên màu và hiệu ứng riêng của preset.                                          | Bật                |
+| **Tối ưu hình ảnh theo card**    | Ưu tiên ảnh trang phục, tư thế/trạng thái rồi đến biểu cảm; dùng ảnh có sẵn và phân bố theo diễn biến.                    | Tắt · Thử nghiệm   |
+| **Danh sách ảnh của card**       | Đếm ảnh/token và gửi từ khóa ảnh bằng tin user riêng ngay sau tin user mới nhất.                                          | Tắt                |
+| **Fix Gemma 4**                  | Ghép bộ quy tắc đầy đủ về nhân vật, đồng thuận, sinh sản, NSFW/NSFL, tiếng Việt và ảnh vào cuối tin user mới nhất.        | Tắt                |
+| **Bộ theo dõi NSFW/NSFL**        | Ghi mẫu đã dùng trong phản hồi; chuyển thành lệnh cấm lặp ở system cuối của request kế tiếp. Chỉ có ở Sola.               | Tắt                |
+| **Theo dõi sinh sản**            | Theo dõi chu kỳ, nhận biết, cơ thể, biện pháp bảo vệ và thai kỳ; hệ thống xét xác suất theo từng nhân vật. Chỉ có ở Sola. | Tắt                |
+| **Biên tập bằng Submodel**       | Viết lại phản hồi AI cuối theo bộ nền đang dùng; lưu thành swipe mới để giữ bản gốc.                                      | Tắt · Thử nghiệm   |
+| **Tự động biên tập**             | Chạy Submodel sau khi phản hồi hoàn tất; cần bật Biên tập bằng Submodel.                                                  | Tắt · Thử nghiệm   |
+| **Âm báo hoàn tất**              | Báo thành công hoặc thất bại; khi tự biên tập, chờ Submodel kết thúc.                                                     | Tắt                |
+| **Ước tính token**               | Tính cục bộ lượng prompt plugin chèn thêm và chi tiết theo module.                                                        | Có sẵn             |
+| **Dọn ngữ cảnh & phục hồi**      | Lưu ẩn state/tracker bị cắt theo độ sâu, phục hồi khi xóa tin, đổi swipe hoặc rẽ nhánh.                                   | Theo bộ lọc đã bật |
+
+Xem [bản phát hành 2.2.2](docs/releases/2.2.2.md).
 
 <details>
 <summary><strong>Xem giao diện trên điện thoại</strong></summary>
@@ -62,10 +66,10 @@ nguyên, còn prompt hỗ trợ tự chuyển sang phiên bản phù hợp.
 ## Cài đặt
 
 **Yêu cầu:** RisuAI có Plugin API 3.0. Các tính năng Submodel, tự biên tập và swipe cần API chat
-output của PocketRisu.
+output của PocketRisu; **Theo dõi sinh sản** cũng cần API này để tự xét và lưu kết quả.
 
 1. Build plugin theo [hướng dẫn bên dưới](#phát-triển) để tạo
-   `dist/tomisakae-vn-rp-plugin-2.0.2.js`.
+   `dist/tomisakae-vn-rp-plugin-2.2.2.js`.
 2. Trong RisuAI/PocketRisu, mở **Plugin Settings → Import Plugin** và chọn file đó.
 3. Cấp quyền plugin yêu cầu: xử lý request, đọc database và `mainDom`.
 4. Mở card, chọn **TomiSakae VN-RP** trong menu chat để cấu hình.
@@ -122,7 +126,7 @@ pnpm install --frozen-lockfile
 pnpm build
 ```
 
-Kết quả: **`dist/tomisakae-vn-rp-plugin-2.0.2.js`**. Tên file tự lấy phiên bản từ `package.json`.
+Kết quả: **`dist/tomisakae-vn-rp-plugin-2.2.2.js`**. Tên file tự lấy phiên bản từ `package.json`.
 File này đã gộp mã plugin và hai preset nguồn, có thể import trực tiếp vào ứng dụng chủ.
 
 | Lệnh               | Mục đích                                                         |
@@ -164,7 +168,9 @@ File này đã gộp mã plugin và hai preset nguồn, có thể import trực 
 | [`src/preset-family.ts`](src/preset-family.ts)                                             | Chọn bộ nền, thứ tự prompt và xử lý riêng theo preset.       |
 | [`src/vietnamese.ts`](src/vietnamese.ts)                                                   | Prompt tiếng Việt và các phép thay thế theo từng bộ nền.     |
 | [`src/image.ts`](src/image.ts), [`src/card-images.ts`](src/card-images.ts)                 | Chỉ dẫn ảnh và danh sách tài nguyên của card.                |
-| [`src/gemma-fix.ts`](src/gemma-fix.ts)                                                     | Lời nhắc ngắn cho Gemma 4 và mức kiểm soát NSFW.             |
+| [`src/gemma-fix.ts`](src/gemma-fix.ts)                                                     | Bộ quy tắc đầy đủ cho Fix Gemma 4.                           |
+| [`src/sola-nsfw-tracker.ts`](src/sola-nsfw-tracker.ts)                                     | Ghi mẫu NSFW/NSFL và tạo lệnh cấm lặp cho lượt kế tiếp.      |
+| [`src/sola-sex-tracker.ts`](src/sola-sex-tracker.ts)                                       | Tracker sinh sản, xét xác suất và hiển thị kết quả.          |
 | [`src/editor-prompts.ts`](src/editor-prompts.ts)                                           | Hai prompt biên tập Submodel theo bộ nền.                    |
 | [`src/sola-history.ts`](src/sola-history.ts), [`src/sola-display.ts`](src/sola-display.ts) | Dọn/phục hồi lịch sử và hiển thị Sola.                       |
 | [`src/sola-prompt-dependencies.ts`](src/sola-prompt-dependencies.ts)                       | Gỡ lời nhắc phụ thuộc các module đã tắt.                     |
