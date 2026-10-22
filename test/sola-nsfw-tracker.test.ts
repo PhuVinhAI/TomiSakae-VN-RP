@@ -84,7 +84,7 @@ describe("Sola NSFW Tracker", () => {
     );
     expect(module?.content).toContain("Record NSFL only when it occurs, otherwise write Không có");
     expect(module?.content).not.toContain("Omit the tracker when no NSFW content occurs");
-    expect(module?.content).toContain("Located inside of '<sola_hud>' tags, append:");
+    expect(module?.content).toContain("In EVERY response, you MUST append inside of '<sola_hud>' tags:");
     const storyReview = composed.absolute.find((message) =>
       message.content.includes("## Story Review"),
     );
@@ -125,7 +125,7 @@ describe("Sola NSFW Tracker", () => {
     settings.promptEnabled["01a0c1ff-4ecf-701f-ae98-acfb7b26a41f"] = false;
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
     const module = composed.trailing.find((message) => message.memo?.endsWith(":nsfw-tracker"));
-    expect(module?.content).toContain("Located at the end of your response, append:");
+    expect(module?.content).toContain("In EVERY response, you MUST append at the end of your response:");
     expect(composed.absolute.some((message) => message.memo?.endsWith(":nsfw-tracker"))).toBe(
       false,
     );

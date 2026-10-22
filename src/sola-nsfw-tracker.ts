@@ -27,7 +27,7 @@ export function solaNsfwTrackerPrompt(vietnamese: boolean, location: string): st
         nsfl: "NSFL bodily response / action",
       };
   return `## ${vietnamese ? "Ghi chép NSFW/NSFL" : "NSFW/NSFL Usage Record"} 🔥
-Located ${location || "at the end of your response"}, append:
+In EVERY response, you MUST append ${location || "at the end of your response"}:
 <nsfw_nsfl_tracker>
 ${labels.description}: [Distinct NSFW descriptive constructions used this turn]
 ${labels.sensory}: [Distinct NSFW tactile, thermal, fluid, olfactory, or acoustic details used this turn]

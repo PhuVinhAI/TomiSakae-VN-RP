@@ -175,7 +175,7 @@ describe("Sola Sexual Context Tracker", () => {
     settings.promptEnabled["01a0c1ff-4ecf-701f-ae98-acfb7b26a41f"] = false;
     const composed = await composePresetPrompts(sola, settings, async (value) => value);
     const module = composed.trailing.find((message) => message.memo?.endsWith(":sex-tracker"));
-    expect(module?.content).toContain("Located at the end of your response, append:");
+    expect(module?.content).toContain("In EVERY response, you MUST append at the end of your response:");
     expect(composed.absolute.some((message) => message.memo?.endsWith(":sex-tracker"))).toBe(false);
   });
 

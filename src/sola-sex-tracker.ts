@@ -58,7 +58,7 @@ export function solaSexTrackerPrompt(vietnamese: boolean, location: string): str
     ? "Biết, Không biết, Chưa rõ hoặc trạng thái nhận biết phù hợp khác"
     : "Known, Unknown, Unclear, or another fitting awareness state";
   return `## Sexual Context Tracker 🌙
-Located ${location || "at the end of your response"}, append:
+In EVERY response, you MUST append ${location || "at the end of your response"}:
 <sex_tracker>
 [${labels.character}]:
 ${labels.cycle}: [${examples.cycle}]
