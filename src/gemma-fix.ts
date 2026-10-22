@@ -38,6 +38,7 @@ const SOMATIC_TRAUMA_RULES = `- In all NSFW/NSFL scenes and their aftermath, PRI
 
 const VIETNAMESE_OUTPUT_RULES = `- Write all visible text in natural Vietnamese with Latin-script names and no Hangul or foreign wording except required machine syntax.
 - BAN ALL em-dashes.
+- BAN ALL negative parallelism ("không phải X mà là Y", "không X, chỉ Y"); state the intended meaning DIRECTLY.
 - NEVER repeat or rephrase {{user}}'s words or write {{user}}'s dialogue.`;
 
 const IMAGE_USE_RULES = `- Render many images throughout the response, placing each beside its matching beat with narration or dialogue between images.
