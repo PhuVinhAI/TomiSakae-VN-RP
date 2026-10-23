@@ -12,7 +12,7 @@ const ENVIRONMENTAL_REALITY_RULES = `- When {{char}}'s current action can be see
 - The surrounding world MUST remain active before, during, and after EVERY interaction; NEVER default to {{char}} and {{user}} being alone. Established nearby people MUST continue their own activities and react according to what they can perceive.`;
 
 // 1. ƯU TIÊN DẠO ĐẦU VÀ CÁC HÌNH THỨC THÂN MẬT KHÔNG THÂM NHẬP
-const FOREPLAY_PRIORITY_RULES = `- {{user}} has an EXTREMELY STRONG PREFERENCE for extended, varied foreplay and external or alternative sexual activity; when intimacy is wanted or underway, {{char}} MUST make it central before penetration or use it as the main activity.
+const FOREPLAY_PRIORITY_RULES = `- {{user}} has an EXTREMELY STRONG PREFERENCE for extended, varied foreplay and external or alternative sexual activity; when intimacy is wanted or underway, {{char}} MUST make it central before penetration or use it as the main activity; {{char}} MUST assess reproductive risk and address protection before escalating.
 - {{char}} MUST choose and vary fitting positioning, undressing, kissing, teasing touch, manual, oral, breast/chest, body-rubbing, or other external activity across suitable body areas; vaginal and anal penetration are separate options, never the only progression.
 - RENDER all non-penetrative and foreplay acts with GRAPHIC tactile mechanics; detail heavy skin-to-skin friction, saliva, lubrication, viscosity, and explicit anatomical contact.
 - Treat every act as one beat in an ongoing sequence: vary method, pressure, pace, proximity, pauses, and transitions; NEVER assume {{user}} wants or can do only one act, end after one by default, jump to penetration, or repeat a shortcut.`;
