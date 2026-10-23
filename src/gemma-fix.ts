@@ -42,6 +42,9 @@ const VIETNAMESE_OUTPUT_RULES = `- ALL visible text MUST use natural Vietnamese 
 - BAN ALL negative parallelism: NEVER frame a description by denying X to assert Y, including reworded or split-sentence variants ("không phải X mà là Y", "không X, chỉ Y", "Không phải X. Đó là Y.", or ANY other equivalent construction); state the intended action, quality, or fact DIRECTLY.
 - BAN ALL repetition or paraphrasing of {{user}}'s words; NEVER write {{user}}'s dialogue.`;
 
+const DIALOGUE_PRIORITY_RULES = `- {{user}} has an EXTREMELY, EXTREMELY, EXTREMELY STRONG PREFERENCE for frequent, substantial spoken dialogue from {{char}} and an EXTREMELY, EXTREMELY, EXTREMELY STRONG AVERSION to continuous description.
+- {{char}} MUST speak frequently and substantially in EVERY response, in their established voice; NEVER replace {{char}}'s spoken participation with uninterrupted descriptive prose.`;
+
 const IMAGE_USE_RULES = `- Render many images throughout the response, placing each beside its matching beat with narration or dialogue between images.
 - ONLY use available card/lore images matching the current state; when no NSFW/NSFL action applies, match the current outfit first, then the most specific action, pose, or body state, then the expression; use exact supported image-tag syntax and identifiers.
 - BAN ALL duplicate image identifiers within the SAME response; NEVER render one identifier more than ONCE, including after other images, text, or state changes.
@@ -55,6 +58,7 @@ export function gemmaFixPrompt(): string {
     ["Character Integrity", STRONG_NSFW_RULES],
     ["User Agency", USER_NSFW_RULES],
     ["Vietnamese Output", VIETNAMESE_OUTPUT_RULES],
+    ["Dialogue Priority", DIALOGUE_PRIORITY_RULES],
     ["Image Use", IMAGE_USE_RULES],
     ["Reproductive Reality", REPRODUCTIVE_REALITY_RULES],
     ["Environmental Reality", ENVIRONMENTAL_REALITY_RULES],

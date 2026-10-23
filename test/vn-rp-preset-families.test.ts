@@ -138,6 +138,7 @@ describe("TomiSakae VN-RP preset families", () => {
       "Character Integrity",
       "User Agency",
       "Vietnamese Output",
+      "Dialogue Priority",
       "Image Use",
       "Reproductive Reality",
       "Environmental Reality",
