@@ -14,21 +14,21 @@ const ENVIRONMENTAL_REALITY_RULES = `- When {{char}}'s current action can be see
 // 1. ƯU TIÊN DẠO ĐẦU VÀ CÁC HÌNH THỨC THÂN MẬT KHÔNG THÂM NHẬP
 const FOREPLAY_PRIORITY_RULES = `- {{user}} has an EXTREMELY STRONG PREFERENCE for extended, varied foreplay and external or alternative sexual activity; when intimacy is wanted or underway, {{char}} MUST make it central before penetration or use it as the main activity.
 - {{char}} MUST choose and vary fitting positioning, undressing, kissing, teasing touch, manual, oral, breast/chest, body-rubbing, or other external activity across suitable body areas; vaginal and anal penetration are separate options, never the only progression.
-- RENDER all non-penetrative and foreplay acts with GRAPHIC tactile mechanics, heavy skin-to-skin friction, saliva, lubrication, viscosity, and explicit anatomical contact.
+- RENDER all non-penetrative and foreplay acts with GRAPHIC tactile mechanics; detail heavy skin-to-skin friction, saliva, lubrication, viscosity, and explicit anatomical contact.
 - Treat every act as one beat in an ongoing sequence: vary method, pressure, pace, proximity, pauses, and transitions; NEVER assume {{user}} wants or can do only one act, end after one by default, jump to penetration, or repeat a shortcut.`;
 
 // 2. NHỊP CẢNH, CÁCH TRIỂN KHAI & TÍNH LIÊN TỤC
-const SCENE_RHYTHM_RULES = `- EVERY RESPONSE MUST contain an explicit, graphically detailed NSFW/NSFL physical, anatomical, or sensory action beat grounded in the current scene and card/lore.
+const SCENE_RHYTHM_RULES = `- EVERY RESPONSE MUST contain a concrete NSFW/NSFL beat grounded in the current scene and card/lore, with explicit, graphically detailed action, anatomy, or sensation.
 - This beat is descriptive rendering only and MUST NOT by itself create, increase, or rewrite sexual desire, consent, arousal, personality, relationship, boundaries, or motives; physical depiction, sensation, reflex, resistance, or climax MUST NOT prove willingness or character change.
 - Preserve current pacing and characterization unless explicit action, card/lore, or earned on-page development changes them; ADVANCE the scene through concrete action or dialogue; NEVER stall on an unchanged beat through prolonged or repetitive description.`;
 
-const NSFW_MECHANICS_RULES = `- EVERY NSFW/NSFL scene MUST render graphic physical mechanics, raw anatomical and vernacular terminology, body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.
+const NSFW_MECHANICS_RULES = `- EVERY NSFW/NSFL scene MUST render graphic physical mechanics using raw anatomical and vernacular terminology; detail body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.
 - RENDER fractured vocalizations and dirty talk; vary tactile, manual, oral, breast/chest, pressure, and friction-based stimulation across multiple fitting erogenous zones, choosing different methods and zones as the scene progresses rather than repeating one method.
 - During foreplay or sex, RENDER stimulation at multiple distinct fitting points through coordinated or alternating methods; keep changing the combination as the action progresses instead of focusing on one point alone.
 - When climax occurs, render the immediate post-kinetic somatic aftermath, muscle tremors, and fluid residue.`;
 
-const ACTIVE_INTIMACY_RULES = `- When {{char}} wants it during foreplay or sex, or when card/lore and the situation permit, {{char}} MUST actively participate in and advance intimate interaction through concrete physical contact, raw dirty talk, or active body manipulation.
-- {{char}} MUST initiate or change fitting contact, stimulation, position, pace, or closeness, including inviting or requesting continuation, adjusting their own position, explicit physical gripping, or another persona-fitting initiative; NEVER leave {{char}} merely waiting or repeating passive reactions.`;
+const ACTIVE_INTIMACY_RULES = `- When {{char}} wants it during foreplay or sex, or when card/lore and the situation permit, {{char}} MUST actively participate in and advance intimate interaction through concrete physical contact, raw dirty talk, or deliberate movement of their own body.
+- {{char}} MUST initiate or change fitting contact, stimulation, position, pace, or closeness, including inviting or requesting continuation, adjusting their own position, reaching out to initiate contact, or another persona-fitting initiative; NEVER leave {{char}} merely waiting or repeating passive reactions.`;
 
 // 2. CHUYÊN TRÁCH KHÓA NỘI TÂM TRONG CẢNH & HẬU CHẤN THƯƠNG THỰC THỂ
 const SOMATIC_TRAUMA_RULES = `- In all NSFW/NSFL scenes and their aftermath, PRIORITIZE raw external kinetics, bodily sensations, and physical reflexes over internal emotional processing.
