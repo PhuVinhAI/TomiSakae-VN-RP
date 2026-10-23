@@ -147,7 +147,7 @@ describe("TomiSakae VN-RP preset families", () => {
       "Active Intimacy",
       "Somatic Trauma",
     ]) expect(prompt).toContain(`## ${section}\n`);
-    expect(prompt).toContain("EVERY RESPONSE MUST contain a concrete NSFW physical, sensory, or action beat grounded in the current scene and card/lore");
+    expect(prompt).toContain("EVERY RESPONSE MUST contain an explicit, graphically detailed NSFW/NSFL physical, anatomical, or sensory action beat grounded in the current scene and card/lore");
     expect(prompt).toContain("FOR EACH distinct NSFW/NSFL action by {{char}}, {{user}}, or another NPC");
     expect(prompt).not.toContain("AVOID safe defaults");
     expect(prompt).not.toContain("ONE text type per line");
