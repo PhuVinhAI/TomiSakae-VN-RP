@@ -301,14 +301,21 @@ describe("Sola Sexual Context Tracker", () => {
     expect(displayed).toContain("🌙 Sola: Reproductive Context");
   });
 
-  it.each([true, false])(
-    "localizes count-first pregnancy statuses without inventing a sampled roll (%s)",
-    (vietnamese) => {
+  it.each([
+    { vietnamese: true, stateFirst: false },
+    { vietnamese: false, stateFirst: false },
+    { vietnamese: true, stateFirst: true },
+    { vietnamese: false, stateFirst: true },
+  ])(
+    "localizes compact pregnancy statuses without inventing a sampled roll ($vietnamese, $stateFirst)",
+    ({ vietnamese, stateFirst }) => {
       const settings = createDefaultSettings(sola);
       settings.solaSexTrackerEnabled = true;
       settings.vietnameseOutputEnabled = vietnamese;
+      const status = (count: number, state: string) =>
+        stateFirst ? `${state}|${count}/3` : `${count}/3|${state}`;
       const displayed = applyRegexScripts(
-        '<sex_tracker>\n[Nana]:\nPregnancy likelihood/status: <pregnancy chance="50.00%" status="1/3|HIT" />\n[Mina]:\nPregnancy likelihood/status: <pregnancy chance="50.00%" status="2/3|MISS" />\n[Lina]:\nPregnancy likelihood/status: <pregnancy chance="50.00%" status="3/3|CONCEIVED" />\n</sex_tracker>',
+        `<sex_tracker>\n[Nana]:\nPregnancy likelihood/status: <pregnancy chance="50.00%" status="${status(1, "HIT")}" />\n[Mina]:\nPregnancy likelihood/status: <pregnancy chance="50.00%" status="${status(2, "MISS")}" />\n[Lina]:\nPregnancy likelihood/status: <pregnancy chance="50.00%" status="${status(3, "CONCEIVED")}" />\n</sex_tracker>`,
         sola,
         settings,
         { placement: PLACEMENT_AI_OUTPUT, markdown: true, depth: 0 },
@@ -319,7 +326,7 @@ describe("Sola Sexual Context Tracker", () => {
       expect(displayed).toContain(`${vietnamese ? "Chưa thụ thai" : "No conception"} (2/3)`);
       expect(displayed).toContain(`${vietnamese ? "Đã thụ thai" : "Conceived"} (3/3)`);
       expect(displayed).not.toContain("Roll:");
-      expect(displayed).not.toMatch(/\|(?:HIT|MISS|CONCEIVED)/);
+      expect(displayed).not.toMatch(/\|(?:HIT|MISS|CONCEIVED)|(?:HIT|MISS|CONCEIVED)\|/);
     },
   );
 
@@ -426,7 +433,7 @@ describe("silent pregnancy resolution", () => {
     expect(random).toHaveBeenCalledTimes(3);
   });
 
-  it.each(["1/3|HIT", "1/3|MISS", " 1/3|HIT "])(
+  it.each(["1/3|HIT", "1/3|MISS", " 1/3|HIT ", "HIT|1/3", "MISS|1/3", " HIT|1/3 "])(
     "retains the count in %s across hits and misses without counting its label twice",
     (status) => {
       const hit = vi.fn(() => 0.1);
@@ -443,16 +450,21 @@ describe("silent pregnancy resolution", () => {
     },
   );
 
-  it("recognizes count-first confirmation and restores count-first progress from history", () => {
-    const random = vi.fn(() => 0.1);
-    const previous = record(`[Nana]:\n${pregnancy("50.00%", "2/3|HIT")}`);
-    expect(resolveSolaPregnancy(record(`[Nana]:\n${pregnancy("50.00%")}`), random, previous)).toBe(
-      record(`[Nana]:\n${pregnancy("50.00%", "10.00%|CONCEIVED|3/3")}`),
-    );
-    const confirmed = record(pregnancy("50.00%", "3/3|CONCEIVED"));
-    expect(resolveSolaPregnancy(confirmed, random)).toBe(confirmed);
-    expect(random).toHaveBeenCalledTimes(1);
-  });
+  it.each([false, true])(
+    "recognizes compact confirmation and restores progress from history (%s)",
+    (stateFirst) => {
+      const random = vi.fn(() => 0.1);
+      const previous = record(
+        `[Nana]:\n${pregnancy("50.00%", stateFirst ? "HIT|2/3" : "2/3|HIT")}`,
+      );
+      expect(
+        resolveSolaPregnancy(record(`[Nana]:\n${pregnancy("50.00%")}`), random, previous),
+      ).toBe(record(`[Nana]:\n${pregnancy("50.00%", "10.00%|CONCEIVED|3/3")}`));
+      const confirmed = record(pregnancy("50.00%", stateFirst ? "CONCEIVED|3/3" : "3/3|CONCEIVED"));
+      expect(resolveSolaPregnancy(confirmed, random)).toBe(confirmed);
+      expect(random).toHaveBeenCalledTimes(1);
+    },
+  );
 
   it("restores cleared counters by character before sampling positive probabilities", () => {
     const random = vi.fn().mockReturnValueOnce(0.9).mockReturnValueOnce(0.1);

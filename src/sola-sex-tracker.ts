@@ -81,6 +81,7 @@ Rules:
 const PREGNANCY_TAG_RE = /<pregnancy\s+chance="(\d{1,3}\.\d{2})%"\s+status="([^"<>&]*)"\s*\/>/g;
 const PREGNANCY_STATUS_RE = /^(\d{1,3}\.\d{2})%\|(MISS|HIT|CONCEIVED)(?:\|([0-3])\/3)?$/;
 const PREGNANCY_COMPACT_STATUS_RE = /^([0-3])\/3(?:\|(MISS|HIT|CONCEIVED))?$/;
+const PREGNANCY_STATE_FIRST_STATUS_RE = /^(MISS|HIT|CONCEIVED)\|([0-3])\/3$/;
 const PREGNANCY_CHARACTER_BOUNDARY_RE = /(?=^[ \t]*\[[^\]\r\n]+\][ \t]*:[ \t]*\r?$)/m;
 const PREGNANCY_STATE_LABELS: Record<string, { en: string; vi: string }> = {
   MISS: { en: "No conception", vi: "Chưa thụ thai" },
@@ -102,6 +103,13 @@ function parsePregnancyStatus(status: string) {
       roll: undefined,
       state: compact[2],
       hits: Number(compact[1]),
+    };
+  const stateFirst = PREGNANCY_STATE_FIRST_STATUS_RE.exec(status.trim());
+  if (stateFirst)
+    return {
+      roll: undefined,
+      state: stateFirst[1],
+      hits: Number(stateFirst[2]),
     };
   return undefined;
 }

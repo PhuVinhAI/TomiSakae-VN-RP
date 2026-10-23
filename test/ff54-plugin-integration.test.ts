@@ -1236,20 +1236,24 @@ describe("Sola silent reproductive state", () => {
     expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("12.34", "0.00%|HIT|1/3"));
   });
 
-  it("continues count-first HIT statuses instead of restarting the counter", async () => {
-    const random = vi.fn(() => 0.1);
-    const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
-    plugin.chats.set("0:0", history(reply("50.00", "1/3|HIT")));
-    for (const count of [1, 2]) {
-      await plugin.request(requestOf(plugin.chats.get("0:0")!));
-      await plugin.complete(reply("50.00", `${count}/3|HIT`));
-      const state = count === 2 ? "CONCEIVED" : "HIT";
-      expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(
-        reply("50.00", `9.99%|${state}|${count + 1}/3`),
-      );
-    }
-    expect(random).toHaveBeenCalledTimes(2);
-  });
+  it.each([false, true])(
+    "continues compact HIT statuses instead of restarting the counter (%s)",
+    async (stateFirst) => {
+      const random = vi.fn(() => 0.1);
+      const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
+      const status = (count: number) => (stateFirst ? `HIT|${count}/3` : `${count}/3|HIT`);
+      plugin.chats.set("0:0", history(reply("50.00", status(1))));
+      for (const count of [1, 2]) {
+        await plugin.request(requestOf(plugin.chats.get("0:0")!));
+        await plugin.complete(reply("50.00", status(count)));
+        const state = count === 2 ? "CONCEIVED" : "HIT";
+        expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(
+          reply("50.00", `9.99%|${state}|${count + 1}/3`),
+        );
+      }
+      expect(random).toHaveBeenCalledTimes(2);
+    },
+  );
 
   it("retains accumulated hits when the AI clears status on every new turn", async () => {
     const random = vi.fn(() => 0.1).mockReturnValueOnce(0.9);
