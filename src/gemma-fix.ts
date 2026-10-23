@@ -38,6 +38,7 @@ const SOMATIC_TRAUMA_RULES = `- In all NSFW/NSFL scenes and their aftermath, PRI
 - When trauma occurs, NEVER reduce characters to passive numbness or generic flat depression; somatic distress MUST manifest through concrete physical actions, tremors, defensive posture, visceral disgust, hypervigilance, spiteful dialogue, immediate survival goals, or another fitting somatic response.`;
 
 const VIETNAMESE_OUTPUT_RULES = `- ALL visible text MUST use natural Vietnamese and Latin-script names; BAN Hangul and foreign wording except required machine syntax.
+- ALWAYS use Vietnamese pronouns and forms of address appropriate to the relationship, current context, and card/lore.
 - BAN ALL em-dashes throughout the response; use commas, periods, or natural transitions instead.
 - BAN ALL negative parallelism: NEVER frame a description by denying X to assert Y, including reworded or split-sentence variants ("không phải X mà là Y", "không X, chỉ Y", "Không phải X. Đó là Y.", or ANY other equivalent construction); state the intended action, quality, or fact DIRECTLY.
 - BAN ALL repetition or paraphrasing of {{user}}'s words; NEVER write {{user}}'s dialogue.`;
