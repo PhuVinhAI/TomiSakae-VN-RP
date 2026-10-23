@@ -57,18 +57,12 @@ describe("Sola Sexual Context Tracker", () => {
     expect(module?.content).toContain("Khả năng và trạng thái mang thai:");
     expect(module?.content).toContain("Giai đoạn thai kỳ:");
     expect(module?.content).toContain('<pregnancy chance="00.00%" status="" />');
-    expect(module?.content).toContain("infer the current conception chance");
-    expect(module?.content).toContain("infer the current conception chance independently");
-    expect(module?.content).toContain("NEVER copy or substitute the Sola roll as the percentage");
-    expect(module?.content).toContain(
-      "Use 0.00% to 100.00% with two decimal places and the % sign",
-    );
-    expect(module?.content).toContain("after its biological window ends");
-    expect(module?.content).toContain(
-      '"00.00%|HIT|n/3", "00.00%|MISS|n/3", or "00.00%|CONCEIVED|3/3"',
-    );
-    expect(module?.content).toContain("unless status already records CONCEIVED");
-    expect(module?.content).toContain("NEVER generate that result yourself");
+    expect(module?.content).toContain("infer conception chance from the simulated cycle");
+    expect(module?.content).toContain("In the next tracker, copy the previous Sola result after removing only its roll");
+    expect(module?.content).toContain("use 0.00% to 100.00% with two decimals");
+    expect(module?.content).toContain("its biological window ends");
+    expect(module?.content).toContain('"HIT|n/3", "MISS|n/3", or "CONCEIVED|3/3"');
+    expect(module?.content).toContain("if none exists, leave status=\"\"");
     expect(module?.content).not.toContain("cycle-timing knowledge");
     expect(module?.content).not.toContain("Tình trạng rủi ro:");
     expect(
@@ -147,21 +141,17 @@ describe("Sola Sexual Context Tracker", () => {
         "Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition",
       );
       expect(prompt).toContain("NEVER invent ignorance to bypass consequences");
-      expect(prompt).toContain('Carry forward the recorded hit count in status as "1/3" or "2/3"');
-      expect(prompt).toContain("even after a MISS; NEVER increment it yourself");
-      expect(prompt).toContain("ONLY 3 cumulative hits confirm conception");
+      expect(prompt).toContain("In the next tracker, copy the previous Sola result after removing only its roll");
+      expect(prompt).toContain("if none exists, leave status=\"\"");
+      expect(prompt).toContain("Never calculate, increment, reorder, or replace the state/count");
       expect(prompt).toContain(
-        'Before conception, reset status to "" and chance to "0.00%" when the exposure window ends or suitable prevention/actions avert conception',
+        'When exposure ends or prevention/actions avert conception, write status="" and chance="0.00%"',
       );
-      expect(prompt).toContain("clear CONCEIVED ONLY when a concrete RP event ends pregnancy");
-      expect(prompt).toContain("otherwise maintain its progression");
       expect(prompt).toContain(
         vietnamese ? "tam cá nguyệt một/hai/ba" : "first/second/third trimester",
       );
       expect(prompt).toContain(vietnamese ? "sinh con, hậu sản" : "childbirth, postpartum");
-      expect(prompt).toContain("PRESERVE the exact sampled code");
-      expect(prompt).toContain("with elapsed RP time");
-      expect(prompt).toContain("NEVER write prose in status");
+      expect(prompt).toContain("otherwise preserve the copied state/count");
       expect(prompt).not.toContain("TRIMESTER_1");
       expect(prompt).not.toMatch(
         /Giai đoạn và trao đổi|Stage and discussion|Chưa nói|Đã nói|Not discussed|Discussed reproduction|active stage|MUST discuss/,
