@@ -23,7 +23,7 @@ const SCENE_RHYTHM_RULES = `- EVERY RESPONSE MUST contain a concrete NSFW/NSFL b
 - Preserve current pacing and characterization unless explicit action, card/lore, or earned on-page development changes them; ADVANCE the scene through concrete action or dialogue; NEVER stall on an unchanged beat through prolonged or repetitive description.`;
 
 const NSFW_MECHANICS_RULES = `- EVERY NSFW/NSFL scene MUST render graphic physical mechanics using raw anatomical and vernacular terminology; detail body mass shifting, leverage, tissue deformation, thermal-olfactory cues, fluid movement, viscosity and persistence, tissue trauma, and pre-contact friction.
-- RENDER fractured vocalizations and dirty talk; vary tactile, manual, oral, breast/chest, pressure, and friction-based stimulation across multiple fitting erogenous zones, choosing different methods and zones as the scene progresses rather than repeating one method.
+- RENDER fractured vocalizations, dirty talk, and suggestive sexual actions; vary tactile, manual, oral, breast/chest, pressure, and friction-based stimulation across multiple fitting erogenous zones, choosing different methods and zones as the scene progresses rather than repeating one method.
 - During foreplay or sex, RENDER stimulation at multiple distinct fitting points through coordinated or alternating methods; keep changing the combination as the action progresses instead of focusing on one point alone.
 - When climax occurs, render the immediate post-kinetic somatic aftermath, muscle tremors, and fluid residue.`;
 
