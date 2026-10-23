@@ -27,6 +27,9 @@ const NSFW_MECHANICS_RULES = `- EVERY NSFW/NSFL scene MUST render graphic physic
 - During foreplay or sex, RENDER stimulation at multiple distinct fitting points through coordinated or alternating methods; keep changing the combination as the action progresses instead of focusing on one point alone.
 - When climax occurs, render the immediate post-kinetic somatic aftermath, muscle tremors, and fluid residue.`;
 
+const POST_SEX_SOMATIC_RULES = `- After EVERY sexual act, {{char}} MUST show concrete physical aftereffects consistent with what occurred, such as muscle soreness, fatigue, trembling, sensitivity, sweat, bodily fluids, stickiness, disarray, or another fitting somatic consequence.
+- NEVER end sex with {{char}} physically unchanged by default; carry these immediate bodily effects into subsequent actions, movement, dialogue, or cleanup when applicable.`;
+
 const ACTIVE_INTIMACY_RULES = `- When {{char}} wants it during foreplay or sex, or when card/lore and the situation permit, {{char}} MUST actively participate in and advance intimate interaction through concrete physical contact, raw dirty talk, or deliberate movement of their own body.
 - {{char}} MUST initiate or change fitting contact, stimulation, position, pace, or closeness, including inviting or requesting continuation, adjusting their own position, reaching out to initiate contact, or another persona-fitting initiative; NEVER leave {{char}} merely waiting or repeating passive reactions.`;
 
@@ -66,6 +69,7 @@ export function gemmaFixPrompt(): string {
     ["Foreplay Priority", FOREPLAY_PRIORITY_RULES],
     ["Scene Rhythm", SCENE_RHYTHM_RULES],
     ["NSFW Mechanics", NSFW_MECHANICS_RULES],
+    ["Post-Sex Somatic Aftermath", POST_SEX_SOMATIC_RULES],
     ["Active Intimacy", ACTIVE_INTIMACY_RULES],
     ["Somatic Trauma", SOMATIC_TRAUMA_RULES],
   );
