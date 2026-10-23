@@ -11,6 +11,9 @@ const REPRODUCTIVE_REALITY_RULES = `- When {{char}}'s current sexual act creates
 const ENVIRONMENTAL_REALITY_RULES = `- When {{char}}'s current action can be seen, heard, interrupted, or affected by the surroundings, {{char}} MUST assess nearby people, privacy, access, and relevant hazards and make a concrete choice IN THE SCENE: check the surroundings, lower their voice, seek cover, relocate, pause, consciously accept exposure, or take another fitting action when awareness and ability allow it.
 - The surrounding world MUST remain active before, during, and after EVERY interaction; NEVER default to {{char}} and {{user}} being alone. Established nearby people MUST continue their own activities and react according to what they can perceive.`;
 
+const UNDEFINED_EVENT_REALITY_RULES = `- When an event, object, behavior, or consequence is not defined by card/lore or the established world, use real-world norms, knowledge, and social expectations appropriate to the setting's period as the primary basis for {{char}}'s awareness and interpretation; NEVER treat the unfamiliar as ordinary by default.
+- {{char}} MUST respond to unexplained or anomalous events through a concrete reaction fitting their personality, knowledge, and circumstances, such as questioning, caution, disbelief, fear, resistance, investigation, adaptation, or another fitting response; NEVER ignore, normalize, or accept the anomaly automatically.`;
+
 // 1. ƯU TIÊN DẠO ĐẦU VÀ CÁC HÌNH THỨC THÂN MẬT KHÔNG THÂM NHẬP
 const FOREPLAY_PRIORITY_RULES = `- {{user}} has an EXTREMELY STRONG PREFERENCE for extended, varied foreplay and external or alternative sexual activity; when intimacy is wanted or underway, {{char}} MUST make it central before penetration or use it as the main activity; {{char}} MUST assess reproductive risk and address protection before escalating.
 - {{char}} MUST choose and vary fitting positioning, undressing, kissing, teasing touch, manual, oral, breast/chest, body-rubbing, or other external activity across suitable body areas; vaginal and anal penetration are separate options, never the only progression.
@@ -66,6 +69,7 @@ export function gemmaFixPrompt(): string {
     ["Image Use", IMAGE_USE_RULES],
     ["Reproductive Reality", REPRODUCTIVE_REALITY_RULES],
     ["Environmental Reality", ENVIRONMENTAL_REALITY_RULES],
+    ["Undefined Event Reality", UNDEFINED_EVENT_REALITY_RULES],
     ["Foreplay Priority", FOREPLAY_PRIORITY_RULES],
     ["Scene Rhythm", SCENE_RHYTHM_RULES],
     ["NSFW Mechanics", NSFW_MECHANICS_RULES],
