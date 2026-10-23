@@ -59,7 +59,7 @@ describe("Sola Sexual Context Tracker", () => {
     expect(module?.content).toContain('<pregnancy chance="00.00%" status="" />');
     expect(module?.content).toContain("infer conception chance from the simulated cycle");
     expect(module?.content).toContain("In the next tracker, copy the previous Sola result after removing only its roll");
-    expect(module?.content).toContain("use 0.00% to 100.00% with two decimals");
+    expect(module?.content).toContain("MUST use 0.00% to 100.00% with two decimals");
     expect(module?.content).toContain("its biological window ends");
     expect(module?.content).toContain('"HIT|n/3", "MISS|n/3", or "CONCEIVED|3/3"');
     expect(module?.content).toContain("if none exists, leave status=\"\"");
@@ -143,15 +143,15 @@ describe("Sola Sexual Context Tracker", () => {
       expect(prompt).toContain("NEVER invent ignorance to bypass consequences");
       expect(prompt).toContain("In the next tracker, copy the previous Sola result after removing only its roll");
       expect(prompt).toContain("if none exists, leave status=\"\"");
-      expect(prompt).toContain("Never calculate, increment, reorder, or replace the state/count");
+      expect(prompt).toContain("NEVER calculate, increment, reorder, or replace the state/count");
       expect(prompt).toContain(
-        'When exposure ends or prevention/actions avert conception, write status="" and chance="0.00%"',
+        'When exposure ends or prevention/actions avert conception, MUST write status="" and chance="0.00%"',
       );
       expect(prompt).toContain(
         vietnamese ? "tam cá nguyệt một/hai/ba" : "first/second/third trimester",
       );
       expect(prompt).toContain(vietnamese ? "sinh con, hậu sản" : "childbirth, postpartum");
-      expect(prompt).toContain("otherwise preserve the copied state/count");
+      expect(prompt).toContain("otherwise PRESERVE the copied state/count");
       expect(prompt).not.toContain("TRIMESTER_1");
       expect(prompt).not.toMatch(
         /Giai đoạn và trao đổi|Stage and discussion|Chưa nói|Đã nói|Not discussed|Discussed reproduction|active stage|MUST discuss/,

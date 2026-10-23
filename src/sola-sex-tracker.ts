@@ -73,9 +73,9 @@ ${labels.protection}: [${examples.protection}]
 Rules:
 - Before writing, run a Cognitive Check: determine what {{char}} understands, which consequences apply, and what concrete choice or response follows IN THE SCENE; record that awareness and choice instead of leaving them abstract or omitted. This check separates objective biological data from character awareness. Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition; NEVER invent ignorance to bypass consequences.
 - Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, relevant RP events, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Always simulate the objective biological menstrual cycle; record ${labels.cycleKnowledge} separately as ${cycleKnowledgeValues}.
-- For EACH character, infer conception chance from the simulated cycle, physical condition, exposure, and ${labels.protection}; use 0.00% to 100.00% with two decimals, never use the Sola roll as the chance, and use 0.00% when no viable exposure exists or its biological window ends.
-- In the next tracker, copy the previous Sola result after removing only its roll: write "HIT|n/3", "MISS|n/3", or "CONCEIVED|3/3"; if none exists, leave status="". Never calculate, increment, reorder, or replace the state/count.
-- When exposure ends or prevention/actions avert conception, write status="" and chance="0.00%"; otherwise preserve the copied state/count and update ${labels.stage} only for CONCEIVED.
+- For EACH character, infer conception chance from the simulated cycle, physical condition, exposure, and ${labels.protection}; MUST use 0.00% to 100.00% with two decimals, NEVER use the Sola roll as the chance, and use 0.00% when no viable exposure exists or its biological window ends.
+- In the next tracker, copy the previous Sola result after removing only its roll: write "HIT|n/3", "MISS|n/3", or "CONCEIVED|3/3"; if none exists, leave status="". NEVER calculate, increment, reorder, or replace the state/count.
+- When exposure ends or prevention/actions avert conception, MUST write status="" and chance="0.00%"; otherwise PRESERVE the copied state/count and update ${labels.stage} ONLY for CONCEIVED.
 - Place characters within a SINGLE <sex_tracker> container, separated by one blank line.`;
 }
 
