@@ -40,7 +40,6 @@ const SOMATIC_TRAUMA_RULES = `- In all NSFW/NSFL scenes and their aftermath, PRI
 const VIETNAMESE_OUTPUT_RULES = `- ALL visible text MUST use natural Vietnamese and Latin-script names; BAN Hangul and foreign wording except required machine syntax.
 - BAN ALL em-dashes throughout the response; use commas, periods, or natural transitions instead.
 - BAN ALL negative parallelism: NEVER frame a description by denying X to assert Y, including reworded or split-sentence variants ("không phải X mà là Y", "không X, chỉ Y", "Không phải X. Đó là Y.", or ANY other equivalent construction); state the intended action, quality, or fact DIRECTLY.
-- Descriptive paragraphs MUST be separated by spoken dialogue; images, sound effects, moans, or ANY other content MUST NOT be used to start another descriptive paragraph. EVERY response MUST use ALL THREE descriptive paragraph lengths, SHORT, MEDIUM, and LONG, at least ONCE EACH, fitting the scene; their arrangement and pacing MUST be COMPLETELY DIFFERENT from the immediately preceding response.
 - BAN ALL repetition or paraphrasing of {{user}}'s words; NEVER write {{user}}'s dialogue.`;
 
 const IMAGE_USE_RULES = `- Render many images throughout the response, placing each beside its matching beat with narration or dialogue between images.
