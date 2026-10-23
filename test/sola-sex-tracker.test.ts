@@ -404,6 +404,38 @@ describe("silent pregnancy resolution", () => {
     expect(random).toHaveBeenCalledTimes(3);
   });
 
+  it("restores cleared counters by character before sampling positive probabilities", () => {
+    const random = vi.fn().mockReturnValueOnce(0.9).mockReturnValueOnce(0.1);
+    const previous = record(
+      `[Nana]:\n${pregnancy("50.00%", "10.00%|HIT|2/3")}\n[Mina]:\n${pregnancy("25.00%", "20.00%|HIT|1/3")}`,
+    );
+    const current = record(
+      `[Mina]:\n${pregnancy("10.00%", " ")}\n[Nana]:\n${pregnancy("75.00%")}`,
+    );
+    expect(resolveSolaPregnancy(current, random, previous)).toBe(
+      record(
+        `[Mina]:\n${pregnancy("10.00%", "90.00%|MISS|1/3")}\n[Nana]:\n${pregnancy("75.00%", "10.00%|CONCEIVED|3/3")}`,
+      ),
+    );
+    expect(random).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps confirmed results when cleared at positive chance and honors zero-chance resets", () => {
+    const random = vi.fn(() => 0);
+    const previous = record(
+      `[Nana]:\n${pregnancy("50.00%", "10.00%|CONCEIVED|3/3")}\n[Mina]:\n${pregnancy("25.00%", "20.00%|HIT|2/3")}`,
+    );
+    const current = record(
+      `[Nana]:\n${pregnancy("50.00%")}\n[Mina]:\n${pregnancy("0.00%")}\n[Lina]:\n${pregnancy("25.00%")}`,
+    );
+    expect(resolveSolaPregnancy(current, random, previous)).toBe(
+      record(
+        `[Nana]:\n${pregnancy("50.00%", "10.00%|CONCEIVED|3/3")}\n[Mina]:\n${pregnancy("0.00%")}\n[Lina]:\n${pregnancy("25.00%", "0.00%|HIT|1/3")}`,
+      ),
+    );
+    expect(random).toHaveBeenCalledTimes(1);
+  });
+
   it("pauses at zero chance and starts a fresh count after an explicit reset", () => {
     const random = vi.fn(() => 0);
     const paused = record(pregnancy("0.00%", "2/3"));

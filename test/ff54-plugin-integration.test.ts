@@ -1236,6 +1236,58 @@ describe("Sola silent reproductive state", () => {
     expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("12.34", "0.00%|HIT|1/3"));
   });
 
+  it("retains accumulated hits when the AI clears status on every new turn", async () => {
+    const random = vi.fn(() => 0.1).mockReturnValueOnce(0.9);
+    const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
+    plugin.chats.set("0:0", history(reply("50.00", "10.00%|HIT|1/3")));
+    const statuses = ["89.99%|MISS|1/3", "9.99%|HIT|2/3", "9.99%|CONCEIVED|3/3"];
+    for (const status of statuses) {
+      await plugin.request(requestOf(plugin.chats.get("0:0")!));
+      await plugin.complete(reply("50.00", " "));
+      const saved = plugin.chats.get("0:0")!;
+      expect(saved.message.at(-1)!.data).toBe(reply("50.00", status));
+      await plugin.callbacks.output!(outputOf(saved));
+    }
+    expect(random).toHaveBeenCalledTimes(3);
+    await plugin.request(requestOf(plugin.chats.get("0:0")!));
+    await plugin.complete(reply("50.00"));
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(
+      reply("50.00", "9.99%|CONCEIVED|3/3"),
+    );
+    expect(random).toHaveBeenCalledTimes(3);
+    await plugin.request(requestOf(plugin.chats.get("0:0")!));
+    await plugin.complete(reply("0.00"));
+    await plugin.request(requestOf(plugin.chats.get("0:0")!));
+    await plugin.complete(reply("50.00"));
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("50.00", "9.99%|HIT|1/3"));
+    expect(random).toHaveBeenCalledTimes(4);
+  });
+
+  it("starts each rerolled swipe from the preceding turn instead of the replaced result", async () => {
+    const random = vi.fn(() => 0);
+    const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
+    const chat = history(reply("50.00", "10.00%|HIT|1/3"));
+    const original = reply("50.00", "20.00%|HIT|2/3");
+    chat.message.push({
+      role: "char", chatId: "rerolled", data: original, swipeId: 0, swipes: [original],
+    });
+    plugin.chats.set("0:0", chat);
+    for (const swipeId of [1, 2]) {
+      await plugin.request(requestOf(plugin.chats.get("0:0")!));
+      const active = plugin.chats.get("0:0")!;
+      const target = active.message.at(-1)!;
+      target.data = reply("50.00");
+      target.swipeId = swipeId;
+      target.swipes!.push(target.data);
+      await plugin.callbacks.output!(outputOf(active));
+      const saved = plugin.chats.get("0:0")!.message.at(-1)!;
+      expect(saved.data).toBe(reply("50.00", "0.00%|HIT|2/3"));
+      expect(saved.swipes?.[swipeId]).toBe(saved.data);
+      expect(saved.swipes?.[0]).toBe(original);
+    }
+    expect(random).toHaveBeenCalledTimes(2);
+  });
+
   it.each(["delete", "branch"] as const)(
     "does not roll restored history after %s; resolves only the newly generated swipe",
     async (action) => {

@@ -73,40 +73,73 @@ ${labels.protection}: [${examples.protection}]
 Rules:
 - Before writing, run a Cognitive Check: determine what {{char}} understands, which consequences apply, and what concrete choice or response follows IN THE SCENE; record that awareness and choice instead of leaving them abstract or omitted. This check separates objective biological data from character awareness. Limit knowledge ONLY when concrete evidence establishes missing knowledge or impaired cognition; NEVER invent ignorance to bypass consequences.
 - Infer and update tracker values from card/lore, the previous tracker, elapsed time, current actions, relevant RP events, and the character's knowledge; when data is missing, choose the most plausible development and keep it consistent. Always simulate the objective biological menstrual cycle; record ${labels.cycleKnowledge} separately as ${cycleKnowledgeValues}.
-- For EACH character, use EXACTLY <pregnancy chance="00.00%" status="" />: infer the current conception chance independently from the simulated cycle, physical condition, reproductive exposure, and the timing/effectiveness of ${labels.protection}; NEVER copy or substitute the Sola roll as the percentage. Use 0.00% to 100.00% with two decimal places and the % sign. Adjust chance as RP develops; use 0.00% without viable reproductive exposure or after its biological window ends. The Sola system tests EVERY positive chance after EACH response unless status already records CONCEIVED, recording "00.00%|HIT|n/3", "00.00%|MISS|n/3", or "00.00%|CONCEIVED|3/3"; ONLY 3 cumulative hits confirm conception. NEVER generate that result yourself.
-- Carry forward the recorded hit count in status as "1/3" or "2/3", even after a MISS; NEVER increment it yourself. For a CONCEIVED status, PRESERVE the exact sampled code; update ${labels.stage} with elapsed RP time. NEVER write prose in status. Before conception, reset status to "" and chance to "0.00%" when the exposure window ends or suitable prevention/actions avert conception; clear CONCEIVED ONLY when a concrete RP event ends pregnancy; otherwise maintain its progression.
+- For EACH character, infer the current conception chance independently from the simulated cycle, physical condition, reproductive exposure, and the timing/effectiveness of ${labels.protection}; NEVER copy or substitute the Sola roll as the percentage. Use 0.00% to 100.00% with two decimal places and the % sign. Adjust chance as RP develops; use 0.00% without viable reproductive exposure or after its biological window ends. The Sola system tests EVERY positive chance after EACH response unless status already records CONCEIVED, recording "00.00%|HIT|n/3", "00.00%|MISS|n/3", or "00.00%|CONCEIVED|3/3"; ONLY 3 cumulative hits confirm conception. NEVER generate that result yourself.
+- Carry forward the recorded hit count in status as "1/3" or "2/3", even after a MISS; NEVER increment it yourself or clear it while chance remains positive. For a CONCEIVED status, PRESERVE the exact sampled code; update ${labels.stage} with elapsed RP time. NEVER write prose in status. Before conception, reset status to "" and chance to "0.00%" when the exposure window ends or suitable prevention/actions avert conception; clear CONCEIVED ONLY when a concrete RP event ends pregnancy; otherwise maintain its progression.
 - Place characters within a SINGLE <sex_tracker> container, separated by one blank line.`;
 }
 
 const PREGNANCY_TAG_RE = /<pregnancy\s+chance="(\d{1,3}\.\d{2})%"\s+status="([^"<>&]*)"\s*\/>/g;
 const PREGNANCY_STATUS_RE = /^(\d{1,3}\.\d{2})%\|(MISS|HIT|CONCEIVED)(?:\|([0-3])\/3)?$/;
 const PREGNANCY_HIT_COUNT_RE = /^([0-2])\/3$/;
+const PREGNANCY_CHARACTER_BOUNDARY_RE = /(?=^[ \t]*\[[^\]\r\n]+\][ \t]*:[ \t]*\r?$)/m;
 const PREGNANCY_STATE_LABELS: Record<string, { en: string; vi: string }> = {
   MISS: { en: "No conception", vi: "Chưa thụ thai" },
   HIT: { en: "Hit, not yet conceived", vi: "Trúng, chưa thụ thai" },
   CONCEIVED: { en: "Conceived", vi: "Đã thụ thai" },
 };
 
-/** Resolve each pending character independently and record the sampled outcome. */
-export function resolveSolaPregnancy(input: string, random: () => number = Math.random): string {
+function pregnancyCharacterKey(section: string): string | undefined {
+  return section
+    .match(/^[ \t]*\[([^\]\r\n]+)\][ \t]*:[ \t]*\r?$/m)?.[1]
+    ?.trim()
+    .normalize("NFC")
+    .toLocaleLowerCase("vi");
+}
+
+/** Recover accidentally cleared counts from the prior turn before sampling each character. */
+export function resolveSolaPregnancy(
+  input: string,
+  random: () => number = Math.random,
+  previousInput = "",
+): string {
+  const previousStatuses = new Map<string, string>();
+  for (const [block] of previousInput.matchAll(new RegExp(TRACKER_RE.source, TRACKER_RE.flags))) {
+    for (const section of block.split(PREGNANCY_CHARACTER_BOUNDARY_RE)) {
+      const character = pregnancyCharacterKey(section);
+      const pregnancy = new RegExp(PREGNANCY_TAG_RE.source, PREGNANCY_TAG_RE.flags).exec(section);
+      if (character && pregnancy) previousStatuses.set(character, pregnancy[2]!.trim());
+    }
+  }
   return input.replace(new RegExp(TRACKER_RE.source, TRACKER_RE.flags), (block) =>
-    block.replace(
-      new RegExp(PREGNANCY_TAG_RE.source, PREGNANCY_TAG_RE.flags),
-      (tag, value: string, status: string) => {
-        const chance = Number(value);
-        const previous = PREGNANCY_STATUS_RE.exec(status);
-        if (previous?.[2] === "CONCEIVED" || chance <= 0 || chance > 100) return tag;
-        const hits = Math.min(
-          2,
-          Number(previous?.[3] ?? PREGNANCY_HIT_COUNT_RE.exec(status)?.[1] ?? 0),
+    block
+      .split(PREGNANCY_CHARACTER_BOUNDARY_RE)
+      .map((section) => {
+        const priorStatus = previousStatuses.get(pregnancyCharacterKey(section) ?? "");
+        return section.replace(
+          new RegExp(PREGNANCY_TAG_RE.source, PREGNANCY_TAG_RE.flags),
+          (tag, value: string, status: string) => {
+            const chance = Number(value);
+            if (chance <= 0 || chance > 100) return tag;
+            const recordedStatus = status.trim() || priorStatus || "";
+            const previous = PREGNANCY_STATUS_RE.exec(recordedStatus);
+            if (previous?.[2] === "CONCEIVED")
+              return tag.replace(/status="[^"]*"/, `status="${recordedStatus}"`);
+            const hits = Math.min(
+              2,
+              Number(previous?.[3] ?? PREGNANCY_HIT_COUNT_RE.exec(recordedStatus)?.[1] ?? 0),
+            );
+            const roll = Math.floor(random() * 10000) / 100;
+            const hit = roll < chance;
+            const total = Math.min(3, hits + Number(hit));
+            const state = total === 3 ? "CONCEIVED" : hit ? "HIT" : "MISS";
+            return tag.replace(
+              /status="[^"]*"/,
+              `status="${roll.toFixed(2)}%|${state}|${total}/3"`,
+            );
+          },
         );
-        const roll = Math.floor(random() * 10000) / 100;
-        const hit = roll < chance;
-        const total = Math.min(3, hits + Number(hit));
-        const state = total === 3 ? "CONCEIVED" : hit ? "HIT" : "MISS";
-        return tag.replace(/status="[^"]*"/, `status="${roll.toFixed(2)}%|${state}|${total}/3"`);
-      },
-    ),
+      })
+      .join(""),
   );
 }
 
