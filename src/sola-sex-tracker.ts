@@ -80,13 +80,31 @@ Rules:
 
 const PREGNANCY_TAG_RE = /<pregnancy\s+chance="(\d{1,3}\.\d{2})%"\s+status="([^"<>&]*)"\s*\/>/g;
 const PREGNANCY_STATUS_RE = /^(\d{1,3}\.\d{2})%\|(MISS|HIT|CONCEIVED)(?:\|([0-3])\/3)?$/;
-const PREGNANCY_HIT_COUNT_RE = /^([0-2])\/3$/;
+const PREGNANCY_COMPACT_STATUS_RE = /^([0-3])\/3(?:\|(MISS|HIT|CONCEIVED))?$/;
 const PREGNANCY_CHARACTER_BOUNDARY_RE = /(?=^[ \t]*\[[^\]\r\n]+\][ \t]*:[ \t]*\r?$)/m;
 const PREGNANCY_STATE_LABELS: Record<string, { en: string; vi: string }> = {
   MISS: { en: "No conception", vi: "Chưa thụ thai" },
   HIT: { en: "Hit, not yet conceived", vi: "Trúng, chưa thụ thai" },
   CONCEIVED: { en: "Conceived", vi: "Đã thụ thai" },
 };
+
+function parsePregnancyStatus(status: string) {
+  const sampled = PREGNANCY_STATUS_RE.exec(status.trim());
+  if (sampled)
+    return {
+      roll: sampled[1],
+      state: sampled[2],
+      hits: sampled[3] === undefined ? undefined : Number(sampled[3]),
+    };
+  const compact = PREGNANCY_COMPACT_STATUS_RE.exec(status.trim());
+  if (compact)
+    return {
+      roll: undefined,
+      state: compact[2],
+      hits: Number(compact[1]),
+    };
+  return undefined;
+}
 
 function pregnancyCharacterKey(section: string): string | undefined {
   return section
@@ -121,13 +139,10 @@ export function resolveSolaPregnancy(
             const chance = Number(value);
             if (chance <= 0 || chance > 100) return tag;
             const recordedStatus = status.trim() || priorStatus || "";
-            const previous = PREGNANCY_STATUS_RE.exec(recordedStatus);
-            if (previous?.[2] === "CONCEIVED")
+            const previous = parsePregnancyStatus(recordedStatus);
+            if (previous?.state === "CONCEIVED")
               return tag.replace(/status="[^"]*"/, `status="${recordedStatus}"`);
-            const hits = Math.min(
-              2,
-              Number(previous?.[3] ?? PREGNANCY_HIT_COUNT_RE.exec(recordedStatus)?.[1] ?? 0),
-            );
+            const hits = Math.min(2, previous?.hits ?? 0);
             const roll = Math.floor(random() * 10000) / 100;
             const hit = roll < chance;
             const total = Math.min(3, hits + Number(hit));
@@ -144,15 +159,12 @@ export function resolveSolaPregnancy(
 }
 
 function pregnancyStatusLabel(status: string, vietnamese: boolean): string {
-  const result = status.match(PREGNANCY_STATUS_RE);
-  if (!result) {
-    const count = status.match(PREGNANCY_HIT_COUNT_RE);
-    if (count) return `${vietnamese ? "Chưa thụ thai" : "No conception"} (${count[1]}/3)`;
-    return status || (vietnamese ? "Chưa có kết quả" : "No result");
-  }
-  const label = PREGNANCY_STATE_LABELS[result[2]!]!;
-  const progress = result[3] === undefined ? "" : ` (${result[3]}/3)`;
-  return `Roll: ${result[1]}% - ${vietnamese ? label.vi : label.en}${progress}`;
+  const result = parsePregnancyStatus(status);
+  if (!result) return status || (vietnamese ? "Chưa có kết quả" : "No result");
+  const label = PREGNANCY_STATE_LABELS[result.state ?? "MISS"]!;
+  const progress = result.hits === undefined ? "" : ` (${result.hits}/3)`;
+  const roll = result.roll === undefined ? "" : `Roll: ${result.roll}% - `;
+  return `${roll}${vietnamese ? label.vi : label.en}${progress}`;
 }
 
 function escapeHtml(value: string): string {

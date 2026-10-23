@@ -302,6 +302,28 @@ describe("Sola Sexual Context Tracker", () => {
   });
 
   it.each([true, false])(
+    "localizes count-first pregnancy statuses without inventing a sampled roll (%s)",
+    (vietnamese) => {
+      const settings = createDefaultSettings(sola);
+      settings.solaSexTrackerEnabled = true;
+      settings.vietnameseOutputEnabled = vietnamese;
+      const displayed = applyRegexScripts(
+        '<sex_tracker>\n[Nana]:\nPregnancy likelihood/status: <pregnancy chance="50.00%" status="1/3|HIT" />\n[Mina]:\nPregnancy likelihood/status: <pregnancy chance="50.00%" status="2/3|MISS" />\n[Lina]:\nPregnancy likelihood/status: <pregnancy chance="50.00%" status="3/3|CONCEIVED" />\n</sex_tracker>',
+        sola,
+        settings,
+        { placement: PLACEMENT_AI_OUTPUT, markdown: true, depth: 0 },
+      );
+      expect(displayed).toContain(
+        `${vietnamese ? "Trúng, chưa thụ thai" : "Hit, not yet conceived"} (1/3)`,
+      );
+      expect(displayed).toContain(`${vietnamese ? "Chưa thụ thai" : "No conception"} (2/3)`);
+      expect(displayed).toContain(`${vietnamese ? "Đã thụ thai" : "Conceived"} (3/3)`);
+      expect(displayed).not.toContain("Roll:");
+      expect(displayed).not.toMatch(/\|(?:HIT|MISS|CONCEIVED)/);
+    },
+  );
+
+  it.each([true, false])(
     "displays pregnancy values safely without exposing markup (%s)",
     (vietnamese) => {
       const settings = createDefaultSettings(sola);
@@ -402,6 +424,34 @@ describe("silent pregnancy resolution", () => {
       ),
     );
     expect(random).toHaveBeenCalledTimes(3);
+  });
+
+  it.each(["1/3|HIT", "1/3|MISS", " 1/3|HIT "])(
+    "retains the count in %s across hits and misses without counting its label twice",
+    (status) => {
+      const hit = vi.fn(() => 0.1);
+      const miss = vi.fn(() => 0.9);
+      const input = record(pregnancy("50.00%", status));
+      expect(resolveSolaPregnancy(input, hit)).toBe(
+        record(pregnancy("50.00%", "10.00%|HIT|2/3")),
+      );
+      expect(resolveSolaPregnancy(input, miss)).toBe(
+        record(pregnancy("50.00%", "90.00%|MISS|1/3")),
+      );
+      expect(hit).toHaveBeenCalledTimes(1);
+      expect(miss).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it("recognizes count-first confirmation and restores count-first progress from history", () => {
+    const random = vi.fn(() => 0.1);
+    const previous = record(`[Nana]:\n${pregnancy("50.00%", "2/3|HIT")}`);
+    expect(resolveSolaPregnancy(record(`[Nana]:\n${pregnancy("50.00%")}`), random, previous)).toBe(
+      record(`[Nana]:\n${pregnancy("50.00%", "10.00%|CONCEIVED|3/3")}`),
+    );
+    const confirmed = record(pregnancy("50.00%", "3/3|CONCEIVED"));
+    expect(resolveSolaPregnancy(confirmed, random)).toBe(confirmed);
+    expect(random).toHaveBeenCalledTimes(1);
   });
 
   it("restores cleared counters by character before sampling positive probabilities", () => {
