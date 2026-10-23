@@ -43,7 +43,7 @@ const VIETNAMESE_OUTPUT_RULES = `- ALL visible text MUST use natural Vietnamese 
 - BAN ALL negative parallelism: NEVER frame a description by denying X to assert Y, including reworded or split-sentence variants ("không phải X mà là Y", "không X, chỉ Y", "Không phải X. Đó là Y.", or ANY other equivalent construction); state the intended action, quality, or fact DIRECTLY.
 - BAN ALL repetition or paraphrasing of {{user}}'s words; NEVER write {{user}}'s dialogue.`;
 
-const DIALOGUE_PRIORITY_RULES = `- {{user}} has an EXTREMELY, EXTREMELY, EXTREMELY STRONG PREFERENCE for frequent, substantial spoken dialogue from {{char}} and short, direct description in one or two paragraphs at a time; {{user}} has an EXTREMELY, EXTREMELY, EXTREMELY STRONG AVERSION to long or continuous description.
+const DIALOGUE_PRIORITY_RULES = `- {{user}} has an EXTREMELY, EXTREMELY, EXTREMELY STRONG PREFERENCE for frequent, substantial spoken dialogue from {{char}} and short, direct descriptive paragraphs; {{user}} has an EXTREMELY, EXTREMELY, EXTREMELY STRONG AVERSION to long or continuous description.
 - {{char}} MUST speak frequently and substantially in EVERY response, using dialogue that actively advances the story or, during NSFW scenes, delivers fitting stimulating dirty talk that engages {{user}}, consistent with {{char}}'s established voice and personality; NEVER replace {{char}}'s spoken participation with uninterrupted descriptive prose.`;
 
 const IMAGE_USE_RULES = `- Render many images throughout the response, placing each beside its matching beat with narration or dialogue between images.
