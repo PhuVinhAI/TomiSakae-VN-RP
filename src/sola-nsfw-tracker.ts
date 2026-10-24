@@ -154,12 +154,14 @@ export function solaNsfwPatternBanConversation(
   const items = solaNsfwPatternItems(patterns);
   if (!items.length && !structureOnly) return undefined;
   const recorded = items.map(naturalSolaNsfwPattern).map((item) => `“${item}”`).join("; ");
+  const variationRule =
+    "At every point, NEVER repeat the same sentence, sentence frame, clause pattern, descriptive formula, gaze or looking description, gesture, action, sound, vocalization, or dialogue shape from the previous response or elsewhere in the new response, even within one scene beat or adjacent paragraphs. When a character, action, look, sensation, sound, or event recurs, change it completely through different wording, syntax, imagery, physical detail, rhythm, and dialogue construction; do not use a near-paraphrase, synonym swap, or repeated cadence.";
   const user = items.length
-    ? '{{OOC: "Do not repeat the NSFW/NSFL patterns recorded in the tracker above. For the next response, ABSOLUTELY do not use the previous response as a template: do not reuse its writing structure, order, pacing, or dialogue form. CHANGE THE RESPONSE COMPLETELY."}}'
-    : '{{OOC: "For the next response, ABSOLUTELY do not use the previous response as a template: do not reuse its writing structure, order, pacing, or dialogue form. CHANGE THE RESPONSE COMPLETELY."}}';
+    ? `{{OOC: "Do not repeat the NSFW/NSFL patterns recorded in the tracker above. For the next response, ABSOLUTELY do not use the previous response as a template: do not reuse its writing structure, order, pacing, or dialogue form. CHANGE THE RESPONSE COMPLETELY. ${variationRule}"}}`
+    : `{{OOC: "For the next response, ABSOLUTELY do not use the previous response as a template: do not reuse its writing structure, order, pacing, or dialogue form. CHANGE THE RESPONSE COMPLETELY. ${variationRule}"}}`;
   const assistant = items.length
-    ? `I understand. I will not reuse these recorded NSFW/NSFL patterns: ${recorded}. I will also completely change the previous response's structure, order, pacing, and dialogue form instead of using it as a template. I will use a new structure and dialogue pattern while keeping the established scene facts and continuity intact.`
-    : "I understand. I will not use the previous response's structure, order, pacing, or dialogue form as a template. I will change the response completely and use a new structure and dialogue pattern while keeping established scene facts and continuity intact.";
+    ? `I understand. I will not reuse these recorded NSFW/NSFL patterns: ${recorded}. I will also completely change the previous response's structure, order, pacing, and dialogue form instead of using it as a template. I will vary every repeated sentence, description, look, gesture, sound, vocalization, and dialogue shape, including repetitions within one scene beat, by rebuilding them with different syntax, imagery, physical detail, rhythm, and dialogue rather than paraphrasing. I will keep the established scene facts and continuity intact.`
+    : "I understand. I will not use the previous response's structure, order, pacing, or dialogue form as a template. I will change the response completely and vary every repeated sentence, description, look, gesture, sound, vocalization, and dialogue shape, including repetitions within one scene beat, by rebuilding them with different syntax, imagery, physical detail, rhythm, and dialogue rather than paraphrasing. I will keep established scene facts and continuity intact.";
   return {
     user,
     assistant,

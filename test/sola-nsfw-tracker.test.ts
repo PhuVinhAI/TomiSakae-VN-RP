@@ -299,11 +299,16 @@ describe("Sola NSFW Tracker", () => {
     expect(banUser.content).toContain("patterns recorded in the tracker above");
     expect(banUser.content).toContain("do not reuse its writing structure, order, pacing, or dialogue form");
     expect(banUser.content).toContain("CHANGE THE RESPONSE COMPLETELY");
+    expect(banUser.content).toContain("NEVER repeat the same sentence, sentence frame, clause pattern");
+    expect(banUser.content).toContain("gaze or looking description");
+    expect(banUser.content).toContain("near-paraphrase, synonym swap, or repeated cadence");
     expect(banAssistant.role).toBe("assistant");
     expect(banAssistant.content).toContain("I understand");
     expect(banAssistant.content).toContain("I will not reuse these recorded NSFW/NSFL patterns");
     expect(banAssistant.content).toContain("completely change the previous response's structure, order, pacing, and dialogue form");
-    expect(banAssistant.content).toContain("use a new structure and dialogue pattern");
+    expect(banAssistant.content).toContain("change the previous response's structure, order, pacing, and dialogue form");
+    expect(banAssistant.content).toContain("vary every repeated sentence, description, look, gesture, sound, vocalization, and dialogue shape");
+    expect(banAssistant.content).toContain("by rebuilding them with different syntax, imagery, physical detail, rhythm, and dialogue rather than paraphrasing");
     expect(banAssistant.content).toContain("“Description patterns: mẫu mới”");
     expect(banAssistant.content).toContain("“Nana's Initiation/Foreplay: gradual undressing”");
     expect(banAssistant.content).toContain("“Nana's Pose/Action/Stimulation: shifting pressure”");
