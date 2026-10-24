@@ -1129,8 +1129,11 @@ export async function buildRequestMessages(
       if (message.role !== "assistant" || isChatComment(message)) continue;
       const extracted = splitSolaNsfwTracker(message.content);
       const patterns = extracted.patterns || message.vnRpNsfwTracker || "";
-      if (message === latestResponse)
-        nsfwPatternBanConversation = solaNsfwPatternBanConversation(patterns);
+      if (message === latestResponse) {
+        nsfwPatternBanConversation = patterns
+          ? solaNsfwPatternBanConversation(patterns, true)
+          : undefined;
+      }
       hostMessages[index] = {
         ...message,
         content: extracted.content,
@@ -1180,20 +1183,30 @@ export async function buildRequestMessages(
           !isPluginMemo(message.memo),
       )?.index;
     if (latestUserIndex !== undefined) {
-      historyWithPrompts.splice(
-        latestUserIndex,
-        0,
-        {
-          role: "user",
-          content: nsfwPatternBanConversation.user,
-          memo: `${pluginMemoPrefix(preset)}nsfw-pattern-ban-user`,
-        },
-        {
-          role: "assistant",
-          content: nsfwPatternBanConversation.assistant,
-          memo: `${pluginMemoPrefix(preset)}nsfw-pattern-ban-assistant`,
-        },
-      );
+      const hasEarlierUser = historyWithPrompts
+        .slice(0, latestUserIndex)
+        .some(
+          (message) =>
+            message.role === "user" &&
+            !isChatComment(message) &&
+            !isPluginMemo(message.memo),
+        );
+      if (hasEarlierUser) {
+        historyWithPrompts.splice(
+          latestUserIndex,
+          0,
+          {
+            role: "user",
+            content: nsfwPatternBanConversation.user,
+            memo: `${pluginMemoPrefix(preset)}nsfw-pattern-ban-user`,
+          },
+          {
+            role: "assistant",
+            content: nsfwPatternBanConversation.assistant,
+            memo: `${pluginMemoPrefix(preset)}nsfw-pattern-ban-assistant`,
+          },
+        );
+      }
     }
   }
   return [

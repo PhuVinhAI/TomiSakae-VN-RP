@@ -364,11 +364,7 @@ describe("Sola NSFW Tracker", () => {
       parse,
       macro,
     );
-    const swipeBan = swipe.find((message) => message.memo?.endsWith(":nsfw-pattern-ban-assistant"));
-    expect(swipeBan?.content).toContain("swipe được chọn");
-    expect(swipeBan?.content).not.toContain("nhánh đầu");
-    expect(swipeBan?.role).toBe("assistant");
-    expect(swipe.filter((message) => message.memo?.endsWith(":nsfw-pattern-ban-user"))).toHaveLength(1);
+    expect(swipe.some((message) => message.memo?.includes(":nsfw-pattern-ban-"))).toBe(false);
 
     const continued = await buildRequestMessages(
       [
@@ -418,6 +414,34 @@ describe("Sola NSFW Tracker", () => {
         "<nsfw_nsfl_tracker>",
       );
     }
+  });
+
+  it("keeps structure variation for an all-empty tracker when an earlier user exists", async () => {
+    const settings = createDefaultSettings(sola);
+    settings.solaNsfwTrackerEnabled = true;
+    const emptyTracker = `<nsfw_nsfl_tracker>
+Description patterns: Không có
+Sensory emphasis: None
+NSFL bodily response / action:
+[Nana]: Không có
+</nsfw_nsfl_tracker>`;
+    const built = await buildRequestMessages(
+      [
+        { role: "user", content: "Mở cảnh." },
+        { role: "assistant", content: emptyTracker },
+        { role: "user", content: "Tiếp tục." },
+      ],
+      sola,
+      settings,
+      async (value) => value,
+    );
+    const injected = built.find((message) =>
+      message.memo?.endsWith(":nsfw-pattern-ban-assistant"),
+    );
+    expect(injected?.content).toContain("I understand");
+    expect(injected?.content).toContain("previous response's structure");
+    expect(injected?.content).not.toContain("NSFW/NSFL choices");
+    expect(injected?.content).not.toContain("Không có");
   });
 
   it("extracts open trackers without swallowing another tracker and wraps localized items without treating None as a pattern", () => {
