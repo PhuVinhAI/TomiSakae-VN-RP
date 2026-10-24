@@ -370,6 +370,21 @@ describe("silent pregnancy resolution", () => {
     expect(random).toHaveBeenCalledTimes(2);
   });
 
+  it("keeps each named character's hit count independent on the next response", () => {
+    const random = vi.fn(() => 0.9);
+    const previous = record(
+      `[Char 1]:\n${pregnancy("50.00%", "10.00%|HIT|1/5")}\n[Char 2]:\n${pregnancy("50.00%", "80.00%|MISS|0/5")}`,
+    );
+    const current = record(
+      `[Char 1]:\n${pregnancy("50.00%", "")}\n[Char 2]:\n${pregnancy("50.00%", "")}`,
+    );
+    expect(resolveSolaPregnancy(current, random, previous)).toBe(
+      record(
+        `[Char 1]:\n${pregnancy("50.00%", "90.00%|MISS|1/5")}\n[Char 2]:\n${pregnancy("50.00%", "90.00%|MISS|0/5")}`,
+      ),
+    );
+  });
+
   it("accumulates five hits across misses and preserves conception and pregnancy progression", () => {
     const random = vi
       .fn()

@@ -130,27 +130,23 @@ export function resolveSolaPregnancy(
   previousInput = "",
 ): string {
   const previousStatuses = new Map<string, string>();
-  const unlabelledPreviousStatuses: string[] = [];
+  const previousUnlabelledStatuses: string[] = [];
   for (const [block] of previousInput.matchAll(new RegExp(TRACKER_RE.source, TRACKER_RE.flags))) {
     for (const section of block.split(PREGNANCY_CHARACTER_BOUNDARY_RE)) {
       const character = pregnancyCharacterKey(section);
       const pregnancy = new RegExp(PREGNANCY_TAG_RE.source, PREGNANCY_TAG_RE.flags).exec(section);
       if (pregnancy) {
         if (character) previousStatuses.set(character, pregnancy[2]!.trim());
-        else unlabelledPreviousStatuses.push(pregnancy[2]!.trim());
+        else previousUnlabelledStatuses.push(pregnancy[2]!.trim());
       }
     }
   }
   return input.replace(new RegExp(TRACKER_RE.source, TRACKER_RE.flags), (block) =>
-    block
-      .split(PREGNANCY_CHARACTER_BOUNDARY_RE)
-      .map((section) => {
+    block.split(PREGNANCY_CHARACTER_BOUNDARY_RE).map((section, sectionIndex) => {
         const character = pregnancyCharacterKey(section);
-        const priorStatus =
-          previousStatuses.get(character ?? "") ??
-          (character === undefined && unlabelledPreviousStatuses.length === 1
-            ? unlabelledPreviousStatuses[0]
-            : undefined);
+        const priorStatus = character
+          ? previousStatuses.get(character)
+          : previousUnlabelledStatuses[sectionIndex];
         return section.replace(
           new RegExp(PREGNANCY_TAG_RE.source, PREGNANCY_TAG_RE.flags),
           (tag, value: string) => {
@@ -173,8 +169,7 @@ export function resolveSolaPregnancy(
             );
           },
         );
-      })
-      .join(""),
+      }).join(""),
   );
 }
 
