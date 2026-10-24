@@ -1145,8 +1145,8 @@ describe("Sola silent reproductive state", () => {
     await plugin.complete(content);
     const saved = plugin.chats.get("0:0")!;
     expect(saved.message[0]!.data).toBe(chat.message[0]!.data);
-    expect(saved.message[2]!.data).toContain(pregnancy("25.00", "9.99%|HIT|1/3"));
-    expect(saved.message[2]!.data).toContain(pregnancy("70.00", "79.99%|MISS|0/3"));
+    expect(saved.message[2]!.data).toContain(pregnancy("25.00", "9.99%|HIT|1/5"));
+    expect(saved.message[2]!.data).toContain(pregnancy("70.00", "79.99%|MISS|0/5"));
     expect(random).toHaveBeenCalledTimes(2);
     const next = await plugin.request(requestOf(saved));
     expect(next.find((message) => message.memo === saved.message[2]!.chatId)!.content).toBe(
@@ -1172,13 +1172,13 @@ describe("Sola silent reproductive state", () => {
     );
     await plugin.complete(reduced);
     expect(plugin.chats.get("0:0")!.message[2]!.data).toBe(
-      reduced.replace('status=""', 'status="50.00%|MISS|0/3"'),
+      reduced.replace('status=""', 'status="50.00%|MISS|0/5"'),
     );
     expect(plugin.chats.get("0:0")!.message[0]!.data).toBe(reply("95.00"));
     expect(random).toHaveBeenCalledTimes(1);
   });
 
-  it("counts three hits once per completed turn and preserves progress across duplicates and reloads", async () => {
+  it("counts five hits once per completed turn and preserves progress across duplicates and reloads", async () => {
     const store = storeWithTracker();
     const random = vi.fn(() => 0.1).mockReturnValueOnce(0.9);
     const plugin = await startPlugin(store, false, undefined, false, random);
@@ -1188,12 +1188,12 @@ describe("Sola silent reproductive state", () => {
     const miss = outputOf(plugin.chats.get("0:0")!);
     await Promise.all([plugin.callbacks.output!(miss), plugin.callbacks.output!(miss)]);
     expect(random).toHaveBeenCalledTimes(1);
-    expect(plugin.chats.get("0:0")!.message[2]!.data).toBe(reply("50.00", "89.99%|MISS|0/3"));
+    expect(plugin.chats.get("0:0")!.message[2]!.data).toBe(reply("50.00", "89.99%|MISS|0/5"));
     await plugin.request(requestOf(plugin.chats.get("0:0")!));
-    await plugin.complete(reply("50.00", "89.99%|MISS|0/3"));
+    await plugin.complete(reply("50.00", "89.99%|MISS|0/5"));
     const firstHit = structuredClone(plugin.chats.get("0:0")!);
     await plugin.callbacks.output!(outputOf(firstHit));
-    expect(firstHit.message[3]!.data).toBe(reply("50.00", "9.99%|HIT|1/3"));
+    expect(firstHit.message[3]!.data).toBe(reply("50.00", "9.99%|HIT|1/5"));
     expect(random).toHaveBeenCalledTimes(2);
 
     const reloadedRandom = vi.fn(() => 0);
@@ -1201,13 +1201,13 @@ describe("Sola silent reproductive state", () => {
     reloaded.chats.set("0:0", firstHit);
     await reloaded.callbacks.output!(outputOf(firstHit));
     expect(reloadedRandom).not.toHaveBeenCalled();
-    for (const count of [1, 2]) {
+    for (const count of [1, 2, 3, 4]) {
       const request = await reloaded.request(requestOf(reloaded.chats.get("0:0")!));
-      expect(request.some((message) => message.content.includes(`|HIT|${count}/3`))).toBe(true);
-      await reloaded.complete(reply("50.00", `${count}/3`));
+      expect(request.some((message) => message.content.includes(`|HIT|${count}/5`))).toBe(true);
+      await reloaded.complete(reply("50.00", `${count}/5`));
       const saved = reloaded.chats.get("0:0")!;
-      const state = count === 2 ? "CONCEIVED" : "HIT";
-      expect(saved.message.at(-1)!.data).toBe(reply("50.00", `0.00%|${state}|${count + 1}/3`));
+      const state = count === 4 ? "CONCEIVED" : "HIT";
+      expect(saved.message.at(-1)!.data).toBe(reply("50.00", `0.00%|${state}|${count + 1}/5`));
       await Promise.all([
         reloaded.callbacks.output!(outputOf(saved)),
         reloaded.callbacks.output!(outputOf(saved)),
@@ -1215,13 +1215,13 @@ describe("Sola silent reproductive state", () => {
       expect(reloadedRandom).toHaveBeenCalledTimes(count);
     }
     await reloaded.request(requestOf(reloaded.chats.get("0:0")!));
-    const progressed = reply("50.00", "0.00%|CONCEIVED|3/3").replace(
+    const progressed = reply("50.00", "0.00%|CONCEIVED|5/5").replace(
       "</sex_tracker>",
       "Giai đoạn thai kỳ: Tam cá nguyệt hai, tuần 16.\n</sex_tracker>",
     );
     await reloaded.complete(progressed);
     expect(reloaded.chats.get("0:0")!.message.at(-1)!.data).toBe(progressed);
-    expect(reloadedRandom).toHaveBeenCalledTimes(2);
+    expect(reloadedRandom).toHaveBeenCalledTimes(4);
   });
 
   it("honors cleared results, zero probability, missing trackers and independently updated probabilities", async () => {
@@ -1233,7 +1233,7 @@ describe("Sola silent reproductive state", () => {
       await plugin.complete(content);
     }
     expect(random).toHaveBeenCalledTimes(1);
-    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("12.34", "0.00%|HIT|1/3"));
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("12.34", "0.00%|HIT|1/5"));
   });
 
   it.each([false, true])(
@@ -1241,25 +1241,31 @@ describe("Sola silent reproductive state", () => {
     async (stateFirst) => {
       const random = vi.fn(() => 0.1);
       const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
-      const status = (count: number) => (stateFirst ? `HIT|${count}/3` : `${count}/3|HIT`);
+      const status = (count: number) => (stateFirst ? `HIT|${count}/5` : `${count}/5|HIT`);
       plugin.chats.set("0:0", history(reply("50.00", status(1))));
-      for (const count of [1, 2]) {
+      for (const count of [1, 2, 3, 4]) {
         await plugin.request(requestOf(plugin.chats.get("0:0")!));
         await plugin.complete(reply("50.00", status(count)));
-        const state = count === 2 ? "CONCEIVED" : "HIT";
+        const state = count === 4 ? "CONCEIVED" : "HIT";
         expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(
-          reply("50.00", `9.99%|${state}|${count + 1}/3`),
+          reply("50.00", `9.99%|${state}|${count + 1}/5`),
         );
       }
-      expect(random).toHaveBeenCalledTimes(2);
+      expect(random).toHaveBeenCalledTimes(4);
     },
   );
 
   it("retains accumulated hits when the AI clears status on every new turn", async () => {
     const random = vi.fn(() => 0.1).mockReturnValueOnce(0.9);
     const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
-    plugin.chats.set("0:0", history(reply("50.00", "10.00%|HIT|1/3")));
-    const statuses = ["89.99%|MISS|1/3", "9.99%|HIT|2/3", "9.99%|CONCEIVED|3/3"];
+    plugin.chats.set("0:0", history(reply("50.00", "10.00%|HIT|1/5")));
+    const statuses = [
+      "89.99%|MISS|1/5",
+      "9.99%|HIT|2/5",
+      "9.99%|HIT|3/5",
+      "9.99%|HIT|4/5",
+      "9.99%|CONCEIVED|5/5",
+    ];
     for (const status of statuses) {
       await plugin.request(requestOf(plugin.chats.get("0:0")!));
       await plugin.complete(reply("50.00", " "));
@@ -1267,26 +1273,26 @@ describe("Sola silent reproductive state", () => {
       expect(saved.message.at(-1)!.data).toBe(reply("50.00", status));
       await plugin.callbacks.output!(outputOf(saved));
     }
-    expect(random).toHaveBeenCalledTimes(3);
+    expect(random).toHaveBeenCalledTimes(5);
     await plugin.request(requestOf(plugin.chats.get("0:0")!));
     await plugin.complete(reply("50.00"));
     expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(
-      reply("50.00", "9.99%|CONCEIVED|3/3"),
+      reply("50.00", "9.99%|CONCEIVED|5/5"),
     );
-    expect(random).toHaveBeenCalledTimes(3);
+    expect(random).toHaveBeenCalledTimes(5);
     await plugin.request(requestOf(plugin.chats.get("0:0")!));
     await plugin.complete(reply("0.00"));
     await plugin.request(requestOf(plugin.chats.get("0:0")!));
     await plugin.complete(reply("50.00"));
-    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("50.00", "9.99%|HIT|1/3"));
-    expect(random).toHaveBeenCalledTimes(4);
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("50.00", "9.99%|HIT|1/5"));
+    expect(random).toHaveBeenCalledTimes(6);
   });
 
   it("starts each rerolled swipe from the preceding turn instead of the replaced result", async () => {
     const random = vi.fn(() => 0);
     const plugin = await startPlugin(storeWithTracker(), false, undefined, false, random);
-    const chat = history(reply("50.00", "10.00%|HIT|1/3"));
-    const original = reply("50.00", "20.00%|HIT|2/3");
+    const chat = history(reply("50.00", "10.00%|HIT|1/5"));
+    const original = reply("50.00", "20.00%|HIT|2/5");
     chat.message.push({
       role: "char", chatId: "rerolled", data: original, swipeId: 0, swipes: [original],
     });
@@ -1300,7 +1306,7 @@ describe("Sola silent reproductive state", () => {
       target.swipes!.push(target.data);
       await plugin.callbacks.output!(outputOf(active));
       const saved = plugin.chats.get("0:0")!.message.at(-1)!;
-      expect(saved.data).toBe(reply("50.00", "0.00%|HIT|2/3"));
+      expect(saved.data).toBe(reply("50.00", "0.00%|HIT|2/5"));
       expect(saved.swipes?.[swipeId]).toBe(saved.data);
       expect(saved.swipes?.[0]).toBe(original);
     }
@@ -1338,7 +1344,7 @@ describe("Sola silent reproductive state", () => {
       target.swipeId = 2;
       await plugin.callbacks.output!(outputOf(active, chatIndex));
       const updated = plugin.chats.get(`0:${chatIndex}`)!.message[0]!;
-      expect(updated.data).toBe(reply("20.00", "0.00%|HIT|1/3"));
+      expect(updated.data).toBe(reply("20.00", "0.00%|HIT|1/5"));
       expect(updated.swipes?.[2]).toBe(updated.data);
       expect(updated.swipes?.slice(0, 2)).toEqual([reply("100.00"), reply("75.00")]);
       expect(random).toHaveBeenCalledTimes(1);
@@ -1389,7 +1395,7 @@ describe("Sola silent reproductive state", () => {
     expect(plugin.chats.get("0:0")!.message[1]!.data).toBe("Tiếp tục.!");
     const newest = plugin.chats.get("0:0")!.message[2]!;
     expect(built.find((message) => message.memo === newest.chatId)!.content).toContain(
-      pregnancy("50.00", "19.99%|HIT|1/3"),
+      pregnancy("50.00", "19.99%|HIT|1/5"),
     );
     getSpy.mockRestore();
     setSpy.mockRestore();
@@ -1404,7 +1410,7 @@ describe("Sola silent reproductive state", () => {
     const event = outputOf(chat);
     await Promise.all([plugin.callbacks.output!(event), plugin.callbacks.output!(event)]);
     expect(random).toHaveBeenCalledTimes(1);
-    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("50.00", "98.99%|MISS|0/3"));
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("50.00", "98.99%|MISS|0/5"));
   });
 
   it("ignores streaming, partial/stale outputs, history polling, display and auxiliary requests", async () => {
@@ -1445,7 +1451,7 @@ describe("Sola silent reproductive state", () => {
     plugin.selectChat(1);
     const other = structuredClone(plugin.chats.get("0:1")!);
     await plugin.complete(reply("100.00"), 0, 0);
-    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("100.00", "0.00%|HIT|1/3"));
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("100.00", "0.00%|HIT|1/5"));
     expect(plugin.chats.get("0:1")).toEqual(other);
     expect(random).toHaveBeenCalledTimes(1);
   });
@@ -1457,7 +1463,7 @@ describe("Sola silent reproductive state", () => {
     const reasoning = `<think>${reply("100.00", "", "Example")}</think>\n`;
     await plugin.complete(reasoning + reply("25.00"));
     const saved = plugin.chats.get("0:0")!.message.at(-1)!.data;
-    expect(saved).toBe(reasoning + reply("25.00", "0.00%|HIT|1/3"));
+    expect(saved).toBe(reasoning + reply("25.00", "0.00%|HIT|1/5"));
     expect(random).toHaveBeenCalledTimes(1);
   });
 
@@ -1478,7 +1484,7 @@ describe("Sola silent reproductive state", () => {
       expect(plugin.chats.get("0:0")!.message.at(-1)!.data).not.toContain("<think>");
       await plugin.callbacks.output!(event);
       expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toContain(
-        pregnancy("25.00", "0.00%|HIT|1/3"),
+        pregnancy("25.00", "0.00%|HIT|1/5"),
       );
       expect(random).toHaveBeenCalledTimes(1);
     } finally {
@@ -1498,7 +1504,7 @@ describe("Sola silent reproductive state", () => {
     expect(plugin.chats.get("0:0")!.message[0]!.data).toBe(reply("100.00"));
     await plugin.complete(reply("25.00"));
     expect(random).toHaveBeenCalledTimes(1);
-    expect(plugin.chats.get("0:0")!.message[1]!.data).toBe(reply("25.00", "0.00%|HIT|1/3"));
+    expect(plugin.chats.get("0:0")!.message[1]!.data).toBe(reply("25.00", "0.00%|HIT|1/5"));
   });
 
   it("does not roll again when automatic or manual Submodel editing creates another swipe", async () => {
@@ -1509,15 +1515,15 @@ describe("Sola silent reproductive state", () => {
     const plugin = await startPlugin(store, false, undefined, false, random);
     plugin.runModel.mockResolvedValue({
       type: "success",
-      result: reply("50.00", "9.99%|HIT|1/3"),
+      result: reply("50.00", "9.99%|HIT|1/5"),
     });
     await plugin.request();
     await plugin.complete(reply("50.00"));
     expect(plugin.runModel).toHaveBeenCalledTimes(1);
     expect(plugin.runModel.mock.calls[0]![0].messages.at(-2).content).toContain(
-      'status="9.99%|HIT|1/3"',
+      'status="9.99%|HIT|1/5"',
     );
-    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("50.00", "9.99%|HIT|1/3"));
+    expect(plugin.chats.get("0:0")!.message.at(-1)!.data).toBe(reply("50.00", "9.99%|HIT|1/5"));
     await plugin.callbacks.output!(outputOf(plugin.chats.get("0:0")!));
     expect(random).toHaveBeenCalledTimes(1);
     expect(plugin.runModel).toHaveBeenCalledTimes(1);
