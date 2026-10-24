@@ -131,15 +131,19 @@ function naturalSolaNsfwPattern(item: string): string {
   if (character) {
     const name = character[1]!.trim();
     value = character[2]!.trim();
-    heading = heading ? `${name}'s ${heading.toLocaleLowerCase("en-US")}` : `${name}'s recorded pattern`;
+    if (heading) {
+      heading = /[À-ỹ]/u.test(heading)
+        ? `${heading} của ${name}`
+        : `${name}'s ${heading}`;
+    } else {
+      heading = `${name}'s recorded pattern`;
+    }
     hasCharacter = true;
-  } else if (heading) {
-    heading = heading.toLocaleLowerCase("en-US");
-  } else {
+  } else if (!heading) {
     heading = "recorded pattern";
   }
-  const label = hasCharacter ? heading : `the ${heading}`;
-  return `${label} “${value.replaceAll("“", "'").replaceAll("”", "'")}”`;
+  const label = hasCharacter ? heading : heading;
+  return `${label}: ${value.replaceAll("“", "'").replaceAll("”", "'")}`;
 }
 
 /** Build a request-only user/assistant exchange that carries the latest pattern ban. */
@@ -149,12 +153,12 @@ export function solaNsfwPatternBanConversation(
 ): { user: string; assistant: string } | undefined {
   const items = solaNsfwPatternItems(patterns);
   if (!items.length && !structureOnly) return undefined;
-  const recorded = items.map(naturalSolaNsfwPattern).join(", ");
+  const recorded = items.map(naturalSolaNsfwPattern).map((item) => `“${item}”`).join("; ");
   const user = items.length
     ? '{{OOC: "Do not repeat the NSFW/NSFL patterns recorded in the tracker above. For the next response, ABSOLUTELY do not use the previous response as a template: do not reuse its writing structure, order, pacing, or dialogue form. CHANGE THE RESPONSE COMPLETELY."}}'
     : '{{OOC: "For the next response, ABSOLUTELY do not use the previous response as a template: do not reuse its writing structure, order, pacing, or dialogue form. CHANGE THE RESPONSE COMPLETELY."}}';
   const assistant = items.length
-    ? `I understand. I will not repeat the recorded NSFW/NSFL choices, including ${recorded}, and I will not use the previous response's structure, order, pacing, or dialogue form as a template. I will change the response completely, use a new structure and dialogue pattern, and describe the same established scene while keeping its facts and continuity intact.`
+    ? `I understand. I will not reuse these recorded NSFW/NSFL patterns: ${recorded}. I will also completely change the previous response's structure, order, pacing, and dialogue form instead of using it as a template. I will use a new structure and dialogue pattern while keeping the established scene facts and continuity intact.`
     : "I understand. I will not use the previous response's structure, order, pacing, or dialogue form as a template. I will change the response completely and use a new structure and dialogue pattern while keeping established scene facts and continuity intact.";
   return {
     user,
