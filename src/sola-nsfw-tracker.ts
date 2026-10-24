@@ -88,8 +88,7 @@ const PATTERN_FIELDS = new Set([
   "phản ứng thân thể / hành động nsfl",
 ]);
 
-/** Wrap each recorded item in a request-only ban for the response about to be written. */
-export function solaNsfwPatternBanPrompt(patterns: string): string {
+function solaNsfwPatternItems(patterns: string): string[] {
   let heading = "";
   const items: string[] = [];
   for (const raw of patterns.split(/\r?\n/)) {
@@ -109,14 +108,53 @@ export function solaNsfwPatternBanPrompt(patterns: string): string {
       .replace(/^[[\]"'“”‘’\s]+|[[\]"'“”‘’\s.!]+$/gu, "");
     if (/^(?:None|Không có)$/iu.test(value)) continue;
     const item = heading ? `${heading}\n${line}` : line;
-    items.push(`<banned_pattern>\n${escapeHtml(item)}\n</banned_pattern>`);
+    items.push(item);
   }
-  if (!items.length) return "";
-  return `## NSFW/NSFL Pattern Ban
-- In the next generated response, treat EVERY recorded item below as an ABSOLUTE WRITING BAN: do not reuse its wording, structure, rhythm, pacing, or reaction pattern; replace it with a new compatible construction.
-- NEVER repeat, closely paraphrase, synonym-swap, or copy any recorded pattern into the new response or tracker.
+  return items;
+}
 
-${items.join("\n\n")}`;
+function naturalSolaNsfwPattern(item: string): string {
+  const lines = item
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const first = lines.shift() ?? "";
+  const headingMatch = first.match(/^([^:]+):\s*(.*)$/u);
+  let heading = headingMatch?.[1]?.trim() ?? "";
+  let value = headingMatch?.[2]?.trim() ?? first;
+  if (!value && lines.length > 0) {
+    value = lines.shift() ?? "";
+  }
+  if (lines.length > 0) value = [value, ...lines].filter(Boolean).join(" ");
+  const character = value.match(/^\[([^\]]+)\]\s*:\s*(.*)$/u);
+  let hasCharacter = false;
+  if (character) {
+    const name = character[1]!.trim();
+    value = character[2]!.trim();
+    heading = heading ? `${name}'s ${heading.toLocaleLowerCase("en-US")}` : `${name}'s recorded pattern`;
+    hasCharacter = true;
+  } else if (heading) {
+    heading = heading.toLocaleLowerCase("en-US");
+  } else {
+    heading = "recorded pattern";
+  }
+  const label = hasCharacter ? heading : `the ${heading}`;
+  return `${label} “${value.replaceAll("“", "'").replaceAll("”", "'")}”`;
+}
+
+/** Build a request-only user/assistant exchange that carries the latest pattern ban. */
+export function solaNsfwPatternBanConversation(
+  patterns: string,
+): { user: string; assistant: string } | undefined {
+  const items = solaNsfwPatternItems(patterns);
+  if (!items.length) return undefined;
+  const recorded = items.map(naturalSolaNsfwPattern).join(", ");
+  return {
+    user:
+      '{{OOC: "Do not repeat the NSFW/NSFL patterns recorded in the tracker above. For the next response, ABSOLUTELY do not use the previous response as a template: do not reuse its writing structure, order, pacing, or dialogue form. CHANGE THE RESPONSE COMPLETELY."}}',
+    assistant:
+      `I understand. I will not repeat the recorded NSFW/NSFL choices, including ${recorded}, and I will not use the previous response's structure, order, pacing, or dialogue form as a template. I will change the response completely, use a new structure and dialogue pattern, and describe the same established scene while keeping its facts and continuity intact.`,
+  };
 }
 
 function escapeHtml(value: string): string {

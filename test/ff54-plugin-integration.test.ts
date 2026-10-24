@@ -1010,13 +1010,13 @@ describe("Sola saved-history restoration", () => {
     expect(rerolledResponse?.content).not.toContain("<nsfw_nsfl_tracker>");
     expect(rerolledResponse?.content).not.toContain("<sex_tracker>");
     expect(rerolledResponse?.content).toContain("bản swipe mới.");
-    expect(rerolledRequest.some((message) => message.memo?.endsWith(":nsfw-pattern-ban"))).toBe(
-      false,
-    );
+    expect(
+      rerolledRequest.some((message) => message.memo?.includes(":nsfw-pattern-ban-")),
+    ).toBe(false);
   });
 
   it.each(["delete", "branch"] as const)(
-    "wraps the active swipe's restored tracker in the final system ban after %s",
+    "injects the active swipe's restored tracker ban before the next user after %s",
     async (action) => {
       const store = solaStore();
       store.presets[0]!.settings.solaNsfwTrackerEnabled = true;
@@ -1050,12 +1050,22 @@ describe("Sola saved-history restoration", () => {
       plugin.chats.set(`0:${chatIndex}`, shortened);
       plugin.selectChat(chatIndex);
       const request = await plugin.request([...staleRequest, { role: "user", content: "Tiếp." }]);
-      const bans = request.filter((message) => message.memo?.endsWith(":nsfw-pattern-ban"));
+      const banUsers = request.filter((message) =>
+        message.memo?.endsWith(":nsfw-pattern-ban-user"),
+      );
+      const bans = request.filter((message) =>
+        message.memo?.endsWith(":nsfw-pattern-ban-assistant"),
+      );
+      expect(banUsers).toHaveLength(1);
       expect(bans).toHaveLength(1);
-      expect(bans[0]!.role).toBe("system");
-      expect(request.at(-1)).toBe(bans[0]);
+      expect(bans[0]!.role).toBe("assistant");
       expect(bans[0]!.content).toContain("mẫu swipe đang chọn");
       expect(bans[0]!.content).not.toContain("mẫu ban đầu");
+      const nextUserIndex = request.findIndex(
+        (message) => message.role === "user" && message.content === "Tiếp.",
+      );
+      expect(request[nextUserIndex - 2]).toBe(banUsers[0]);
+      expect(request[nextUserIndex - 1]).toBe(bans[0]);
       expect(request.find((message) => message.memo === "sola-a-0")?.content).not.toContain(
         "<nsfw_nsfl_tracker>",
       );

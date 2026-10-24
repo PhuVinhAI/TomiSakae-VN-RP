@@ -13,7 +13,10 @@ import {
 } from "../src/core.js";
 import { restoreSolaHistoryContent, type SolaHistoryRemoval } from "../src/sola-history.js";
 import { estimatePluginPromptTokens } from "../src/token-estimate.js";
-import { solaNsfwPatternBanPrompt, splitSolaNsfwTracker } from "../src/sola-nsfw-tracker.js";
+import {
+  solaNsfwPatternBanConversation,
+  splitSolaNsfwTracker,
+} from "../src/sola-nsfw-tracker.js";
 
 let sola: FfPreset;
 let ff54: FfPreset;
@@ -251,7 +254,7 @@ describe("Sola NSFW Tracker", () => {
     }
   });
 
-  it("places the latest response's ban as the final system message after all preset prompts", async () => {
+  it("injects the latest response's ban as a request-only exchange before the latest user", async () => {
     const settings = createDefaultSettings(sola);
     settings.solaNsfwTrackerEnabled = true;
     settings.solaSexTrackerEnabled = true;
@@ -280,37 +283,40 @@ describe("Sola NSFW Tracker", () => {
     expect(assistants.every((message) => !message.content.includes("<nsfw_nsfl_tracker>"))).toBe(
       true,
     );
-    expect(assistants.at(-1)?.content).toContain("<sex_tracker>Trạng thái hiện tại</sex_tracker>");
-    const bans = built.filter((message) => message.memo?.endsWith(":nsfw-pattern-ban"));
-    expect(bans).toHaveLength(1);
-    const ban = bans[0]!;
-    expect(ban.role).toBe("system");
-    expect(ban.content).toContain("ABSOLUTE WRITING BAN");
-    expect(ban.content).toContain("In the next generated response");
-    expect(ban.content).toContain("into the new response or tracker");
-    expect(ban.content).toContain(
-      "NEVER repeat, closely paraphrase, synonym-swap, or copy any recorded pattern",
+    expect(
+      assistants.find((message) => message.memo === "latest-response")?.content,
+    ).toContain("<sex_tracker>Trạng thái hiện tại</sex_tracker>");
+    const banUsers = built.filter((message) => message.memo?.endsWith(":nsfw-pattern-ban-user"));
+    const banAssistants = built.filter((message) =>
+      message.memo?.endsWith(":nsfw-pattern-ban-assistant"),
     );
-    expect(ban.content).toContain("replace it with a new compatible construction");
-    expect(ban.content).not.toMatch(/RESTRUCTURE|response layout|block order/);
-    expect(ban.content).toContain("Description patterns: mẫu mới");
-    expect(ban.content).toContain("Initiation/Foreplay:\n[Nana]: gradual undressing");
-    expect(ban.content).toContain("Pose/Action/Stimulation:\n[Nana]: shifting pressure");
-    expect(ban.content).toContain("Dialogue patterns:\n[Nana]: &quot;Lại đây.&quot;");
-    expect(ban.content).toContain("Moans/Vocal reactions:\n[Nana]: breath catching");
-    expect(ban.content.match(/<banned_pattern>/g)).toHaveLength(6);
-    expect(ban.content).not.toContain("mẫu cũ");
+    expect(banUsers).toHaveLength(1);
+    expect(banAssistants).toHaveLength(1);
+    const banUser = banUsers[0]!;
+    const banAssistant = banAssistants[0]!;
+    expect(banUser.role).toBe("user");
+    expect(banUser.content).toContain("{{OOC:");
+    expect(banUser.content).toContain("patterns recorded in the tracker above");
+    expect(banUser.content).toContain("do not reuse its writing structure, order, pacing, or dialogue form");
+    expect(banUser.content).toContain("CHANGE THE RESPONSE COMPLETELY");
+    expect(banAssistant.role).toBe("assistant");
+    expect(banAssistant.content).toContain("I understand");
+    expect(banAssistant.content).toContain("I will not repeat");
+    expect(banAssistant.content).toContain("I will not use the previous response's structure, order, pacing, or dialogue form as a template");
+    expect(banAssistant.content).toContain("I will change the response completely");
+    expect(banAssistant.content).toContain("description patterns “mẫu mới”");
+    expect(banAssistant.content).toContain("Nana's initiation/foreplay “gradual undressing”");
+    expect(banAssistant.content).toContain("Nana's pose/action/stimulation “shifting pressure”");
+    expect(banAssistant.content).toContain('Nana\'s dialogue patterns “"Lại đây."”');
+    expect(banAssistant.content).toContain("Nana's moans/vocal reactions “breath catching”");
+    expect(banAssistant.content).not.toContain("mẫu cũ");
+    expect(built.filter((message) => message.role === "system" && message.content.includes("NSFW/NSFL Pattern Ban"))).toHaveLength(0);
     const userIndex = built.findIndex((message) => message.memo === "latest-user");
+    expect(built[userIndex - 2]).toBe(banUser);
+    expect(built[userIndex - 1]).toBe(banAssistant);
     expect(built[userIndex]!.content).toContain("Tiếp tục.\n\n{{\n");
     expect(built[userIndex]!.content).toContain("## Reproductive Reality");
     expect(built[userIndex + 1]?.memo).toBe("vn-rp:sola:card-image-catalog");
-    expect(built.at(-1)).toBe(ban);
-    expect(
-      built.filter(
-        (message) =>
-          message.role === "system" && message.content.includes("## NSFW/NSFL Pattern Ban"),
-      ),
-    ).toEqual([ban]);
     expect(messages).toEqual(snapshot);
   });
 
@@ -323,9 +329,10 @@ describe("Sola NSFW Tracker", () => {
       );
       const settings = createDefaultSettings(sola);
       settings.solaNsfwTrackerEnabled = true;
-      const ban = solaNsfwPatternBanPrompt(splitSolaNsfwTracker(legacy).patterns);
-      expect(ban).not.toContain("old layout");
-      expect(ban).toContain("Description patterns: mẫu");
+      const ban = solaNsfwPatternBanConversation(splitSolaNsfwTracker(legacy).patterns);
+      expect(ban?.assistant).not.toContain("old layout");
+      expect(ban?.assistant).toContain("description patterns");
+      expect(ban?.assistant).toContain("mẫu");
       const displayed = applyRegexScripts(legacy, sola, settings, {
         placement: PLACEMENT_AI_OUTPUT,
         markdown: true,
@@ -357,11 +364,11 @@ describe("Sola NSFW Tracker", () => {
       parse,
       macro,
     );
-    const swipeBan = swipe.find((message) => message.memo?.endsWith(":nsfw-pattern-ban"));
+    const swipeBan = swipe.find((message) => message.memo?.endsWith(":nsfw-pattern-ban-assistant"));
     expect(swipeBan?.content).toContain("swipe được chọn");
     expect(swipeBan?.content).not.toContain("nhánh đầu");
-    expect(swipeBan?.role).toBe("system");
-    expect(swipe.at(-1)).toBe(swipeBan);
+    expect(swipeBan?.role).toBe("assistant");
+    expect(swipe.filter((message) => message.memo?.endsWith(":nsfw-pattern-ban-user"))).toHaveLength(1);
 
     const continued = await buildRequestMessages(
       [
@@ -374,7 +381,7 @@ describe("Sola NSFW Tracker", () => {
       parse,
       macro,
     );
-    expect(continued.some((message) => message.memo?.endsWith(":nsfw-pattern-ban"))).toBe(false);
+    expect(continued.some((message) => message.memo?.endsWith(":nsfw-pattern-ban-user"))).toBe(false);
     const disabled = await buildRequestMessages(
       built,
       sola,
@@ -382,12 +389,10 @@ describe("Sola NSFW Tracker", () => {
       parse,
       macro,
     );
-    expect(disabled.some((message) => message.memo?.endsWith(":nsfw-pattern-ban"))).toBe(false);
+    expect(disabled.some((message) => message.memo?.endsWith(":nsfw-pattern-ban-user"))).toBe(false);
     const branch = await buildRequestMessages(history.slice(0, 1), sola, settings, parse, macro);
-    const branchBan = branch.find((message) => message.memo?.endsWith(":nsfw-pattern-ban"));
-    expect(branchBan?.content).toContain("nhánh đầu");
-    expect(branchBan?.role).toBe("system");
-    expect(branch.at(-1)).toBe(branchBan);
+    const branchBan = branch.find((message) => message.memo?.endsWith(":nsfw-pattern-ban-assistant"));
+    expect(branchBan).toBeUndefined();
   });
 
   it("does not convert user trackers, disabled trackers, or FF5.4 history into bans", async () => {
@@ -398,7 +403,7 @@ describe("Sola NSFW Tracker", () => {
     const enabled = createDefaultSettings(sola);
     enabled.solaNsfwTrackerEnabled = true;
     const userOnly = await buildRequestMessages(messages, sola, enabled, async (value) => value);
-    expect(userOnly.some((message) => message.memo?.endsWith(":nsfw-pattern-ban"))).toBe(false);
+    expect(userOnly.some((message) => message.memo?.endsWith(":nsfw-pattern-ban-user"))).toBe(false);
     for (const preset of [sola, ff54]) {
       const settings = createDefaultSettings(preset);
       settings.solaNsfwTrackerEnabled = preset === ff54;
@@ -408,7 +413,7 @@ describe("Sola NSFW Tracker", () => {
         settings,
         async (value) => value,
       );
-      expect(request.some((message) => message.memo?.endsWith(":nsfw-pattern-ban"))).toBe(false);
+      expect(request.some((message) => message.memo?.endsWith(":nsfw-pattern-ban-user"))).toBe(false);
       expect(request.find((message) => message.memo === "host-response")?.content).toContain(
         "<nsfw_nsfl_tracker>",
       );
@@ -420,13 +425,13 @@ describe("Sola NSFW Tracker", () => {
       "<sola_hud><nsfw_nsfl_tracker>Tiếp cận/Dạo đầu: chậm rồi ngắt\nPhản ứng thân thể / Hành động NSFL:\n[Nana]: Không có<sex_tracker>Giữ lại</sex_tracker></sola_hud>";
     const extracted = splitSolaNsfwTracker(raw);
     expect(extracted.content).toBe("<sola_hud><sex_tracker>Giữ lại</sex_tracker></sola_hud>");
-    const ban = solaNsfwPatternBanPrompt(extracted.patterns);
-    expect(ban.match(/<banned_pattern>/g)).toHaveLength(1);
-    expect(ban).toContain("Tiếp cận/Dạo đầu: chậm rồi ngắt");
-    expect(ban).not.toContain("Không có");
-    expect(solaNsfwPatternBanPrompt("NSFL bodily response / action:\n[Nana]: None")).toBe("");
-    expect(solaNsfwPatternBanPrompt("Description patterns: </banned_pattern>")).toContain(
-      "&lt;/banned_pattern&gt;",
+    const ban = solaNsfwPatternBanConversation(extracted.patterns);
+    expect(ban?.assistant).toContain("tiếp cận/dạo đầu");
+    expect(ban?.assistant).toContain("chậm rồi ngắt");
+    expect(ban?.assistant).not.toContain("Không có");
+    expect(solaNsfwPatternBanConversation("NSFL bodily response / action:\n[Nana]: None")).toBeUndefined();
+    expect(solaNsfwPatternBanConversation("Description patterns: </banned_pattern>")?.assistant).toContain(
+      "</banned_pattern>",
     );
   });
 
@@ -435,13 +440,13 @@ describe("Sola NSFW Tracker", () => {
     ["Tiếp cận/Dạo đầu", "- [Nana]: bước tới", "- [Mina]: lùi lại"],
     ["**Kiểu thoại**", "**Nana:** câu hỏi ngắt quãng", "**Mina:** câu trả lời ngắn"],
   ])("keeps the %s heading with every character's banned pattern", (heading, first, second) => {
-    const ban = solaNsfwPatternBanPrompt(
+    const ban = solaNsfwPatternBanConversation(
       `${heading}:\n${first}\n${second}\nSensory emphasis: warmth`,
     );
-    expect(ban).toContain(`<banned_pattern>\n${heading}:\n${first}\n</banned_pattern>`);
-    expect(ban).toContain(`<banned_pattern>\n${heading}:\n${second}\n</banned_pattern>`);
-    expect(ban).toContain("<banned_pattern>\nSensory emphasis: warmth\n</banned_pattern>");
-    expect(ban.match(/<banned_pattern>/g)).toHaveLength(3);
+    expect(ban?.assistant).toContain(first.replace(/^[*-]\s+/u, ""));
+    expect(ban?.assistant).toContain(second.replace(/^[*-]\s+/u, ""));
+    expect(ban?.assistant).toContain("warmth");
+    expect(ban?.assistant).not.toContain("<banned_pattern>");
   });
 
   it.each([
@@ -453,27 +458,26 @@ describe("Sola NSFW Tracker", () => {
     "None",
     "- [Nana]: `None`",
   ])("omits empty patterns written as %s", (empty) => {
-    expect(solaNsfwPatternBanPrompt(`Phản ứng thân thể / Hành động NSFL:\n${empty}`)).toBe("");
-    const ban = solaNsfwPatternBanPrompt(`Kiểu thoại:\n${empty}\nMina: câu hỏi ngắt quãng`);
-    expect(ban).toBe(solaNsfwPatternBanPrompt("Kiểu thoại:\nMina: câu hỏi ngắt quãng"));
+    expect(solaNsfwPatternBanConversation(`Phản ứng thân thể / Hành động NSFL:\n${empty}`)).toBeUndefined();
+    const ban = solaNsfwPatternBanConversation(`Kiểu thoại:\n${empty}\nMina: câu hỏi ngắt quãng`);
+    const expected = solaNsfwPatternBanConversation("Kiểu thoại:\nMina: câu hỏi ngắt quãng");
+    expect(ban).toEqual(expected);
   });
 
   it("omits empty inline fields without carrying a previous heading into the next item", () => {
-    expect(solaNsfwPatternBanPrompt("NSFL bodily response / action: **None**")).toBe("");
-    const ban = solaNsfwPatternBanPrompt(
+    expect(solaNsfwPatternBanConversation("NSFL bodily response / action: **None**")).toBeUndefined();
+    const ban = solaNsfwPatternBanConversation(
       "Kiểu thoại:\nNana: câu hỏi ngắn\nĐiểm nhấn cảm giác: Không có\nTư thế/Hành động/Kích thích:\n[Mina]: lùi lại",
     );
-    expect(ban).not.toContain("Không có");
-    expect(ban).not.toContain("Điểm nhấn cảm giác");
-    expect(ban).toContain("<banned_pattern>\nKiểu thoại:\nNana: câu hỏi ngắn\n</banned_pattern>");
-    expect(ban).toContain(
-      "<banned_pattern>\nTư thế/Hành động/Kích thích:\n[Mina]: lùi lại\n</banned_pattern>",
-    );
+    expect(ban?.assistant).not.toContain("Không có");
+    expect(ban?.assistant).not.toContain("Điểm nhấn cảm giác");
+    expect(ban?.assistant).toContain("kiểu thoại “Nana: câu hỏi ngắn”");
+    expect(ban?.assistant).toContain("Mina's tư thế/hành động/kích thích “lùi lại”");
   });
 
   it("keeps meaningful patterns that contain the words Không có", () => {
-    const ban = solaNsfwPatternBanPrompt("Kiểu thoại:\nNana: Không có câu trả lời trọn vẹn");
-    expect(ban).toContain("Kiểu thoại:\nNana: Không có câu trả lời trọn vẹn");
+    const ban = solaNsfwPatternBanConversation("Kiểu thoại:\nNana: Không có câu trả lời trọn vẹn");
+    expect(ban?.assistant).toContain("Không có câu trả lời trọn vẹn");
   });
 
   it("counts the injected module in token estimates", async () => {

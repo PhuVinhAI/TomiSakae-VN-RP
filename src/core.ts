@@ -29,7 +29,7 @@ import { cardImagePrompt, type CardImageCatalog } from "./card-images.js";
 import {
   adaptSolaNsfwTrackerForDisplay,
   expireSolaNsfwTracker,
-  solaNsfwPatternBanPrompt,
+  solaNsfwPatternBanConversation,
   solaNsfwTrackerPrompt,
   splitSolaNsfwTracker,
   SOLA_NSFW_TRACKER_MEMO,
@@ -1119,7 +1119,7 @@ export async function buildRequestMessages(
         hostMessage.content = hostMessage.content.slice(0, -suffix.length);
       return hostMessage;
     });
-  let nsfwPatternBan = "";
+  let nsfwPatternBanConversation: { user: string; assistant: string } | undefined;
   if (familyOf(preset) === "sola" && settings.solaNsfwTrackerEnabled) {
     const latestResponse = [...hostMessages]
       .reverse()
@@ -1129,7 +1129,8 @@ export async function buildRequestMessages(
       if (message.role !== "assistant" || isChatComment(message)) continue;
       const extracted = splitSolaNsfwTracker(message.content);
       const patterns = extracted.patterns || message.vnRpNsfwTracker || "";
-      if (message === latestResponse) nsfwPatternBan = solaNsfwPatternBanPrompt(patterns);
+      if (message === latestResponse)
+        nsfwPatternBanConversation = solaNsfwPatternBanConversation(patterns);
       hostMessages[index] = {
         ...message,
         content: extracted.content,
@@ -1168,6 +1169,33 @@ export async function buildRequestMessages(
       }
     }
   }
+  if (nsfwPatternBanConversation) {
+    const latestUserIndex = [...historyWithPrompts]
+      .map((message, index) => ({ message, index }))
+      .reverse()
+      .find(
+        ({ message }) =>
+          message.role === "user" &&
+          !isChatComment(message) &&
+          !isPluginMemo(message.memo),
+      )?.index;
+    if (latestUserIndex !== undefined) {
+      historyWithPrompts.splice(
+        latestUserIndex,
+        0,
+        {
+          role: "user",
+          content: nsfwPatternBanConversation.user,
+          memo: `${pluginMemoPrefix(preset)}nsfw-pattern-ban-user`,
+        },
+        {
+          role: "assistant",
+          content: nsfwPatternBanConversation.assistant,
+          memo: `${pluginMemoPrefix(preset)}nsfw-pattern-ban-assistant`,
+        },
+      );
+    }
+  }
   return [
     ...composed.leading,
     ...(settings.vietnameseOutputEnabled
@@ -1181,14 +1209,5 @@ export async function buildRequestMessages(
       : []),
     ...historyWithPrompts,
     ...composed.trailing,
-    ...(nsfwPatternBan
-      ? [
-          {
-            role: "system" as const,
-            content: nsfwPatternBan,
-            memo: `${pluginMemoPrefix(preset)}nsfw-pattern-ban`,
-          },
-        ]
-      : []),
   ];
 }
