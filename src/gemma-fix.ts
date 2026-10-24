@@ -52,6 +52,9 @@ const VIETNAMESE_OUTPUT_RULES = `- ALL visible text MUST use natural Vietnamese 
 const DIALOGUE_PRIORITY_RULES = `- {{user}} has an EXTREMELY STRONG PREFERENCE for frequent, substantial spoken dialogue from {{char}} and short, direct descriptive paragraphs; {{user}} has an EXTREMELY STRONG AVERSION to long or continuous internal or emotional description.
 - {{char}} MUST speak frequently and substantially in EVERY response; during NSFW scenes, alternate fitting stimulating dirty talk and explicit sexual moans across separate beats, choosing either dirty talk or a moan for each beat as appropriate; keep them engaging and consistent with {{char}}'s established voice and personality; NEVER replace {{char}}'s spoken participation with uninterrupted descriptive prose.`;
 
+const VOCALIZATION_VARIETY_RULES = `- {{user}} has an EXTREMELY STRONG PREFERENCE for varied, expressive, and sexually suggestive vocalizations instead of repetitive moans.
+- {{char}} MUST frequently vary vocalizations in sound, length, rhythm, intensity, breath, interruption, and wording to match each physical beat and {{char}}'s established voice; NEVER repeat the same moan pattern by default.`;
+
 const IMAGE_USE_RULES = `- Render many images throughout the response, placing each beside its matching beat with narration or dialogue between images.
 - ONLY use available card/lore images matching the current state; when no NSFW/NSFL action applies, match the current outfit first, then the most specific action, pose, or body state, then the expression; use exact supported image-tag syntax and identifiers.
 - BAN ALL duplicate image identifiers within the SAME response; NEVER render one identifier more than ONCE, including after other images, text, or state changes.
@@ -66,6 +69,7 @@ export function gemmaFixPrompt(): string {
     ["User Agency", USER_NSFW_RULES],
     ["Vietnamese Output", VIETNAMESE_OUTPUT_RULES],
     ["Dialogue Priority", DIALOGUE_PRIORITY_RULES],
+    ["Vocalization Variety", VOCALIZATION_VARIETY_RULES],
     ["Image Use", IMAGE_USE_RULES],
     ["Reproductive Reality", REPRODUCTIVE_REALITY_RULES],
     ["Environmental Reality", ENVIRONMENTAL_REALITY_RULES],

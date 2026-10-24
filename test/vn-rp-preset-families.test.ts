@@ -139,6 +139,7 @@ describe("TomiSakae VN-RP preset families", () => {
       "User Agency",
       "Vietnamese Output",
       "Dialogue Priority",
+      "Vocalization Variety",
       "Image Use",
       "Reproductive Reality",
       "Environmental Reality",
@@ -148,7 +149,7 @@ describe("TomiSakae VN-RP preset families", () => {
       "Active Intimacy",
       "Somatic Trauma",
     ]) expect(prompt).toContain(`## ${section}\n`);
-    expect(prompt).toContain("EVERY RESPONSE MUST contain a concrete NSFW/NSFL beat grounded in the current scene and card/lore, with explicit, graphically detailed action, anatomy, or sensation");
+    expect(prompt).toContain("EVERY RESPONSE MUST contain a concrete NSFW/NSFL beat grounded in the current scene and card/lore, rendered in short, direct descriptive prose with explicit, graphically detailed action, anatomy, or sensation");
     expect(prompt).toContain("FOR EACH distinct NSFW/NSFL action by {{char}}, {{user}}, or another NPC");
     expect(prompt).not.toContain("AVOID safe defaults");
     expect(prompt).not.toContain("ONE text type per line");
