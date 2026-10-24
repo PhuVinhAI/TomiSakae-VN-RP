@@ -50,7 +50,7 @@ const VIETNAMESE_OUTPUT_RULES = `- ALL visible text MUST use natural Vietnamese 
 - BAN ALL repetition or paraphrasing of {{user}}'s words; NEVER write {{user}}'s dialogue.`;
 
 const DIALOGUE_PRIORITY_RULES = `- {{user}} has an EXTREMELY STRONG PREFERENCE for frequent, substantial spoken dialogue from {{char}} and short, direct descriptive paragraphs; {{user}} has an EXTREMELY STRONG AVERSION to long or continuous internal or emotional description.
-- {{char}} MUST speak frequently and substantially in EVERY response; during NSFW scenes, {{char}} MUST deliver fitting stimulating dirty talk or explicit sexual moans that engage {{user}}, consistent with {{char}}'s established voice and personality; NEVER replace {{char}}'s spoken participation with uninterrupted descriptive prose.`;
+- {{char}} MUST speak frequently and substantially in EVERY response; during NSFW scenes, alternate fitting stimulating dirty talk and explicit sexual moans across separate beats, choosing either dirty talk or a moan for each beat as appropriate; keep them engaging and consistent with {{char}}'s established voice and personality; NEVER replace {{char}}'s spoken participation with uninterrupted descriptive prose.`;
 
 const IMAGE_USE_RULES = `- Render many images throughout the response, placing each beside its matching beat with narration or dialogue between images.
 - ONLY use available card/lore images matching the current state; when no NSFW/NSFL action applies, match the current outfit first, then the most specific action, pose, or body state, then the expression; use exact supported image-tag syntax and identifiers.
